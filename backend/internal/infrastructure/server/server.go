@@ -9,9 +9,10 @@ import (
 	"syscall"
 	"time"
 
+	"go.uber.org/zap"
+
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/config"
 	router "github.com/Unikyri/WealthScope/backend/internal/interfaces/http"
-	"go.uber.org/zap"
 )
 
 // Server represents the HTTP server

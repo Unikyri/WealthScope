@@ -3,8 +3,9 @@ package handlers
 import (
 	"time"
 
-	"github.com/Unikyri/WealthScope/backend/pkg/response"
 	"github.com/gin-gonic/gin"
+
+	"github.com/Unikyri/WealthScope/backend/pkg/response"
 )
 
 // HealthHandler handles health check endpoints

@@ -1,11 +1,12 @@
 package database
 
 import (
-	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/config"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+
+	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/config"
 )
 
 // Connect establishes a connection to the PostgreSQL database

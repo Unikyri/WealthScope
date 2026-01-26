@@ -3,10 +3,11 @@ package main
 import (
 	"log"
 
+	"go.uber.org/zap"
+
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/config"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/database"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/server"
-	"go.uber.org/zap"
 )
 
 func main() {
@@ -25,7 +26,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to initialize logger: %v", err)
 	}
-	defer logger.Sync()
+	defer func() {
+		_ = logger.Sync()
+	}()
 
 	logger.Info("Starting WealthScope API",
 		zap.String("mode", cfg.Server.Mode),

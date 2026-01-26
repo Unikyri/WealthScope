@@ -1,9 +1,10 @@
 package http
 
 import (
-	"github.com/Unikyri/WealthScope/backend/internal/interfaces/http/handlers"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+
+	"github.com/Unikyri/WealthScope/backend/internal/interfaces/http/handlers"
 )
 
 // NewRouter creates and configures a new Gin router

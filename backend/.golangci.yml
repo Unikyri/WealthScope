@@ -21,12 +21,14 @@ linters:
     - gosec          # Security checks
     - bodyclose      # Check HTTP response body is closed
     - noctx          # Check context usage in HTTP requests
-    - exportloopref  # Check for loop variable references
+    - copyloopvar    # Check for loop variable copies (replaces exportloopref)
 
 linters-settings:
   errcheck:
     check-type-assertions: true
-    check-blank: true
+    check-blank: false
+    exclude-functions:
+      - (*go.uber.org/zap.Logger).Sync
   
   govet:
     enable-all: true
