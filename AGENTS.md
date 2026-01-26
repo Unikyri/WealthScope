@@ -136,6 +136,46 @@ Refer to the wiki for detailed specifications:
 - `WealthScope.wiki/Shadow-Pricing.md` - Illiquid asset valuation
 - `WealthScope.wiki/Security-Privacy.md` - Security requirements
 - `WealthScope.wiki/Sprint-Plan.md` - Development timeline
+- `WealthScope.wiki/CI-CD-GitFlow.md` - Git workflow and CI/CD
+
+## Git Workflow
+
+### Branches
+
+| Branch | Purpose |
+|--------|---------|
+| `main` | Production, always stable |
+| `develop` | Integration branch |
+| `feature/*` | New features |
+| `hotfix/*` | Urgent fixes from main |
+
+### Commit Convention
+
+```bash
+feat: add new feature
+fix: bug fix
+docs: documentation
+chore: maintenance
+test: add tests
+refactor: code refactor
+```
+
+### Workflow
+
+```bash
+# New feature
+git checkout develop && git pull
+git checkout -b feature/my-feature
+# ... work and commit ...
+git push -u origin feature/my-feature
+# Create PR to develop
+
+# Hotfix
+git checkout main && git pull
+git checkout -b hotfix/fix-name
+# ... fix and commit ...
+# Create PR to main, then sync develop
+```
 
 ## AI Assistant Guidelines
 
