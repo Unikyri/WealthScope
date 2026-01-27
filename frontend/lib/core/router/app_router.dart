@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:wealthscope_app/features/auth/presentation/screens/register_screen.dart';
+import 'package:wealthscope_app/features/profile/presentation/screens/profile_screen.dart';
 import 'package:wealthscope_app/features/splash/presentation/screens/splash_screen.dart';
 
 /// Application Router Configuration
@@ -27,6 +28,11 @@ class AppRouter {
         path: '/login',
         name: 'login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/profile',
+        name: 'profile',
+        builder: (context, state) => const ProfileScreen(),
       ),
       // TODO: Add dashboard route
       GoRoute(
