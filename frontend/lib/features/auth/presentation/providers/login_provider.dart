@@ -80,7 +80,7 @@ class LoginNotifier extends _$LoginNotifier {
     }
 
     // End cooldown and reset attempts
-    Future.delayed(Duration(seconds: _cooldownSeconds), () {
+    Future.delayed(const Duration(seconds: _cooldownSeconds), () {
       state = state.copyWith(
         isCooldownActive: false,
         cooldownSeconds: 0,
