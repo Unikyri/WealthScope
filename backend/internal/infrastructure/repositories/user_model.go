@@ -10,12 +10,12 @@ import (
 
 // UserModel is the GORM model for the users table
 type UserModel struct {
-	ID          uuid.UUID `gorm:"type:uuid;primaryKey"`
+	CreatedAt   time.Time `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt   time.Time `gorm:"column:updated_at;autoUpdateTime"`
 	Email       string    `gorm:"uniqueIndex;not null"`
 	DisplayName string    `gorm:"column:display_name"`
 	AvatarURL   string    `gorm:"column:avatar_url"`
-	CreatedAt   time.Time `gorm:"column:created_at;autoCreateTime"`
-	UpdatedAt   time.Time `gorm:"column:updated_at;autoUpdateTime"`
+	ID          uuid.UUID `gorm:"type:uuid;primaryKey"`
 }
 
 // TableName returns the table name for GORM

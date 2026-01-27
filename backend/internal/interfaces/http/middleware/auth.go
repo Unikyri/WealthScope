@@ -115,11 +115,15 @@ func GetUserID(c *gin.Context) (uuid.UUID, bool) {
 
 // GetUserEmail extracts user email from gin context
 func GetUserEmail(c *gin.Context) string {
-	email, _ := c.Get(string(UserEmailKey))
-	if email == nil {
+	email, exists := c.Get(string(UserEmailKey))
+	if !exists || email == nil {
 		return ""
 	}
-	return email.(string)
+	emailStr, ok := email.(string)
+	if !ok {
+		return ""
+	}
+	return emailStr
 }
 
 // OptionalAuthMiddleware extracts user info if token present, but doesn't require it

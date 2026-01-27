@@ -8,12 +8,12 @@ import (
 
 // User represents a user in the system
 type User struct {
-	ID          uuid.UUID `json:"id"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 	Email       string    `json:"email"`
 	DisplayName string    `json:"display_name,omitempty"`
 	AvatarURL   string    `json:"avatar_url,omitempty"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID          uuid.UUID `json:"id"`
 }
 
 // NewUser creates a new User with the given ID and email

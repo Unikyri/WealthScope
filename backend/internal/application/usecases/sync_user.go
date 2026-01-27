@@ -13,9 +13,9 @@ import (
 
 // SyncUserInput represents the input for syncing a user
 type SyncUserInput struct {
-	UserID      uuid.UUID
 	Email       string
 	DisplayName string
+	UserID      uuid.UUID
 }
 
 // SyncUserOutput represents the output of syncing a user
