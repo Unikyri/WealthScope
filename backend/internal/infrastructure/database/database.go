@@ -106,13 +106,13 @@ func (d *DB) Close() error {
 
 // HealthStatus represents the database health status
 type HealthStatus struct {
-	Connected   bool   `json:"connected"`
 	Latency     string `json:"latency,omitempty"`
 	Error       string `json:"error,omitempty"`
 	MaxOpenConn int    `json:"max_open_connections"`
 	OpenConn    int    `json:"open_connections"`
 	InUse       int    `json:"in_use"`
 	Idle        int    `json:"idle"`
+	Connected   bool   `json:"connected"`
 }
 
 // GetHealthStatus returns detailed health status of the database

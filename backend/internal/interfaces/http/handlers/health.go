@@ -23,10 +23,10 @@ func NewHealthHandler(db *database.DB) *HealthHandler {
 
 // HealthResponse represents the health check response
 type HealthResponse struct {
+	Database  *database.HealthStatus `json:"database,omitempty"`
 	Status    string                 `json:"status"`
 	Timestamp string                 `json:"timestamp"`
 	Version   string                 `json:"version"`
-	Database  *database.HealthStatus `json:"database,omitempty"`
 }
 
 // Health handles GET /health
