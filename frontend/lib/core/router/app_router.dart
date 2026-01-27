@@ -1,8 +1,10 @@
 import 'package:go_router/go_router.dart';
+import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/assets/presentation/screens/add_asset_screen.dart';
 import 'package:wealthscope_app/features/assets/presentation/screens/asset_detail_screen.dart';
 import 'package:wealthscope_app/features/assets/presentation/screens/assets_list_screen.dart';
 import 'package:wealthscope_app/features/assets/presentation/screens/select_asset_type_screen.dart';
+import 'package:wealthscope_app/features/assets/presentation/screens/stock_form_screen.dart';
 import 'package:wealthscope_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:wealthscope_app/features/auth/presentation/screens/register_screen.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/screens/dashboard_screen.dart';
@@ -64,6 +66,15 @@ class AppRouter {
                 path: 'add',
                 name: 'assets-add',
                 builder: (context, state) => const AddAssetScreen(),
+              ),
+              GoRoute(
+                path: 'add-stock',
+                name: 'assets-add-stock',
+                builder: (context, state) {
+                  final typeStr = state.uri.queryParameters['type'] ?? 'stock';
+                  final type = AssetType.fromString(typeStr);
+                  return StockFormScreen(type: type);
+                },
               ),
               GoRoute(
                 path: ':id',
