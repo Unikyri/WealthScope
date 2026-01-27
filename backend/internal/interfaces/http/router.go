@@ -4,11 +4,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
+	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/database"
 	"github.com/Unikyri/WealthScope/backend/internal/interfaces/http/handlers"
 )
 
 // NewRouter creates and configures a new Gin router
-func NewRouter(mode string) *gin.Engine {
+func NewRouter(mode string, db *database.DB) *gin.Engine {
 	// Set Gin mode
 	gin.SetMode(mode)
 
@@ -19,8 +20,8 @@ func NewRouter(mode string) *gin.Engine {
 	router.Use(requestIDMiddleware())
 	router.Use(gin.Logger())
 
-	// Initialize handlers
-	healthHandler := handlers.NewHealthHandler()
+	// Initialize handlers with dependencies
+	healthHandler := handlers.NewHealthHandler(db)
 
 	// Health check (public)
 	router.GET("/health", healthHandler.Health)

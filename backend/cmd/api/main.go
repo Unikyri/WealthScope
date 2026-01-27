@@ -35,14 +35,23 @@ func main() {
 	)
 
 	// Connect to database (optional for initial setup)
-	_, err = database.Connect(cfg, logger)
+	db, err := database.Connect(cfg, logger)
 	if err != nil {
 		logger.Warn("Database connection failed, continuing without database",
 			zap.Error(err),
 		)
 	}
 
-	// Start server
-	srv := server.New(cfg, logger)
+	// Ensure database is closed on shutdown
+	if db != nil {
+		defer func() {
+			if err := db.Close(); err != nil {
+				logger.Error("Failed to close database connection", zap.Error(err))
+			}
+		}()
+	}
+
+	// Start server with database connection
+	srv := server.New(cfg, logger, db)
 	srv.Run()
 }
