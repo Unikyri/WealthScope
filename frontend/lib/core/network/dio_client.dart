@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:wealthscope_app/core/constants/app_config.dart';
 
 /// Dio HTTP Client Configuration
 /// Centralized HTTP client for all API calls.
@@ -17,10 +18,7 @@ class DioClient {
   static Dio _createDio() {
     final dio = Dio(
       BaseOptions(
-        baseUrl: const String.fromEnvironment(
-          'API_BASE_URL',
-          defaultValue: 'http://localhost:3000',
-        ),
+        baseUrl: AppConfig.apiBaseUrl,
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
         headers: {
