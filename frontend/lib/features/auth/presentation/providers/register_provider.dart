@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wealthscope_app/features/auth/data/auth_data.dart';
 
 part 'register_provider.g.dart';
@@ -114,13 +116,28 @@ class RegisterNotifier extends _$RegisterNotifier {
         password: password,
       );
 
-      if (response.user != null) {
+      if (response.user != null && response.session != null) {
+        // Sync with backend after successful Supabase registration
+        try {
+          final syncService = ref.read(userSyncServiceProvider);
+          await syncService.syncUserWithBackend(
+            accessToken: response.session!.accessToken,
+            userId: response.user!.id,
+            email: response.user!.email!,
+          );
+        } catch (syncError) {
+          // Log sync error but don't fail registration
+          // User is already registered in Supabase
+          // Backend sync can be retried later
+          debugPrint('Backend sync failed: $syncError');
+        }
+
         state = state.copyWith(isLoading: false);
         return true;
       } else {
         state = state.copyWith(
           isLoading: false,
-          errorMessage: 'Error creating account',
+          errorMessage: 'Error al crear cuenta',
         );
         return false;
       }
@@ -145,14 +162,36 @@ class RegisterNotifier extends _$RegisterNotifier {
 
   /// Parse error message from exception
   String _parseError(dynamic error) {
+    // Handle Supabase AuthException
+    if (error is AuthException) {
+      return _mapAuthError(error);
+    }
+    
+    // Fallback for other errors
     final errorStr = error.toString();
     if (errorStr.contains('already registered')) {
-      return 'This email is already registered';
+      return 'Este email ya está registrado';
     } else if (errorStr.contains('invalid email')) {
-      return 'Invalid email';
+      return 'Email inválido';
     } else if (errorStr.contains('weak password')) {
-      return 'Weak password';
+      return 'Contraseña débil';
     }
-    return 'Error creating account. Please try again.';
+    return 'Error al crear cuenta. Intenta de nuevo.';
+  }
+
+  /// Map Supabase AuthException to user-friendly messages
+  String _mapAuthError(AuthException e) {
+    switch (e.message) {
+      case 'User already registered':
+        return 'Este email ya está registrado';
+      case 'Invalid email':
+        return 'Email inválido';
+      case 'Password should be at least 6 characters':
+        return 'La contraseña debe tener al menos 6 caracteres';
+      case 'Unable to validate email address: invalid format':
+        return 'Formato de email inválido';
+      default:
+        return 'Error al crear cuenta. Intenta de nuevo.';
+    }
   }
 }
