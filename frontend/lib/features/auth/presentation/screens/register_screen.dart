@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/auth/presentation/providers/register_provider.dart';
+import 'package:wealthscope_app/features/auth/presentation/validators/register_form_validators.dart';
 
 /// Register Screen
 /// Screen where users can create a new account
@@ -118,6 +119,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     controller: _emailController,
                     enabled: !registerState.isLoading,
                     keyboardType: TextInputType.emailAddress,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     decoration: InputDecoration(
                       labelText: 'Email',
                       hintText: 'email@example.com',
@@ -129,16 +131,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Email is required';
-                      }
-                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                          .hasMatch(value)) {
-                        return 'Invalid email';
-                      }
-                      return null;
-                    },
+                    validator: RegisterFormValidators.validateEmail,
                   ),
                   const SizedBox(height: 16),
 
@@ -147,9 +140,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     controller: _passwordController,
                     enabled: !registerState.isLoading,
                     obscureText: registerState.obscurePassword,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     decoration: InputDecoration(
                       labelText: 'Password',
-                      hintText: 'Minimum 6 characters',
+                      hintText: 'Mínimo 8 caracteres',
                       prefixIcon: Icon(
                         Icons.lock_outline,
                         color: theme.colorScheme.primary,
@@ -171,15 +165,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Password is required';
-                      }
-                      if (value.length < 6) {
-                        return 'Minimum 6 characters';
-                      }
-                      return null;
-                    },
+                    validator: RegisterFormValidators.validatePassword,
                   ),
                   const SizedBox(height: 16),
 
@@ -188,6 +174,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     controller: _confirmPasswordController,
                     enabled: !registerState.isLoading,
                     obscureText: registerState.obscureConfirmPassword,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     decoration: InputDecoration(
                       labelText: 'Confirm Password',
                       hintText: 'Re-enter your password',
@@ -212,15 +199,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please confirm your password';
-                      }
-                      if (value != _passwordController.text) {
-                        return 'Passwords do not match';
-                      }
-                      return null;
-                    },
+                    validator: (value) =>
+                        RegisterFormValidators.validateConfirmPassword(
+                      value,
+                      _passwordController.text,
+                    ),
                   ),
                   const SizedBox(height: 24),
 
