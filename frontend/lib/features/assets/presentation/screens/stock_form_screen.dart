@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:wealthscope_app/core/utils/asset_validators.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_metadata.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/currency.dart';
@@ -146,6 +147,7 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
       ),
       body: Form(
         key: _formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
@@ -171,12 +173,7 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
                 prefixIcon: const Icon(Icons.business),
               ),
               textCapitalization: TextCapitalization.words,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Company name is required';
-                }
-                return null;
-              },
+              validator: AssetValidators.validateName,
             ),
             const SizedBox(height: 16),
 
@@ -193,16 +190,7 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,4}')),
               ],
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Quantity is required';
-                }
-                final quantity = double.tryParse(value);
-                if (quantity == null || quantity <= 0) {
-                  return 'Quantity must be greater than 0';
-                }
-                return null;
-              },
+              validator: AssetValidators.validateQuantity,
             ),
             const SizedBox(height: 16),
 
@@ -222,11 +210,14 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
               ],
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Purchase price is required';
+                  return 'El precio de compra es requerido';
                 }
                 final price = double.tryParse(value);
-                if (price == null || price < 0) {
-                  return 'Price must be 0 or greater';
+                if (price == null) {
+                  return 'Ingresa un precio valido';
+                }
+                if (price < 0) {
+                  return 'El precio no puede ser negativo';
                 }
                 return null;
               },
@@ -446,15 +437,7 @@ class _SymbolAutocompleteFieldState
             FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z]')),
             LengthLimitingTextInputFormatter(10),
           ],
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Symbol is required';
-            }
-            if (value.length > 10) {
-              return 'Symbol must be 10 characters or less';
-            }
-            return null;
-          },
+          validator: (value) => AssetValidators.validateSymbol(value, required: true),
           onChanged: (value) {
             widget.controller.text = value;
           },

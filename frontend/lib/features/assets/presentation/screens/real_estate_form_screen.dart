@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:wealthscope_app/core/utils/asset_validators.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/real_estate_form_provider.dart';
 
 /// Real Estate Form Screen
@@ -88,6 +89,7 @@ class _RealEstateFormScreenState extends ConsumerState<RealEstateFormScreen> {
       ),
       body: Form(
         key: _formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
@@ -182,6 +184,7 @@ class _NameField extends StatelessWidget {
         prefixIcon: const Icon(Icons.home),
       ),
       textCapitalization: TextCapitalization.words,
+      validator: AssetValidators.validateName,
       onChanged: onChanged,
     );
   }
@@ -215,6 +218,7 @@ class _EstimatedValueField extends StatelessWidget {
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
       ],
+      validator: AssetValidators.validateValue,
       onChanged: onChanged,
     );
   }
@@ -246,6 +250,7 @@ class _AddressField extends StatelessWidget {
       ),
       maxLines: 2,
       textCapitalization: TextCapitalization.words,
+      validator: AssetValidators.validateAddress,
       onChanged: onChanged,
     );
   }
@@ -287,6 +292,7 @@ class _AreaField extends StatelessWidget {
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
             ],
+            validator: AssetValidators.validateArea,
             onChanged: onAreaChanged,
           ),
         ),
