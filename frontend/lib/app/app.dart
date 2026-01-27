@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wealthscope/core/theme/app_theme.dart';
-import 'package:wealthscope/app/router.dart';
+import 'router.dart';
 
-/// Main Application Widget
-/// Wraps the app with ProviderScope and configures MaterialApp with GoRouter
-class App extends ConsumerWidget {
-  const App({super.key});
+class WealthScopeApp extends ConsumerWidget {
+  const WealthScopeApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
+    
     return MaterialApp.router(
       title: 'WealthScope',
+      routerConfig: router,
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      routerConfig: AppRouter.router,
     );
   }
 }

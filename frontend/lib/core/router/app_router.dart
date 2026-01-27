@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 /// Application Router Configuration
@@ -9,12 +10,24 @@ class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/',
     routes: [
-      // Routes will be added here as features are implemented
-      // Example:
-      // GoRoute(
-      //   path: '/',
-      //   builder: (context, state) => const DashboardScreen(),
-      // ),
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const _InitialScreen(),
+      ),
     ],
   );
+}
+
+/// Temporary initial screen
+class _InitialScreen extends StatelessWidget {
+  const _InitialScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: Text('WealthScope - Initial Screen'),
+      ),
+    );
+  }
 }
