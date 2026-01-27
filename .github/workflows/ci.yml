@@ -170,16 +170,16 @@ jobs:
           path: frontend/build/app/outputs/flutter-apk/app-release.apk
           retention-days: 7
 
-  # Deploy Job (only on main)
+  # Deploy to Railway (staging on develop)
   deploy:
-    name: Deploy
+    name: Deploy to Railway
     runs-on: ubuntu-latest
-    needs: [backend-build, frontend-build]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: [backend-build]
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     steps:
-      - name: Deploy notification
-        run: echo "🚀 Ready to deploy! Add deployment steps here."
-      
-      # TODO: Add actual deployment steps
-      # - Railway deploy for backend
-      # - App store upload for frontend
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Railway
+        uses: railwayapp/deploy@v3
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN }}
