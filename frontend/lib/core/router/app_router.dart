@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:wealthscope_app/features/auth/presentation/screens/register_screen.dart';
+import 'package:wealthscope_app/features/splash/presentation/screens/splash_screen.dart';
 
 /// Application Router Configuration
 /// Define all app routes here using GoRouter.
@@ -10,11 +11,12 @@ class AppRouter {
   AppRouter._();
 
   static final GoRouter router = GoRouter(
-    initialLocation: '/login',
+    initialLocation: '/',
     routes: [
       GoRoute(
         path: '/',
-        builder: (context, state) => const _InitialScreen(),
+        name: 'splash',
+        builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(
         path: '/register',
