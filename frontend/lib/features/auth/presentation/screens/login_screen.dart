@@ -198,7 +198,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                     // Login Button
                     FilledButton(
-                      onPressed: loginState.isLoading ? null : _handleLogin,
+                      onPressed: loginState.isLoading || loginState.isCooldownActive 
+                          ? null 
+                          : _handleLogin,
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -216,13 +218,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ),
                               ),
                             )
-                          : const Text(
-                              'Sign In',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                          : loginState.isCooldownActive
+                              ? Text(
+                                  'Wait ${loginState.cooldownSeconds}s',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                )
+                              : const Text(
+                                  'Sign In',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                     ),
                     const SizedBox(height: 24),
 
