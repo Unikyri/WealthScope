@@ -4,14 +4,25 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
+	"github.com/Unikyri/WealthScope/backend/internal/application/usecases"
+	"github.com/Unikyri/WealthScope/backend/internal/domain/repositories"
+	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/config"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/database"
+	infraRepo "github.com/Unikyri/WealthScope/backend/internal/infrastructure/repositories"
 	"github.com/Unikyri/WealthScope/backend/internal/interfaces/http/handlers"
+	"github.com/Unikyri/WealthScope/backend/internal/interfaces/http/middleware"
 )
 
+// RouterDeps holds all dependencies needed by the router
+type RouterDeps struct {
+	Config *config.Config
+	DB     *database.DB
+}
+
 // NewRouter creates and configures a new Gin router
-func NewRouter(mode string, db *database.DB) *gin.Engine {
+func NewRouter(deps RouterDeps) *gin.Engine {
 	// Set Gin mode
-	gin.SetMode(mode)
+	gin.SetMode(deps.Config.Server.Mode)
 
 	router := gin.New()
 
@@ -20,8 +31,21 @@ func NewRouter(mode string, db *database.DB) *gin.Engine {
 	router.Use(requestIDMiddleware())
 	router.Use(gin.Logger())
 
-	// Initialize handlers with dependencies
-	healthHandler := handlers.NewHealthHandler(db)
+	// Initialize repositories
+	var userRepo repositories.UserRepository
+	if deps.DB != nil {
+		userRepo = infraRepo.NewPostgresUserRepository(deps.DB.DB)
+	}
+
+	// Initialize use cases
+	var syncUserUseCase *usecases.SyncUserUseCase
+	if userRepo != nil {
+		syncUserUseCase = usecases.NewSyncUserUseCase(userRepo)
+	}
+
+	// Initialize handlers
+	healthHandler := handlers.NewHealthHandler(deps.DB)
+	authHandler := handlers.NewAuthHandler(syncUserUseCase)
 
 	// Health check (public)
 	router.GET("/health", healthHandler.Health)
@@ -29,7 +53,16 @@ func NewRouter(mode string, db *database.DB) *gin.Engine {
 	// API v1 routes
 	v1 := router.Group("/api/v1")
 	{
+		// Public routes
 		v1.GET("/ping", healthHandler.Ping)
+
+		// Auth routes (protected)
+		auth := v1.Group("/auth")
+		auth.Use(middleware.AuthMiddleware(deps.Config.Supabase.JWTSecret))
+		{
+			auth.POST("/sync", authHandler.Sync)
+			auth.GET("/me", authHandler.Me)
+		}
 	}
 
 	return router

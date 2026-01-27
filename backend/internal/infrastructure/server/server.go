@@ -34,8 +34,11 @@ func New(cfg *config.Config, logger *zap.Logger, db *database.DB) *Server {
 
 // Run starts the HTTP server with graceful shutdown
 func (s *Server) Run() {
-	// Create router with database
-	r := router.NewRouter(s.cfg.Server.Mode, s.db)
+	// Create router with dependencies
+	r := router.NewRouter(router.RouterDeps{
+		Config: s.cfg,
+		DB:     s.db,
+	})
 
 	// Create HTTP server
 	srv := &http.Server{
