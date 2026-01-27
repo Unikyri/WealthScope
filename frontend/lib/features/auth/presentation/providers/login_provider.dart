@@ -10,34 +10,26 @@ class LoginState {
   final bool isLoading;
   final String? errorMessage;
   final bool obscurePassword;
-  final bool isCooldownActive;
-  final int cooldownSeconds;
-  final int failedAttempts;
+  final bool isButtonDisabled;
 
   const LoginState({
     this.isLoading = false,
     this.errorMessage,
     this.obscurePassword = true,
-    this.isCooldownActive = false,
-    this.cooldownSeconds = 0,
-    this.failedAttempts = 0,
+    this.isButtonDisabled = false,
   });
 
   LoginState copyWith({
     bool? isLoading,
     String? errorMessage,
     bool? obscurePassword,
-    bool? isCooldownActive,
-    int? cooldownSeconds,
-    int? failedAttempts,
+    bool? isButtonDisabled,
   }) {
     return LoginState(
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage,
       obscurePassword: obscurePassword ?? this.obscurePassword,
-      isCooldownActive: isCooldownActive ?? this.isCooldownActive,
-      cooldownSeconds: cooldownSeconds ?? this.cooldownSeconds,
-      failedAttempts: failedAttempts ?? this.failedAttempts,
+      isButtonDisabled: isButtonDisabled ?? this.isButtonDisabled,
     );
   }
 }
@@ -45,9 +37,6 @@ class LoginState {
 /// Provider for login form logic
 @riverpod
 class LoginNotifier extends _$LoginNotifier {
-  static const int _maxFailedAttempts = 3;
-  static const int _cooldownSeconds = 30;
-
   @override
   LoginState build() {
     return const LoginState();
@@ -63,29 +52,11 @@ class LoginNotifier extends _$LoginNotifier {
     state = state.copyWith(errorMessage: '');
   }
 
-  /// Start cooldown timer after too many failed attempts
+  /// Start 3-second cooldown after error
   void _startCooldown() {
-    state = state.copyWith(
-      isCooldownActive: true,
-      cooldownSeconds: _cooldownSeconds,
-    );
-
-    // Countdown timer
-    for (int i = _cooldownSeconds; i > 0; i--) {
-      Future.delayed(Duration(seconds: _cooldownSeconds - i), () {
-        if (state.isCooldownActive) {
-          state = state.copyWith(cooldownSeconds: i - 1);
-        }
-      });
-    }
-
-    // End cooldown and reset attempts
-    Future.delayed(const Duration(seconds: _cooldownSeconds), () {
-      state = state.copyWith(
-        isCooldownActive: false,
-        cooldownSeconds: 0,
-        failedAttempts: 0,
-      );
+    state = state.copyWith(isButtonDisabled: true);
+    Future.delayed(const Duration(seconds: 3), () {
+      state = state.copyWith(isButtonDisabled: false);
     });
   }
 
@@ -94,33 +65,8 @@ class LoginNotifier extends _$LoginNotifier {
     required String email,
     required String password,
   }) async {
-    // Check if cooldown is active
-    if (state.isCooldownActive) {
-      state = state.copyWith(
-        errorMessage: 'Too many attempts. Please wait ${state.cooldownSeconds} seconds.',
-      );
-      return false;
-    }
-
-    // Validate inputs
-    if (email.isEmpty || password.isEmpty) {
-      state = state.copyWith(
-        errorMessage: 'All fields are required',
-      );
-      return false;
-    }
-
-    if (!_isValidEmail(email)) {
-      state = state.copyWith(
-        errorMessage: 'Invalid email',
-      );
-      return false;
-    }
-
-    if (password.length < 6) {
-      state = state.copyWith(
-        errorMessage: 'Password must be at least 6 characters',
-      );
+    // Check if button is disabled
+    if (state.isButtonDisabled) {
       return false;
     }
 
@@ -139,96 +85,79 @@ class LoginNotifier extends _$LoginNotifier {
 
       if (result.session != null) {
         // Login successful - session is automatically saved by Supabase
-        state = state.copyWith(
-          isLoading: false,
-          failedAttempts: 0,
-        );
+        state = state.copyWith(isLoading: false);
         debugPrint('✅ Login successful: ${result.user?.email}');
-        debugPrint('✅ Session saved automatically');
         return true;
       } else {
-        // Login failed - increment failed attempts
-        final newFailedAttempts = state.failedAttempts + 1;
-        
+        // Login failed without exception
         state = state.copyWith(
           isLoading: false,
-          errorMessage: 'Login failed. Please check your credentials.',
-          failedAttempts: newFailedAttempts,
+          errorMessage: 'Incorrect email or password',
         );
-
-        // Start cooldown if max attempts reached
-        if (newFailedAttempts >= _maxFailedAttempts) {
-          _startCooldown();
-        }
-
+        _startCooldown();
         return false;
       }
     } on AuthException catch (e) {
       debugPrint('❌ Login failed with AuthException: ${e.message}');
       
-      final newFailedAttempts = state.failedAttempts + 1;
       final errorMessage = _mapAuthError(e);
-
       state = state.copyWith(
         isLoading: false,
         errorMessage: errorMessage,
-        failedAttempts: newFailedAttempts,
       );
-
-      // Start cooldown if max attempts reached
-      if (newFailedAttempts >= _maxFailedAttempts) {
-        _startCooldown();
-      }
-
+      _startCooldown();
       return false;
     } catch (e) {
       debugPrint('❌ Login failed with error: $e');
       
-      final newFailedAttempts = state.failedAttempts + 1;
+      // Check for network errors
+      String errorMessage = 'An error occurred. Please try again.';
+      if (e.toString().toLowerCase().contains('network') ||
+          e.toString().toLowerCase().contains('connection')) {
+        errorMessage = 'Connection error. Check your internet.';
+      }
 
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Unexpected error. Please try again.',
-        failedAttempts: newFailedAttempts,
+        errorMessage: errorMessage,
       );
-
-      // Start cooldown if max attempts reached
-      if (newFailedAttempts >= _maxFailedAttempts) {
-        _startCooldown();
-      }
-
+      _startCooldown();
       return false;
     }
-  }
-
-  /// Validate email format
-  bool _isValidEmail(String email) {
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    return emailRegex.hasMatch(email);
   }
 
   /// Map Supabase AuthException to user-friendly messages
   String _mapAuthError(AuthException e) {
     final message = e.message.toLowerCase();
 
+    // Invalid login credentials
     if (message.contains('invalid login credentials') || 
-        message.contains('invalid email or password')) {
-      return 'Invalid email or password';
-    }
-    if (message.contains('email not confirmed')) {
-      return 'Please confirm your email before logging in';
-    }
-    if (message.contains('user not found')) {
-      return 'No account exists with this email';
-    }
-    if (message.contains('too many requests') || 
-        message.contains('rate limit')) {
-      return 'Too many attempts. Please try again later';
-    }
-    if (message.contains('network')) {
-      return 'Network error. Please check your connection';
+        message.contains('invalid email or password') ||
+        message.contains('invalid password')) {
+      return 'Incorrect email or password';
     }
     
-    return 'Login failed. Please check your credentials.';
+    // Email not confirmed
+    if (message.contains('email not confirmed') ||
+        message.contains('not confirmed')) {
+      return 'Please confirm your email';
+    }
+    
+    // Too many requests / Rate limit
+    if (message.contains('too many requests') || 
+        message.contains('rate limit') ||
+        message.contains('too many')) {
+      return 'Too many attempts. Wait a moment.';
+    }
+    
+    // Network error
+    if (message.contains('network') ||
+        message.contains('connection') ||
+        message.contains('timeout')) {
+      return 'Connection error. Check your internet.';
+    }
+    
+    // Default error
+    return 'An error occurred. Please try again.';
   }
 }
