@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
+	Supabase SupabaseConfig
 	Log      LogConfig
 }
 
@@ -22,6 +23,14 @@ type ServerConfig struct {
 // DatabaseConfig holds database configuration
 type DatabaseConfig struct {
 	URL string
+}
+
+// SupabaseConfig holds Supabase configuration
+type SupabaseConfig struct {
+	URL        string
+	AnonKey    string
+	ServiceKey string
+	JWTSecret  string
 }
 
 // LogConfig holds logging configuration
@@ -38,6 +47,10 @@ func Load() *Config {
 	viper.SetDefault("server.port", "8080")
 	viper.SetDefault("server.mode", "debug")
 	viper.SetDefault("database.url", "")
+	viper.SetDefault("supabase.url", "")
+	viper.SetDefault("supabase.anon_key", "")
+	viper.SetDefault("supabase.service_key", "")
+	viper.SetDefault("supabase.jwt_secret", "")
 	viper.SetDefault("log.level", "info")
 
 	return &Config{
@@ -47,6 +60,12 @@ func Load() *Config {
 		},
 		Database: DatabaseConfig{
 			URL: viper.GetString("database.url"),
+		},
+		Supabase: SupabaseConfig{
+			URL:        viper.GetString("supabase.url"),
+			AnonKey:    viper.GetString("supabase.anon_key"),
+			ServiceKey: viper.GetString("supabase.service_key"),
+			JWTSecret:  viper.GetString("supabase.jwt_secret"),
 		},
 		Log: LogConfig{
 			Level: viper.GetString("log.level"),
