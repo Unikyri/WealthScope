@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/assets/presentation/screens/add_asset_screen.dart';
 import 'package:wealthscope_app/features/assets/presentation/screens/asset_detail_screen.dart';
 import 'package:wealthscope_app/features/assets/presentation/screens/assets_list_screen.dart';
+import 'package:wealthscope_app/features/assets/presentation/screens/select_asset_type_screen.dart';
 import 'package:wealthscope_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:wealthscope_app/features/auth/presentation/screens/register_screen.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/screens/dashboard_screen.dart';
@@ -54,6 +55,11 @@ class AppRouter {
             name: 'assets',
             builder: (context, state) => const AssetsListScreen(),
             routes: [
+              GoRoute(
+                path: 'select-type',
+                name: 'assets-select-type',
+                builder: (context, state) => const SelectAssetTypeScreen(),
+              ),
               GoRoute(
                 path: 'add',
                 name: 'assets-add',
