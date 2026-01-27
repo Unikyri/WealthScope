@@ -281,7 +281,7 @@ class AppTheme {
       appBarTheme: AppBarTheme(
         centerTitle: true,
         elevation: 0,
-        backgroundColor: primaryColor.withOpacity(0.8),
+        backgroundColor: primaryColor.withValues(alpha: 0.8),
         foregroundColor: Colors.white,
       ),
       
