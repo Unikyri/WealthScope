@@ -5,30 +5,49 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/database"
 	"github.com/Unikyri/WealthScope/backend/pkg/response"
 )
 
 // HealthHandler handles health check endpoints
-type HealthHandler struct{}
+type HealthHandler struct {
+	db *database.DB
+}
 
 // NewHealthHandler creates a new health handler
-func NewHealthHandler() *HealthHandler {
-	return &HealthHandler{}
+func NewHealthHandler(db *database.DB) *HealthHandler {
+	return &HealthHandler{
+		db: db,
+	}
 }
 
 // HealthResponse represents the health check response
 type HealthResponse struct {
-	Status    string `json:"status"`
-	Timestamp string `json:"timestamp"`
-	Version   string `json:"version"`
+	Database  *database.HealthStatus `json:"database,omitempty"`
+	Status    string                 `json:"status"`
+	Timestamp string                 `json:"timestamp"`
+	Version   string                 `json:"version"`
 }
 
 // Health handles GET /health
 func (h *HealthHandler) Health(c *gin.Context) {
+	status := "healthy"
+	var dbStatus *database.HealthStatus
+
+	// Check database health if available
+	if h.db != nil {
+		dbHealth := h.db.GetHealthStatus(c.Request.Context())
+		dbStatus = &dbHealth
+		if !dbHealth.Connected {
+			status = "degraded"
+		}
+	}
+
 	response.Success(c, HealthResponse{
-		Status:    "healthy",
+		Status:    status,
 		Timestamp: time.Now().UTC().Format(time.RFC3339),
 		Version:   "0.1.0",
+		Database:  dbStatus,
 	})
 }
 

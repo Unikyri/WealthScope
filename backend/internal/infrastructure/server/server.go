@@ -12,6 +12,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/config"
+	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/database"
 	router "github.com/Unikyri/WealthScope/backend/internal/interfaces/http"
 )
 
@@ -19,20 +20,22 @@ import (
 type Server struct {
 	cfg    *config.Config
 	logger *zap.Logger
+	db     *database.DB
 }
 
 // New creates a new server instance
-func New(cfg *config.Config, logger *zap.Logger) *Server {
+func New(cfg *config.Config, logger *zap.Logger, db *database.DB) *Server {
 	return &Server{
 		cfg:    cfg,
 		logger: logger,
+		db:     db,
 	}
 }
 
 // Run starts the HTTP server with graceful shutdown
 func (s *Server) Run() {
-	// Create router
-	r := router.NewRouter(s.cfg.Server.Mode)
+	// Create router with database
+	r := router.NewRouter(s.cfg.Server.Mode, s.db)
 
 	// Create HTTP server
 	srv := &http.Server{
@@ -48,6 +51,7 @@ func (s *Server) Run() {
 		s.logger.Info("Starting server",
 			zap.String("port", s.cfg.Server.Port),
 			zap.String("mode", s.cfg.Server.Mode),
+			zap.Bool("database_connected", s.db != nil),
 		)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			s.logger.Fatal("Server failed to start", zap.Error(err))
