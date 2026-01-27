@@ -1,9 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:wealthscope_app/features/assets/presentation/screens/add_asset_screen.dart';
+import 'package:wealthscope_app/features/assets/presentation/screens/asset_detail_screen.dart';
+import 'package:wealthscope_app/features/assets/presentation/screens/assets_list_screen.dart';
 import 'package:wealthscope_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:wealthscope_app/features/auth/presentation/screens/register_screen.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:wealthscope_app/features/profile/presentation/screens/profile_screen.dart';
 import 'package:wealthscope_app/features/splash/presentation/screens/splash_screen.dart';
+import 'package:wealthscope_app/shared/widgets/main_shell.dart';
 
 /// Application Router Configuration
 /// Define all app routes here using GoRouter.
@@ -12,17 +16,18 @@ class AppRouter {
   AppRouter._();
 
   static final GoRouter router = GoRouter(
-    initialLocation: '/',
-    routes: [
+    initialLocation: '/splash',
+    routes: routes,
+  );
+
+  /// List of all application routes
+  /// Used by the routerProvider with auth guard
+  static final List<RouteBase> routes = [
+      // Auth routes
       GoRoute(
-        path: '/',
+        path: '/splash',
         name: 'splash',
         builder: (context, state) => const SplashScreen(),
-      ),
-      GoRoute(
-        path: '/register',
-        name: 'register',
-        builder: (context, state) => const RegisterScreen(),
       ),
       GoRoute(
         path: '/login',
@@ -30,30 +35,46 @@ class AppRouter {
         builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
-        path: '/profile',
-        name: 'profile',
-        builder: (context, state) => const ProfileScreen(),
+        path: '/register',
+        name: 'register',
+        builder: (context, state) => const RegisterScreen(),
       ),
-      // TODO: Add dashboard route
-      GoRoute(
-        path: '/dashboard',
-        name: 'dashboard',
-        builder: (context, state) => const _InitialScreen(),
+      
+      // Protected routes with shell
+      ShellRoute(
+        builder: (context, state, child) => MainShell(child: child),
+        routes: [
+          GoRoute(
+            path: '/dashboard',
+            name: 'dashboard',
+            builder: (context, state) => const DashboardScreen(),
+          ),
+          GoRoute(
+            path: '/assets',
+            name: 'assets',
+            builder: (context, state) => const AssetsListScreen(),
+            routes: [
+              GoRoute(
+                path: 'add',
+                name: 'assets-add',
+                builder: (context, state) => const AddAssetScreen(),
+              ),
+              GoRoute(
+                path: ':id',
+                name: 'assets-detail',
+                builder: (context, state) {
+                  final id = state.pathParameters['id']!;
+                  return AssetDetailScreen(assetId: id);
+                },
+              ),
+            ],
+          ),
+          GoRoute(
+            path: '/profile',
+            name: 'profile',
+            builder: (context, state) => const ProfileScreen(),
+          ),
+        ],
       ),
-    ],
-  );
-}
-
-/// Temporary initial screen
-class _InitialScreen extends StatelessWidget {
-  const _InitialScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('WealthScope - Initial Screen'),
-      ),
-    );
-  }
+    ];
 }
