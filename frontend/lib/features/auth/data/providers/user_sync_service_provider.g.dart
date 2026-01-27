@@ -6,7 +6,7 @@ part of 'user_sync_service_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$userSyncServiceHash() => r'02df0a8ffe6e52883b6ea91135c9b8399fc4e039';
+String _$userSyncServiceHash() => r'530167db22e6a499c67ac0f0ee7cadcd56982808';
 
 /// Provider for UserSyncService instance
 ///
