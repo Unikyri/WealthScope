@@ -17,7 +17,12 @@ class AppRouter {
 
   static final GoRouter router = GoRouter(
     initialLocation: '/splash',
-    routes: [
+    routes: routes,
+  );
+
+  /// List of all application routes
+  /// Used by the routerProvider with auth guard
+  static final List<RouteBase> routes = [
       // Auth routes
       GoRoute(
         path: '/splash',
@@ -71,6 +76,5 @@ class AppRouter {
           ),
         ],
       ),
-    ],
-  );
+    ];
 }
