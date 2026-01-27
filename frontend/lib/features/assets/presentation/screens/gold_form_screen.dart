@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:wealthscope_app/core/utils/asset_validators.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/gold_form_provider.dart';
 
 /// Gold & Precious Metals Form Screen
@@ -84,6 +85,7 @@ class _GoldFormScreenState extends ConsumerState<GoldFormScreen> {
       ),
       body: Form(
         key: _formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
@@ -181,6 +183,7 @@ class _NameField extends StatelessWidget {
         prefixIcon: const Icon(Icons.label),
       ),
       textCapitalization: TextCapitalization.words,
+      validator: AssetValidators.validateName,
       onChanged: onChanged,
     );
   }
@@ -214,6 +217,7 @@ class _WeightField extends StatelessWidget {
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
       ],
+      validator: AssetValidators.validateWeight,
       onChanged: onChanged,
     );
   }
@@ -311,6 +315,7 @@ class _PurchasePriceField extends StatelessWidget {
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
       ],
+      validator: AssetValidators.validatePrice,
       onChanged: onChanged,
     );
   }
