@@ -58,6 +58,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               content: Text(next.errorMessage!),
               backgroundColor: theme.colorScheme.error,
               behavior: SnackBarBehavior.floating,
+              action: SnackBarAction(
+                label: 'OK',
+                textColor: Colors.white,
+                onPressed: () {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                },
+              ),
             ),
           );
           ref.read(loginNotifierProvider.notifier).clearError();
@@ -198,7 +205,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                     // Login Button
                     FilledButton(
-                      onPressed: loginState.isLoading || loginState.isCooldownActive 
+                      onPressed: loginState.isLoading || loginState.isButtonDisabled 
                           ? null 
                           : _handleLogin,
                       style: FilledButton.styleFrom(
@@ -218,21 +225,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ),
                               ),
                             )
-                          : loginState.isCooldownActive
-                              ? Text(
-                                  'Wait ${loginState.cooldownSeconds}s',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                )
-                              : const Text(
-                                  'Sign In',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                          : const Text(
+                              'Sign In',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                     ),
                     const SizedBox(height: 24),
 
