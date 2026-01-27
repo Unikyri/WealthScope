@@ -1,0 +1,25 @@
+# Build configuration for code generation
+targets:
+  $default:
+    builders:
+      # Riverpod Generator
+      riverpod_generator:riverpod_generator:
+        generate_for:
+          - lib/**/*.dart
+        options:
+          # Generate code for all files with @riverpod annotation
+
+      # Freezed
+      freezed:freezed:
+        generate_for:
+          - lib/**/*.dart
+        options:
+          # Generate copyWith, toString, etc.
+
+      # JSON Serializable
+      json_serializable:json_serializable:
+        generate_for:
+          - lib/**/*.dart
+        options:
+          explicit_to_json: true
+          field_rename: snake_case
