@@ -21,9 +21,14 @@ class SelectAssetTypeScreen extends ConsumerWidget {
   };
 
   void _onAssetTypeSelected(BuildContext context, AssetType type) {
-    // Navigate to the add asset form with the selected type
-    // TODO: Pass the selected type to the form when implementing type-specific forms
-    context.go('/assets/add', extra: {'type': type});
+    // Navigate to specific form based on asset type
+    if (type == AssetType.stock || type == AssetType.etf) {
+      // Use dedicated stock/ETF form
+      context.push('/assets/add-stock?type=${type.label.toLowerCase()}');
+    } else {
+      // Use generic asset form for other types
+      context.go('/assets/add', extra: {'type': type});
+    }
   }
 
   @override
