@@ -13,21 +13,21 @@ import (
 
 // AssetModel is the GORM model for the assets table
 type AssetModel struct {
-	DeletedAt     gorm.DeletedAt  `gorm:"index"`
-	PurchaseDate  sql.NullTime    `gorm:"column:purchase_date"`
 	CreatedAt     time.Time       `gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt     time.Time       `gorm:"column:updated_at;autoUpdateTime"`
-	Notes         sql.NullString  `gorm:"column:notes"`
-	Metadata      json.RawMessage `gorm:"type:jsonb;default:'{}'"`
-	Symbol        sql.NullString  `gorm:"column:symbol"`
+	DeletedAt     gorm.DeletedAt  `gorm:"index"`
+	PurchaseDate  sql.NullTime    `gorm:"column:purchase_date"`
+	Currency      string          `gorm:"default:USD"`
 	Type          string          `gorm:"type:asset_type;not null"`
 	Name          string          `gorm:"not null"`
-	Currency      string          `gorm:"default:USD"`
+	Metadata      json.RawMessage `gorm:"type:jsonb;default:'{}'"`
+	Symbol        sql.NullString  `gorm:"column:symbol"`
+	Notes         sql.NullString  `gorm:"column:notes"`
 	CurrentPrice  sql.NullFloat64 `gorm:"type:decimal(20,2);column:current_price"`
-	ID            uuid.UUID       `gorm:"type:uuid;primaryKey"`
-	UserID        uuid.UUID       `gorm:"type:uuid;not null;index"`
 	Quantity      float64         `gorm:"type:decimal(20,8);not null"`
 	PurchasePrice float64         `gorm:"type:decimal(20,2);not null;column:purchase_price"`
+	ID            uuid.UUID       `gorm:"type:uuid;primaryKey"`
+	UserID        uuid.UUID       `gorm:"type:uuid;not null;index"`
 }
 
 // TableName returns the table name for GORM
