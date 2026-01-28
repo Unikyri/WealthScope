@@ -6,10 +6,10 @@ part of 'assets_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$allAssetsHash() => r'3d6942bd6fea72908c7b50923960b9d14cf8d062';
+String _$allAssetsHash() => r'f8b90c3b917114d6b142e9eb14a03cc719d54964';
 
 /// Provider for fetching all assets
-/// This provider fetches the complete list of user assets
+/// This provider fetches the complete list of user assets from the backend
 ///
 /// Copied from [allAssets].
 @ProviderFor(allAssets)
