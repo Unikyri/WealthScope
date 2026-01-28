@@ -1,5 +1,10 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_metadata.dart';
+import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
+import 'package:wealthscope_app/features/assets/domain/entities/currency.dart';
+import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
+import 'package:wealthscope_app/features/assets/presentation/providers/asset_form_submission_provider.dart';
 
 part 'real_estate_form_provider.g.dart';
 
@@ -163,16 +168,43 @@ class RealEstateForm extends _$RealEstateForm {
     state = const RealEstateFormState();
   }
 
-  /// Submit form (placeholder for now)
+  /// Submit form and create real estate asset via API
   Future<bool> submit() async {
     if (!state.isValid) {
       return false;
     }
 
-    // TODO: Implement actual submission to repository
-    // final metadata = state.toMetadata();
-    // await ref.read(assetRepositoryProvider).createAsset(...)
+    try {
+      final userId = Supabase.instance.client.auth.currentUser?.id;
+      if (userId == null) throw Exception('User not authenticated');
 
-    return true;
+      // Build asset entity
+      final asset = StockAsset(
+        userId: userId,
+        type: AssetType.realEstate,
+        symbol: 'RE-${state.name.toUpperCase().replaceAll(' ', '-')}',
+        name: state.name,
+        quantity: 1.0, // One property unit
+        purchasePrice: state.estimatedValue ?? 0.0,
+        purchaseDate: state.purchaseDate,
+        currency: Currency.usd,
+        metadata: state.toMetadata().toJson(),
+        notes: state.notes.isEmpty ? null : state.notes,
+      );
+
+      // Submit via API
+      await ref.read(assetFormSubmissionProvider.notifier).submitCreate(asset);
+
+      // Check result
+      final submissionState = ref.read(assetFormSubmissionProvider);
+      if (submissionState.error != null) {
+        return false;
+      }
+
+      reset();
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }

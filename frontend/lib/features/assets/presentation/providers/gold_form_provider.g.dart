@@ -6,7 +6,7 @@ part of 'gold_form_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$goldFormHash() => r'7e177e560dc8c7969173c27198c05fc53451cea3';
+String _$goldFormHash() => r'376c9f050b790a00c13dad6c23fb6f9475bf8338';
 
 /// Gold Form Provider
 ///

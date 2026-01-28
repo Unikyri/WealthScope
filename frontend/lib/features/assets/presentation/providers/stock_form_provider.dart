@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/currency.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
+import 'package:wealthscope_app/features/assets/presentation/providers/asset_form_submission_provider.dart';
 
 part 'stock_form_provider.g.dart';
 
@@ -57,20 +58,28 @@ class StockForm extends _$StockForm {
   }
 
   /// Submit the form and save the asset
+  /// Uses AssetFormSubmissionProvider to make the API call
   Future<void> submitForm(StockAsset asset) async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      // TODO: Replace with actual repository call
-      // await ref.read(assetRepositoryProvider).addAsset(asset);
+      // Call the submission provider to handle API interaction
+      await ref.read(assetFormSubmissionProvider.notifier).submitCreate(asset);
       
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
-
-      state = state.copyWith(
-        isLoading: false,
-        savedAsset: asset,
-      );
+      // Check if submission was successful
+      final submissionState = ref.read(assetFormSubmissionProvider);
+      
+      if (submissionState.error != null) {
+        state = state.copyWith(
+          isLoading: false,
+          error: submissionState.error,
+        );
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          savedAsset: submissionState.savedAsset,
+        );
+      }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
