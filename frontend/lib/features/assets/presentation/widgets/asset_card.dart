@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
 
 /// Asset Card Widget
-/// Displays a single asset in the list with its details
+/// Reusable widget to display an asset in a list.
+/// 
+/// Displays:
+/// - Icon based on asset type
+/// - Asset name and symbol (if applicable)
+/// - Quantity with unit label
+/// - Total value
+/// - Percentage change (green/red based on positive/negative)
+/// 
+/// Tapping the card navigates to asset detail screen.
 class AssetCard extends StatelessWidget {
   const AssetCard({
     super.key,
@@ -16,58 +26,53 @@ class AssetCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final hasGainLoss = asset.gainLoss != null;
-    final isPositive = hasGainLoss && asset.gainLoss! >= 0;
+    final isPositive = hasGainLoss && (asset.gainLossPercent ?? 0) >= 0;
 
     return Card(
-      elevation: 2,
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: InkWell(
         onTap: () => context.push('/assets/${asset.id}'),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              // Asset Icon
+              // Asset Type Icon
               Container(
-                padding: const EdgeInsets.all(12),
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(8),
+                  color: _getTypeColor(theme, asset.type).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
-                  _getIconForType(asset.type.label),
-                  color: theme.colorScheme.primary,
+                  _getTypeIcon(asset.type),
+                  color: _getTypeColor(theme, asset.type),
                   size: 24,
                 ),
               ),
               const SizedBox(width: 16),
               
-              // Asset Details
+              // Asset Information
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Asset Name and Symbol
                     Text(
-                      asset.symbol,
+                      _getDisplayName(),
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      asset.name,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
+                    // Quantity with unit
                     Text(
-                      '${asset.quantity} ${asset.type.displayName}',
+                      '${asset.quantity.toStringAsFixed(_getDecimalPlaces())} ${_getUnitLabel()}',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.5),
+                        color: theme.colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                   ],
@@ -78,41 +83,24 @@ class AssetCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(
-                    asset.currentValue != null
-                        ? '${asset.currency.symbol}${asset.currentValue!.toStringAsFixed(2)}'
-                        : '${asset.currency.symbol}${asset.totalInvested.toStringAsFixed(2)}',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
+                  // Percentage Change
                   if (hasGainLoss)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
+                    Text(
+                      '${isPositive ? '+' : ''}${asset.gainLossPercent!.toStringAsFixed(1)}%',
+                      style: theme.textTheme.titleSmall?.copyWith(
                         color: isPositive
-                            ? Colors.green.withOpacity(0.1)
-                            : Colors.red.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        '${isPositive ? '+' : ''}${asset.gainLossPercent!.toStringAsFixed(2)}%',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: isPositive ? Colors.green : Colors.red,
-                          fontWeight: FontWeight.bold,
-                        ),
+                            ? theme.colorScheme.tertiary
+                            : theme.colorScheme.error,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   const SizedBox(height: 4),
-                  Icon(
-                    Icons.chevron_right,
-                    color: theme.colorScheme.onSurface.withOpacity(0.4),
-                    size: 20,
+                  // Total Value
+                  Text(
+                    '${asset.currency.symbol}${_formatValue(asset.currentValue ?? asset.totalInvested)}',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
@@ -123,22 +111,97 @@ class AssetCard extends StatelessWidget {
     );
   }
 
-  IconData _getIconForType(String type) {
-    switch (type.toLowerCase()) {
-      case 'stock':
+  /// Get display name with symbol if available
+  String _getDisplayName() {
+    final hasSymbol = asset.symbol.isNotEmpty;
+    if (hasSymbol && asset.type != AssetType.realEstate && asset.type != AssetType.gold) {
+      return '${asset.name} (${asset.symbol})';
+    }
+    return asset.name;
+  }
+
+  /// Get icon based on asset type
+  IconData _getTypeIcon(AssetType type) {
+    switch (type) {
+      case AssetType.stock:
         return Icons.show_chart;
-      case 'etf':
+      case AssetType.etf:
         return Icons.pie_chart;
-      case 'real estate':
-        return Icons.home;
-      case 'gold':
-        return Icons.diamond;
-      case 'bond':
+      case AssetType.bond:
         return Icons.receipt_long;
-      case 'crypto':
+      case AssetType.crypto:
         return Icons.currency_bitcoin;
-      default:
+      case AssetType.realEstate:
+        return Icons.home;
+      case AssetType.gold:
+        return Icons.diamond;
+      case AssetType.other:
         return Icons.business;
     }
+  }
+
+  /// Get color based on asset type
+  Color _getTypeColor(ThemeData theme, AssetType type) {
+    switch (type) {
+      case AssetType.stock:
+        return theme.colorScheme.primary;
+      case AssetType.etf:
+        return theme.colorScheme.secondary;
+      case AssetType.bond:
+        return theme.colorScheme.tertiary;
+      case AssetType.crypto:
+        return const Color(0xFFF7931A); // Bitcoin orange
+      case AssetType.realEstate:
+        return const Color(0xFF4CAF50); // Green
+      case AssetType.gold:
+        return const Color(0xFFFFD700); // Gold
+      case AssetType.other:
+        return theme.colorScheme.surfaceContainerHighest;
+    }
+  }
+
+  /// Get unit label based on asset type
+  String _getUnitLabel() {
+    switch (asset.type) {
+      case AssetType.stock:
+      case AssetType.etf:
+        return asset.quantity == 1 ? 'share' : 'shares';
+      case AssetType.crypto:
+        return 'units';
+      case AssetType.bond:
+        return 'bonds';
+      case AssetType.realEstate:
+        return 'properties';
+      case AssetType.gold:
+        return 'oz';
+      case AssetType.other:
+        return 'units';
+    }
+  }
+
+  /// Get decimal places for quantity display
+  int _getDecimalPlaces() {
+    switch (asset.type) {
+      case AssetType.crypto:
+        return 8; // Crypto typically needs more precision
+      case AssetType.gold:
+        return 3; // Gold in troy ounces
+      case AssetType.stock:
+      case AssetType.etf:
+      case AssetType.bond:
+      case AssetType.realEstate:
+      case AssetType.other:
+        return asset.quantity % 1 == 0 ? 0 : 2;
+    }
+  }
+
+  /// Format value to readable string (K, M notation for large numbers)
+  String _formatValue(double value) {
+    if (value >= 1000000) {
+      return '${(value / 1000000).toStringAsFixed(1)}M';
+    } else if (value >= 1000) {
+      return '${(value / 1000).toStringAsFixed(1)}K';
+    }
+    return value.toStringAsFixed(0);
   }
 }

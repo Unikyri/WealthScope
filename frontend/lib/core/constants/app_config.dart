@@ -4,23 +4,24 @@ class AppConfig {
   AppConfig._();
 
   /// Backend API Base URL
-  /// Change this according to your environment:
-  /// - Development: 'http://localhost:3000'
-  /// - Production: 'https://api.wealthscope.com'
+  /// Railway deployment URL for production backend
+  /// For local testing: 'http://localhost:8080'
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://localhost:3000', // Change this for production
+    defaultValue: 'https://wealthscope-production.up.railway.app',
   );
 
   /// Supabase Configuration
+  /// Project URL from Supabase Dashboard
   static const String supabaseUrl = String.fromEnvironment(
     'SUPABASE_URL',
-    defaultValue: 'https://placeholder.supabase.co',
+    defaultValue: 'https://jdgnyhxoagatsdlnbrjo.supabase.co',
   );
 
+  /// Supabase Anon Key (safe for frontend use)
   static const String supabaseAnonKey = String.fromEnvironment(
     'SUPABASE_ANON_KEY',
-    defaultValue: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NDUxOTI4MDAsImV4cCI6MTk2MDc2ODgwMH0.placeholder',
+    defaultValue: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkZ255aHhvYWdhdHNkbG5icmpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0ODEwMTAsImV4cCI6MjA4NTA1NzAxMH0.dQO322CEN2J8L_BuFrCr4BybpU2ErHryECJMeTFJlvA',
   );
 
   /// Environment
