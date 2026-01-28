@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
+import 'package:wealthscope_app/features/assets/presentation/widgets/asset_detail_header.dart';
+import 'package:wealthscope_app/features/assets/presentation/widgets/asset_info_section.dart';
+import 'package:wealthscope_app/features/assets/presentation/widgets/asset_metadata_section.dart';
 
+/// Asset Detail Screen
+/// Displays complete information about a specific asset including
+/// header with large icon and price, investment details, and type-specific metadata
 class AssetDetailScreen extends ConsumerWidget {
   final String assetId;
   
@@ -13,8 +20,7 @@ class AssetDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    
-    // TODO: Fetch asset data using provider with assetId
+    final assetAsync = ref.watch(assetDetailProvider(assetId));
     
     return Scaffold(
       appBar: AppBar(
@@ -27,243 +33,145 @@ class AssetDetailScreen extends ConsumerWidget {
             icon: const Icon(Icons.edit),
             onPressed: () {
               // TODO: Navigate to edit screen
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Edit functionality coming soon')),
-              );
+              context.push('/assets/$assetId/edit');
             },
-            tooltip: 'Edit',
+            tooltip: 'Edit Asset',
           ),
           IconButton(
             icon: const Icon(Icons.delete),
-            onPressed: () {
-              _showDeleteDialog(context);
-            },
-            tooltip: 'Delete',
+            onPressed: () => _showDeleteDialog(context, ref),
+            tooltip: 'Delete Asset',
           ),
         ],
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _AssetHeader(assetId: assetId, theme: theme),
-              const SizedBox(height: 24),
-              _AssetDetailsSection(theme: theme),
-              const SizedBox(height: 24),
-              _AssetPerformanceSection(theme: theme),
-            ],
+      body: assetAsync.when(
+        data: (asset) => SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Header with large icon, name, symbol, current price, daily change
+                AssetDetailHeader(asset: asset),
+                const SizedBox(height: 24),
+                
+                // Investment details section
+                AssetInfoSection(asset: asset),
+                const SizedBox(height: 24),
+                
+                // Type-specific metadata
+                AssetMetadataSection(asset: asset),
+              ],
+            ),
+          ),
+        ),
+        loading: () => const Center(
+          child: CircularProgressIndicator(),
+        ),
+        error: (error, stackTrace) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: theme.colorScheme.error,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Error loading asset',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: theme.colorScheme.error,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  error.toString(),
+                  style: theme.textTheme.bodyMedium,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                FilledButton.icon(
+                  onPressed: () => ref.invalidate(assetDetailProvider(assetId)),
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Retry'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  void _showDeleteDialog(BuildContext context) {
+  void _showDeleteDialog(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Delete Asset'),
-        content: const Text('Are you sure you want to delete this asset?'),
+        content: const Text(
+          'Are you sure you want to delete this asset? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
-              // TODO: Delete asset using provider
-              Navigator.of(context).pop();
-              context.pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Asset deleted')),
-              );
+            onPressed: () async {
+              Navigator.of(dialogContext).pop();
+              
+              // Show loading indicator
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Deleting asset...'),
+                    duration: Duration(seconds: 1),
+                  ),
+                );
+              }
+              
+              try {
+                // TODO: Implement delete functionality via repository
+                // await ref.read(assetRepositoryProvider).deleteAsset(assetId);
+                
+                // Invalidate the assets list to refresh
+                ref.invalidate(allAssetsProvider);
+                
+                if (context.mounted) {
+                  // Navigate back
+                  context.pop();
+                  
+                  // Show success message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Asset deleted successfully'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to delete asset: $e'),
+                      backgroundColor: theme.colorScheme.error,
+                    ),
+                  );
+                }
+              }
             },
             style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: theme.colorScheme.error,
             ),
             child: const Text('Delete'),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _AssetHeader extends StatelessWidget {
-  final String assetId;
-  final ThemeData theme;
-
-  const _AssetHeader({
-    required this.assetId,
-    required this.theme,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            theme.colorScheme.primary,
-            theme.colorScheme.primary.withOpacity(0.7),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Sample Asset #$assetId',
-            style: theme.textTheme.headlineSmall?.copyWith(
-              color: theme.colorScheme.onPrimary,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Stock',
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onPrimary.withOpacity(0.8),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            '\$1,000.00',
-            style: theme.textTheme.displaySmall?.copyWith(
-              color: theme.colorScheme.onPrimary,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AssetDetailsSection extends StatelessWidget {
-  final ThemeData theme;
-
-  const _AssetDetailsSection({required this.theme});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Details',
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 16),
-        _DetailRow(
-          label: 'Purchase Date',
-          value: 'Jan 15, 2026',
-          theme: theme,
-        ),
-        const SizedBox(height: 12),
-        _DetailRow(
-          label: 'Purchase Price',
-          value: '\$950.00',
-          theme: theme,
-        ),
-        const SizedBox(height: 12),
-        _DetailRow(
-          label: 'Current Value',
-          value: '\$1,000.00',
-          theme: theme,
-        ),
-        const SizedBox(height: 12),
-        _DetailRow(
-          label: 'Gain/Loss',
-          value: '+\$50.00 (5.26%)',
-          valueColor: Colors.green,
-          theme: theme,
-        ),
-      ],
-    );
-  }
-}
-
-class _DetailRow extends StatelessWidget {
-  final String label;
-  final String value;
-  final Color? valueColor;
-  final ThemeData theme;
-
-  const _DetailRow({
-    required this.label,
-    required this.value,
-    required this.theme,
-    this.valueColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.7),
-          ),
-        ),
-        Text(
-          value,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: valueColor ?? theme.colorScheme.onSurface,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _AssetPerformanceSection extends StatelessWidget {
-  final ThemeData theme;
-
-  const _AssetPerformanceSection({required this.theme});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Performance',
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Container(
-          height: 200,
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: theme.colorScheme.outline.withOpacity(0.2),
-            ),
-          ),
-          child: Center(
-            child: Text(
-              'Chart coming soon',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.5),
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
