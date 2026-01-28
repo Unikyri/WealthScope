@@ -259,6 +259,21 @@ func (r *PostgresAssetRepository) UpdateCurrentPriceBySymbol(ctx context.Context
 	return nil
 }
 
+// ListUserIDsWithListedAssets returns distinct user IDs that have listed assets.
+func (r *PostgresAssetRepository) ListUserIDsWithListedAssets(ctx context.Context) ([]uuid.UUID, error) {
+	var userIDs []uuid.UUID
+	result := r.db.WithContext(ctx).
+		Model(&AssetModel{}).
+		Where("symbol IS NOT NULL AND symbol <> ''").
+		Distinct("user_id").
+		Pluck("user_id", &userIDs)
+
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to list user IDs with listed assets: %w", result.Error)
+	}
+	return userIDs, nil
+}
+
 // GetPortfolioSummary returns complete portfolio summary with breakdown by asset type
 func (r *PostgresAssetRepository) GetPortfolioSummary(ctx context.Context, userID uuid.UUID) (*repositories.PortfolioSummary, error) {
 	// Fetch all assets for the user

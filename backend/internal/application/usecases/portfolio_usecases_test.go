@@ -46,6 +46,9 @@ func (f *fakeAssetRepo) FindListedAssets(ctx context.Context, userID uuid.UUID) 
 func (f *fakeAssetRepo) UpdateCurrentPriceBySymbol(ctx context.Context, userID uuid.UUID, symbol string, price float64) error {
 	return nil
 }
+func (f *fakeAssetRepo) ListUserIDsWithListedAssets(ctx context.Context) ([]uuid.UUID, error) {
+	return nil, nil
+}
 func (f *fakeAssetRepo) GetPortfolioSummary(ctx context.Context, userID uuid.UUID) (*repositories.PortfolioSummary, error) {
 	if f.err != nil {
 		return nil, f.err

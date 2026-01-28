@@ -84,4 +84,7 @@ type AssetRepository interface {
 
 	// UpdateCurrentPriceBySymbol updates current_price for all assets matching a symbol for a user.
 	UpdateCurrentPriceBySymbol(ctx context.Context, userID uuid.UUID, symbol string, price float64) error
+
+	// ListUserIDsWithListedAssets returns distinct user IDs that have listed assets.
+	ListUserIDsWithListedAssets(ctx context.Context) ([]uuid.UUID, error)
 }

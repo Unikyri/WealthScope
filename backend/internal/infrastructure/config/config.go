@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
+	Pricing  PricingConfig
 	Supabase SupabaseConfig
 	Log      LogConfig
 }
@@ -23,6 +24,11 @@ type ServerConfig struct {
 // DatabaseConfig holds database configuration
 type DatabaseConfig struct {
 	URL string
+}
+
+// PricingConfig holds pricing/market data configuration
+type PricingConfig struct {
+	UpdateIntervalSeconds int
 }
 
 // SupabaseConfig holds Supabase configuration
@@ -47,6 +53,7 @@ func Load() *Config {
 	viper.SetDefault("server.port", "8080")
 	viper.SetDefault("server.mode", "debug")
 	viper.SetDefault("database.url", "")
+	viper.SetDefault("pricing.update_interval_seconds", 300)
 	viper.SetDefault("supabase.url", "")
 	viper.SetDefault("supabase.anon_key", "")
 	viper.SetDefault("supabase.service_key", "")
@@ -60,6 +67,9 @@ func Load() *Config {
 		},
 		Database: DatabaseConfig{
 			URL: viper.GetString("database.url"),
+		},
+		Pricing: PricingConfig{
+			UpdateIntervalSeconds: viper.GetInt("pricing.update_interval_seconds"),
 		},
 		Supabase: SupabaseConfig{
 			URL:        viper.GetString("supabase.url"),

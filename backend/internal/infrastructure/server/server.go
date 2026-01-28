@@ -11,8 +11,12 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/Unikyri/WealthScope/backend/internal/application/jobs"
+	"github.com/Unikyri/WealthScope/backend/internal/application/services"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/config"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/database"
+	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/marketdata"
+	infraRepo "github.com/Unikyri/WealthScope/backend/internal/infrastructure/repositories"
 	router "github.com/Unikyri/WealthScope/backend/internal/interfaces/http"
 )
 
@@ -49,6 +53,11 @@ func (s *Server) Run() {
 		IdleTimeout:  60 * time.Second,
 	}
 
+	// Start price update job (best-effort) if DB is available.
+	if s.db != nil {
+		go s.runPriceUpdateLoop()
+	}
+
 	// Start server in goroutine
 	go func() {
 		s.logger.Info("Starting server",
@@ -77,4 +86,42 @@ func (s *Server) Run() {
 	}
 
 	s.logger.Info("Server exited properly")
+}
+
+func (s *Server) runPriceUpdateLoop() {
+	intervalSeconds := s.cfg.Pricing.UpdateIntervalSeconds
+	if intervalSeconds <= 0 {
+		intervalSeconds = 300
+	}
+	interval := time.Duration(intervalSeconds) * time.Second
+
+	assetRepo := infraRepo.NewPostgresAssetRepository(s.db.DB)
+	priceRepo := infraRepo.NewPostgresPriceHistoryRepository(s.db.DB)
+
+	client := marketdata.NewYahooFinanceClient(nil)
+	pricingSvc := services.NewPricingService(client, time.Minute)
+	job := jobs.NewPriceUpdateJob(pricingSvc, assetRepo, priceRepo, s.logger)
+
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	// NOTE: We intentionally do not run immediately on startup to avoid
+	// expensive work during deployments; first run happens after interval.
+	for range ticker.C {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		userIDs, err := assetRepo.ListUserIDsWithListedAssets(ctx)
+		if err != nil {
+			s.logger.Error("Failed to list users for price job", zap.Error(err))
+			cancel()
+			continue
+		}
+
+		for _, userID := range userIDs {
+			if err := job.Run(ctx, userID); err != nil {
+				// continue best-effort
+				s.logger.Warn("Price job failed for user", zap.String("user_id", userID.String()), zap.Error(err))
+			}
+		}
+		cancel()
+	}
 }
