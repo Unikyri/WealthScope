@@ -13,21 +13,21 @@ import (
 
 // AssetModel is the GORM model for the assets table
 type AssetModel struct {
-	UpdatedAt     time.Time       `gorm:"column:updated_at;autoUpdateTime"`
 	CreatedAt     time.Time       `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt     time.Time       `gorm:"column:updated_at;autoUpdateTime"`
+	DeletedAt     gorm.DeletedAt  `gorm:"index"`
 	PurchaseDate  sql.NullTime    `gorm:"column:purchase_date"`
 	Type          string          `gorm:"type:asset_type;not null"`
 	Name          string          `gorm:"not null"`
 	Currency      string          `gorm:"default:USD"`
 	Notes         sql.NullString  `gorm:"column:notes"`
-	Symbol        sql.NullString  `gorm:"column:symbol"`
 	Metadata      json.RawMessage `gorm:"type:jsonb;default:'{}'"`
+	Symbol        sql.NullString  `gorm:"column:symbol"`
 	CurrentPrice  sql.NullFloat64 `gorm:"type:decimal(20,2);column:current_price"`
 	Quantity      float64         `gorm:"type:decimal(20,8);not null"`
 	PurchasePrice float64         `gorm:"type:decimal(20,2);not null;column:purchase_price"`
 	ID            uuid.UUID       `gorm:"type:uuid;primaryKey"`
 	UserID        uuid.UUID       `gorm:"type:uuid;not null;index"`
-	DeletedAt     gorm.DeletedAt  `gorm:"index"`
 }
 
 // TableName returns the table name for GORM
