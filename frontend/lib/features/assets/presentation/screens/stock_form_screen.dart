@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wealthscope_app/core/utils/asset_validators.dart';
+import 'package:wealthscope_app/core/utils/snackbar_utils.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_metadata.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/currency.dart';
@@ -60,6 +62,13 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
       return;
     }
 
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+    if (userId == null) {
+      if (!mounted) return;
+      SnackbarUtils.showError(context, 'Authentication error. Please log in again.');
+      return;
+    }
+
     final currency = ref.read(selectedCurrencyProvider);
     
     // Build metadata for stock/ETF
@@ -75,7 +84,7 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
     }
     
     final asset = StockAsset(
-      userId: 'temp-user-id', // TODO: Get from auth provider
+      userId: userId,
       symbol: _symbolController.text.trim().toUpperCase(),
       name: _nameController.text.trim(),
       quantity: double.parse(_quantityController.text),
@@ -94,29 +103,14 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
     if (!mounted) return;
 
     if (state.error != null) {
-      _showErrorSnackbar(state.error!);
+      SnackbarUtils.showError(context, state.error!);
     } else if (state.savedAsset != null) {
-      _showSuccessSnackbar();
+      SnackbarUtils.showSuccess(
+        context, 
+        '${_isStock ? 'Stock' : 'ETF'} added successfully',
+      );
       context.pop();
     }
-  }
-
-  void _showErrorSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      ),
-    );
-  }
-
-  void _showSuccessSnackbar() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${_isStock ? 'Stock' : 'ETF'} added successfully'),
-        backgroundColor: Colors.green,
-      ),
-    );
   }
 
   Future<void> _selectDate() async {

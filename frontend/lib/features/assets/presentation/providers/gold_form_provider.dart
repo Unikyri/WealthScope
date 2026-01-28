@@ -1,5 +1,10 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_metadata.dart';
+import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
+import 'package:wealthscope_app/features/assets/domain/entities/currency.dart';
+import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
+import 'package:wealthscope_app/features/assets/presentation/providers/asset_form_submission_provider.dart';
 
 part 'gold_form_provider.g.dart';
 
@@ -150,22 +155,36 @@ class GoldForm extends _$GoldForm {
     state = const GoldFormState();
   }
 
-  /// Submit form (placeholder for API integration)
+  /// Submit form and create gold asset via API
   Future<bool> submit() async {
     if (!state.isValid) return false;
 
     try {
-      // TODO: Integrate with assets repository
-      // final metadata = state.toMetadata();
-      // await ref.read(assetsRepositoryProvider).createAsset(
-      //   name: state.name,
-      //   type: 'precious_metal',
-      //   value: calculateCurrentValue(),
-      //   metadata: metadata,
-      // );
+      final userId = Supabase.instance.client.auth.currentUser?.id;
+      if (userId == null) throw Exception('User not authenticated');
 
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
+      // Build asset entity
+      final asset = StockAsset(
+        userId: userId,
+        type: AssetType.gold,
+        symbol: 'GOLD',
+        name: state.name,
+        quantity: state.weightOz ?? 0.0,
+        purchasePrice: state.purchasePrice ?? 0.0,
+        purchaseDate: state.purchaseDate,
+        currency: Currency.usd,
+        metadata: state.toMetadata().toJson(),
+        notes: state.notes.isEmpty ? null : state.notes,
+      );
+
+      // Submit via API
+      await ref.read(assetFormSubmissionProvider.notifier).submitCreate(asset);
+
+      // Check result
+      final submissionState = ref.read(assetFormSubmissionProvider);
+      if (submissionState.error != null) {
+        return false;
+      }
 
       reset();
       return true;

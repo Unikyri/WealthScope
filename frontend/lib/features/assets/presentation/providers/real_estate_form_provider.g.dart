@@ -6,7 +6,7 @@ part of 'real_estate_form_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$realEstateFormHash() => r'7b4a25e4b81035b6186bf8010c26e5db1c4d1968';
+String _$realEstateFormHash() => r'cba58ae2f94f091b0be3dad8f38d82d33cf1213a';
 
 /// Real Estate Form Provider
 ///

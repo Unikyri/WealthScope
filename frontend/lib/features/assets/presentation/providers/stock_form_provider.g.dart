@@ -6,7 +6,7 @@ part of 'stock_form_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$stockFormHash() => r'2f55fbeff46158a71088398e20261591ca02a5ad';
+String _$stockFormHash() => r'2c7c6af97269f33e5aa65a4210f38aee364f767f';
 
 /// Stock Form Provider
 /// Manages the state and business logic for the stock/ETF form.
