@@ -1,0 +1,108 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'assets_provider.dart';
+
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+String _$allAssetsHash() => r'3d6942bd6fea72908c7b50923960b9d14cf8d062';
+
+/// Provider for fetching all assets
+/// This provider fetches the complete list of user assets
+///
+/// Copied from [allAssets].
+@ProviderFor(allAssets)
+final allAssetsProvider = AutoDisposeFutureProvider<List<StockAsset>>.internal(
+  allAssets,
+  name: r'allAssetsProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$allAssetsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef AllAssetsRef = AutoDisposeFutureProviderRef<List<StockAsset>>;
+String _$filteredAssetsHash() => r'a904447274ef7820997e0ce1cf4a916d31793b58';
+
+/// Provider for filtered assets based on selected type
+/// This provider automatically updates when the filter changes
+///
+/// Copied from [filteredAssets].
+@ProviderFor(filteredAssets)
+final filteredAssetsProvider =
+    AutoDisposeFutureProvider<List<StockAsset>>.internal(
+  filteredAssets,
+  name: r'filteredAssetsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$filteredAssetsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef FilteredAssetsRef = AutoDisposeFutureProviderRef<List<StockAsset>>;
+String _$searchedAssetsHash() => r'f18f12f21513e77fb4b2ad4f1fe0e70386ebc585';
+
+/// Provider for searched assets
+/// Returns filtered assets based on search query
+///
+/// Copied from [searchedAssets].
+@ProviderFor(searchedAssets)
+final searchedAssetsProvider =
+    AutoDisposeFutureProvider<List<StockAsset>>.internal(
+  searchedAssets,
+  name: r'searchedAssetsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$searchedAssetsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef SearchedAssetsRef = AutoDisposeFutureProviderRef<List<StockAsset>>;
+String _$selectedAssetTypeHash() => r'0c728901cd16e576e2636227e3c7633934ab9d3e';
+
+/// Provider for selected asset type filter
+/// This provider manages the current filter state for the asset list
+///
+/// Copied from [SelectedAssetType].
+@ProviderFor(SelectedAssetType)
+final selectedAssetTypeProvider =
+    AutoDisposeNotifierProvider<SelectedAssetType, AssetType?>.internal(
+  SelectedAssetType.new,
+  name: r'selectedAssetTypeProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$selectedAssetTypeHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$SelectedAssetType = AutoDisposeNotifier<AssetType?>;
+String _$assetSearchHash() => r'a05e4bad77e105e770b074481b8781880d16bc4e';
+
+/// Provider for asset search functionality
+/// This provider handles searching assets by symbol or name
+///
+/// Copied from [AssetSearch].
+@ProviderFor(AssetSearch)
+final assetSearchProvider =
+    AutoDisposeNotifierProvider<AssetSearch, String>.internal(
+  AssetSearch.new,
+  name: r'assetSearchProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$assetSearchHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$AssetSearch = AutoDisposeNotifier<String>;
+// ignore_for_file: type=lint
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

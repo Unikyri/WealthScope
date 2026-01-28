@@ -6,7 +6,7 @@ import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
 /// Router Provider
 /// Provides the GoRouter instance with auth guard
 final routerProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authStateNotifierProvider);
+  final authState = ref.watch(authStateProvider);
   
   return GoRouter(
     initialLocation: '/splash',
