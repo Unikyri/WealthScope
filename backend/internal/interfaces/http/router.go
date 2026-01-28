@@ -1,6 +1,8 @@
 package http
 
 import (
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
@@ -8,6 +10,7 @@ import (
 	"github.com/Unikyri/WealthScope/backend/internal/domain/repositories"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/config"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/database"
+	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/logging"
 	infraRepo "github.com/Unikyri/WealthScope/backend/internal/infrastructure/repositories"
 	"github.com/Unikyri/WealthScope/backend/internal/interfaces/http/handlers"
 	"github.com/Unikyri/WealthScope/backend/internal/interfaces/http/middleware"
@@ -30,6 +33,13 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 	router.Use(gin.Recovery())
 	router.Use(requestIDMiddleware())
 	router.Use(gin.Logger())
+
+	// Initialize rate limiter for auth endpoints (5 attempts per minute)
+	authRateLimiter := middleware.NewRateLimiter(5, time.Minute)
+
+	// Initialize auth logger
+	authLogger, _ := logging.NewAuthLogger()
+	_ = authLogger // Will be used in handlers
 
 	// Initialize repositories
 	var userRepo repositories.UserRepository
@@ -85,8 +95,9 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		// Public routes
 		v1.GET("/ping", healthHandler.Ping)
 
-		// Auth routes (protected)
+		// Auth routes (protected with rate limiting)
 		auth := v1.Group("/auth")
+		auth.Use(authRateLimiter.Middleware()) // Rate limit: 5 attempts per minute
 		auth.Use(middleware.AuthMiddleware(deps.Config.Supabase.JWTSecret))
 		{
 			auth.POST("/sync", authHandler.Sync)
