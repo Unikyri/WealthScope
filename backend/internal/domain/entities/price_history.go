@@ -3,12 +3,14 @@ package entities
 import "time"
 
 // PriceHistory represents a single recorded price observation.
+//
+//nolint:govet // fieldalignment: readability over micro-optimization for DTO
 type PriceHistory struct {
-	Symbol        string    `json:"symbol"`
+	RecordedAt    time.Time `json:"recorded_at"`
 	Price         float64   `json:"price"`
 	ChangeAmount  float64   `json:"change_amount,omitempty"`
 	ChangePercent float64   `json:"change_percent,omitempty"`
+	Symbol        string    `json:"symbol"`
 	MarketState   string    `json:"market_state,omitempty"`
-	RecordedAt    time.Time `json:"recorded_at"`
 	Source        string    `json:"source,omitempty"`
 }

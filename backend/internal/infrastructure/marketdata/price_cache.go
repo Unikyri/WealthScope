@@ -12,9 +12,9 @@ type cacheEntry[T any] struct {
 
 // TTLCache is a small in-memory cache with TTL, safe for concurrent use.
 type TTLCache[T any] struct {
-	ttl time.Duration
-	mu  sync.RWMutex
 	m   map[string]cacheEntry[T]
+	mu  sync.RWMutex
+	ttl time.Duration
 }
 
 // NewTTLCache creates a new TTLCache with the given TTL.
@@ -62,4 +62,3 @@ func (c *TTLCache[T]) Clear() {
 	c.m = make(map[string]cacheEntry[T])
 	c.mu.Unlock()
 }
-

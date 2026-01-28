@@ -7,12 +7,14 @@ import (
 )
 
 // Config holds all configuration for the application
+//
+//nolint:govet // fieldalignment: keep grouped sub-configs for readability
 type Config struct {
-	Server   ServerConfig
-	Database DatabaseConfig
 	Pricing  PricingConfig
-	Supabase SupabaseConfig
+	Database DatabaseConfig
+	Server   ServerConfig
 	Log      LogConfig
+	Supabase SupabaseConfig
 }
 
 // ServerConfig holds server-specific configuration

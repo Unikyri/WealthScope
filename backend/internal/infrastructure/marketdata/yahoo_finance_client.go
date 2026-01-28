@@ -11,14 +11,16 @@ import (
 )
 
 // Quote represents a market quote for a symbol.
+//
+//nolint:govet // fieldalignment: readability over micro-optimization for DTO
 type Quote struct {
-	Symbol        string    `json:"symbol"`
+	UpdatedAt     time.Time `json:"updated_at"`
 	Price         float64   `json:"price"`
 	Change        float64   `json:"change"`
 	ChangePercent float64   `json:"change_percent"`
+	Symbol        string    `json:"symbol"`
 	MarketState   string    `json:"market_state"`
 	Currency      string    `json:"currency,omitempty"`
-	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 // YahooFinanceClient fetches quotes from Yahoo Finance public endpoints.
@@ -135,14 +137,17 @@ func normalizeSymbols(symbols []string) []string {
 
 type yahooQuoteResponse struct {
 	QuoteResponse struct {
-		Result []struct {
-			Symbol                     string  `json:"symbol"`
-			RegularMarketPrice         float64 `json:"regularMarketPrice"`
-			RegularMarketChange        float64 `json:"regularMarketChange"`
-			RegularMarketChangePercent float64 `json:"regularMarketChangePercent"`
-			MarketState                string  `json:"marketState"`
-			Currency                   string  `json:"currency"`
-		} `json:"result"`
-		Error interface{} `json:"error"`
+		Error  interface{}        `json:"error"`
+		Result []yahooQuoteResult `json:"result"`
 	} `json:"quoteResponse"`
+}
+
+//nolint:govet // fieldalignment: readability over micro-optimization for DTO
+type yahooQuoteResult struct {
+	RegularMarketPrice         float64 `json:"regularMarketPrice"`
+	RegularMarketChange        float64 `json:"regularMarketChange"`
+	RegularMarketChangePercent float64 `json:"regularMarketChangePercent"`
+	Symbol                     string  `json:"symbol"`
+	MarketState                string  `json:"marketState"`
+	Currency                   string  `json:"currency"`
 }
