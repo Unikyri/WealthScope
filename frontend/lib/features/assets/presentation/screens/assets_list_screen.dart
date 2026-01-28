@@ -49,18 +49,35 @@ class AssetsListScreen extends ConsumerWidget {
           Expanded(
             child: assetsAsync.when(
               data: (assets) {
-                // Empty state
+                // Empty state with pull-to-refresh support
                 if (assets.isEmpty) {
-                  return const EmptyAssetsView();
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      // Invalidate provider to force reload
+                      ref.invalidate(allAssetsProvider);
+                      // Wait for the refresh to complete
+                      await ref.read(allAssetsProvider.future);
+                    },
+                    child: const SingleChildScrollView(
+                      physics: AlwaysScrollableScrollPhysics(),
+                      child: SizedBox(
+                        height: 500, // Minimum height for pull-to-refresh
+                        child: EmptyAssetsView(),
+                      ),
+                    ),
+                  );
                 }
 
-                // Data state - show list
+                // Data state - show list with pull-to-refresh
                 return RefreshIndicator(
                   onRefresh: () async {
-                    // Refresh assets
+                    // Invalidate provider to force reload
                     ref.invalidate(allAssetsProvider);
+                    // Wait for the refresh to complete
+                    await ref.read(allAssetsProvider.future);
                   },
                   child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(16),
                     itemCount: assets.length,
                     itemBuilder: (context, index) {
@@ -74,13 +91,27 @@ class AssetsListScreen extends ConsumerWidget {
                 return const AssetListSkeleton();
               },
               error: (error, stack) {
-                // Error state
-                return ErrorView(
-                  message: error.toString(),
-                  onRetry: () {
-                    // Retry fetching assets
+                // Error state with pull-to-refresh support
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    // Invalidate provider to retry
                     ref.invalidate(allAssetsProvider);
+                    // Wait for the refresh to complete
+                    await ref.read(allAssetsProvider.future);
                   },
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: SizedBox(
+                      height: 500, // Minimum height for pull-to-refresh
+                      child: ErrorView(
+                        message: error.toString(),
+                        onRetry: () {
+                          // Retry fetching assets
+                          ref.invalidate(allAssetsProvider);
+                        },
+                      ),
+                    ),
+                  ),
                 );
               },
             ),

@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:wealthscope_app/features/assets/data/providers/asset_repository_provider.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
 
@@ -23,20 +24,11 @@ class SelectedAssetType extends _$SelectedAssetType {
 }
 
 /// Provider for fetching all assets
-/// This provider fetches the complete list of user assets
+/// This provider fetches the complete list of user assets from the backend
 @riverpod
 Future<List<StockAsset>> allAssets(AllAssetsRef ref) async {
-  // TODO: Replace with actual repository implementation
-  // For now, return mock data for demonstration
-  await Future.delayed(const Duration(seconds: 1));
-  
-  // Mock data - replace with:
-  // final repository = ref.watch(assetRepositoryProvider);
-  // return await repository.getAssets();
-  
-  return [
-    // Sample data for demonstration
-  ];
+  final repository = ref.watch(assetRepositoryProvider);
+  return await repository.getAssets();
 }
 
 /// Provider for filtered assets based on selected type

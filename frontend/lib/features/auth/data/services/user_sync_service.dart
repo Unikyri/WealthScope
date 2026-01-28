@@ -15,7 +15,7 @@ class UserSyncService {
   }) async {
     try {
       await _dio.post(
-        '/api/users/sync',
+        '/api/v1/users/sync',
         data: {
           'userId': userId,
           'email': email,
