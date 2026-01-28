@@ -33,19 +33,41 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 
 	// Initialize repositories
 	var userRepo repositories.UserRepository
+	var assetRepo repositories.AssetRepository
 	if deps.DB != nil {
 		userRepo = infraRepo.NewPostgresUserRepository(deps.DB.DB)
+		assetRepo = infraRepo.NewPostgresAssetRepository(deps.DB.DB)
 	}
 
 	// Initialize use cases
 	var syncUserUseCase *usecases.SyncUserUseCase
+	var createAssetUC *usecases.CreateAssetUseCase
+	var getAssetUC *usecases.GetAssetUseCase
+	var listAssetsUC *usecases.ListAssetsUseCase
+	var updateAssetUC *usecases.UpdateAssetUseCase
+	var deleteAssetUC *usecases.DeleteAssetUseCase
+
 	if userRepo != nil {
 		syncUserUseCase = usecases.NewSyncUserUseCase(userRepo)
+	}
+	if assetRepo != nil {
+		createAssetUC = usecases.NewCreateAssetUseCase(assetRepo)
+		getAssetUC = usecases.NewGetAssetUseCase(assetRepo)
+		listAssetsUC = usecases.NewListAssetsUseCase(assetRepo)
+		updateAssetUC = usecases.NewUpdateAssetUseCase(assetRepo)
+		deleteAssetUC = usecases.NewDeleteAssetUseCase(assetRepo)
 	}
 
 	// Initialize handlers
 	healthHandler := handlers.NewHealthHandler(deps.DB)
 	authHandler := handlers.NewAuthHandler(syncUserUseCase)
+	assetHandler := handlers.NewAssetHandler(
+		createAssetUC,
+		getAssetUC,
+		listAssetsUC,
+		updateAssetUC,
+		deleteAssetUC,
+	)
 
 	// Health check (public)
 	router.GET("/health", healthHandler.Health)
@@ -62,6 +84,17 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		{
 			auth.POST("/sync", authHandler.Sync)
 			auth.GET("/me", authHandler.Me)
+		}
+
+		// Asset routes (protected)
+		assets := v1.Group("/assets")
+		assets.Use(middleware.AuthMiddleware(deps.Config.Supabase.JWTSecret))
+		{
+			assets.POST("", assetHandler.Create)
+			assets.GET("", assetHandler.List)
+			assets.GET("/:id", assetHandler.GetByID)
+			assets.PUT("/:id", assetHandler.Update)
+			assets.DELETE("/:id", assetHandler.Delete)
 		}
 	}
 
