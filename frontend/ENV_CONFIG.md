@@ -1,53 +1,58 @@
-# Configuración de Variables de Entorno
+# Environment Configuration Guide
 
-## 🎯 Opción 1: Editar Directamente (Más Simple)
+## 🎯 Option 1: Direct Edit (Quickest for Hackathon)
 
-Para el hackathon, la forma más rápida:
+The fastest approach for hackathon development:
 
-1. Abre el archivo [`lib/core/constants/app_config.dart`](lib/core/constants/app_config.dart)
-2. Cambia el `defaultValue` de las constantes:
+1. Open [`lib/core/constants/app_config.dart`](lib/core/constants/app_config.dart)
+2. Change the `defaultValue` of the constants:
 
 ```dart
 static const String apiBaseUrl = String.fromEnvironment(
   'API_BASE_URL',
-  defaultValue: 'http://localhost:3000', // 👈 Cambia esto
+  defaultValue: 'https://wealthscope-production.up.railway.app', // 👈 Update this
 );
 ```
 
-✅ **Ventaja**: No requiere setup adicional  
-⚠️ **Desventaja**: No puedes tener múltiples ambientes fácilmente
+✅ **Advantage**: No additional setup required  
+⚠️ **Disadvantage**: Cannot easily switch between environments
 
 ---
 
-## 🚀 Opción 2: Usar Variables de Entorno (Recomendado)
+## 🚀 Option 2: Use Environment Variables (Recommended)
 
-### Paso 1: Configurar el archivo `.env`
+### Step 1: Configure the `.env` file
 
-1. Copia [`.env.example`](.env.example) → `.env`
-2. Edita [`.env`](.env) con tus valores reales:
+1. Copy [`.env.example`](.env.example) → `.env` (already done)
+2. Edit [`.env`](.env) with your actual values:
 
 ```env
-API_BASE_URL=http://localhost:3000
-SUPABASE_URL=https://tu-proyecto.supabase.co
-SUPABASE_ANON_KEY=tu-anon-key-aqui
+API_BASE_URL=https://wealthscope-production.up.railway.app
+SUPABASE_URL=https://jdgnyhxoagatsdlnbrjo.supabase.co
+SUPABASE_ANON_KEY=your-actual-key-here
 ENVIRONMENT=development
 ```
 
-### Paso 2: Ejecutar con Variables
+### Step 2: Run with Environment Variables
 
-**Para Development:**
+**For Development:**
 ```bash
 flutter run --dart-define-from-file=.env
 ```
 
-**Para Production:**
+**For Production:**
 ```bash
 flutter run --dart-define-from-file=.env.production
 ```
 
-### Paso 3: (Opcional) Configurar VS Code
+**For Web:**
+```bash
+flutter run -d chrome --dart-define-from-file=.env
+```
 
-Crea `.vscode/launch.json`:
+### Step 3: (Optional) Configure VS Code
+
+Create or update `.vscode/launch.json`:
 
 ```json
 {
@@ -57,8 +62,18 @@ Crea `.vscode/launch.json`:
       "name": "WealthScope (Dev)",
       "request": "launch",
       "type": "dart",
+      "program": "lib/main.dart",
       "args": [
         "--dart-define-from-file=.env"
+      ]
+    },
+    {
+      "name": "WealthScope (Prod)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=.env.production"
       ]
     }
   ]
@@ -67,18 +82,59 @@ Crea `.vscode/launch.json`:
 
 ---
 
-## 📝 Valores Actuales
+## 📝 Current Configuration
 
-Los valores por defecto están en [`app_config.dart`](lib/core/constants/app_config.dart):
+Default values are in [`app_config.dart`](lib/core/constants/app_config.dart):
 
-- **API Base URL**: `http://localhost:3000`
-- **Supabase URL**: Por configurar
-- **Supabase Anon Key**: Por configurar
+- **API Base URL**: `https://wealthscope-production.up.railway.app` (Railway deployment)
+- **Supabase URL**: `https://jdgnyhxoagatsdlnbrjo.supabase.co`
+- **Supabase Anon Key**: Configured in `.env`
 - **Environment**: `development`
+
+### Available Environment Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `API_BASE_URL` | Backend API endpoint | `https://wealthscope-production.up.railway.app` |
+| `SUPABASE_URL` | Supabase project URL | `https://xxx.supabase.co` |
+| `SUPABASE_ANON_KEY` | Supabase public key | `eyJhbGci...` |
+| `ENVIRONMENT` | Current environment | `development`, `staging`, `production` |
+| `ENABLE_DEBUG_LOGS` | Enable debug logging | `true` / `false` |
+| `ENABLE_API_LOGS` | Log API requests | `true` / `false` |
+| `DEFAULT_CURRENCY` | Default currency | `USD`, `EUR`, etc. |
+| `API_TIMEOUT_SECONDS` | Request timeout | `30` |
 
 ---
 
-## 🔒 Seguridad
+## 🔒 Security
 
-⚠️ **NUNCA** commitees el archivo `.env` con keys reales  
-✅ El `.gitignore` ya está configurado para ignorarlo
+⚠️ **NEVER** commit the `.env` file with real keys  
+✅ The `.gitignore` is already configured to ignore it  
+🔑 Only use `SUPABASE_ANON_KEY` in frontend (never use `service_role` key)
+
+---
+
+## 🐛 Troubleshooting
+
+### Variables not loading?
+
+1. Make sure you're using `--dart-define-from-file=.env` when running
+2. Check that `.env` file exists in the project root
+3. Verify no syntax errors in `.env` (no quotes needed for values)
+4. Restart the app completely (hot reload won't update env vars)
+
+### Still seeing placeholder values?
+
+Check the `defaultValue` in [`app_config.dart`](lib/core/constants/app_config.dart) - these are used when env vars aren't provided.
+
+---
+
+## 🎯 Quick Start
+
+For immediate use during hackathon:
+
+1. **Verify `.env` is configured** (already done ✅)
+2. **Update default values in `app_config.dart`** (recommended for quick testing)
+3. **Or run with:** `flutter run --dart-define-from-file=.env`
+
+The app will work with either approach!
