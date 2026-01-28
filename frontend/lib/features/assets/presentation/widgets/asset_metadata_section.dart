@@ -276,7 +276,16 @@ class AssetMetadataSection extends StatelessWidget {
             icon: Icons.percent,
             theme: theme,
           ),
-        if (metadata.couponRate != null && metadata.rating != null)
+        if (metadata.couponRate != null && metadata.maturityDate != null)
+          const SizedBox(height: 16),
+        if (metadata.maturityDate != null)
+          _MetadataRow(
+            label: 'Maturity Date',
+            value: _formatDate(metadata.maturityDate!),
+            icon: Icons.event,
+            theme: theme,
+          ),
+        if (metadata.maturityDate != null && metadata.rating != null)
           const SizedBox(height: 16),
         if (metadata.rating != null)
           _MetadataRow(
@@ -310,6 +319,10 @@ class AssetMetadataSection extends StatelessWidget {
         .split('_')
         .map((word) => word[0].toUpperCase() + word.substring(1))
         .join(' ');
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
   }
 
   String _truncateAddress(String address) {
