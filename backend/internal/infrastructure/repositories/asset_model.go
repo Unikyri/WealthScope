@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 
 	"github.com/Unikyri/WealthScope/backend/internal/domain/entities"
 )
@@ -26,6 +27,7 @@ type AssetModel struct {
 	PurchasePrice float64         `gorm:"type:decimal(20,2);not null;column:purchase_price"`
 	ID            uuid.UUID       `gorm:"type:uuid;primaryKey"`
 	UserID        uuid.UUID       `gorm:"type:uuid;not null;index"`
+	DeletedAt     gorm.DeletedAt  `gorm:"index"`
 }
 
 // TableName returns the table name for GORM
