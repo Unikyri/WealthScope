@@ -12,12 +12,17 @@ import (
 // PortfolioHandler handles portfolio-related HTTP requests
 type PortfolioHandler struct {
 	getPortfolioSummaryUC *usecases.GetPortfolioSummaryUseCase
+	getPortfolioRiskUC    *usecases.GetPortfolioRiskUseCase
 }
 
 // NewPortfolioHandler creates a new PortfolioHandler
-func NewPortfolioHandler(getPortfolioSummaryUC *usecases.GetPortfolioSummaryUseCase) *PortfolioHandler {
+func NewPortfolioHandler(
+	getPortfolioSummaryUC *usecases.GetPortfolioSummaryUseCase,
+	getPortfolioRiskUC *usecases.GetPortfolioRiskUseCase,
+) *PortfolioHandler {
 	return &PortfolioHandler{
 		getPortfolioSummaryUC: getPortfolioSummaryUC,
+		getPortfolioRiskUC:    getPortfolioRiskUC,
 	}
 }
 
@@ -72,6 +77,32 @@ func (h *PortfolioHandler) GetSummary(c *gin.Context) {
 	}
 
 	response.Success(c, toPortfolioSummaryResponse(summary))
+}
+
+// GetRisk handles GET /api/v1/portfolio/risk
+// @Summary Get portfolio risk alerts
+// @Description Returns basic concentration risk alerts for the authenticated user's portfolio
+// @Tags portfolio
+// @Produce json
+// @Success 200 {object} response.Response{data=services.PortfolioRisk}
+// @Failure 401 {object} response.Response{error=string}
+// @Failure 500 {object} response.Response{error=string}
+// @Security BearerAuth
+// @Router /api/v1/portfolio/risk [get]
+func (h *PortfolioHandler) GetRisk(c *gin.Context) {
+	userID, ok := middleware.GetUserID(c)
+	if !ok {
+		response.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	risk, err := h.getPortfolioRiskUC.Execute(c.Request.Context(), userID)
+	if err != nil {
+		response.InternalError(c, "Failed to analyze portfolio risk")
+		return
+	}
+
+	response.Success(c, risk)
 }
 
 // ====================================

@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
+	"github.com/Unikyri/WealthScope/backend/internal/application/services"
 	"github.com/Unikyri/WealthScope/backend/internal/application/usecases"
 	"github.com/Unikyri/WealthScope/backend/internal/domain/repositories"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/config"
@@ -74,6 +75,12 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		getPortfolioSummaryUC = usecases.NewGetPortfolioSummaryUseCase(assetRepo)
 	}
 
+	// Initialize risk use cases
+	var getPortfolioRiskUC *usecases.GetPortfolioRiskUseCase
+	if assetRepo != nil {
+		getPortfolioRiskUC = usecases.NewGetPortfolioRiskUseCase(assetRepo, services.NewRiskService())
+	}
+
 	// Initialize handlers
 	healthHandler := handlers.NewHealthHandler(deps.DB)
 	authHandler := handlers.NewAuthHandler(syncUserUseCase)
@@ -84,7 +91,7 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		updateAssetUC,
 		deleteAssetUC,
 	)
-	portfolioHandler := handlers.NewPortfolioHandler(getPortfolioSummaryUC)
+	portfolioHandler := handlers.NewPortfolioHandler(getPortfolioSummaryUC, getPortfolioRiskUC)
 
 	// Health check (public)
 	router.GET("/health", healthHandler.Health)
@@ -120,6 +127,7 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		portfolio.Use(middleware.AuthMiddleware(deps.Config.Supabase.JWTSecret))
 		{
 			portfolio.GET("/summary", portfolioHandler.GetSummary)
+			portfolio.GET("/risk", portfolioHandler.GetRisk)
 		}
 	}
 
