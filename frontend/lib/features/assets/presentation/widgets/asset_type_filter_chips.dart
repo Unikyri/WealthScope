@@ -13,6 +13,21 @@ class AssetTypeFilterChips extends StatelessWidget {
   final AssetType? selected;
   final ValueChanged<AssetType?> onSelected;
 
+  /// Map of asset types to their corresponding icons
+  static const Map<AssetType, IconData> _assetTypeIcons = {
+    AssetType.stock: Icons.trending_up,
+    AssetType.etf: Icons.pie_chart,
+    AssetType.realEstate: Icons.home,
+    AssetType.gold: Icons.diamond,
+    AssetType.bond: Icons.account_balance,
+    AssetType.crypto: Icons.currency_bitcoin,
+    AssetType.other: Icons.category,
+  };
+
+  IconData _getTypeIcon(AssetType type) {
+    return _assetTypeIcons[type] ?? Icons.category;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -33,19 +48,25 @@ class AssetTypeFilterChips extends StatelessWidget {
               onSelected: (_) => onSelected(null),
               selectedColor: theme.colorScheme.primaryContainer,
               checkmarkColor: theme.colorScheme.primary,
+              showCheckmark: true,
             ),
           ),
           
           // Asset type chips
           ...AssetType.values.map((type) {
+            final icon = _getTypeIcon(type);
             return Padding(
               padding: const EdgeInsets.only(right: 8),
               child: FilterChip(
+                avatar: selected == type
+                    ? null
+                    : Icon(icon, size: 18),
                 label: Text(type.displayName),
                 selected: selected == type,
                 onSelected: (_) => onSelected(type),
                 selectedColor: theme.colorScheme.primaryContainer,
                 checkmarkColor: theme.colorScheme.primary,
+                showCheckmark: true,
               ),
             );
           }),
