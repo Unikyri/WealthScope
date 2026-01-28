@@ -40,6 +40,15 @@ func (f *fakeAssetRepo) GetTotalValueByUserID(ctx context.Context, userID uuid.U
 func (f *fakeAssetRepo) FindBySymbol(ctx context.Context, userID uuid.UUID, symbol string) ([]entities.Asset, error) {
 	return nil, nil
 }
+func (f *fakeAssetRepo) FindListedAssets(ctx context.Context, userID uuid.UUID) ([]entities.Asset, error) {
+	return nil, nil
+}
+func (f *fakeAssetRepo) UpdateCurrentPriceBySymbol(ctx context.Context, userID uuid.UUID, symbol string, price float64) error {
+	return nil
+}
+func (f *fakeAssetRepo) ListUserIDsWithListedAssets(ctx context.Context) ([]uuid.UUID, error) {
+	return nil, nil
+}
 func (f *fakeAssetRepo) GetPortfolioSummary(ctx context.Context, userID uuid.UUID) (*repositories.PortfolioSummary, error) {
 	if f.err != nil {
 		return nil, f.err

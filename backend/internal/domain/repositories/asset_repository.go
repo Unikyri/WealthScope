@@ -78,4 +78,13 @@ type AssetRepository interface {
 
 	// GetPortfolioSummary returns complete portfolio summary with breakdown by asset type
 	GetPortfolioSummary(ctx context.Context, userID uuid.UUID) (*PortfolioSummary, error)
+
+	// FindListedAssets returns assets that have a tradable symbol (e.g. stocks, ETFs, crypto).
+	FindListedAssets(ctx context.Context, userID uuid.UUID) ([]entities.Asset, error)
+
+	// UpdateCurrentPriceBySymbol updates current_price for all assets matching a symbol for a user.
+	UpdateCurrentPriceBySymbol(ctx context.Context, userID uuid.UUID, symbol string, price float64) error
+
+	// ListUserIDsWithListedAssets returns distinct user IDs that have listed assets.
+	ListUserIDsWithListedAssets(ctx context.Context) ([]uuid.UUID, error)
 }

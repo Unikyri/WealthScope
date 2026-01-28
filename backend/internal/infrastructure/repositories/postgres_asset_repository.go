@@ -223,6 +223,57 @@ func (r *PostgresAssetRepository) FindBySymbol(ctx context.Context, userID uuid.
 	return assets, nil
 }
 
+// FindListedAssets returns assets that have a tradable symbol.
+func (r *PostgresAssetRepository) FindListedAssets(ctx context.Context, userID uuid.UUID) ([]entities.Asset, error) {
+	var models []AssetModel
+	result := r.db.WithContext(ctx).
+		Where("user_id = ? AND symbol IS NOT NULL AND symbol <> ''", userID).
+		Find(&models)
+
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to list listed assets: %w", result.Error)
+	}
+
+	assets := make([]entities.Asset, len(models))
+	for i, model := range models {
+		assets[i] = *model.ToEntity()
+	}
+	return assets, nil
+}
+
+// UpdateCurrentPriceBySymbol updates current_price for all assets matching a symbol for a user.
+func (r *PostgresAssetRepository) UpdateCurrentPriceBySymbol(ctx context.Context, userID uuid.UUID, symbol string, price float64) error {
+	now := time.Now().UTC()
+	result := r.db.WithContext(ctx).
+		Model(&AssetModel{}).
+		Where("user_id = ? AND symbol = ?", userID, symbol).
+		Updates(map[string]interface{}{
+			"current_price": price,
+			"updated_at":    now,
+		})
+
+	if result.Error != nil {
+		return fmt.Errorf("failed to update current_price: %w", result.Error)
+	}
+
+	return nil
+}
+
+// ListUserIDsWithListedAssets returns distinct user IDs that have listed assets.
+func (r *PostgresAssetRepository) ListUserIDsWithListedAssets(ctx context.Context) ([]uuid.UUID, error) {
+	var userIDs []uuid.UUID
+	result := r.db.WithContext(ctx).
+		Model(&AssetModel{}).
+		Where("symbol IS NOT NULL AND symbol <> ''").
+		Distinct("user_id").
+		Pluck("user_id", &userIDs)
+
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to list user IDs with listed assets: %w", result.Error)
+	}
+	return userIDs, nil
+}
+
 // GetPortfolioSummary returns complete portfolio summary with breakdown by asset type
 func (r *PostgresAssetRepository) GetPortfolioSummary(ctx context.Context, userID uuid.UUID) (*repositories.PortfolioSummary, error) {
 	// Fetch all assets for the user
