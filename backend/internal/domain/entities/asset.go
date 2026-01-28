@@ -45,20 +45,20 @@ func (t AssetType) IsValid() bool {
 
 // Asset represents an investment asset owned by a user
 type Asset struct {
-	ID            uuid.UUID       `json:"id"`
-	UserID        uuid.UUID       `json:"user_id"`
-	Type          AssetType       `json:"type"`
-	Name          string          `json:"name"`
-	Symbol        *string         `json:"symbol,omitempty"`
-	Quantity      float64         `json:"quantity"`
-	PurchasePrice float64         `json:"purchase_price"`
-	CurrentPrice  *float64        `json:"current_price,omitempty"`
-	Currency      string          `json:"currency"`
-	PurchaseDate  *time.Time      `json:"purchase_date,omitempty"`
-	Metadata      json.RawMessage `json:"metadata,omitempty"`
-	Notes         *string         `json:"notes,omitempty"`
 	CreatedAt     time.Time       `json:"created_at"`
 	UpdatedAt     time.Time       `json:"updated_at"`
+	CurrentPrice  *float64        `json:"current_price,omitempty"`
+	Notes         *string         `json:"notes,omitempty"`
+	Symbol        *string         `json:"symbol,omitempty"`
+	PurchaseDate  *time.Time      `json:"purchase_date,omitempty"`
+	Type          AssetType       `json:"type"`
+	Name          string          `json:"name"`
+	Currency      string          `json:"currency"`
+	Metadata      json.RawMessage `json:"metadata,omitempty"`
+	Quantity      float64         `json:"quantity"`
+	PurchasePrice float64         `json:"purchase_price"`
+	ID            uuid.UUID       `json:"id"`
+	UserID        uuid.UUID       `json:"user_id"`
 }
 
 // NewAsset creates a new Asset with required fields

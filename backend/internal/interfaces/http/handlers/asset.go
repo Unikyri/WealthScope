@@ -48,20 +48,21 @@ func NewAssetHandler(
 
 // CreateAssetRequest represents the request body for creating an asset
 type CreateAssetRequest struct {
+	Metadata      map[string]interface{} `json:"metadata,omitempty"`
+	Symbol        *string                `json:"symbol,omitempty" binding:"omitempty,max=20"`
+	CurrentPrice  *float64               `json:"current_price,omitempty" binding:"omitempty,gte=0"`
+	PurchaseDate  *string                `json:"purchase_date,omitempty"`
+	Notes         *string                `json:"notes,omitempty" binding:"omitempty,max=1000"`
 	Type          string                 `json:"type" binding:"required,oneof=stock etf bond crypto real_estate gold cash other"`
 	Name          string                 `json:"name" binding:"required,min=1,max=255"`
-	Symbol        *string                `json:"symbol,omitempty" binding:"omitempty,max=20"`
+	Currency      string                 `json:"currency,omitempty" binding:"omitempty,len=3"`
 	Quantity      float64                `json:"quantity" binding:"required,gt=0"`
 	PurchasePrice float64                `json:"purchase_price" binding:"required,gte=0"`
-	CurrentPrice  *float64               `json:"current_price,omitempty" binding:"omitempty,gte=0"`
-	Currency      string                 `json:"currency,omitempty" binding:"omitempty,len=3"`
-	PurchaseDate  *string                `json:"purchase_date,omitempty"`
-	Metadata      map[string]interface{} `json:"metadata,omitempty"`
-	Notes         *string                `json:"notes,omitempty" binding:"omitempty,max=1000"`
 }
 
 // UpdateAssetRequest represents the request body for updating an asset
 type UpdateAssetRequest struct {
+	Metadata      map[string]interface{} `json:"metadata,omitempty"`
 	Type          *string                `json:"type,omitempty" binding:"omitempty,oneof=stock etf bond crypto real_estate gold cash other"`
 	Name          *string                `json:"name,omitempty" binding:"omitempty,min=1,max=255"`
 	Symbol        *string                `json:"symbol,omitempty" binding:"omitempty,max=20"`
@@ -70,29 +71,28 @@ type UpdateAssetRequest struct {
 	CurrentPrice  *float64               `json:"current_price,omitempty" binding:"omitempty,gte=0"`
 	Currency      *string                `json:"currency,omitempty" binding:"omitempty,len=3"`
 	PurchaseDate  *string                `json:"purchase_date,omitempty"`
-	Metadata      map[string]interface{} `json:"metadata,omitempty"`
 	Notes         *string                `json:"notes,omitempty" binding:"omitempty,max=1000"`
 }
 
 // AssetResponse represents an asset in API responses
 type AssetResponse struct {
+	Metadata        map[string]interface{} `json:"metadata,omitempty"`
+	Symbol          *string                `json:"symbol,omitempty"`
+	CurrentPrice    *float64               `json:"current_price,omitempty"`
+	PurchaseDate    *string                `json:"purchase_date,omitempty"`
+	Notes           *string                `json:"notes,omitempty"`
+	GainLoss        *float64               `json:"gain_loss,omitempty"`
+	GainLossPercent *float64               `json:"gain_loss_percent,omitempty"`
 	ID              string                 `json:"id"`
 	Type            string                 `json:"type"`
 	Name            string                 `json:"name"`
-	Symbol          *string                `json:"symbol,omitempty"`
-	Quantity        float64                `json:"quantity"`
-	PurchasePrice   float64                `json:"purchase_price"`
-	CurrentPrice    *float64               `json:"current_price,omitempty"`
 	Currency        string                 `json:"currency"`
-	PurchaseDate    *string                `json:"purchase_date,omitempty"`
-	Metadata        map[string]interface{} `json:"metadata,omitempty"`
-	Notes           *string                `json:"notes,omitempty"`
-	TotalValue      float64                `json:"total_value"`
-	TotalCost       float64                `json:"total_cost"`
-	GainLoss        *float64               `json:"gain_loss,omitempty"`
-	GainLossPercent *float64               `json:"gain_loss_percent,omitempty"`
 	CreatedAt       string                 `json:"created_at"`
 	UpdatedAt       string                 `json:"updated_at"`
+	Quantity        float64                `json:"quantity"`
+	PurchasePrice   float64                `json:"purchase_price"`
+	TotalValue      float64                `json:"total_value"`
+	TotalCost       float64                `json:"total_cost"`
 }
 
 // ListAssetsResponse represents the response for listing assets
@@ -142,8 +142,8 @@ func (h *AssetHandler) Create(c *gin.Context) {
 	// Parse purchase date if provided
 	var purchaseDate *time.Time
 	if req.PurchaseDate != nil {
-		parsed, err := time.Parse("2006-01-02", *req.PurchaseDate)
-		if err != nil {
+		parsed, parseErr := time.Parse("2006-01-02", *req.PurchaseDate)
+		if parseErr != nil {
 			response.BadRequest(c, "Invalid purchase_date format. Use YYYY-MM-DD")
 			return
 		}
@@ -318,16 +318,16 @@ func (h *AssetHandler) Update(c *gin.Context) {
 	}
 
 	var req UpdateAssetRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.BadRequest(c, "Invalid request: "+err.Error())
+	if bindErr := c.ShouldBindJSON(&req); bindErr != nil {
+		response.BadRequest(c, "Invalid request: "+bindErr.Error())
 		return
 	}
 
 	// Parse purchase date if provided
 	var purchaseDate *time.Time
 	if req.PurchaseDate != nil {
-		parsed, err := time.Parse("2006-01-02", *req.PurchaseDate)
-		if err != nil {
+		parsed, parseErr := time.Parse("2006-01-02", *req.PurchaseDate)
+		if parseErr != nil {
 			response.BadRequest(c, "Invalid purchase_date format. Use YYYY-MM-DD")
 			return
 		}
@@ -421,7 +421,7 @@ func toAssetResponse(asset *entities.Asset) AssetResponse {
 	}
 
 	// Parse metadata if available
-	if asset.Metadata != nil && len(asset.Metadata) > 2 {
+	if len(asset.Metadata) > 2 {
 		var metadata map[string]interface{}
 		if err := json.Unmarshal(asset.Metadata, &metadata); err == nil {
 			resp.Metadata = metadata

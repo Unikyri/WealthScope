@@ -29,17 +29,17 @@ var (
 
 // CreateAssetInput represents the input for creating an asset
 type CreateAssetInput struct {
-	UserID        uuid.UUID
+	Metadata      map[string]interface{}
+	PurchaseDate  *time.Time
+	Symbol        *string
+	CurrentPrice  *float64
+	Notes         *string
 	Type          string
 	Name          string
-	Symbol        *string
+	Currency      string
 	Quantity      float64
 	PurchasePrice float64
-	CurrentPrice  *float64
-	Currency      string
-	PurchaseDate  *time.Time
-	Metadata      map[string]interface{}
-	Notes         *string
+	UserID        uuid.UUID
 }
 
 // CreateAssetUseCase handles creating a new asset
@@ -145,10 +145,10 @@ func (uc *GetAssetUseCase) Execute(ctx context.Context, assetID, userID uuid.UUI
 
 // ListAssetsInput represents the input for listing assets
 type ListAssetsInput struct {
-	UserID   uuid.UUID
 	Type     *string
 	Symbol   *string
 	Currency *string
+	UserID   uuid.UUID
 	Page     int
 	PerPage  int
 }
@@ -218,8 +218,8 @@ func (uc *ListAssetsUseCase) Execute(ctx context.Context, input ListAssetsInput)
 
 // UpdateAssetInput represents the input for updating an asset
 type UpdateAssetInput struct {
-	AssetID       uuid.UUID
-	UserID        uuid.UUID
+	Metadata      map[string]interface{}
+	PurchaseDate  *time.Time
 	Type          *string
 	Name          *string
 	Symbol        *string
@@ -227,9 +227,9 @@ type UpdateAssetInput struct {
 	PurchasePrice *float64
 	CurrentPrice  *float64
 	Currency      *string
-	PurchaseDate  *time.Time
-	Metadata      map[string]interface{}
 	Notes         *string
+	AssetID       uuid.UUID
+	UserID        uuid.UUID
 }
 
 // UpdateAssetUseCase handles updating an existing asset
