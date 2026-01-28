@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -220,4 +221,78 @@ func (r *PostgresAssetRepository) FindBySymbol(ctx context.Context, userID uuid.
 		assets[i] = *model.ToEntity()
 	}
 	return assets, nil
+}
+
+// GetPortfolioSummary returns complete portfolio summary with breakdown by asset type
+func (r *PostgresAssetRepository) GetPortfolioSummary(ctx context.Context, userID uuid.UUID) (*repositories.PortfolioSummary, error) {
+	// Fetch all assets for the user
+	var models []AssetModel
+	result := r.db.WithContext(ctx).
+		Where("user_id = ?", userID).
+		Find(&models)
+
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to fetch assets for portfolio summary: %w", result.Error)
+	}
+
+	// Calculate totals and build breakdown
+	var totalValue, totalInvested float64
+	typeMap := make(map[entities.AssetType]*repositories.AssetTypeBreakdown)
+	var lastUpdated time.Time
+
+	for _, model := range models {
+		asset := model.ToEntity()
+
+		// Calculate values
+		currentValue := asset.TotalValue()
+		investedValue := asset.TotalCost()
+
+		totalValue += currentValue
+		totalInvested += investedValue
+
+		// Track last updated
+		if asset.UpdatedAt.After(lastUpdated) {
+			lastUpdated = asset.UpdatedAt
+		}
+
+		// Group by type
+		if _, exists := typeMap[asset.Type]; !exists {
+			typeMap[asset.Type] = &repositories.AssetTypeBreakdown{
+				Type: asset.Type,
+			}
+		}
+		typeMap[asset.Type].Value += currentValue
+		typeMap[asset.Type].Count++
+	}
+
+	// Calculate gain/loss
+	gainLoss := totalValue - totalInvested
+	var gainLossPercent float64
+	if totalInvested > 0 {
+		gainLossPercent = (gainLoss / totalInvested) * 100
+	}
+
+	// Build breakdown slice and calculate percentages
+	breakdown := make([]repositories.AssetTypeBreakdown, 0, len(typeMap))
+	for _, tb := range typeMap {
+		if totalValue > 0 {
+			tb.Percent = (tb.Value / totalValue) * 100
+		}
+		breakdown = append(breakdown, *tb)
+	}
+
+	// Set default time if no assets
+	if lastUpdated.IsZero() {
+		lastUpdated = time.Now().UTC()
+	}
+
+	return &repositories.PortfolioSummary{
+		TotalValue:      totalValue,
+		TotalInvested:   totalInvested,
+		GainLoss:        gainLoss,
+		GainLossPercent: gainLossPercent,
+		AssetCount:      len(models),
+		LastUpdated:     lastUpdated,
+		BreakdownByType: breakdown,
+	}, nil
 }
