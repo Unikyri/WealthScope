@@ -16,27 +16,25 @@ class EmptyAssetsView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Illustration/Icon
+            // Empty portfolio illustration
             Icon(
-              Icons.wallet_outlined,
+              Icons.account_balance_wallet_outlined,
               size: 120,
-              color: theme.colorScheme.primary.withOpacity(0.3),
+              color: theme.colorScheme.onSurface.withOpacity(0.2),
             ),
             const SizedBox(height: 24),
             
             // Title
             Text(
-              'No Assets Yet',
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              'You don\'t have any assets yet',
+              style: theme.textTheme.headlineSmall,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             
-            // Description
+            // Subtitle/Description
             Text(
-              'Start building your portfolio by adding your first asset',
+              'Start by adding your first investment to see your portfolio here.',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface.withOpacity(0.6),
               ),
@@ -45,10 +43,10 @@ class EmptyAssetsView extends StatelessWidget {
             const SizedBox(height: 32),
             
             // CTA Button
-            FilledButton.icon(
+            ElevatedButton.icon(
               onPressed: () => context.push('/assets/add'),
               icon: const Icon(Icons.add),
-              label: const Text('Add First Asset'),
+              label: const Text('Add my first asset'),
             ),
           ],
         ),
