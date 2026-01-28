@@ -10,7 +10,7 @@ description: Guides implementation of the asset ingestion feature in WealthScope
 Asset ingestion is the process of adding assets to a user's portfolio. WealthScope supports two methods:
 
 1. **Manual Entry**: Form-based input with validation
-2. **AI-Assisted (OCR)**: Document scanning with GPT-4 Vision extraction
+2. **AI-Assisted (OCR)**: Document scanning with Google Gemini 3.0 extraction
 
 ## Manual Asset Entry
 
@@ -244,27 +244,34 @@ For each asset found, return:
 Be conservative with confidence scores. Omit assets where key data is uncertain.`
 
 func (s *AIService) ExtractFromDocument(ctx context.Context, imageURL string) (*ExtractionResult, error) {
-    resp, err := s.openai.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
-        Model: "gpt-4o",
-        Messages: []openai.ChatCompletionMessage{
-            {Role: "system", Content: extractionPrompt},
+    // Prepare request to Gemini API
+    req := &genai.GenerateContentRequest{
+        Model: "gemini-3.0-flash",
+        Contents: []*genai.Content{
             {
                 Role: "user",
-                Content: []openai.ChatMessagePart{
-                    {Type: "image_url", ImageURL: &openai.ChatMessageImageURL{URL: imageURL}},
+                Parts: []*genai.Part{
+                    {Text: extractionPrompt},
+                    {InlineData: &genai.Blob{
+                        MimeType: "image/jpeg",
+                        Data:     imageData,
+                    }},
                 },
             },
         },
-        MaxTokens:   1500,
-        Temperature: 0.1,
-    })
+        GenerationConfig: &genai.GenerationConfig{
+            Temperature:     0.1,
+            MaxOutputTokens: 1500,
+        },
+    }
     
+    resp, err := s.gemini.GenerateContent(ctx, req)
     if err != nil {
-        return nil, fmt.Errorf("OpenAI API error: %w", err)
+        return nil, fmt.Errorf("Gemini API error: %w", err)
     }
     
     var result ExtractionResult
-    if err := json.Unmarshal([]byte(resp.Choices[0].Message.Content), &result); err != nil {
+    if err := json.Unmarshal([]byte(resp.Candidates[0].Content.Parts[0].Text), &result); err != nil {
         return nil, fmt.Errorf("failed to parse AI response: %w", err)
     }
     

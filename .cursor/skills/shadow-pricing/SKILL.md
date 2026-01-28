@@ -63,7 +63,7 @@ func (r *PricingRouter) Valuate(ctx context.Context, asset *Asset) (*ValuationRe
 ```go
 type RealEstateValuator struct {
     propertyAPI PropertyDataAPI
-    aiClient    *openai.Client
+    gemini      *genai.Client
 }
 
 type PropertyInput struct {
@@ -352,19 +352,31 @@ Be conservative. If uncertain, reflect in lower confidence and wider range.`
 func (v *AIFallbackValuator) Valuate(ctx context.Context, asset *Asset) (*ValuationResult, error) {
     assetJSON, _ := json.Marshal(asset)
     
-    resp, err := v.openai.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
-        Model:       "gpt-4o",
-        Messages:    []openai.ChatCompletionMessage{
-            {Role: "system", Content: strings.Replace(aiValuationPrompt, "{{.AssetJSON}}", string(assetJSON), 1)},
-            {Role: "user", Content: "Please provide your valuation."},
+    req := &genai.GenerateContentRequest{
+        Model: "gemini-3.0-flash",
+        Contents: []*genai.Content{
+            {
+                Role: "user",
+                Parts: []*genai.Part{
+                    {Text: strings.Replace(aiValuationPrompt, "{{.AssetJSON}}", string(assetJSON), 1)},
+                    {Text: "Please provide your valuation."},
+                },
+            },
         },
-        MaxTokens:   800,
-        Temperature: 0.2,
-    })
+        GenerationConfig: &genai.GenerationConfig{
+            Temperature:     0.2,
+            MaxOutputTokens: 800,
+        },
+    }
+    
+    resp, err := v.gemini.GenerateContent(ctx, req)
+    if err != nil {
+        return nil, fmt.Errorf("Gemini API error: %w", err)
+    }
     
     // Parse response
     var aiResult AIValuationResponse
-    json.Unmarshal([]byte(resp.Choices[0].Message.Content), &aiResult)
+    json.Unmarshal([]byte(resp.Candidates[0].Content.Parts[0].Text), &aiResult)
     
     // Cap AI confidence at 0.75 (never fully trust AI-only)
     confidence := math.Min(aiResult.Confidence, 0.75)

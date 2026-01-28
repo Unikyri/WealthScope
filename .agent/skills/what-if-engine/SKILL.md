@@ -60,7 +60,7 @@ type AssetImpact struct {
 
 ```go
 type ScenarioService struct {
-    openai       *openai.Client
+    gemini       *genai.Client
     portfolioSvc PortfolioService
     marketData   MarketDataService
     scenarioRepo ScenarioRepository
@@ -82,19 +82,23 @@ func (s *ScenarioService) RunScenario(ctx context.Context, userID uuid.UUID, que
     // 4. Build prompt
     prompt := s.buildPrompt(portfolio, query, marketContext)
     
-    // 5. Call OpenAI
-    resp, err := s.openai.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
-        Model:       "gpt-4o",
-        Messages:    prompt,
-        MaxTokens:   2000,
-        Temperature: 0.3,
-    })
+    // 5. Call Gemini
+    req := &genai.GenerateContentRequest{
+        Model:    "gemini-3.0-flash",
+        Contents: prompt,
+        GenerationConfig: &genai.GenerationConfig{
+            Temperature:     0.3,
+            MaxOutputTokens: 2000,
+        },
+    }
+    
+    resp, err := s.gemini.GenerateContent(ctx, req)
     if err != nil {
         return nil, fmt.Errorf("AI request failed: %w", err)
     }
     
     // 6. Parse and validate response
-    result, err := s.parseResponse(resp.Choices[0].Message.Content)
+    result, err := s.parseResponse(resp.Candidates[0].Content.Parts[0].Text)
     if err != nil {
         return nil, fmt.Errorf("failed to parse response: %w", err)
     }
