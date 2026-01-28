@@ -26,6 +26,7 @@ type RiskAlert struct {
 	Threshold float64 `json:"threshold"`
 }
 
+//nolint:govet // fieldalignment: keep response DTO readable and stable
 type PortfolioRisk struct {
 	Alerts               []RiskAlert `json:"alerts"`
 	RiskScore            int         `json:"risk_score"` // 0-100
