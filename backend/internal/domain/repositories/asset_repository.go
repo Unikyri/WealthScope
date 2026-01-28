@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -30,6 +31,25 @@ type AssetListResult struct {
 	TotalPages int
 }
 
+// AssetTypeBreakdown represents aggregated data for a single asset type
+type AssetTypeBreakdown struct {
+	Type    entities.AssetType
+	Value   float64
+	Percent float64
+	Count   int
+}
+
+// PortfolioSummary contains the complete portfolio summary with breakdown
+type PortfolioSummary struct {
+	LastUpdated     time.Time
+	BreakdownByType []AssetTypeBreakdown
+	TotalValue      float64
+	TotalInvested   float64
+	GainLoss        float64
+	GainLossPercent float64
+	AssetCount      int
+}
+
 // AssetRepository defines the interface for asset data access
 type AssetRepository interface {
 	// Create creates a new asset
@@ -55,4 +75,7 @@ type AssetRepository interface {
 
 	// FindBySymbol finds assets by symbol for a specific user
 	FindBySymbol(ctx context.Context, userID uuid.UUID, symbol string) ([]entities.Asset, error)
+
+	// GetPortfolioSummary returns complete portfolio summary with breakdown by asset type
+	GetPortfolioSummary(ctx context.Context, userID uuid.UUID) (*PortfolioSummary, error)
 }

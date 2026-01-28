@@ -58,6 +58,12 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		deleteAssetUC = usecases.NewDeleteAssetUseCase(assetRepo)
 	}
 
+	// Initialize portfolio use cases
+	var getPortfolioSummaryUC *usecases.GetPortfolioSummaryUseCase
+	if assetRepo != nil {
+		getPortfolioSummaryUC = usecases.NewGetPortfolioSummaryUseCase(assetRepo)
+	}
+
 	// Initialize handlers
 	healthHandler := handlers.NewHealthHandler(deps.DB)
 	authHandler := handlers.NewAuthHandler(syncUserUseCase)
@@ -68,6 +74,7 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		updateAssetUC,
 		deleteAssetUC,
 	)
+	portfolioHandler := handlers.NewPortfolioHandler(getPortfolioSummaryUC)
 
 	// Health check (public)
 	router.GET("/health", healthHandler.Health)
@@ -95,6 +102,13 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 			assets.GET("/:id", assetHandler.GetByID)
 			assets.PUT("/:id", assetHandler.Update)
 			assets.DELETE("/:id", assetHandler.Delete)
+		}
+
+		// Portfolio routes (protected)
+		portfolio := v1.Group("/portfolio")
+		portfolio.Use(middleware.AuthMiddleware(deps.Config.Supabase.JWTSecret))
+		{
+			portfolio.GET("/summary", portfolioHandler.GetSummary)
 		}
 	}
 
