@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:wealthscope_app/features/assets/data/providers/asset_repository_provider.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/asset_detail_header.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/asset_info_section.dart';
@@ -136,8 +137,9 @@ class AssetDetailScreen extends ConsumerWidget {
               }
               
               try {
-                // TODO: Implement delete functionality via repository
-                // await ref.read(assetRepositoryProvider).deleteAsset(assetId);
+                // Delete the asset via repository
+                final repository = ref.read(assetRepositoryProvider);
+                await repository.deleteAsset(assetId);
                 
                 // Invalidate the assets list to refresh
                 ref.invalidate(allAssetsProvider);

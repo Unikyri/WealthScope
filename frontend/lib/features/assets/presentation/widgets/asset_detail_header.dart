@@ -116,6 +116,8 @@ class AssetDetailHeader extends StatelessWidget {
     switch (type) {
       case AssetType.stock:
         return Icons.show_chart;
+      case AssetType.etf:
+        return Icons.pie_chart;
       case AssetType.bond:
         return Icons.account_balance;
       case AssetType.realEstate:
@@ -124,12 +126,8 @@ class AssetDetailHeader extends StatelessWidget {
         return Icons.diamond;
       case AssetType.crypto:
         return Icons.currency_bitcoin;
-      case AssetType.etf:
-        return Icons.pie_chart;
-      case AssetType.mutualFund:
-        return Icons.analytics;
-      case AssetType.commodity:
-        return Icons.business;
+      case AssetType.other:
+        return Icons.category;
     }
   }
 
