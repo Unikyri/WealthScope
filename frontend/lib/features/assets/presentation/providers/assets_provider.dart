@@ -82,3 +82,17 @@ Future<List<StockAsset>> searchedAssets(SearchedAssetsRef ref) async {
         asset.name.toLowerCase().contains(lowerQuery);
   }).toList();
 }
+
+/// Provider for fetching a single asset by ID
+/// This provider fetches detailed information for a specific asset
+@riverpod
+Future<StockAsset> assetDetail(AssetDetailRef ref, String assetId) async {
+  final repository = ref.watch(assetRepositoryProvider);
+  final asset = await repository.getAssetById(assetId);
+  
+  if (asset == null) {
+    throw Exception('Asset not found');
+  }
+  
+  return asset;
+}
