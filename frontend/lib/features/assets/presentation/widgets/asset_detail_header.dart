@@ -34,17 +34,20 @@ class AssetDetailHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Asset Type Icon
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface.withOpacity(0.2),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              _getAssetIcon(asset.type),
-              size: 40,
-              color: theme.colorScheme.onPrimary,
+          // Asset Type Icon with Hero animation
+          Hero(
+            tag: 'asset-icon-${asset.id}',
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                _getAssetIcon(asset.type),
+                size: 40,
+                color: theme.colorScheme.onPrimary,
+              ),
             ),
           ),
           const SizedBox(height: 16),
