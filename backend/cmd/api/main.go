@@ -8,7 +8,43 @@ import (
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/config"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/database"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/server"
+
+	_ "github.com/Unikyri/WealthScope/backend/docs" // Swagger docs
 )
+
+// @title WealthScope API
+// @version 1.0.0
+// @description API para gestión de portafolio de inversiones personales
+// @description
+// @description ## Autenticación
+// @description Esta API utiliza JWT de Supabase Auth. Incluye el token en el header:
+// @description `Authorization: Bearer <tu-token-jwt>`
+// @description
+// @description ## Tipos de Activos Soportados
+// @description - `stock` - Acciones
+// @description - `etf` - Fondos cotizados
+// @description - `bond` - Bonos
+// @description - `crypto` - Criptomonedas
+// @description - `real_estate` - Bienes raíces
+// @description - `gold` - Oro
+// @description - `cash` - Efectivo
+// @description - `other` - Otros
+
+// @contact.name WealthScope Team
+// @contact.url https://github.com/Unikyri/WealthScope
+// @contact.email support@wealthscope.app
+
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+
+// @host localhost:8080
+// @BasePath /
+// @schemes http https
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Ingresa tu JWT token con el prefijo "Bearer ". Ejemplo: "Bearer eyJhbGci..."
 
 func main() {
 	// Load configuration
