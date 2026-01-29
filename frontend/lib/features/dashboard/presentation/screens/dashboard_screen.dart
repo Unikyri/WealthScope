@@ -1,129 +1,116 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/providers/dashboard_providers.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/allocation_section.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/dashboard_skeleton.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/empty_dashboard.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/error_view.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_summary_card.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/risk_alerts_section.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/top_assets_section.dart';
+import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
 
+/// Dashboard Screen
+/// Main screen displaying portfolio overview
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    
+    final summaryAsync = ref.watch(portfolioSummaryProvider);
+    final currentUserEmail = ref.watch(currentUserProvider)?.email;
+
+    // Extract first name from email
+    final userName = currentUserEmail?.split('@').first.capitalize() ?? 'User';
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Dashboard',
-          style: theme.textTheme.titleLarge,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Hello, $userName',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              'Your Financial Summary',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.6),
+              ),
+            ),
+          ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined),
+            onPressed: () {
+              // TODO: Navigate to notifications
+            },
+          ),
+        ],
       ),
-      body: SafeArea(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(portfolioSummaryProvider);
+          await ref.read(portfolioSummaryProvider.future);
+        },
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Welcome to WealthScope',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Your financial overview',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
-                ),
-              ),
-              const SizedBox(height: 32),
-              // TODO: Add dashboard content (charts, statistics, etc.)
-              _DashboardCard(
-                title: 'Total Assets',
-                value: '\$0.00',
-                icon: Icons.account_balance_wallet,
-                color: theme.colorScheme.primary,
-              ),
-              const SizedBox(height: 16),
-              _DashboardCard(
-                title: 'Monthly Growth',
-                value: '0%',
-                icon: Icons.trending_up,
-                color: theme.colorScheme.secondary,
-              ),
-            ],
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16),
+          child: summaryAsync.when(
+            data: (summary) {
+              // Check if portfolio is empty
+              if (summary.totalValue == 0 && summary.allocations.isEmpty) {
+                return EmptyDashboard(
+                  onAddAsset: () => context.go('/assets/select-type'),
+                );
+              }
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  PortfolioSummaryCard(summary: summary),
+                  const SizedBox(height: 24),
+                  if (summary.allocations.isNotEmpty) ...[
+                    AllocationSection(allocations: summary.allocations),
+                    const SizedBox(height: 24),
+                  ],
+                  if (summary.alerts.isNotEmpty) ...[
+                    RiskAlertsSection(alerts: summary.alerts),
+                    const SizedBox(height: 24),
+                  ],
+                  if (summary.topAssets.isNotEmpty) ...[
+                    TopAssetsSection(topAssets: summary.topAssets),
+                  ],
+                ],
+              );
+            },
+            loading: () => const DashboardSkeleton(),
+            error: (error, _) => ErrorView(
+              message: error.toString(),
+              onRetry: () => ref.invalidate(portfolioSummaryProvider),
+            ),
           ),
         ),
       ),
-    );
-  }
-}
-
-class _DashboardCard extends StatelessWidget {
-  final String title;
-  final String value;
-  final IconData icon;
-  final Color color;
-
-  const _DashboardCard({
-    required this.title,
-    required this.value,
-    required this.icon,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: theme.colorScheme.shadow.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 28,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.7),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.go('/assets/select-type'),
+        icon: const Icon(Icons.add),
+        label: const Text('Add Asset'),
       ),
     );
   }
 }
+
+/// Extension to capitalize string
+extension StringExtension on String {
+  String capitalize() {
+    if (isEmpty) return this;
+    return '${this[0].toUpperCase()}${substring(1)}';
+  }
+}
+
