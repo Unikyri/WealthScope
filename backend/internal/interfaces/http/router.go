@@ -5,6 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"github.com/Unikyri/WealthScope/backend/internal/application/services"
 	"github.com/Unikyri/WealthScope/backend/internal/application/usecases"
@@ -95,6 +97,11 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 
 	// Health check (public)
 	router.GET("/health", healthHandler.Health)
+
+	// Swagger documentation (only in debug mode)
+	if deps.Config.Server.Mode != "release" {
+		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
 
 	// API v1 routes
 	v1 := router.Group("/api/v1")

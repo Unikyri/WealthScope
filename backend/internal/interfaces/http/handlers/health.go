@@ -30,6 +30,12 @@ type HealthResponse struct {
 }
 
 // Health handles GET /health
+// @Summary Health check
+// @Description Retorna el estado de salud del servicio y la conexión a la base de datos
+// @Tags health
+// @Produce json
+// @Success 200 {object} response.Response{data=HealthResponse}
+// @Router /health [get]
 func (h *HealthHandler) Health(c *gin.Context) {
 	status := "healthy"
 	var dbStatus *database.HealthStatus
@@ -57,6 +63,12 @@ type PingResponse struct {
 }
 
 // Ping handles GET /api/v1/ping
+// @Summary Ping
+// @Description Endpoint simple para verificar conectividad
+// @Tags health
+// @Produce json
+// @Success 200 {object} response.Response{data=PingResponse}
+// @Router /api/v1/ping [get]
 func (h *HealthHandler) Ping(c *gin.Context) {
 	response.Success(c, PingResponse{
 		Message: "pong",

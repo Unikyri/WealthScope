@@ -1,0 +1,718 @@
+basePath: /
+definitions:
+  github_com_Unikyri_WealthScope_backend_internal_infrastructure_database.HealthStatus:
+    properties:
+      connected:
+        type: boolean
+      error:
+        type: string
+      idle:
+        type: integer
+      in_use:
+        type: integer
+      latency:
+        type: string
+      max_open_connections:
+        type: integer
+      open_connections:
+        type: integer
+    type: object
+  github_com_Unikyri_WealthScope_backend_pkg_response.ErrorInfo:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  github_com_Unikyri_WealthScope_backend_pkg_response.Meta:
+    properties:
+      request_id:
+        type: string
+    type: object
+  github_com_Unikyri_WealthScope_backend_pkg_response.Response:
+    properties:
+      data: {}
+      error:
+        $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.ErrorInfo'
+      meta:
+        $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Meta'
+      success:
+        type: boolean
+    type: object
+  internal_interfaces_http_handlers.AssetResponse:
+    properties:
+      created_at:
+        type: string
+      currency:
+        type: string
+      current_price:
+        type: number
+      gain_loss:
+        type: number
+      gain_loss_percent:
+        type: number
+      id:
+        type: string
+      metadata:
+        additionalProperties: true
+        type: object
+      name:
+        type: string
+      notes:
+        type: string
+      purchase_date:
+        type: string
+      purchase_price:
+        type: number
+      quantity:
+        type: number
+      symbol:
+        type: string
+      total_cost:
+        type: number
+      total_value:
+        type: number
+      type:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  internal_interfaces_http_handlers.AssetTypeBreakdownResponse:
+    properties:
+      count:
+        type: integer
+      percent:
+        type: number
+      type:
+        type: string
+      value:
+        type: number
+    type: object
+  internal_interfaces_http_handlers.CreateAssetRequest:
+    properties:
+      currency:
+        type: string
+      current_price:
+        minimum: 0
+        type: number
+      metadata:
+        additionalProperties: true
+        type: object
+      name:
+        maxLength: 255
+        minLength: 1
+        type: string
+      notes:
+        maxLength: 1000
+        type: string
+      purchase_date:
+        type: string
+      purchase_price:
+        minimum: 0
+        type: number
+      quantity:
+        type: number
+      symbol:
+        maxLength: 20
+        type: string
+      type:
+        enum:
+        - stock
+        - etf
+        - bond
+        - crypto
+        - real_estate
+        - gold
+        - cash
+        - other
+        type: string
+    required:
+    - name
+    - purchase_price
+    - quantity
+    - type
+    type: object
+  internal_interfaces_http_handlers.HealthResponse:
+    properties:
+      database:
+        $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_internal_infrastructure_database.HealthStatus'
+      status:
+        type: string
+      timestamp:
+        type: string
+      version:
+        type: string
+    type: object
+  internal_interfaces_http_handlers.ListAssetsResponse:
+    properties:
+      assets:
+        items:
+          $ref: '#/definitions/internal_interfaces_http_handlers.AssetResponse'
+        type: array
+      pagination:
+        $ref: '#/definitions/internal_interfaces_http_handlers.PaginationInfo'
+    type: object
+  internal_interfaces_http_handlers.PaginationInfo:
+    properties:
+      page:
+        type: integer
+      per_page:
+        type: integer
+      total_count:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  internal_interfaces_http_handlers.PingResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  internal_interfaces_http_handlers.PortfolioRiskResponse:
+    properties:
+      alerts:
+        items:
+          $ref: '#/definitions/internal_interfaces_http_handlers.RiskAlertResponse'
+        type: array
+      diversification_level:
+        example: moderate
+        type: string
+      risk_score:
+        example: 35
+        type: integer
+    type: object
+  internal_interfaces_http_handlers.PortfolioSummaryResponse:
+    properties:
+      asset_count:
+        type: integer
+      breakdown_by_type:
+        items:
+          $ref: '#/definitions/internal_interfaces_http_handlers.AssetTypeBreakdownResponse'
+        type: array
+      gain_loss:
+        type: number
+      gain_loss_percent:
+        type: number
+      last_updated:
+        type: string
+      total_invested:
+        type: number
+      total_value:
+        type: number
+    type: object
+  internal_interfaces_http_handlers.RiskAlertResponse:
+    properties:
+      message:
+        example: El 45% de tu portafolio está en un solo sector
+        type: string
+      severity:
+        example: warning
+        type: string
+      threshold:
+        example: 40
+        type: number
+      title:
+        example: Alta concentración en Tecnología
+        type: string
+      type:
+        example: sector_concentration
+        type: string
+      value:
+        example: 45.5
+        type: number
+    type: object
+  internal_interfaces_http_handlers.SyncRequest:
+    properties:
+      display_name:
+        type: string
+    type: object
+  internal_interfaces_http_handlers.SyncResponse:
+    properties:
+      created:
+        type: boolean
+      user:
+        $ref: '#/definitions/internal_interfaces_http_handlers.UserResponse'
+    type: object
+  internal_interfaces_http_handlers.UpdateAssetRequest:
+    properties:
+      currency:
+        type: string
+      current_price:
+        minimum: 0
+        type: number
+      metadata:
+        additionalProperties: true
+        type: object
+      name:
+        maxLength: 255
+        minLength: 1
+        type: string
+      notes:
+        maxLength: 1000
+        type: string
+      purchase_date:
+        type: string
+      purchase_price:
+        minimum: 0
+        type: number
+      quantity:
+        type: number
+      symbol:
+        maxLength: 20
+        type: string
+      type:
+        enum:
+        - stock
+        - etf
+        - bond
+        - crypto
+        - real_estate
+        - gold
+        - cash
+        - other
+        type: string
+    type: object
+  internal_interfaces_http_handlers.UserResponse:
+    properties:
+      avatar_url:
+        type: string
+      created_at:
+        type: string
+      display_name:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@wealthscope.app
+    name: WealthScope Team
+    url: https://github.com/Unikyri/WealthScope
+  description: |-
+    API para gestión de portafolio de inversiones personales
+
+    ## Autenticación
+    Esta API utiliza JWT de Supabase Auth. Incluye el token en el header:
+    `Authorization: Bearer <tu-token-jwt>`
+
+    ## Tipos de Activos Soportados
+    - `stock` - Acciones
+    - `etf` - Fondos cotizados
+    - `bond` - Bonos
+    - `crypto` - Criptomonedas
+    - `real_estate` - Bienes raíces
+    - `gold` - Oro
+    - `cash` - Efectivo
+    - `other` - Otros
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: WealthScope API
+  version: 1.0.0
+paths:
+  /api/v1/assets:
+    get:
+      description: Returns a paginated list of assets for the authenticated user
+      parameters:
+      - description: Filter by asset type
+        in: query
+        name: type
+        type: string
+      - description: Filter by symbol
+        in: query
+        name: symbol
+        type: string
+      - description: Filter by currency
+        in: query
+        name: currency
+        type: string
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Items per page (default: 20, max: 100)'
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_interfaces_http_handlers.ListAssetsResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+      security:
+      - BearerAuth: []
+      summary: List user's assets
+      tags:
+      - assets
+    post:
+      consumes:
+      - application/json
+      description: Creates a new investment asset for the authenticated user
+      parameters:
+      - description: Asset data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_interfaces_http_handlers.CreateAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_interfaces_http_handlers.AssetResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a new asset
+      tags:
+      - assets
+  /api/v1/assets/{id}:
+    delete:
+      description: Deletes an asset by its ID
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete an asset
+      tags:
+      - assets
+    get:
+      description: Returns a specific asset by its ID
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_interfaces_http_handlers.AssetResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+      security:
+      - BearerAuth: []
+      summary: Get asset by ID
+      tags:
+      - assets
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing asset
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated asset data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_interfaces_http_handlers.UpdateAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_interfaces_http_handlers.AssetResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+      security:
+      - BearerAuth: []
+      summary: Update an asset
+      tags:
+      - assets
+  /api/v1/auth/me:
+    get:
+      description: Returns the currently authenticated user's profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_interfaces_http_handlers.UserResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+      security:
+      - BearerAuth: []
+      summary: Get current user
+      tags:
+      - auth
+  /api/v1/auth/sync:
+    post:
+      consumes:
+      - application/json
+      description: Synchronizes user data from Supabase Auth to local database
+      parameters:
+      - description: Sync request
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/internal_interfaces_http_handlers.SyncRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_interfaces_http_handlers.SyncResponse'
+              type: object
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_interfaces_http_handlers.SyncResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+      security:
+      - BearerAuth: []
+      summary: Sync user from Supabase Auth
+      tags:
+      - auth
+  /api/v1/ping:
+    get:
+      description: Endpoint simple para verificar conectividad
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_interfaces_http_handlers.PingResponse'
+              type: object
+      summary: Ping
+      tags:
+      - health
+  /api/v1/portfolio/risk:
+    get:
+      description: Retorna análisis de riesgo y alertas de concentración del portafolio
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_interfaces_http_handlers.PortfolioRiskResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - properties:
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - properties:
+                error:
+                  type: string
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Get portfolio risk alerts
+      tags:
+      - portfolio
+  /api/v1/portfolio/summary:
+    get:
+      description: Returns complete portfolio summary with asset type breakdown
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_interfaces_http_handlers.PortfolioSummaryResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - properties:
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - properties:
+                error:
+                  type: string
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Get portfolio summary
+      tags:
+      - portfolio
+  /health:
+    get:
+      description: Retorna el estado de salud del servicio y la conexión a la base
+        de datos
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_interfaces_http_handlers.HealthResponse'
+              type: object
+      summary: Health check
+      tags:
+      - health
+schemes:
+- http
+- https
+securityDefinitions:
+  BearerAuth:
+    description: 'Ingresa tu JWT token con el prefijo "Bearer ". Ejemplo: "Bearer
+      eyJhbGci..."'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

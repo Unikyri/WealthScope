@@ -49,6 +49,25 @@ type PortfolioSummaryResponse struct {
 	AssetCount      int                          `json:"asset_count"`
 }
 
+// RiskAlertResponse represents a single risk alert
+type RiskAlertResponse struct {
+	Type      string  `json:"type" example:"sector_concentration"`
+	Severity  string  `json:"severity" example:"warning"`
+	Title     string  `json:"title" example:"Alta concentración en Tecnología"`
+	Message   string  `json:"message" example:"El 45% de tu portafolio está en un solo sector"`
+	Value     float64 `json:"value" example:"45.5"`
+	Threshold float64 `json:"threshold" example:"40.0"`
+}
+
+// PortfolioRiskResponse represents the portfolio risk analysis response
+//
+//nolint:govet // fieldalignment: keep response DTO readable
+type PortfolioRiskResponse struct {
+	Alerts               []RiskAlertResponse `json:"alerts"`
+	RiskScore            int                 `json:"risk_score" example:"35"`
+	DiversificationLevel string              `json:"diversification_level" example:"moderate"`
+}
+
 // ====================================
 // Handlers
 // ====================================
@@ -81,10 +100,10 @@ func (h *PortfolioHandler) GetSummary(c *gin.Context) {
 
 // GetRisk handles GET /api/v1/portfolio/risk
 // @Summary Get portfolio risk alerts
-// @Description Returns basic concentration risk alerts for the authenticated user's portfolio
+// @Description Retorna análisis de riesgo y alertas de concentración del portafolio
 // @Tags portfolio
 // @Produce json
-// @Success 200 {object} response.Response{data=services.PortfolioRisk}
+// @Success 200 {object} response.Response{data=PortfolioRiskResponse}
 // @Failure 401 {object} response.Response{error=string}
 // @Failure 500 {object} response.Response{error=string}
 // @Security BearerAuth
