@@ -6,6 +6,7 @@ import 'package:wealthscope_app/features/assets/presentation/providers/assets_pr
 import 'package:wealthscope_app/features/assets/presentation/widgets/asset_detail_header.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/asset_info_section.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/asset_metadata_section.dart';
+import 'package:wealthscope_app/features/assets/presentation/widgets/delete_asset_dialog.dart';
 
 /// Asset Detail Screen
 /// Displays complete information about a specific asset including
@@ -39,7 +40,7 @@ class AssetDetailScreen extends ConsumerWidget {
           ),
           IconButton(
             icon: const Icon(Icons.delete),
-            onPressed: () => _showDeleteDialog(context, ref),
+            onPressed: () => _handleDeleteAsset(context, ref),
             tooltip: 'Delete Asset',
           ),
         ],
@@ -106,73 +107,68 @@ class AssetDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _showDeleteDialog(BuildContext context, WidgetRef ref) {
+  void _handleDeleteAsset(BuildContext context, WidgetRef ref) async {
     final theme = Theme.of(context);
     
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Asset'),
-        content: const Text(
-          'Are you sure you want to delete this asset? This action cannot be undone.',
+    // Get the asset data first
+    final assetAsync = ref.read(assetDetailProvider(assetId));
+    final asset = assetAsync.valueOrNull;
+    
+    if (asset == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Unable to load asset data'),
+          backgroundColor: theme.colorScheme.error,
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancel'),
+      );
+      return;
+    }
+    
+    // Show confirmation dialog with asset name
+    final confirmed = await showDeleteAssetDialog(context, asset);
+    
+    // User cancelled or dismissed dialog
+    if (confirmed != true) return;
+    
+    // Show loading indicator
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Deleting asset...'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+    }
+    
+    try {
+      // Delete the asset via repository
+      final repository = ref.read(assetRepositoryProvider);
+      await repository.deleteAsset(assetId);
+      
+      // Invalidate the assets list to refresh
+      ref.invalidate(allAssetsProvider);
+      
+      if (context.mounted) {
+        // Navigate back to assets list
+        context.go('/assets');
+        
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Asset deleted successfully'),
+            backgroundColor: Colors.green,
           ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(dialogContext).pop();
-              
-              // Show loading indicator
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Deleting asset...'),
-                    duration: Duration(seconds: 1),
-                  ),
-                );
-              }
-              
-              try {
-                // Delete the asset via repository
-                final repository = ref.read(assetRepositoryProvider);
-                await repository.deleteAsset(assetId);
-                
-                // Invalidate the assets list to refresh
-                ref.invalidate(allAssetsProvider);
-                
-                if (context.mounted) {
-                  // Navigate back
-                  context.pop();
-                  
-                  // Show success message
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Asset deleted successfully'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Failed to delete asset: $e'),
-                      backgroundColor: theme.colorScheme.error,
-                    ),
-                  );
-                }
-              }
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: theme.colorScheme.error,
-            ),
-            child: const Text('Delete'),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to delete asset: $e'),
+            backgroundColor: theme.colorScheme.error,
           ),
-        ],
-      ),
-    );
+        );
+      }
+    }
   }
 }
