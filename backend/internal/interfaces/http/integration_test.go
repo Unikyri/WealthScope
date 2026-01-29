@@ -57,8 +57,8 @@ func TestIntegration_AssetsAndPortfolioEndpoints(t *testing.T) {
 	require.Equal(t, http.StatusCreated, created.Code)
 
 	var createResp struct {
-		Success bool                   `json:"success"`
 		Data    map[string]interface{} `json:"data"`
+		Success bool                   `json:"success"`
 	}
 	require.NoError(t, json.Unmarshal(created.Body.Bytes(), &createResp))
 	require.True(t, createResp.Success)

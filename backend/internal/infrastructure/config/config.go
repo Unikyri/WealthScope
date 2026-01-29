@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -51,36 +52,47 @@ func Load() *Config {
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
-	// Set defaults
-	viper.SetDefault("server.port", "8080")
-	viper.SetDefault("server.mode", "debug")
-	viper.SetDefault("database.url", "")
-	viper.SetDefault("pricing.update_interval_seconds", 300)
-	viper.SetDefault("supabase.url", "")
-	viper.SetDefault("supabase.anon_key", "")
-	viper.SetDefault("supabase.service_key", "")
-	viper.SetDefault("supabase.jwt_secret", "")
-	viper.SetDefault("log.level", "info")
+	viper.SetConfigFile(".env")
+	viper.AddConfigPath(".")
+	viper.SetConfigType("env")
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		// Advertencia suave si no existe el archivo (para producción con variables de entorno reales)
+		log.Printf("Advertencia al leer config: %v (usando variables de entorno)", err)
+	}
+
+	// Set defaults (Usando las claves tipo ENV para consistencia)
+	viper.SetDefault("SERVER_PORT", "8080")
+	viper.SetDefault("SERVER_MODE", "debug")
+	viper.SetDefault("DATABASE_URL", "")
+	viper.SetDefault("PRICING_UPDATE_INTERVAL_SECONDS", 300)
+	viper.SetDefault("SUPABASE_URL", "")
+	viper.SetDefault("SUPABASE_ANON_KEY", "")
+	viper.SetDefault("SUPABASE_SERVICE_KEY", "")
+	viper.SetDefault("SUPABASE_JWT_SECRET", "")
+	viper.SetDefault("LOG_LEVEL", "info")
 
 	return &Config{
 		Server: ServerConfig{
-			Port: viper.GetString("server.port"),
-			Mode: viper.GetString("server.mode"),
+			// CAMBIO: Usar claves en mayúsculas que coinciden con el .env
+			Port: viper.GetString("SERVER_PORT"),
+			Mode: viper.GetString("SERVER_MODE"),
 		},
 		Database: DatabaseConfig{
-			URL: viper.GetString("database.url"),
+			URL: viper.GetString("DATABASE_URL"),
 		},
 		Pricing: PricingConfig{
-			UpdateIntervalSeconds: viper.GetInt("pricing.update_interval_seconds"),
+			UpdateIntervalSeconds: viper.GetInt("PRICING_UPDATE_INTERVAL_SECONDS"),
 		},
 		Supabase: SupabaseConfig{
-			URL:        viper.GetString("supabase.url"),
-			AnonKey:    viper.GetString("supabase.anon_key"),
-			ServiceKey: viper.GetString("supabase.service_key"),
-			JWTSecret:  viper.GetString("supabase.jwt_secret"),
+			URL:        viper.GetString("SUPABASE_URL"),
+			AnonKey:    viper.GetString("SUPABASE_ANON_KEY"),
+			ServiceKey: viper.GetString("SUPABASE_SERVICE_KEY"),
+			JWTSecret:  viper.GetString("SUPABASE_JWT_SECRET"),
 		},
 		Log: LogConfig{
-			Level: viper.GetString("log.level"),
+			Level: viper.GetString("LOG_LEVEL"),
 		},
 	}
 }
