@@ -33,7 +33,6 @@ class AssetDetailScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
-              // TODO: Navigate to edit screen
               context.push('/assets/$assetId/edit');
             },
             tooltip: 'Edit Asset',

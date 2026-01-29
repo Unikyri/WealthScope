@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/assets/presentation/screens/add_asset_screen.dart';
 import 'package:wealthscope_app/features/assets/presentation/screens/asset_detail_screen.dart';
+import 'package:wealthscope_app/features/assets/presentation/screens/asset_edit_screen.dart';
 import 'package:wealthscope_app/features/assets/presentation/screens/assets_list_screen.dart';
 import 'package:wealthscope_app/features/assets/presentation/screens/select_asset_type_screen.dart';
 import 'package:wealthscope_app/features/assets/presentation/screens/stock_form_screen.dart';
@@ -83,6 +84,16 @@ class AppRouter {
                   final id = state.pathParameters['id']!;
                   return AssetDetailScreen(assetId: id);
                 },
+                routes: [
+                  GoRoute(
+                    path: 'edit',
+                    name: 'assets-edit',
+                    builder: (context, state) {
+                      final id = state.pathParameters['id']!;
+                      return AssetEditScreen(assetId: id);
+                    },
+                  ),
+                ],
               ),
             ],
           ),
