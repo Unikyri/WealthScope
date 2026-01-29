@@ -89,7 +89,7 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
     final assetAsync = ref.read(assetDetailProvider(widget.assetId));
     
     assetAsync.whenData((asset) {
-      if (asset != null && mounted) {
+      if (mounted) {
         setState(() {
           _originalAsset = asset;
           
@@ -302,26 +302,7 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
       ),
       body: assetAsync.when(
         data: (asset) {
-          if (asset == null) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: theme.colorScheme.error,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Asset not found',
-                    style: theme.textTheme.titleLarge,
-                  ),
-                ],
-              ),
-            );
-          }
-          
+          // AssetDetailProvider throws if asset not found, so this is always valid
           return _buildForm(asset);
         },
         loading: () => const Center(

@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wealthscope_app/core/utils/asset_validators.dart';
 import 'package:wealthscope_app/core/utils/snackbar_utils.dart';
-import 'package:wealthscope_app/features/assets/domain/entities/asset_metadata.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/currency.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
@@ -38,7 +37,6 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
   final _notesController = TextEditingController();
 
   DateTime? _selectedDate;
-  String? _selectedSymbol;
 
   @override
   void dispose() {
@@ -150,7 +148,6 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
               controller: _symbolController,
               onSymbolSelected: (symbol) {
                 setState(() {
-                  _selectedSymbol = symbol;
                   _symbolController.text = symbol;
                 });
               },

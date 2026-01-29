@@ -92,26 +92,20 @@ class AssetsListScreen extends ConsumerWidget {
                           return await showDeleteAssetDialog(context, asset);
                         },
                         onDismissed: (direction) async {
+                          // Optimistically update UI immediately
+                          ref.read(allAssetsProvider.notifier).removeAsset(asset.id!);
+
                           try {
                             // Delete asset from backend
                             await ref
                                 .read(assetRepositoryProvider)
                                 .deleteAsset(asset.id!);
 
-                            // Invalidate cache to refresh list
-                            ref.invalidate(allAssetsProvider);
-
                             // Show success message
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text('${asset.name} deleted'),
-                                  action: SnackBarAction(
-                                    label: 'Undo',
-                                    onPressed: () {
-                                      // TODO: Implement undo if time permits
-                                    },
-                                  ),
                                 ),
                               );
                             }
@@ -126,8 +120,8 @@ class AssetsListScreen extends ConsumerWidget {
                                 ),
                               );
                             }
-                            // Refresh list to restore item
-                            ref.invalidate(allAssetsProvider);
+                            // Revert optimistic update by refreshing from backend
+                            await ref.read(allAssetsProvider.notifier).refresh();
                           }
                         },
                         background: Container(
