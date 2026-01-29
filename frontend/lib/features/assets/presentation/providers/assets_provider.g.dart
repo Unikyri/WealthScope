@@ -6,25 +6,6 @@ part of 'assets_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$allAssetsHash() => r'f8b90c3b917114d6b142e9eb14a03cc719d54964';
-
-/// Provider for fetching all assets
-/// This provider fetches the complete list of user assets from the backend
-///
-/// Copied from [allAssets].
-@ProviderFor(allAssets)
-final allAssetsProvider = AutoDisposeFutureProvider<List<StockAsset>>.internal(
-  allAssets,
-  name: r'allAssetsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$allAssetsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef AllAssetsRef = AutoDisposeFutureProviderRef<List<StockAsset>>;
 String _$filteredAssetsHash() => r'a904447274ef7820997e0ce1cf4a916d31793b58';
 
 /// Provider for filtered assets based on selected type
@@ -255,6 +236,25 @@ final selectedAssetTypeProvider =
 );
 
 typedef _$SelectedAssetType = AutoDisposeNotifier<AssetType?>;
+String _$allAssetsHash() => r'6a0e34be2a184503958b26276bb5c9776d978fc8';
+
+/// Provider for fetching all assets
+/// This provider fetches the complete list of user assets from the backend
+/// Supports optimistic updates for delete operations
+///
+/// Copied from [AllAssets].
+@ProviderFor(AllAssets)
+final allAssetsProvider =
+    AutoDisposeAsyncNotifierProvider<AllAssets, List<StockAsset>>.internal(
+  AllAssets.new,
+  name: r'allAssetsProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$allAssetsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$AllAssets = AutoDisposeAsyncNotifier<List<StockAsset>>;
 String _$assetSearchHash() => r'a05e4bad77e105e770b074481b8781880d16bc4e';
 
 /// Provider for asset search functionality

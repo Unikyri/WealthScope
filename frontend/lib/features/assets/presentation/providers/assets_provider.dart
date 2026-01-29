@@ -25,10 +25,31 @@ class SelectedAssetType extends _$SelectedAssetType {
 
 /// Provider for fetching all assets
 /// This provider fetches the complete list of user assets from the backend
+/// Supports optimistic updates for delete operations
 @riverpod
-Future<List<StockAsset>> allAssets(AllAssetsRef ref) async {
-  final repository = ref.watch(assetRepositoryProvider);
-  return await repository.getAssets();
+class AllAssets extends _$AllAssets {
+  @override
+  Future<List<StockAsset>> build() async {
+    final repository = ref.watch(assetRepositoryProvider);
+    return await repository.getAssets();
+  }
+
+  /// Optimistically remove an asset from the list
+  /// Updates the UI immediately without waiting for the backend
+  void removeAsset(String assetId) {
+    state = state.whenData((assets) {
+      return assets.where((asset) => asset.id != assetId).toList();
+    });
+  }
+
+  /// Refresh the asset list from the backend
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final repository = ref.read(assetRepositoryProvider);
+      return await repository.getAssets();
+    });
+  }
 }
 
 /// Provider for filtered assets based on selected type

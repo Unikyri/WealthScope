@@ -63,12 +63,12 @@ class AssetFormSubmission extends _$AssetFormSubmission {
         isLoading: false,
         error: e.message,
       );
-    } on AuthFailure catch (e) {
+    } on AuthFailure {
       state = state.copyWith(
         isLoading: false,
         error: 'Session expired. Please log in again.',
       );
-    } on NetworkFailure catch (e) {
+    } on NetworkFailure {
       state = state.copyWith(
         isLoading: false,
         error: 'Connection error. Please check your internet.',
@@ -115,17 +115,17 @@ class AssetFormSubmission extends _$AssetFormSubmission {
         isLoading: false,
         error: e.message,
       );
-    } on AuthFailure catch (e) {
+    } on AuthFailure {
       state = state.copyWith(
         isLoading: false,
         error: 'Session expired. Please log in again.',
       );
-    } on NetworkFailure catch (e) {
+    } on NetworkFailure {
       state = state.copyWith(
         isLoading: false,
         error: 'Connection error. Please check your internet.',
       );
-    } on NotFoundFailure catch (e) {
+    } on NotFoundFailure {
       state = state.copyWith(
         isLoading: false,
         error: 'Asset not found',
@@ -159,17 +159,17 @@ class AssetFormSubmission extends _$AssetFormSubmission {
         isLoading: false,
         savedAsset: null,
       );
-    } on AuthFailure catch (e) {
+    } on AuthFailure {
       state = state.copyWith(
         isLoading: false,
         error: 'Session expired. Please log in again.',
       );
-    } on NetworkFailure catch (e) {
+    } on NetworkFailure {
       state = state.copyWith(
         isLoading: false,
         error: 'Connection error. Please check your internet.',
       );
-    } on NotFoundFailure catch (e) {
+    } on NotFoundFailure {
       state = state.copyWith(
         isLoading: false,
         error: 'Asset not found',
