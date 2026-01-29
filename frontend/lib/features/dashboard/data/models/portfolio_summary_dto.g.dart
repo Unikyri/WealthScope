@@ -14,6 +14,7 @@ _$PortfolioSummaryDtoImpl _$$PortfolioSummaryDtoImplFromJson(
       totalGainPercentage: (json['total_gain_percentage'] as num).toDouble(),
       dayChange: (json['day_change'] as num).toDouble(),
       dayChangePercentage: (json['day_change_percentage'] as num).toDouble(),
+      assetCount: (json['asset_count'] as num?)?.toInt() ?? 0,
       allocations: (json['allocations'] as List<dynamic>?)
               ?.map(
                   (e) => AssetAllocationDto.fromJson(e as Map<String, dynamic>))
@@ -37,6 +38,7 @@ Map<String, dynamic> _$$PortfolioSummaryDtoImplToJson(
       'total_gain_percentage': instance.totalGainPercentage,
       'day_change': instance.dayChange,
       'day_change_percentage': instance.dayChangePercentage,
+      'asset_count': instance.assetCount,
       'allocations': instance.allocations.map((e) => e.toJson()).toList(),
       'top_assets': instance.topAssets.map((e) => e.toJson()).toList(),
       'alerts': instance.alerts.map((e) => e.toJson()).toList(),

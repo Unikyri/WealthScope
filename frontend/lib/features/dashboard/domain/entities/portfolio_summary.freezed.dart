@@ -21,6 +21,7 @@ mixin _$PortfolioSummary {
   double get totalGainPercentage => throw _privateConstructorUsedError;
   double get dayChange => throw _privateConstructorUsedError;
   double get dayChangePercentage => throw _privateConstructorUsedError;
+  int get assetCount => throw _privateConstructorUsedError;
   List<AssetAllocation> get allocations => throw _privateConstructorUsedError;
   List<TopAsset> get topAssets => throw _privateConstructorUsedError;
   List<RiskAlert> get alerts => throw _privateConstructorUsedError;
@@ -44,6 +45,7 @@ abstract class $PortfolioSummaryCopyWith<$Res> {
       double totalGainPercentage,
       double dayChange,
       double dayChangePercentage,
+      int assetCount,
       List<AssetAllocation> allocations,
       List<TopAsset> topAssets,
       List<RiskAlert> alerts});
@@ -69,6 +71,7 @@ class _$PortfolioSummaryCopyWithImpl<$Res, $Val extends PortfolioSummary>
     Object? totalGainPercentage = null,
     Object? dayChange = null,
     Object? dayChangePercentage = null,
+    Object? assetCount = null,
     Object? allocations = null,
     Object? topAssets = null,
     Object? alerts = null,
@@ -94,6 +97,10 @@ class _$PortfolioSummaryCopyWithImpl<$Res, $Val extends PortfolioSummary>
           ? _value.dayChangePercentage
           : dayChangePercentage // ignore: cast_nullable_to_non_nullable
               as double,
+      assetCount: null == assetCount
+          ? _value.assetCount
+          : assetCount // ignore: cast_nullable_to_non_nullable
+              as int,
       allocations: null == allocations
           ? _value.allocations
           : allocations // ignore: cast_nullable_to_non_nullable
@@ -124,6 +131,7 @@ abstract class _$$PortfolioSummaryImplCopyWith<$Res>
       double totalGainPercentage,
       double dayChange,
       double dayChangePercentage,
+      int assetCount,
       List<AssetAllocation> allocations,
       List<TopAsset> topAssets,
       List<RiskAlert> alerts});
@@ -147,6 +155,7 @@ class __$$PortfolioSummaryImplCopyWithImpl<$Res>
     Object? totalGainPercentage = null,
     Object? dayChange = null,
     Object? dayChangePercentage = null,
+    Object? assetCount = null,
     Object? allocations = null,
     Object? topAssets = null,
     Object? alerts = null,
@@ -172,6 +181,10 @@ class __$$PortfolioSummaryImplCopyWithImpl<$Res>
           ? _value.dayChangePercentage
           : dayChangePercentage // ignore: cast_nullable_to_non_nullable
               as double,
+      assetCount: null == assetCount
+          ? _value.assetCount
+          : assetCount // ignore: cast_nullable_to_non_nullable
+              as int,
       allocations: null == allocations
           ? _value._allocations
           : allocations // ignore: cast_nullable_to_non_nullable
@@ -197,6 +210,7 @@ class _$PortfolioSummaryImpl implements _PortfolioSummary {
       required this.totalGainPercentage,
       required this.dayChange,
       required this.dayChangePercentage,
+      this.assetCount = 0,
       final List<AssetAllocation> allocations = const [],
       final List<TopAsset> topAssets = const [],
       final List<RiskAlert> alerts = const []})
@@ -214,6 +228,9 @@ class _$PortfolioSummaryImpl implements _PortfolioSummary {
   final double dayChange;
   @override
   final double dayChangePercentage;
+  @override
+  @JsonKey()
+  final int assetCount;
   final List<AssetAllocation> _allocations;
   @override
   @JsonKey()
@@ -243,7 +260,7 @@ class _$PortfolioSummaryImpl implements _PortfolioSummary {
 
   @override
   String toString() {
-    return 'PortfolioSummary(totalValue: $totalValue, totalGain: $totalGain, totalGainPercentage: $totalGainPercentage, dayChange: $dayChange, dayChangePercentage: $dayChangePercentage, allocations: $allocations, topAssets: $topAssets, alerts: $alerts)';
+    return 'PortfolioSummary(totalValue: $totalValue, totalGain: $totalGain, totalGainPercentage: $totalGainPercentage, dayChange: $dayChange, dayChangePercentage: $dayChangePercentage, assetCount: $assetCount, allocations: $allocations, topAssets: $topAssets, alerts: $alerts)';
   }
 
   @override
@@ -261,6 +278,8 @@ class _$PortfolioSummaryImpl implements _PortfolioSummary {
                 other.dayChange == dayChange) &&
             (identical(other.dayChangePercentage, dayChangePercentage) ||
                 other.dayChangePercentage == dayChangePercentage) &&
+            (identical(other.assetCount, assetCount) ||
+                other.assetCount == assetCount) &&
             const DeepCollectionEquality()
                 .equals(other._allocations, _allocations) &&
             const DeepCollectionEquality()
@@ -276,6 +295,7 @@ class _$PortfolioSummaryImpl implements _PortfolioSummary {
       totalGainPercentage,
       dayChange,
       dayChangePercentage,
+      assetCount,
       const DeepCollectionEquality().hash(_allocations),
       const DeepCollectionEquality().hash(_topAssets),
       const DeepCollectionEquality().hash(_alerts));
@@ -297,6 +317,7 @@ abstract class _PortfolioSummary implements PortfolioSummary {
       required final double totalGainPercentage,
       required final double dayChange,
       required final double dayChangePercentage,
+      final int assetCount,
       final List<AssetAllocation> allocations,
       final List<TopAsset> topAssets,
       final List<RiskAlert> alerts}) = _$PortfolioSummaryImpl;
@@ -311,6 +332,8 @@ abstract class _PortfolioSummary implements PortfolioSummary {
   double get dayChange;
   @override
   double get dayChangePercentage;
+  @override
+  int get assetCount;
   @override
   List<AssetAllocation> get allocations;
   @override
