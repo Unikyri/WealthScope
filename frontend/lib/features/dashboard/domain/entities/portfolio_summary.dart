@@ -12,6 +12,7 @@ class PortfolioSummary with _$PortfolioSummary {
     required double totalGainPercentage,
     required double dayChange,
     required double dayChangePercentage,
+    @Default(0) int assetCount,
     @Default([]) List<AssetAllocation> allocations,
     @Default([]) List<TopAsset> topAssets,
     @Default([]) List<RiskAlert> alerts,

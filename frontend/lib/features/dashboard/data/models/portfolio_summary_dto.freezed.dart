@@ -30,6 +30,8 @@ mixin _$PortfolioSummaryDto {
   double get dayChange => throw _privateConstructorUsedError;
   @JsonKey(name: 'day_change_percentage')
   double get dayChangePercentage => throw _privateConstructorUsedError;
+  @JsonKey(name: 'asset_count')
+  int get assetCount => throw _privateConstructorUsedError;
   List<AssetAllocationDto> get allocations =>
       throw _privateConstructorUsedError;
   @JsonKey(name: 'top_assets')
@@ -58,6 +60,7 @@ abstract class $PortfolioSummaryDtoCopyWith<$Res> {
       @JsonKey(name: 'total_gain_percentage') double totalGainPercentage,
       @JsonKey(name: 'day_change') double dayChange,
       @JsonKey(name: 'day_change_percentage') double dayChangePercentage,
+      @JsonKey(name: 'asset_count') int assetCount,
       List<AssetAllocationDto> allocations,
       @JsonKey(name: 'top_assets') List<TopAssetDto> topAssets,
       List<RiskAlertDto> alerts});
@@ -83,6 +86,7 @@ class _$PortfolioSummaryDtoCopyWithImpl<$Res, $Val extends PortfolioSummaryDto>
     Object? totalGainPercentage = null,
     Object? dayChange = null,
     Object? dayChangePercentage = null,
+    Object? assetCount = null,
     Object? allocations = null,
     Object? topAssets = null,
     Object? alerts = null,
@@ -108,6 +112,10 @@ class _$PortfolioSummaryDtoCopyWithImpl<$Res, $Val extends PortfolioSummaryDto>
           ? _value.dayChangePercentage
           : dayChangePercentage // ignore: cast_nullable_to_non_nullable
               as double,
+      assetCount: null == assetCount
+          ? _value.assetCount
+          : assetCount // ignore: cast_nullable_to_non_nullable
+              as int,
       allocations: null == allocations
           ? _value.allocations
           : allocations // ignore: cast_nullable_to_non_nullable
@@ -138,6 +146,7 @@ abstract class _$$PortfolioSummaryDtoImplCopyWith<$Res>
       @JsonKey(name: 'total_gain_percentage') double totalGainPercentage,
       @JsonKey(name: 'day_change') double dayChange,
       @JsonKey(name: 'day_change_percentage') double dayChangePercentage,
+      @JsonKey(name: 'asset_count') int assetCount,
       List<AssetAllocationDto> allocations,
       @JsonKey(name: 'top_assets') List<TopAssetDto> topAssets,
       List<RiskAlertDto> alerts});
@@ -161,6 +170,7 @@ class __$$PortfolioSummaryDtoImplCopyWithImpl<$Res>
     Object? totalGainPercentage = null,
     Object? dayChange = null,
     Object? dayChangePercentage = null,
+    Object? assetCount = null,
     Object? allocations = null,
     Object? topAssets = null,
     Object? alerts = null,
@@ -186,6 +196,10 @@ class __$$PortfolioSummaryDtoImplCopyWithImpl<$Res>
           ? _value.dayChangePercentage
           : dayChangePercentage // ignore: cast_nullable_to_non_nullable
               as double,
+      assetCount: null == assetCount
+          ? _value.assetCount
+          : assetCount // ignore: cast_nullable_to_non_nullable
+              as int,
       allocations: null == allocations
           ? _value._allocations
           : allocations // ignore: cast_nullable_to_non_nullable
@@ -211,6 +225,7 @@ class _$PortfolioSummaryDtoImpl extends _PortfolioSummaryDto {
       @JsonKey(name: 'total_gain_percentage') required this.totalGainPercentage,
       @JsonKey(name: 'day_change') required this.dayChange,
       @JsonKey(name: 'day_change_percentage') required this.dayChangePercentage,
+      @JsonKey(name: 'asset_count') this.assetCount = 0,
       final List<AssetAllocationDto> allocations = const [],
       @JsonKey(name: 'top_assets') final List<TopAssetDto> topAssets = const [],
       final List<RiskAlertDto> alerts = const []})
@@ -237,6 +252,9 @@ class _$PortfolioSummaryDtoImpl extends _PortfolioSummaryDto {
   @override
   @JsonKey(name: 'day_change_percentage')
   final double dayChangePercentage;
+  @override
+  @JsonKey(name: 'asset_count')
+  final int assetCount;
   final List<AssetAllocationDto> _allocations;
   @override
   @JsonKey()
@@ -266,7 +284,7 @@ class _$PortfolioSummaryDtoImpl extends _PortfolioSummaryDto {
 
   @override
   String toString() {
-    return 'PortfolioSummaryDto(totalValue: $totalValue, totalGain: $totalGain, totalGainPercentage: $totalGainPercentage, dayChange: $dayChange, dayChangePercentage: $dayChangePercentage, allocations: $allocations, topAssets: $topAssets, alerts: $alerts)';
+    return 'PortfolioSummaryDto(totalValue: $totalValue, totalGain: $totalGain, totalGainPercentage: $totalGainPercentage, dayChange: $dayChange, dayChangePercentage: $dayChangePercentage, assetCount: $assetCount, allocations: $allocations, topAssets: $topAssets, alerts: $alerts)';
   }
 
   @override
@@ -284,6 +302,8 @@ class _$PortfolioSummaryDtoImpl extends _PortfolioSummaryDto {
                 other.dayChange == dayChange) &&
             (identical(other.dayChangePercentage, dayChangePercentage) ||
                 other.dayChangePercentage == dayChangePercentage) &&
+            (identical(other.assetCount, assetCount) ||
+                other.assetCount == assetCount) &&
             const DeepCollectionEquality()
                 .equals(other._allocations, _allocations) &&
             const DeepCollectionEquality()
@@ -300,6 +320,7 @@ class _$PortfolioSummaryDtoImpl extends _PortfolioSummaryDto {
       totalGainPercentage,
       dayChange,
       dayChangePercentage,
+      assetCount,
       const DeepCollectionEquality().hash(_allocations),
       const DeepCollectionEquality().hash(_topAssets),
       const DeepCollectionEquality().hash(_alerts));
@@ -330,6 +351,7 @@ abstract class _PortfolioSummaryDto extends PortfolioSummaryDto {
       @JsonKey(name: 'day_change') required final double dayChange,
       @JsonKey(name: 'day_change_percentage')
       required final double dayChangePercentage,
+      @JsonKey(name: 'asset_count') final int assetCount,
       final List<AssetAllocationDto> allocations,
       @JsonKey(name: 'top_assets') final List<TopAssetDto> topAssets,
       final List<RiskAlertDto> alerts}) = _$PortfolioSummaryDtoImpl;
@@ -353,6 +375,9 @@ abstract class _PortfolioSummaryDto extends PortfolioSummaryDto {
   @override
   @JsonKey(name: 'day_change_percentage')
   double get dayChangePercentage;
+  @override
+  @JsonKey(name: 'asset_count')
+  int get assetCount;
   @override
   List<AssetAllocationDto> get allocations;
   @override
