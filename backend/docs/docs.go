@@ -1133,9 +1133,9 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0.0",
-	Host:             "localhost:8080",
+	Host:             "wealthscope-production.up.railway.app",
 	BasePath:         "/",
-	Schemes:          []string{"http", "https"},
+	Schemes:          []string{"https", "http"},
 	Title:            "WealthScope API",
 	Description:      "API para gestión de portafolio de inversiones personales\n\n## Autenticación\nEsta API utiliza JWT de Supabase Auth. Incluye el token en el header:\n`Authorization: Bearer <tu-token-jwt>`\n\n## Tipos de Activos Soportados\n- `stock` - Acciones\n- `etf` - Fondos cotizados\n- `bond` - Bonos\n- `crypto` - Criptomonedas\n- `real_estate` - Bienes raíces\n- `gold` - Oro\n- `cash` - Efectivo\n- `other` - Otros",
 	InfoInstanceName: "swagger",

@@ -37,9 +37,9 @@ import (
 // @license.name MIT
 // @license.url https://opensource.org/licenses/MIT
 
-// @host localhost:8080
+// @host wealthscope-production.up.railway.app
 // @BasePath /
-// @schemes http https
+// @schemes https http
 
 // @securityDefinitions.apikey BearerAuth
 // @in header
