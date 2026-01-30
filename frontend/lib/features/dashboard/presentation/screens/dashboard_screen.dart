@@ -96,10 +96,9 @@ class DashboardScreen extends ConsumerWidget {
                     EnhancedAllocationSection(allocations: summary.allocations),
                     const SizedBox(height: 24),
                   ],
-                  if (summary.alerts.isNotEmpty) ...[
-                    RiskAlertsSection(alerts: summary.alerts),
-                    const SizedBox(height: 24),
-                  ],
+                  // Always show risk alerts section (shows positive message when empty)
+                  RiskAlertsSection(alerts: summary.alerts),
+                  const SizedBox(height: 24),
                   if (summary.topAssets.isNotEmpty) ...[
                     TopAssetsSection(topAssets: summary.topAssets),
                   ],

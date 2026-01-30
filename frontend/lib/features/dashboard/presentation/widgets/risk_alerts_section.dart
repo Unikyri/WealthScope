@@ -16,8 +16,9 @@ class RiskAlertsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // Show positive message when no alerts
     if (alerts.isEmpty) {
-      return const SizedBox.shrink();
+      return _buildNoAlertsView(context);
     }
 
     return Column(
@@ -47,6 +48,45 @@ class RiskAlertsSection extends StatelessWidget {
               child: RiskAlertCard(alert: alert),
             )),
       ],
+    );
+  }
+
+  /// Build view when there are no alerts
+  Widget _buildNoAlertsView(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    return Card(
+      elevation: 0,
+      color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: theme.colorScheme.primary.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Icon(
+              Icons.check_circle,
+              color: theme.colorScheme.primary,
+              size: 24,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Your portfolio is well diversified',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurface,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
