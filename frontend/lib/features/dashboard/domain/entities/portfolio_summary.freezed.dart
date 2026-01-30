@@ -26,6 +26,7 @@ mixin _$PortfolioSummary {
   List<TopAsset> get topAssets => throw _privateConstructorUsedError;
   List<RiskAlert> get alerts => throw _privateConstructorUsedError;
   DateTime get lastUpdated => throw _privateConstructorUsedError;
+  bool? get isMarketOpen => throw _privateConstructorUsedError;
 
   /// Create a copy of PortfolioSummary
   /// with the given fields replaced by the non-null parameter values.
@@ -50,7 +51,8 @@ abstract class $PortfolioSummaryCopyWith<$Res> {
       List<AssetAllocation> allocations,
       List<TopAsset> topAssets,
       List<RiskAlert> alerts,
-      DateTime lastUpdated});
+      DateTime lastUpdated,
+      bool? isMarketOpen});
 }
 
 /// @nodoc
@@ -78,6 +80,7 @@ class _$PortfolioSummaryCopyWithImpl<$Res, $Val extends PortfolioSummary>
     Object? topAssets = null,
     Object? alerts = null,
     Object? lastUpdated = null,
+    Object? isMarketOpen = freezed,
   }) {
     return _then(_value.copyWith(
       totalValue: null == totalValue
@@ -120,6 +123,10 @@ class _$PortfolioSummaryCopyWithImpl<$Res, $Val extends PortfolioSummary>
           ? _value.lastUpdated
           : lastUpdated // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      isMarketOpen: freezed == isMarketOpen
+          ? _value.isMarketOpen
+          : isMarketOpen // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ) as $Val);
   }
 }
@@ -142,7 +149,8 @@ abstract class _$$PortfolioSummaryImplCopyWith<$Res>
       List<AssetAllocation> allocations,
       List<TopAsset> topAssets,
       List<RiskAlert> alerts,
-      DateTime lastUpdated});
+      DateTime lastUpdated,
+      bool? isMarketOpen});
 }
 
 /// @nodoc
@@ -168,6 +176,7 @@ class __$$PortfolioSummaryImplCopyWithImpl<$Res>
     Object? topAssets = null,
     Object? alerts = null,
     Object? lastUpdated = null,
+    Object? isMarketOpen = freezed,
   }) {
     return _then(_$PortfolioSummaryImpl(
       totalValue: null == totalValue
@@ -210,6 +219,10 @@ class __$$PortfolioSummaryImplCopyWithImpl<$Res>
           ? _value.lastUpdated
           : lastUpdated // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      isMarketOpen: freezed == isMarketOpen
+          ? _value.isMarketOpen
+          : isMarketOpen // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ));
   }
 }
@@ -227,7 +240,8 @@ class _$PortfolioSummaryImpl implements _PortfolioSummary {
       final List<AssetAllocation> allocations = const [],
       final List<TopAsset> topAssets = const [],
       final List<RiskAlert> alerts = const [],
-      required this.lastUpdated})
+      required this.lastUpdated,
+      this.isMarketOpen})
       : _allocations = allocations,
         _topAssets = topAssets,
         _alerts = alerts;
@@ -274,10 +288,12 @@ class _$PortfolioSummaryImpl implements _PortfolioSummary {
 
   @override
   final DateTime lastUpdated;
+  @override
+  final bool? isMarketOpen;
 
   @override
   String toString() {
-    return 'PortfolioSummary(totalValue: $totalValue, totalGain: $totalGain, totalGainPercentage: $totalGainPercentage, dayChange: $dayChange, dayChangePercentage: $dayChangePercentage, assetCount: $assetCount, allocations: $allocations, topAssets: $topAssets, alerts: $alerts, lastUpdated: $lastUpdated)';
+    return 'PortfolioSummary(totalValue: $totalValue, totalGain: $totalGain, totalGainPercentage: $totalGainPercentage, dayChange: $dayChange, dayChangePercentage: $dayChangePercentage, assetCount: $assetCount, allocations: $allocations, topAssets: $topAssets, alerts: $alerts, lastUpdated: $lastUpdated, isMarketOpen: $isMarketOpen)';
   }
 
   @override
@@ -303,7 +319,9 @@ class _$PortfolioSummaryImpl implements _PortfolioSummary {
                 .equals(other._topAssets, _topAssets) &&
             const DeepCollectionEquality().equals(other._alerts, _alerts) &&
             (identical(other.lastUpdated, lastUpdated) ||
-                other.lastUpdated == lastUpdated));
+                other.lastUpdated == lastUpdated) &&
+            (identical(other.isMarketOpen, isMarketOpen) ||
+                other.isMarketOpen == isMarketOpen));
   }
 
   @override
@@ -318,7 +336,8 @@ class _$PortfolioSummaryImpl implements _PortfolioSummary {
       const DeepCollectionEquality().hash(_allocations),
       const DeepCollectionEquality().hash(_topAssets),
       const DeepCollectionEquality().hash(_alerts),
-      lastUpdated);
+      lastUpdated,
+      isMarketOpen);
 
   /// Create a copy of PortfolioSummary
   /// with the given fields replaced by the non-null parameter values.
@@ -341,7 +360,8 @@ abstract class _PortfolioSummary implements PortfolioSummary {
       final List<AssetAllocation> allocations,
       final List<TopAsset> topAssets,
       final List<RiskAlert> alerts,
-      required final DateTime lastUpdated}) = _$PortfolioSummaryImpl;
+      required final DateTime lastUpdated,
+      final bool? isMarketOpen}) = _$PortfolioSummaryImpl;
 
   @override
   double get totalValue;
@@ -363,6 +383,8 @@ abstract class _PortfolioSummary implements PortfolioSummary {
   List<RiskAlert> get alerts;
   @override
   DateTime get lastUpdated;
+  @override
+  bool? get isMarketOpen;
 
   /// Create a copy of PortfolioSummary
   /// with the given fields replaced by the non-null parameter values.

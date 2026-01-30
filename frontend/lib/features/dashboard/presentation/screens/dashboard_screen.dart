@@ -8,6 +8,7 @@ import 'package:wealthscope_app/features/dashboard/presentation/widgets/empty_da
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/error_view.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/last_updated_indicator.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_summary_card.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/price_status_chip.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/risk_alerts_section.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/top_assets_section.dart';
 import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
@@ -76,7 +77,20 @@ class DashboardScreen extends ConsumerWidget {
                 children: [
                   PortfolioSummaryCard(summary: summary),
                   const SizedBox(height: 8),
-                  LastUpdatedIndicator(lastUpdated: summary.lastUpdated),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: LastUpdatedIndicator(
+                          lastUpdated: summary.lastUpdated,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      PriceStatusChip(
+                        lastUpdated: summary.lastUpdated,
+                        isMarketOpen: summary.isMarketOpen,
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 24),
                   if (summary.allocations.isNotEmpty) ...[
                     EnhancedAllocationSection(allocations: summary.allocations),

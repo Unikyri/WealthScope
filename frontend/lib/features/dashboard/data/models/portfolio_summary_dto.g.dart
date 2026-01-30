@@ -29,6 +29,7 @@ _$PortfolioSummaryDtoImpl _$$PortfolioSummaryDtoImplFromJson(
               .toList() ??
           const [],
       lastUpdated: DateTime.parse(json['last_updated'] as String),
+      isMarketOpen: json['is_market_open'] as bool?,
     );
 
 Map<String, dynamic> _$$PortfolioSummaryDtoImplToJson(
@@ -44,6 +45,7 @@ Map<String, dynamic> _$$PortfolioSummaryDtoImplToJson(
       'top_assets': instance.topAssets.map((e) => e.toJson()).toList(),
       'alerts': instance.alerts.map((e) => e.toJson()).toList(),
       'last_updated': instance.lastUpdated.toIso8601String(),
+      'is_market_open': instance.isMarketOpen,
     };
 
 _$AssetAllocationDtoImpl _$$AssetAllocationDtoImplFromJson(

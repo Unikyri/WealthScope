@@ -17,6 +17,7 @@ class PortfolioSummary with _$PortfolioSummary {
     @Default([]) List<TopAsset> topAssets,
     @Default([]) List<RiskAlert> alerts,
     required DateTime lastUpdated,
+    bool? isMarketOpen,
   }) = _PortfolioSummary;
 }
 

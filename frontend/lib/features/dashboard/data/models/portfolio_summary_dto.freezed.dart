@@ -39,6 +39,8 @@ mixin _$PortfolioSummaryDto {
   List<RiskAlertDto> get alerts => throw _privateConstructorUsedError;
   @JsonKey(name: 'last_updated')
   DateTime get lastUpdated => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_market_open')
+  bool? get isMarketOpen => throw _privateConstructorUsedError;
 
   /// Serializes this PortfolioSummaryDto to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -66,7 +68,8 @@ abstract class $PortfolioSummaryDtoCopyWith<$Res> {
       List<AssetAllocationDto> allocations,
       @JsonKey(name: 'top_assets') List<TopAssetDto> topAssets,
       List<RiskAlertDto> alerts,
-      @JsonKey(name: 'last_updated') DateTime lastUpdated});
+      @JsonKey(name: 'last_updated') DateTime lastUpdated,
+      @JsonKey(name: 'is_market_open') bool? isMarketOpen});
 }
 
 /// @nodoc
@@ -94,6 +97,7 @@ class _$PortfolioSummaryDtoCopyWithImpl<$Res, $Val extends PortfolioSummaryDto>
     Object? topAssets = null,
     Object? alerts = null,
     Object? lastUpdated = null,
+    Object? isMarketOpen = freezed,
   }) {
     return _then(_value.copyWith(
       totalValue: null == totalValue
@@ -136,6 +140,10 @@ class _$PortfolioSummaryDtoCopyWithImpl<$Res, $Val extends PortfolioSummaryDto>
           ? _value.lastUpdated
           : lastUpdated // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      isMarketOpen: freezed == isMarketOpen
+          ? _value.isMarketOpen
+          : isMarketOpen // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ) as $Val);
   }
 }
@@ -158,7 +166,8 @@ abstract class _$$PortfolioSummaryDtoImplCopyWith<$Res>
       List<AssetAllocationDto> allocations,
       @JsonKey(name: 'top_assets') List<TopAssetDto> topAssets,
       List<RiskAlertDto> alerts,
-      @JsonKey(name: 'last_updated') DateTime lastUpdated});
+      @JsonKey(name: 'last_updated') DateTime lastUpdated,
+      @JsonKey(name: 'is_market_open') bool? isMarketOpen});
 }
 
 /// @nodoc
@@ -184,6 +193,7 @@ class __$$PortfolioSummaryDtoImplCopyWithImpl<$Res>
     Object? topAssets = null,
     Object? alerts = null,
     Object? lastUpdated = null,
+    Object? isMarketOpen = freezed,
   }) {
     return _then(_$PortfolioSummaryDtoImpl(
       totalValue: null == totalValue
@@ -226,6 +236,10 @@ class __$$PortfolioSummaryDtoImplCopyWithImpl<$Res>
           ? _value.lastUpdated
           : lastUpdated // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      isMarketOpen: freezed == isMarketOpen
+          ? _value.isMarketOpen
+          : isMarketOpen // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ));
   }
 }
@@ -243,7 +257,8 @@ class _$PortfolioSummaryDtoImpl extends _PortfolioSummaryDto {
       final List<AssetAllocationDto> allocations = const [],
       @JsonKey(name: 'top_assets') final List<TopAssetDto> topAssets = const [],
       final List<RiskAlertDto> alerts = const [],
-      @JsonKey(name: 'last_updated') required this.lastUpdated})
+      @JsonKey(name: 'last_updated') required this.lastUpdated,
+      @JsonKey(name: 'is_market_open') this.isMarketOpen})
       : _allocations = allocations,
         _topAssets = topAssets,
         _alerts = alerts,
@@ -300,10 +315,13 @@ class _$PortfolioSummaryDtoImpl extends _PortfolioSummaryDto {
   @override
   @JsonKey(name: 'last_updated')
   final DateTime lastUpdated;
+  @override
+  @JsonKey(name: 'is_market_open')
+  final bool? isMarketOpen;
 
   @override
   String toString() {
-    return 'PortfolioSummaryDto(totalValue: $totalValue, totalGain: $totalGain, totalGainPercentage: $totalGainPercentage, dayChange: $dayChange, dayChangePercentage: $dayChangePercentage, assetCount: $assetCount, allocations: $allocations, topAssets: $topAssets, alerts: $alerts, lastUpdated: $lastUpdated)';
+    return 'PortfolioSummaryDto(totalValue: $totalValue, totalGain: $totalGain, totalGainPercentage: $totalGainPercentage, dayChange: $dayChange, dayChangePercentage: $dayChangePercentage, assetCount: $assetCount, allocations: $allocations, topAssets: $topAssets, alerts: $alerts, lastUpdated: $lastUpdated, isMarketOpen: $isMarketOpen)';
   }
 
   @override
@@ -329,7 +347,9 @@ class _$PortfolioSummaryDtoImpl extends _PortfolioSummaryDto {
                 .equals(other._topAssets, _topAssets) &&
             const DeepCollectionEquality().equals(other._alerts, _alerts) &&
             (identical(other.lastUpdated, lastUpdated) ||
-                other.lastUpdated == lastUpdated));
+                other.lastUpdated == lastUpdated) &&
+            (identical(other.isMarketOpen, isMarketOpen) ||
+                other.isMarketOpen == isMarketOpen));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -345,7 +365,8 @@ class _$PortfolioSummaryDtoImpl extends _PortfolioSummaryDto {
       const DeepCollectionEquality().hash(_allocations),
       const DeepCollectionEquality().hash(_topAssets),
       const DeepCollectionEquality().hash(_alerts),
-      lastUpdated);
+      lastUpdated,
+      isMarketOpen);
 
   /// Create a copy of PortfolioSummaryDto
   /// with the given fields replaced by the non-null parameter values.
@@ -377,7 +398,8 @@ abstract class _PortfolioSummaryDto extends PortfolioSummaryDto {
           final List<AssetAllocationDto> allocations,
           @JsonKey(name: 'top_assets') final List<TopAssetDto> topAssets,
           final List<RiskAlertDto> alerts,
-          @JsonKey(name: 'last_updated') required final DateTime lastUpdated}) =
+          @JsonKey(name: 'last_updated') required final DateTime lastUpdated,
+          @JsonKey(name: 'is_market_open') final bool? isMarketOpen}) =
       _$PortfolioSummaryDtoImpl;
   const _PortfolioSummaryDto._() : super._();
 
@@ -412,6 +434,9 @@ abstract class _PortfolioSummaryDto extends PortfolioSummaryDto {
   @override
   @JsonKey(name: 'last_updated')
   DateTime get lastUpdated;
+  @override
+  @JsonKey(name: 'is_market_open')
+  bool? get isMarketOpen;
 
   /// Create a copy of PortfolioSummaryDto
   /// with the given fields replaced by the non-null parameter values.
