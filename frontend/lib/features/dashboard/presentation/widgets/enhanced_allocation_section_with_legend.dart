@@ -43,10 +43,18 @@ class _EnhancedAllocationSectionState extends State<EnhancedAllocationSection> {
               ),
             ),
             const SizedBox(height: 24),
-            // Pie Chart
-            AllocationPieChart(allocations: widget.allocations),
+            // Pie Chart with bidirectional sync
+            AllocationPieChart(
+              allocations: widget.allocations,
+              selectedIndex: selectedIndex,
+              onSectionTouched: (index) {
+                setState(() {
+                  selectedIndex = index;
+                });
+              },
+            ),
             const SizedBox(height: 24),
-            // Legend with selection support
+            // Legend with bidirectional sync
             AllocationLegend(
               allocations: widget.allocations,
               selectedIndex: selectedIndex,

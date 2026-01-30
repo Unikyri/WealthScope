@@ -91,25 +91,25 @@ class AllocationLegend extends StatelessWidget {
   }
 
   /// Get localized label for asset type
-  /// Returns Spanish label for the asset type
+  /// Returns English label for the asset type
   String _getTypeLabel(String typeString) {
     final type = _parseAssetType(typeString);
 
     switch (type) {
       case AssetType.stock:
-        return 'Acciones';
+        return 'Stocks';
       case AssetType.etf:
         return 'ETFs';
       case AssetType.realEstate:
-        return 'Bienes Raíces';
+        return 'Real Estate';
       case AssetType.gold:
-        return 'Oro';
+        return 'Gold';
       case AssetType.crypto:
         return 'Crypto';
       case AssetType.bond:
-        return 'Bonos';
+        return 'Bonds';
       case AssetType.other:
-        return 'Otros';
+        return 'Other';
     }
   }
 
