@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/providers/dashboard_providers.dart';
-import 'package:wealthscope_app/features/dashboard/presentation/widgets/allocation_section.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/enhanced_allocation_section_with_legend.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/dashboard_skeleton.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/empty_dashboard.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/error_view.dart';
@@ -79,7 +79,7 @@ class DashboardScreen extends ConsumerWidget {
                   LastUpdatedIndicator(lastUpdated: summary.lastUpdated),
                   const SizedBox(height: 24),
                   if (summary.allocations.isNotEmpty) ...[
-                    AllocationSection(allocations: summary.allocations),
+                    EnhancedAllocationSection(allocations: summary.allocations),
                     const SizedBox(height: 24),
                   ],
                   if (summary.alerts.isNotEmpty) ...[
