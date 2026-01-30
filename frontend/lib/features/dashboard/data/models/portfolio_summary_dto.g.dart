@@ -28,6 +28,7 @@ _$PortfolioSummaryDtoImpl _$$PortfolioSummaryDtoImplFromJson(
               ?.map((e) => RiskAlertDto.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      lastUpdated: DateTime.parse(json['last_updated'] as String),
     );
 
 Map<String, dynamic> _$$PortfolioSummaryDtoImplToJson(
@@ -42,6 +43,7 @@ Map<String, dynamic> _$$PortfolioSummaryDtoImplToJson(
       'allocations': instance.allocations.map((e) => e.toJson()).toList(),
       'top_assets': instance.topAssets.map((e) => e.toJson()).toList(),
       'alerts': instance.alerts.map((e) => e.toJson()).toList(),
+      'last_updated': instance.lastUpdated.toIso8601String(),
     };
 
 _$AssetAllocationDtoImpl _$$AssetAllocationDtoImplFromJson(

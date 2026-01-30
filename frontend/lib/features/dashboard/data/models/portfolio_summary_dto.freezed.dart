@@ -37,6 +37,8 @@ mixin _$PortfolioSummaryDto {
   @JsonKey(name: 'top_assets')
   List<TopAssetDto> get topAssets => throw _privateConstructorUsedError;
   List<RiskAlertDto> get alerts => throw _privateConstructorUsedError;
+  @JsonKey(name: 'last_updated')
+  DateTime get lastUpdated => throw _privateConstructorUsedError;
 
   /// Serializes this PortfolioSummaryDto to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -63,7 +65,8 @@ abstract class $PortfolioSummaryDtoCopyWith<$Res> {
       @JsonKey(name: 'asset_count') int assetCount,
       List<AssetAllocationDto> allocations,
       @JsonKey(name: 'top_assets') List<TopAssetDto> topAssets,
-      List<RiskAlertDto> alerts});
+      List<RiskAlertDto> alerts,
+      @JsonKey(name: 'last_updated') DateTime lastUpdated});
 }
 
 /// @nodoc
@@ -90,6 +93,7 @@ class _$PortfolioSummaryDtoCopyWithImpl<$Res, $Val extends PortfolioSummaryDto>
     Object? allocations = null,
     Object? topAssets = null,
     Object? alerts = null,
+    Object? lastUpdated = null,
   }) {
     return _then(_value.copyWith(
       totalValue: null == totalValue
@@ -128,6 +132,10 @@ class _$PortfolioSummaryDtoCopyWithImpl<$Res, $Val extends PortfolioSummaryDto>
           ? _value.alerts
           : alerts // ignore: cast_nullable_to_non_nullable
               as List<RiskAlertDto>,
+      lastUpdated: null == lastUpdated
+          ? _value.lastUpdated
+          : lastUpdated // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ) as $Val);
   }
 }
@@ -149,7 +157,8 @@ abstract class _$$PortfolioSummaryDtoImplCopyWith<$Res>
       @JsonKey(name: 'asset_count') int assetCount,
       List<AssetAllocationDto> allocations,
       @JsonKey(name: 'top_assets') List<TopAssetDto> topAssets,
-      List<RiskAlertDto> alerts});
+      List<RiskAlertDto> alerts,
+      @JsonKey(name: 'last_updated') DateTime lastUpdated});
 }
 
 /// @nodoc
@@ -174,6 +183,7 @@ class __$$PortfolioSummaryDtoImplCopyWithImpl<$Res>
     Object? allocations = null,
     Object? topAssets = null,
     Object? alerts = null,
+    Object? lastUpdated = null,
   }) {
     return _then(_$PortfolioSummaryDtoImpl(
       totalValue: null == totalValue
@@ -212,6 +222,10 @@ class __$$PortfolioSummaryDtoImplCopyWithImpl<$Res>
           ? _value._alerts
           : alerts // ignore: cast_nullable_to_non_nullable
               as List<RiskAlertDto>,
+      lastUpdated: null == lastUpdated
+          ? _value.lastUpdated
+          : lastUpdated // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ));
   }
 }
@@ -228,7 +242,8 @@ class _$PortfolioSummaryDtoImpl extends _PortfolioSummaryDto {
       @JsonKey(name: 'asset_count') this.assetCount = 0,
       final List<AssetAllocationDto> allocations = const [],
       @JsonKey(name: 'top_assets') final List<TopAssetDto> topAssets = const [],
-      final List<RiskAlertDto> alerts = const []})
+      final List<RiskAlertDto> alerts = const [],
+      @JsonKey(name: 'last_updated') required this.lastUpdated})
       : _allocations = allocations,
         _topAssets = topAssets,
         _alerts = alerts,
@@ -283,8 +298,12 @@ class _$PortfolioSummaryDtoImpl extends _PortfolioSummaryDto {
   }
 
   @override
+  @JsonKey(name: 'last_updated')
+  final DateTime lastUpdated;
+
+  @override
   String toString() {
-    return 'PortfolioSummaryDto(totalValue: $totalValue, totalGain: $totalGain, totalGainPercentage: $totalGainPercentage, dayChange: $dayChange, dayChangePercentage: $dayChangePercentage, assetCount: $assetCount, allocations: $allocations, topAssets: $topAssets, alerts: $alerts)';
+    return 'PortfolioSummaryDto(totalValue: $totalValue, totalGain: $totalGain, totalGainPercentage: $totalGainPercentage, dayChange: $dayChange, dayChangePercentage: $dayChangePercentage, assetCount: $assetCount, allocations: $allocations, topAssets: $topAssets, alerts: $alerts, lastUpdated: $lastUpdated)';
   }
 
   @override
@@ -308,7 +327,9 @@ class _$PortfolioSummaryDtoImpl extends _PortfolioSummaryDto {
                 .equals(other._allocations, _allocations) &&
             const DeepCollectionEquality()
                 .equals(other._topAssets, _topAssets) &&
-            const DeepCollectionEquality().equals(other._alerts, _alerts));
+            const DeepCollectionEquality().equals(other._alerts, _alerts) &&
+            (identical(other.lastUpdated, lastUpdated) ||
+                other.lastUpdated == lastUpdated));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -323,7 +344,8 @@ class _$PortfolioSummaryDtoImpl extends _PortfolioSummaryDto {
       assetCount,
       const DeepCollectionEquality().hash(_allocations),
       const DeepCollectionEquality().hash(_topAssets),
-      const DeepCollectionEquality().hash(_alerts));
+      const DeepCollectionEquality().hash(_alerts),
+      lastUpdated);
 
   /// Create a copy of PortfolioSummaryDto
   /// with the given fields replaced by the non-null parameter values.
@@ -344,17 +366,19 @@ class _$PortfolioSummaryDtoImpl extends _PortfolioSummaryDto {
 
 abstract class _PortfolioSummaryDto extends PortfolioSummaryDto {
   const factory _PortfolioSummaryDto(
-      {@JsonKey(name: 'total_value') required final double totalValue,
-      @JsonKey(name: 'total_gain') required final double totalGain,
-      @JsonKey(name: 'total_gain_percentage')
-      required final double totalGainPercentage,
-      @JsonKey(name: 'day_change') required final double dayChange,
-      @JsonKey(name: 'day_change_percentage')
-      required final double dayChangePercentage,
-      @JsonKey(name: 'asset_count') final int assetCount,
-      final List<AssetAllocationDto> allocations,
-      @JsonKey(name: 'top_assets') final List<TopAssetDto> topAssets,
-      final List<RiskAlertDto> alerts}) = _$PortfolioSummaryDtoImpl;
+          {@JsonKey(name: 'total_value') required final double totalValue,
+          @JsonKey(name: 'total_gain') required final double totalGain,
+          @JsonKey(name: 'total_gain_percentage')
+          required final double totalGainPercentage,
+          @JsonKey(name: 'day_change') required final double dayChange,
+          @JsonKey(name: 'day_change_percentage')
+          required final double dayChangePercentage,
+          @JsonKey(name: 'asset_count') final int assetCount,
+          final List<AssetAllocationDto> allocations,
+          @JsonKey(name: 'top_assets') final List<TopAssetDto> topAssets,
+          final List<RiskAlertDto> alerts,
+          @JsonKey(name: 'last_updated') required final DateTime lastUpdated}) =
+      _$PortfolioSummaryDtoImpl;
   const _PortfolioSummaryDto._() : super._();
 
   factory _PortfolioSummaryDto.fromJson(Map<String, dynamic> json) =
@@ -385,6 +409,9 @@ abstract class _PortfolioSummaryDto extends PortfolioSummaryDto {
   List<TopAssetDto> get topAssets;
   @override
   List<RiskAlertDto> get alerts;
+  @override
+  @JsonKey(name: 'last_updated')
+  DateTime get lastUpdated;
 
   /// Create a copy of PortfolioSummaryDto
   /// with the given fields replaced by the non-null parameter values.

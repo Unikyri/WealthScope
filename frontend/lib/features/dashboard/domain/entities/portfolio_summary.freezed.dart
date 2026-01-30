@@ -25,6 +25,7 @@ mixin _$PortfolioSummary {
   List<AssetAllocation> get allocations => throw _privateConstructorUsedError;
   List<TopAsset> get topAssets => throw _privateConstructorUsedError;
   List<RiskAlert> get alerts => throw _privateConstructorUsedError;
+  DateTime get lastUpdated => throw _privateConstructorUsedError;
 
   /// Create a copy of PortfolioSummary
   /// with the given fields replaced by the non-null parameter values.
@@ -48,7 +49,8 @@ abstract class $PortfolioSummaryCopyWith<$Res> {
       int assetCount,
       List<AssetAllocation> allocations,
       List<TopAsset> topAssets,
-      List<RiskAlert> alerts});
+      List<RiskAlert> alerts,
+      DateTime lastUpdated});
 }
 
 /// @nodoc
@@ -75,6 +77,7 @@ class _$PortfolioSummaryCopyWithImpl<$Res, $Val extends PortfolioSummary>
     Object? allocations = null,
     Object? topAssets = null,
     Object? alerts = null,
+    Object? lastUpdated = null,
   }) {
     return _then(_value.copyWith(
       totalValue: null == totalValue
@@ -113,6 +116,10 @@ class _$PortfolioSummaryCopyWithImpl<$Res, $Val extends PortfolioSummary>
           ? _value.alerts
           : alerts // ignore: cast_nullable_to_non_nullable
               as List<RiskAlert>,
+      lastUpdated: null == lastUpdated
+          ? _value.lastUpdated
+          : lastUpdated // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ) as $Val);
   }
 }
@@ -134,7 +141,8 @@ abstract class _$$PortfolioSummaryImplCopyWith<$Res>
       int assetCount,
       List<AssetAllocation> allocations,
       List<TopAsset> topAssets,
-      List<RiskAlert> alerts});
+      List<RiskAlert> alerts,
+      DateTime lastUpdated});
 }
 
 /// @nodoc
@@ -159,6 +167,7 @@ class __$$PortfolioSummaryImplCopyWithImpl<$Res>
     Object? allocations = null,
     Object? topAssets = null,
     Object? alerts = null,
+    Object? lastUpdated = null,
   }) {
     return _then(_$PortfolioSummaryImpl(
       totalValue: null == totalValue
@@ -197,6 +206,10 @@ class __$$PortfolioSummaryImplCopyWithImpl<$Res>
           ? _value._alerts
           : alerts // ignore: cast_nullable_to_non_nullable
               as List<RiskAlert>,
+      lastUpdated: null == lastUpdated
+          ? _value.lastUpdated
+          : lastUpdated // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ));
   }
 }
@@ -213,7 +226,8 @@ class _$PortfolioSummaryImpl implements _PortfolioSummary {
       this.assetCount = 0,
       final List<AssetAllocation> allocations = const [],
       final List<TopAsset> topAssets = const [],
-      final List<RiskAlert> alerts = const []})
+      final List<RiskAlert> alerts = const [],
+      required this.lastUpdated})
       : _allocations = allocations,
         _topAssets = topAssets,
         _alerts = alerts;
@@ -259,8 +273,11 @@ class _$PortfolioSummaryImpl implements _PortfolioSummary {
   }
 
   @override
+  final DateTime lastUpdated;
+
+  @override
   String toString() {
-    return 'PortfolioSummary(totalValue: $totalValue, totalGain: $totalGain, totalGainPercentage: $totalGainPercentage, dayChange: $dayChange, dayChangePercentage: $dayChangePercentage, assetCount: $assetCount, allocations: $allocations, topAssets: $topAssets, alerts: $alerts)';
+    return 'PortfolioSummary(totalValue: $totalValue, totalGain: $totalGain, totalGainPercentage: $totalGainPercentage, dayChange: $dayChange, dayChangePercentage: $dayChangePercentage, assetCount: $assetCount, allocations: $allocations, topAssets: $topAssets, alerts: $alerts, lastUpdated: $lastUpdated)';
   }
 
   @override
@@ -284,7 +301,9 @@ class _$PortfolioSummaryImpl implements _PortfolioSummary {
                 .equals(other._allocations, _allocations) &&
             const DeepCollectionEquality()
                 .equals(other._topAssets, _topAssets) &&
-            const DeepCollectionEquality().equals(other._alerts, _alerts));
+            const DeepCollectionEquality().equals(other._alerts, _alerts) &&
+            (identical(other.lastUpdated, lastUpdated) ||
+                other.lastUpdated == lastUpdated));
   }
 
   @override
@@ -298,7 +317,8 @@ class _$PortfolioSummaryImpl implements _PortfolioSummary {
       assetCount,
       const DeepCollectionEquality().hash(_allocations),
       const DeepCollectionEquality().hash(_topAssets),
-      const DeepCollectionEquality().hash(_alerts));
+      const DeepCollectionEquality().hash(_alerts),
+      lastUpdated);
 
   /// Create a copy of PortfolioSummary
   /// with the given fields replaced by the non-null parameter values.
@@ -320,7 +340,8 @@ abstract class _PortfolioSummary implements PortfolioSummary {
       final int assetCount,
       final List<AssetAllocation> allocations,
       final List<TopAsset> topAssets,
-      final List<RiskAlert> alerts}) = _$PortfolioSummaryImpl;
+      final List<RiskAlert> alerts,
+      required final DateTime lastUpdated}) = _$PortfolioSummaryImpl;
 
   @override
   double get totalValue;
@@ -340,6 +361,8 @@ abstract class _PortfolioSummary implements PortfolioSummary {
   List<TopAsset> get topAssets;
   @override
   List<RiskAlert> get alerts;
+  @override
+  DateTime get lastUpdated;
 
   /// Create a copy of PortfolioSummary
   /// with the given fields replaced by the non-null parameter values.

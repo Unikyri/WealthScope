@@ -16,6 +16,7 @@ class PortfolioSummary with _$PortfolioSummary {
     @Default([]) List<AssetAllocation> allocations,
     @Default([]) List<TopAsset> topAssets,
     @Default([]) List<RiskAlert> alerts,
+    required DateTime lastUpdated,
   }) = _PortfolioSummary;
 }
 

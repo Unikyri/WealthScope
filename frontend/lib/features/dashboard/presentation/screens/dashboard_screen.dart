@@ -6,6 +6,7 @@ import 'package:wealthscope_app/features/dashboard/presentation/widgets/allocati
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/dashboard_skeleton.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/empty_dashboard.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/error_view.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/last_updated_indicator.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_summary_card.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/risk_alerts_section.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/top_assets_section.dart';
@@ -74,6 +75,8 @@ class DashboardScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   PortfolioSummaryCard(summary: summary),
+                  const SizedBox(height: 8),
+                  LastUpdatedIndicator(lastUpdated: summary.lastUpdated),
                   const SizedBox(height: 24),
                   if (summary.allocations.isNotEmpty) ...[
                     AllocationSection(allocations: summary.allocations),
