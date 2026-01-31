@@ -57,7 +57,7 @@ func getOrCreateJWKS(supabaseURL string) (jwt.Keyfunc, error) {
 
 	// Use NewDefault which handles background refresh without requiring a context
 	// This avoids the "context deadline exceeded" error that occurs when
-	// using NewDefaultCtx with a context that gets cancelled
+	// using NewDefaultCtx with a context that gets canceled
 	k, err := keyfunc.NewDefault([]string{jwksURL})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create JWKS keyfunc: %w", err)
