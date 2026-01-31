@@ -6,7 +6,7 @@ part of 'register_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$registerNotifierHash() => r'd7138179bcf89d1a94997c67fe4374ab58529196';
+String _$registerNotifierHash() => r'7e596397ba9bbfdb8f4c0f4e3b532f175f42fa6e';
 
 /// Provider for register form logic
 ///
