@@ -13,8 +13,6 @@ class MainShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    
     return Scaffold(
       body: child,
       bottomNavigationBar: _MainBottomNavigationBar(),
@@ -26,7 +24,6 @@ class _MainBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
-    final theme = Theme.of(context);
     
     // Determine selected index based on current route
     int selectedIndex = 0;
