@@ -1,9 +1,13 @@
 package middleware
 
 import (
-	"errors"
+	"context"
+	"fmt"
 	"strings"
+	"sync"
+	"time"
 
+	"github.com/MicahParks/keyfunc/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -21,8 +25,58 @@ const (
 	UserEmailKey ContextKey = "user_email"
 )
 
+// jwksCache holds the cached JWKS keyfunc
+//
+//nolint:govet // fieldalignment: keep related fields together for readability
+type jwksCache struct {
+	mu      sync.RWMutex
+	keyfunc jwt.Keyfunc
+	jwksURL string
+}
+
+var globalJWKSCache = &jwksCache{}
+
+// getOrCreateJWKS returns a cached JWKS keyfunc or creates a new one
+func getOrCreateJWKS(supabaseURL string) (jwt.Keyfunc, error) {
+	jwksURL := fmt.Sprintf("%s/auth/v1/.well-known/jwks.json", supabaseURL)
+
+	globalJWKSCache.mu.RLock()
+	if globalJWKSCache.keyfunc != nil && globalJWKSCache.jwksURL == jwksURL {
+		kf := globalJWKSCache.keyfunc
+		globalJWKSCache.mu.RUnlock()
+		return kf, nil
+	}
+	globalJWKSCache.mu.RUnlock()
+
+	// Create new JWKS keyfunc with refresh
+	globalJWKSCache.mu.Lock()
+	defer globalJWKSCache.mu.Unlock()
+
+	// Double-check after acquiring write lock
+	if globalJWKSCache.keyfunc != nil && globalJWKSCache.jwksURL == jwksURL {
+		return globalJWKSCache.keyfunc, nil
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	k, err := keyfunc.NewDefaultCtx(ctx, []string{jwksURL})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create JWKS keyfunc: %w", err)
+	}
+
+	globalJWKSCache.keyfunc = k.Keyfunc
+	globalJWKSCache.jwksURL = jwksURL
+
+	return k.Keyfunc, nil
+}
+
 // AuthMiddleware validates JWT tokens from Supabase Auth
-func AuthMiddleware(jwtSecret string) gin.HandlerFunc {
+// It supports both HS256 (legacy) and ES256 (current) signing methods
+func AuthMiddleware(jwtSecretOrSupabaseURL string) gin.HandlerFunc {
+	// Detect if this is a Supabase URL or a JWT secret
+	isSupabaseURL := strings.HasPrefix(jwtSecretOrSupabaseURL, "http")
+
 	return func(c *gin.Context) {
 		// Get Authorization header
 		authHeader := c.GetHeader("Authorization")
@@ -47,14 +101,30 @@ func AuthMiddleware(jwtSecret string) gin.HandlerFunc {
 			return
 		}
 
-		// Parse and validate token
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			// Validate signing method
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, errors.New("invalid signing method")
+		var token *jwt.Token
+		var err error
+
+		if isSupabaseURL {
+			// Use JWKS for ES256 tokens
+			kf, jwksErr := getOrCreateJWKS(jwtSecretOrSupabaseURL)
+			if jwksErr != nil {
+				response.InternalError(c, "Failed to initialize token validation")
+				c.Abort()
+				return
 			}
-			return []byte(jwtSecret), nil
-		})
+			token, err = jwt.Parse(tokenString, kf)
+		} else {
+			// Fallback to HS256 with secret (for backwards compatibility)
+			token, err = jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+				// Accept both HMAC and ECDSA
+				switch token.Method.(type) {
+				case *jwt.SigningMethodHMAC:
+					return []byte(jwtSecretOrSupabaseURL), nil
+				default:
+					return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+				}
+			})
+		}
 
 		if err != nil {
 			response.Unauthorized(c, "Invalid token: "+err.Error())
@@ -127,7 +197,9 @@ func GetUserEmail(c *gin.Context) string {
 }
 
 // OptionalAuthMiddleware extracts user info if token present, but doesn't require it
-func OptionalAuthMiddleware(jwtSecret string) gin.HandlerFunc {
+func OptionalAuthMiddleware(jwtSecretOrSupabaseURL string) gin.HandlerFunc {
+	isSupabaseURL := strings.HasPrefix(jwtSecretOrSupabaseURL, "http")
+
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
@@ -146,12 +218,24 @@ func OptionalAuthMiddleware(jwtSecret string) gin.HandlerFunc {
 			return
 		}
 
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, errors.New("invalid signing method")
+		var token *jwt.Token
+		var err error
+
+		if isSupabaseURL {
+			kf, jwksErr := getOrCreateJWKS(jwtSecretOrSupabaseURL)
+			if jwksErr != nil {
+				c.Next()
+				return
 			}
-			return []byte(jwtSecret), nil
-		})
+			token, err = jwt.Parse(tokenString, kf)
+		} else {
+			token, err = jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+					return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+				}
+				return []byte(jwtSecretOrSupabaseURL), nil
+			})
+		}
 
 		if err != nil || !token.Valid {
 			c.Next()
