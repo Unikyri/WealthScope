@@ -34,12 +34,13 @@ func Connect(cfg *config.Config, zapLogger *zap.Logger) (*DB, error) {
 
 	// Open database connection
 	//
-	// NOTE: PreferSimpleProtocol avoids prepared statement caching conflicts that can
-	// happen with poolers (e.g. Supabase PgBouncer) during tests/integration runs.
-	dialector := postgres.Open(cfg.Database.URL)
-	if cfg.Server.Mode == "test" {
-		dialector = postgres.New(postgres.Config{DSN: cfg.Database.URL, PreferSimpleProtocol: true})
-	}
+	// NOTE: PreferSimpleProtocol avoids prepared statement caching conflicts that
+	// happen with connection poolers like Supabase PgBouncer. This must be enabled
+	// for ALL modes (not just test) because Supabase always uses PgBouncer.
+	dialector := postgres.New(postgres.Config{
+		DSN:                  cfg.Database.URL,
+		PreferSimpleProtocol: true,
+	})
 
 	db, err := gorm.Open(dialector, &gorm.Config{
 		Logger:                 gormLogger,
