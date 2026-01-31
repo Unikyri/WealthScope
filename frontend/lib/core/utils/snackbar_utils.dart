@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wealthscope_app/core/theme/app_theme.dart';
 
 /// Snackbar Utility Functions
 /// Provides consistent success/error notifications throughout the app
@@ -25,7 +26,7 @@ class SnackbarUtils {
               ),
             ],
           ),
-          backgroundColor: Colors.green,
+          backgroundColor: AppTheme.successColor,
           behavior: SnackBarBehavior.floating,
           duration: const Duration(seconds: 3),
         ),
@@ -52,7 +53,7 @@ class SnackbarUtils {
               ),
             ],
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.errorColor,
           behavior: SnackBarBehavior.floating,
           duration: const Duration(seconds: 4),
           action: SnackBarAction(
@@ -86,7 +87,7 @@ class SnackbarUtils {
               ),
             ],
           ),
-          backgroundColor: Colors.blue,
+          backgroundColor: AppTheme.primaryColor,
           behavior: SnackBarBehavior.floating,
           duration: const Duration(seconds: 3),
         ),
