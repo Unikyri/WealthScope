@@ -8,52 +8,36 @@ part 'portfolio_summary.freezed.dart';
 class PortfolioSummary with _$PortfolioSummary {
   const factory PortfolioSummary({
     required double totalValue,
-    required double totalGain,
-    required double totalGainPercentage,
-    required double dayChange,
-    required double dayChangePercentage,
+    required double totalInvested,
+    required double gainLoss,
+    required double gainLossPercent,
     @Default(0) int assetCount,
-    @Default([]) List<AssetAllocation> allocations,
-    @Default([]) List<TopAsset> topAssets,
-    @Default([]) List<RiskAlert> alerts,
+    @Default([]) List<AssetTypeBreakdown> breakdownByType,
     required DateTime lastUpdated,
-    bool? isMarketOpen,
   }) = _PortfolioSummary;
 }
 
-/// Asset Allocation by Type
+/// Asset Type Breakdown
 @freezed
-class AssetAllocation with _$AssetAllocation {
-  const factory AssetAllocation({
-    required String type,
-    required String label,
-    required double value,
-    required double percentage,
-  }) = _AssetAllocation;
-}
-
-/// Top Performing Asset
-@freezed
-class TopAsset with _$TopAsset {
-  const factory TopAsset({
-    required String id,
-    required String name,
+class AssetTypeBreakdown with _$AssetTypeBreakdown {
+  const factory AssetTypeBreakdown({
     required String type,
     required double value,
-    required double gain,
-    required double gainPercentage,
-  }) = _TopAsset;
+    required double percent,
+    required int count,
+  }) = _AssetTypeBreakdown;
 }
 
-/// Risk Alert Entity
+/// Risk Alert Entity (from separate /api/v1/portfolio/risk endpoint)
 @freezed
 class RiskAlert with _$RiskAlert {
   const factory RiskAlert({
-    required String id,
+    required String type,
     required String title,
     required String message,
     required AlertSeverity severity,
-    required DateTime timestamp,
+    required double value,
+    required double threshold,
   }) = _RiskAlert;
 }
 

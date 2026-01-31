@@ -66,7 +66,14 @@ class AppRouter {
               GoRoute(
                 path: 'add',
                 name: 'assets-add',
-                builder: (context, state) => const AddAssetScreen(),
+                builder: (context, state) {
+                  // Get asset type from query parameter
+                  final typeStr = state.uri.queryParameters['type'];
+                  final assetType = typeStr != null 
+                      ? AssetType.fromString(typeStr) 
+                      : null;
+                  return AddAssetScreen(assetType: assetType);
+                },
               ),
               GoRoute(
                 path: 'add-stock',

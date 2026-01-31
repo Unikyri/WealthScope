@@ -20,14 +20,4 @@ class DashboardRepositoryImpl implements DashboardRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
-
-  @override
-  Future<Either<Failure, void>> refreshPortfolio() async {
-    try {
-      await _remoteSource.refreshPortfolio();
-      return const Right(null);
-    } catch (e) {
-      return Left(ServerFailure(e.toString()));
-    }
-  }
 }

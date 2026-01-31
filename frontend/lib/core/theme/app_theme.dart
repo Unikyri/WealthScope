@@ -189,15 +189,15 @@ class AppTheme {
       ),
       
       // Card
-      cardTheme: CardTheme(
+      cardTheme: const CardThemeData(
         elevation: 0,
         color: Colors.white,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(radiusMd),
-          side: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+          borderRadius: BorderRadius.all(Radius.circular(radiusMd)),
+          side: BorderSide(color: Color(0xFFE2E8F0), width: 1),
         ),
-        margin: const EdgeInsets.all(spacingSm),
+        margin: EdgeInsets.all(spacingSm),
       ),
       
       // Input Decoration
@@ -372,15 +372,15 @@ class AppTheme {
       ),
       
       // Card
-      cardTheme: CardTheme(
+      cardTheme: const CardThemeData(
         elevation: 0,
-        color: const Color(0xFF1E293B),
+        color: Color(0xFF1E293B),
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(radiusMd),
-          side: const BorderSide(color: Color(0xFF334155), width: 1),
+          borderRadius: BorderRadius.all(Radius.circular(radiusMd)),
+          side: BorderSide(color: Color(0xFF334155), width: 1),
         ),
-        margin: const EdgeInsets.all(spacingSm),
+        margin: EdgeInsets.all(spacingSm),
       ),
       
       // Input Decoration

@@ -3,11 +3,11 @@ import 'package:wealthscope_app/features/assets/domain/entities/currency.dart';
 
 /// Stock/ETF Asset Entity
 /// Represents a stock or ETF asset in the portfolio.
-/// Matches the database schema from assets table.
+/// Matches the API response from GET /api/v1/assets
 class StockAsset {
   const StockAsset({
     this.id,
-    required this.userId,
+    this.userId,
     required this.type,
     required this.symbol,
     required this.name,
@@ -16,8 +16,10 @@ class StockAsset {
     this.purchaseDate,
     required this.currency,
     this.currentPrice,
-    this.currentValue,
-    this.lastPriceUpdate,
+    this.totalCost,
+    this.totalValue,
+    this.gainLoss,
+    this.gainLossPercent,
     this.metadata = const {},
     this.notes,
     this.isActive = true,
@@ -28,8 +30,8 @@ class StockAsset {
   // Database primary key
   final String? id;
   
-  // Foreign key to users table
-  final String userId;
+  // Foreign key to users table (optional since backend knows from JWT)
+  final String? userId;
   
   // Asset identification
   final AssetType type;
@@ -42,10 +44,12 @@ class StockAsset {
   final DateTime? purchaseDate;
   final Currency currency;
   
-  // Current valuation (cached from price service)
+  // Current valuation (calculated by backend)
   final double? currentPrice;
-  final double? currentValue;
-  final DateTime? lastPriceUpdate;
+  final double? totalCost;      // quantity * purchase_price (from API)
+  final double? totalValue;     // quantity * current_price (from API)
+  final double? gainLoss;       // total_value - total_cost (from API)
+  final double? gainLossPercent; // (gain_loss / total_cost) * 100 (from API)
   
   // Type-specific metadata (JSONB in DB)
   // For stocks/ETFs: {"exchange": "NASDAQ", "sector": "Technology", "industry": "Consumer Electronics", "country": "USA"}
@@ -57,16 +61,8 @@ class StockAsset {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  /// Total invested amount
-  double get totalInvested => quantity * purchasePrice;
-  
-  /// Current gain/loss amount
-  double? get gainLoss => currentValue != null ? currentValue! - totalInvested : null;
-  
-  /// Current gain/loss percentage
-  double? get gainLossPercent => totalInvested > 0 && gainLoss != null
-      ? (gainLoss! / totalInvested * 100)
-      : null;
+  /// Total invested amount (prefer totalCost from API if available)
+  double get totalInvested => totalCost ?? (quantity * purchasePrice);
 
   /// Create a copy with updated fields
   StockAsset copyWith({
@@ -80,8 +76,10 @@ class StockAsset {
     DateTime? purchaseDate,
     Currency? currency,
     double? currentPrice,
-    double? currentValue,
-    DateTime? lastPriceUpdate,
+    double? totalCost,
+    double? totalValue,
+    double? gainLoss,
+    double? gainLossPercent,
     Map<String, dynamic>? metadata,
     String? notes,
     bool? isActive,
@@ -99,8 +97,10 @@ class StockAsset {
       purchaseDate: purchaseDate ?? this.purchaseDate,
       currency: currency ?? this.currency,
       currentPrice: currentPrice ?? this.currentPrice,
-      currentValue: currentValue ?? this.currentValue,
-      lastPriceUpdate: lastPriceUpdate ?? this.lastPriceUpdate,
+      totalCost: totalCost ?? this.totalCost,
+      totalValue: totalValue ?? this.totalValue,
+      gainLoss: gainLoss ?? this.gainLoss,
+      gainLossPercent: gainLossPercent ?? this.gainLossPercent,
       metadata: metadata ?? this.metadata,
       notes: notes ?? this.notes,
       isActive: isActive ?? this.isActive,

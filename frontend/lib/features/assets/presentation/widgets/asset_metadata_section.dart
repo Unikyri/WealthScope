@@ -60,6 +60,8 @@ class AssetMetadataSection extends StatelessWidget {
         return _buildCryptoMetadata(theme);
       case AssetType.bond:
         return _buildBondMetadata(theme);
+      case AssetType.cash:
+        return _buildCashMetadata(theme);
       default:
         return _buildGenericMetadata(theme);
     }
@@ -297,7 +299,45 @@ class AssetMetadataSection extends StatelessWidget {
       ],
     );
   }
-
+  Widget _buildCashMetadata(ThemeData theme) {
+    final metadata = asset.metadata;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (metadata['account_type'] != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: _MetadataRow(
+              icon: Icons.account_balance,
+              label: 'Account Type',
+              value: metadata['account_type'].toString(),
+              theme: theme,
+            ),
+          ),
+        if (metadata['institution'] != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: _MetadataRow(
+              icon: Icons.business,
+              label: 'Institution',
+              value: metadata['institution'].toString(),
+              theme: theme,
+            ),
+          ),
+        if (metadata['interest_rate'] != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: _MetadataRow(
+              icon: Icons.percent,
+              label: 'Interest Rate',
+              value: '${metadata['interest_rate']}%',
+              theme: theme,
+            ),
+          ),
+      ],
+    );
+  }
   Widget _buildGenericMetadata(ThemeData theme) {
     return Column(
       children: asset.metadata.entries.map((entry) {

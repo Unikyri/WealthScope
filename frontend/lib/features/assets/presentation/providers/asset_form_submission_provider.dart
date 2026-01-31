@@ -3,6 +3,7 @@ import 'package:wealthscope_app/core/errors/failures.dart';
 import 'package:wealthscope_app/features/assets/data/providers/asset_repository_provider.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/providers/dashboard_providers.dart';
 
 part 'asset_form_submission_provider.g.dart';
 
@@ -51,8 +52,9 @@ class AssetFormSubmission extends _$AssetFormSubmission {
       final repository = ref.read(assetRepositoryProvider);
       final savedAsset = await repository.addAsset(asset);
 
-      // Invalidate assets list to trigger refresh
+      // Invalidate assets list and portfolio summary to trigger refresh
       ref.invalidate(allAssetsProvider);
+      ref.invalidate(portfolioSummaryProvider);
 
       state = state.copyWith(
         isLoading: false,
@@ -103,8 +105,9 @@ class AssetFormSubmission extends _$AssetFormSubmission {
       final repository = ref.read(assetRepositoryProvider);
       final updatedAsset = await repository.updateAsset(asset);
 
-      // Invalidate assets list to trigger refresh
+      // Invalidate assets list and portfolio summary to trigger refresh
       ref.invalidate(allAssetsProvider);
+      ref.invalidate(portfolioSummaryProvider);
 
       state = state.copyWith(
         isLoading: false,
@@ -152,8 +155,9 @@ class AssetFormSubmission extends _$AssetFormSubmission {
       final repository = ref.read(assetRepositoryProvider);
       await repository.deleteAsset(assetId);
 
-      // Invalidate assets list to trigger refresh
+      // Invalidate assets list and portfolio summary to trigger refresh
       ref.invalidate(allAssetsProvider);
+      ref.invalidate(portfolioSummaryProvider);
 
       state = state.copyWith(
         isLoading: false,

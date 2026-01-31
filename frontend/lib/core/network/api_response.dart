@@ -54,12 +54,12 @@ class PaginatedApiResponse<T> {
 class ResponseMeta {
   const ResponseMeta({
     required this.requestId,
-    required this.timestamp,
+    this.timestamp,
   });
 
   @JsonKey(name: 'request_id')
   final String requestId;
-  final String timestamp;
+  final String? timestamp;
 
   factory ResponseMeta.fromJson(Map<String, dynamic> json) =>
       _$ResponseMetaFromJson(json);
@@ -72,7 +72,7 @@ class ResponseMeta {
 class PaginatedMeta extends ResponseMeta {
   const PaginatedMeta({
     required super.requestId,
-    required super.timestamp,
+    super.timestamp,
     required this.pagination,
   });
 

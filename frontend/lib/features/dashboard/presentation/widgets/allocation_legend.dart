@@ -8,7 +8,7 @@ import 'package:wealthscope_app/features/dashboard/domain/entities/portfolio_sum
 /// Displays a legend for the asset allocation pie chart with colors, percentages, and values
 /// Supports selection highlighting and tap interactions
 class AllocationLegend extends StatelessWidget {
-  final List<AssetAllocation> allocations;
+  final List<AssetTypeBreakdown> allocations;
   final int? selectedIndex;
   final Function(int)? onTap;
 
@@ -69,7 +69,7 @@ class AllocationLegend extends StatelessWidget {
                 ),
                 // Percentage
                 Text(
-                  '${allocation.percentage.toStringAsFixed(0)}%',
+                  '${allocation.percent.toStringAsFixed(0)}%',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w500,
                   ),
@@ -77,8 +77,7 @@ class AllocationLegend extends StatelessWidget {
                 const SizedBox(width: 16),
                 // Value
                 Text(
-                  NumberFormat.currency(symbol: '\$', decimalDigits: 0)
-                      .format(allocation.value),
+                  _formatCurrency(allocation.value),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withOpacity(0.6),
                   ),
@@ -101,14 +100,16 @@ class AllocationLegend extends StatelessWidget {
         return 'Stocks';
       case AssetType.etf:
         return 'ETFs';
+      case AssetType.bond:
+        return 'Bonds';
+      case AssetType.crypto:
+        return 'Crypto';
       case AssetType.realEstate:
         return 'Real Estate';
       case AssetType.gold:
         return 'Gold';
-      case AssetType.crypto:
-        return 'Crypto';
-      case AssetType.bond:
-        return 'Bonds';
+      case AssetType.cash:
+        return 'Cash';
       case AssetType.other:
         return 'Other';
     }
@@ -124,14 +125,16 @@ class AllocationLegend extends StatelessWidget {
         return AppTheme.getChartColor(0);  // Indigo
       case AssetType.etf:
         return AppTheme.getChartColor(4);  // Violet
+      case AssetType.bond:
+        return AppTheme.getChartColor(3);  // Pink
+      case AssetType.crypto:
+        return AppTheme.getChartColor(6);  // Orange
       case AssetType.realEstate:
         return AppTheme.getChartColor(1);  // Emerald
       case AssetType.gold:
         return AppTheme.getChartColor(2);  // Amber
-      case AssetType.crypto:
-        return AppTheme.getChartColor(6);  // Orange
-      case AssetType.bond:
-        return AppTheme.getChartColor(3);  // Pink
+      case AssetType.cash:
+        return AppTheme.getChartColor(5);  // Cyan
       case AssetType.other:
         return AppTheme.neutralColor;
     }
@@ -143,6 +146,21 @@ class AllocationLegend extends StatelessWidget {
       return AssetType.fromString(typeString);
     } catch (e) {
       return AssetType.other;
+    }
+  }
+
+  String _formatCurrency(double value) {
+    if (value >= 1000000000) {
+      // Billions
+      return '\$${(value / 1000000000).toStringAsFixed(2)}B';
+    } else if (value >= 1000000) {
+      // Millions
+      return '\$${(value / 1000000).toStringAsFixed(2)}M';
+    } else if (value >= 1000) {
+      // Thousands
+      return '\$${(value / 1000).toStringAsFixed(2)}K';
+    } else {
+      return NumberFormat.currency(symbol: '\$', decimalDigits: 2).format(value);
     }
   }
 }

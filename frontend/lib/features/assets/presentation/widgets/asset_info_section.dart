@@ -67,7 +67,7 @@ class AssetInfoSection extends StatelessWidget {
           // Current Value
           _InfoRow(
             label: 'Current Value',
-            value: '${asset.currency.symbol}${(asset.currentValue ?? asset.totalInvested).toStringAsFixed(2)}',
+            value: '${asset.currency.symbol}${(asset.totalValue ?? asset.totalInvested).toStringAsFixed(2)}',
             icon: Icons.account_balance_wallet,
             theme: theme,
           ),

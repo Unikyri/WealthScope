@@ -7,7 +7,7 @@ part of 'asset_form_submission_provider.dart';
 // **************************************************************************
 
 String _$assetFormSubmissionHash() =>
-    r'c633c73ceeaf2a5d9cc760b2aefe7ee8244153a9';
+    r'7630147642d3c70b421e63940a5fd068b50411de';
 
 /// Asset Form Submission Provider
 /// Manages the submission of asset creation/update forms to the backend API.

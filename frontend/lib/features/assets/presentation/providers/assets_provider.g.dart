@@ -6,7 +6,7 @@ part of 'assets_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$filteredAssetsHash() => r'a904447274ef7820997e0ce1cf4a916d31793b58';
+String _$filteredAssetsHash() => r'5a5d9893b7d6efa75efcff1a4d0c4c9f90e3e957';
 
 /// Provider for filtered assets based on selected type
 /// This provider automatically updates when the filter changes
@@ -236,7 +236,7 @@ final selectedAssetTypeProvider =
 );
 
 typedef _$SelectedAssetType = AutoDisposeNotifier<AssetType?>;
-String _$allAssetsHash() => r'6a0e34be2a184503958b26276bb5c9776d978fc8';
+String _$allAssetsHash() => r'e4b6a858ddd5891418047419e1f1f35b3d2243d5';
 
 /// Provider for fetching all assets
 /// This provider fetches the complete list of user assets from the backend

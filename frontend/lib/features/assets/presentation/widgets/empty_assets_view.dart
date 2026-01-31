@@ -44,7 +44,7 @@ class EmptyAssetsView extends StatelessWidget {
             
             // CTA Button
             ElevatedButton.icon(
-              onPressed: () => context.push('/assets/add'),
+              onPressed: () => context.push('/assets/select-type'),
               icon: const Icon(Icons.add),
               label: const Text('Add my first asset'),
             ),

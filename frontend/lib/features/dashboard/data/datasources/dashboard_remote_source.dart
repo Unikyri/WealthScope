@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:wealthscope_app/core/network/api_response.dart';
 import 'package:wealthscope_app/features/dashboard/data/models/portfolio_summary_dto.dart';
+import 'package:wealthscope_app/features/dashboard/data/models/portfolio_risk_dto.dart';
 
 /// Dashboard Remote Data Source
 /// Handles API calls for dashboard data
@@ -9,19 +11,34 @@ class DashboardRemoteDataSource {
   DashboardRemoteDataSource(this._dio);
 
   /// Fetch portfolio summary from API
+  /// GET /api/v1/portfolio/summary
   Future<PortfolioSummaryDto> getPortfolioSummary() async {
     try {
       final response = await _dio.get('/portfolio/summary');
-      return PortfolioSummaryDto.fromJson(response.data);
+      
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        response.data,
+        (json) => json as Map<String, dynamic>,
+      );
+
+      return PortfolioSummaryDto.fromJson(apiResponse.data);
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
   }
 
-  /// Refresh portfolio data
-  Future<void> refreshPortfolio() async {
+  /// Fetch portfolio risk alerts
+  /// GET /api/v1/portfolio/risk
+  Future<PortfolioRiskDto> getPortfolioRisk() async {
     try {
-      await _dio.post('/portfolio/refresh');
+      final response = await _dio.get('/portfolio/risk');
+      
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        response.data,
+        (json) => json as Map<String, dynamic>,
+      );
+
+      return PortfolioRiskDto.fromJson(apiResponse.data);
     } on DioException catch (e) {
       throw _handleDioError(e);
     }

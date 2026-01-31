@@ -5,12 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1149f820-81cc-4014-8cb1-e3a88cebafdf" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/lib/features/assets/data/datasources/asset_remote_data_source.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/features/assets/data/datasources/asset_remote_data_source.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/lib/features/assets/data/repositories/asset_repository_impl.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/features/assets/data/repositories/asset_repository_impl.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/lib/features/assets/domain/repositories/asset_repository.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/features/assets/domain/repositories/asset_repository.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/lib/features/assets/presentation/providers/assets_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/features/assets/presentation/providers/assets_provider.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/lib/features/assets/presentation/providers/assets_provider.g.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/features/assets/presentation/providers/assets_provider.g.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/lib/features/assets/presentation/screens/asset_edit_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/features/assets/presentation/screens/asset_edit_screen.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,7 +46,7 @@
     "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "86-t-344-implementar-llamada-put-y-manejo-de-respuesta",
+    "git-widget-placeholder": "192-hotfix-1",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "last_opened_file_path": "C:/Users/JULHE/Documents/WealthScope/backend",
