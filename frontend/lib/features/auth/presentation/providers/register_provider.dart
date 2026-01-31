@@ -120,16 +120,13 @@ class RegisterNotifier extends _$RegisterNotifier {
         // Sync with backend after successful Supabase registration
         try {
           final syncService = ref.read(userSyncServiceProvider);
-          await syncService.syncUserWithBackend(
-            accessToken: response.session!.accessToken,
-            userId: response.user!.id,
-            email: response.user!.email!,
-          );
+          await syncService.syncUserWithBackend();
+          debugPrint('✅ User synced with backend after registration');
         } catch (syncError) {
           // Log sync error but don't fail registration
           // User is already registered in Supabase
           // Backend sync can be retried later
-          debugPrint('Backend sync failed: $syncError');
+          debugPrint('⚠️ Backend sync failed: $syncError');
         }
 
         state = state.copyWith(isLoading: false);

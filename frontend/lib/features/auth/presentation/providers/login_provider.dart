@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wealthscope_app/features/auth/data/providers/auth_service_provider.dart';
+import 'package:wealthscope_app/features/auth/data/providers/user_sync_service_provider.dart';
 
 part 'login_provider.g.dart';
 
@@ -85,8 +86,20 @@ class LoginNotifier extends _$LoginNotifier {
 
       if (result.session != null) {
         // Login successful - session is automatically saved by Supabase
-        state = state.copyWith(isLoading: false);
         debugPrint('✅ Login successful: ${result.user?.email}');
+        
+        // Sync user with backend to ensure they exist in the local database
+        try {
+          final syncService = ref.read(userSyncServiceProvider);
+          await syncService.syncUserWithBackend();
+          debugPrint('✅ User synced with backend after login');
+        } catch (syncError) {
+          // Log sync error but don't fail login
+          // User can still use the app, sync can be retried later
+          debugPrint('⚠️ Backend sync failed: $syncError');
+        }
+        
+        state = state.copyWith(isLoading: false);
         return true;
       } else {
         // Login failed without exception

@@ -34,6 +34,7 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 
 	// Global middleware
 	router.Use(gin.Recovery())
+	router.Use(corsMiddleware())
 	router.Use(requestIDMiddleware())
 	router.Use(gin.Logger())
 
@@ -148,6 +149,34 @@ func requestIDMiddleware() gin.HandlerFunc {
 		}
 		c.Set("request_id", requestID)
 		c.Header("X-Request-ID", requestID)
+		c.Next()
+	}
+}
+
+// corsMiddleware handles Cross-Origin Resource Sharing (CORS)
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		origin := c.GetHeader("Origin")
+
+		// Allow requests from any origin in development
+		// In production, you might want to restrict this to specific domains
+		if origin != "" {
+			c.Header("Access-Control-Allow-Origin", origin)
+		} else {
+			c.Header("Access-Control-Allow-Origin", "*")
+		}
+
+		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization, X-Request-ID")
+		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Header("Access-Control-Max-Age", "86400")
+
+		// Handle preflight OPTIONS request
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
 		c.Next()
 	}
 }
