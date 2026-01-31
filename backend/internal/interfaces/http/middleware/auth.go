@@ -1,11 +1,9 @@
 package middleware
 
 import (
-	"context"
 	"fmt"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/MicahParks/keyfunc/v3"
 	"github.com/gin-gonic/gin"
@@ -57,10 +55,10 @@ func getOrCreateJWKS(supabaseURL string) (jwt.Keyfunc, error) {
 		return globalJWKSCache.keyfunc, nil
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	k, err := keyfunc.NewDefaultCtx(ctx, []string{jwksURL})
+	// Use NewDefault which handles background refresh without requiring a context
+	// This avoids the "context deadline exceeded" error that occurs when
+	// using NewDefaultCtx with a context that gets canceled
+	k, err := keyfunc.NewDefault([]string{jwksURL})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create JWKS keyfunc: %w", err)
 	}
