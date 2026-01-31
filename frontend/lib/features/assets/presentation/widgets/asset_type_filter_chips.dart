@@ -17,10 +17,11 @@ class AssetTypeFilterChips extends StatelessWidget {
   static const Map<AssetType, IconData> _assetTypeIcons = {
     AssetType.stock: Icons.trending_up,
     AssetType.etf: Icons.pie_chart,
-    AssetType.realEstate: Icons.home,
-    AssetType.gold: Icons.diamond,
     AssetType.bond: Icons.account_balance,
     AssetType.crypto: Icons.currency_bitcoin,
+    AssetType.realEstate: Icons.home,
+    AssetType.gold: Icons.diamond,
+    AssetType.cash: Icons.account_balance_wallet,
     AssetType.other: Icons.category,
   };
 
@@ -32,45 +33,51 @@ class AssetTypeFilterChips extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
+    return SizedBox(
       height: 56,
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: ListView(
+      child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        children: [
-          // "All" chip
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: FilterChip(
-              label: const Text('All'),
-              selected: selected == null,
-              onSelected: (_) => onSelected(null),
-              selectedColor: theme.colorScheme.primaryContainer,
-              checkmarkColor: theme.colorScheme.primary,
-              showCheckmark: true,
-            ),
-          ),
-          
-          // Asset type chips
-          ...AssetType.values.map((type) {
-            final icon = _getTypeIcon(type);
-            return Padding(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          children: [
+            // "All" chip
+            Padding(
               padding: const EdgeInsets.only(right: 8),
               child: FilterChip(
-                avatar: selected == type
-                    ? null
-                    : Icon(icon, size: 18),
-                label: Text(type.displayName),
-                selected: selected == type,
-                onSelected: (_) => onSelected(type),
+                label: const Text('All'),
+                selected: selected == null,
+                onSelected: (_) => onSelected(null),
                 selectedColor: theme.colorScheme.primaryContainer,
                 checkmarkColor: theme.colorScheme.primary,
                 showCheckmark: true,
               ),
-            );
-          }),
-        ],
+            ),
+            
+            // Asset type chips
+            ...AssetType.values.asMap().entries.map((entry) {
+              final index = entry.key;
+              final type = entry.value;
+              final icon = _getTypeIcon(type);
+              final isLast = index == AssetType.values.length - 1;
+              
+              return Padding(
+                padding: EdgeInsets.only(right: isLast ? 16 : 8),
+                child: FilterChip(
+                  avatar: selected == type
+                      ? null
+                      : Icon(icon, size: 18),
+                  label: Text(type.displayName),
+                  selected: selected == type,
+                  onSelected: (_) => onSelected(type),
+                  selectedColor: theme.colorScheme.primaryContainer,
+                  checkmarkColor: theme.colorScheme.primary,
+                  showCheckmark: true,
+                ),
+              );
+            }),
+          ],
+        ),
       ),
     );
   }

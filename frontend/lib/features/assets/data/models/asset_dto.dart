@@ -6,12 +6,12 @@ import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart
 part 'asset_dto.g.dart';
 
 /// Asset Data Transfer Object
-/// Maps to the assets table in PostgreSQL via Supabase
+/// Maps to GET /api/v1/assets response from backend API
 @JsonSerializable()
 class AssetDto {
   const AssetDto({
     this.id,
-    required this.userId,
+    this.userId,
     required this.type,
     this.symbol,
     required this.name,
@@ -20,8 +20,10 @@ class AssetDto {
     this.purchaseDate,
     this.currency,
     this.currentPrice,
-    this.currentValue,
-    this.lastPriceUpdate,
+    this.totalCost,
+    this.totalValue,
+    this.gainLoss,
+    this.gainLossPercent,
     this.metadata,
     this.notes,
     this.isActive,
@@ -32,7 +34,7 @@ class AssetDto {
   final String? id;
   
   @JsonKey(name: 'user_id')
-  final String userId;
+  final String? userId;
   
   final String type;
   final String? symbol;
@@ -50,11 +52,17 @@ class AssetDto {
   @JsonKey(name: 'current_price')
   final double? currentPrice;
   
-  @JsonKey(name: 'current_value')
-  final double? currentValue;
+  @JsonKey(name: 'total_cost')
+  final double? totalCost;
   
-  @JsonKey(name: 'last_price_update')
-  final String? lastPriceUpdate; // ISO timestamp
+  @JsonKey(name: 'total_value')
+  final double? totalValue;
+  
+  @JsonKey(name: 'gain_loss')
+  final double? gainLoss;
+  
+  @JsonKey(name: 'gain_loss_percent')
+  final double? gainLossPercent;
   
   final Map<String, dynamic>? metadata;
   final String? notes;
@@ -72,6 +80,24 @@ class AssetDto {
 
   Map<String, dynamic> toJson() => _$AssetDtoToJson(this);
 
+  /// Convert to JSON for POST/PUT requests (excludes read-only fields)
+  /// This method is deprecated - use CreateAssetRequest/UpdateAssetRequest instead
+  @Deprecated('Use CreateAssetRequest for POST and UpdateAssetRequest for PUT')
+  Map<String, dynamic> toCreateJson() {
+    return {
+      'type': type,
+      'name': name,
+      'symbol': symbol,
+      'quantity': quantity,
+      'purchase_price': purchasePrice,
+      if (purchaseDate != null) 'purchase_date': purchaseDate,
+      if (currency != null) 'currency': currency,
+      if (currentPrice != null) 'current_price': currentPrice,
+      if (metadata != null && metadata!.isNotEmpty) 'metadata': metadata,
+      if (notes != null && notes!.isNotEmpty) 'notes': notes,
+    };
+  }
+
   /// Convert DTO to Domain Entity
   StockAsset toDomain() {
     return StockAsset(
@@ -85,8 +111,10 @@ class AssetDto {
       purchaseDate: purchaseDate != null ? DateTime.parse(purchaseDate!) : null,
       currency: Currency.fromString(currency ?? 'USD'),
       currentPrice: currentPrice,
-      currentValue: currentValue,
-      lastPriceUpdate: lastPriceUpdate != null ? DateTime.parse(lastPriceUpdate!) : null,
+      totalCost: totalCost,
+      totalValue: totalValue,
+      gainLoss: gainLoss,
+      gainLossPercent: gainLossPercent,
       metadata: metadata ?? {},
       notes: notes,
       isActive: isActive ?? true,
@@ -100,7 +128,7 @@ class AssetDto {
     return AssetDto(
       id: asset.id,
       userId: asset.userId,
-      type: asset.type.label.toLowerCase(),
+      type: asset.type.toApiString(),
       symbol: asset.symbol,
       name: asset.name,
       quantity: asset.quantity,
@@ -108,8 +136,10 @@ class AssetDto {
       purchaseDate: asset.purchaseDate?.toIso8601String(),
       currency: asset.currency.code,
       currentPrice: asset.currentPrice,
-      currentValue: asset.currentValue,
-      lastPriceUpdate: asset.lastPriceUpdate?.toIso8601String(),
+      totalCost: asset.totalCost,
+      totalValue: asset.totalValue,
+      gainLoss: asset.gainLoss,
+      gainLossPercent: asset.gainLossPercent,
       metadata: asset.metadata.isNotEmpty ? asset.metadata : null,
       notes: asset.notes,
       isActive: asset.isActive,

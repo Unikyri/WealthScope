@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:wealthscope_app/core/network/api_response.dart';
 import 'package:wealthscope_app/features/assets/data/models/asset_dto.dart';
+import 'package:wealthscope_app/features/assets/data/models/create_asset_request.dart';
+import 'package:wealthscope_app/features/assets/data/models/update_asset_request.dart';
 
 /// Asset Remote Data Source
 /// Handles all HTTP requests related to assets using the backend API
@@ -11,10 +13,10 @@ class AssetRemoteDataSource {
 
   /// Create a new asset
   /// POST /api/v1/assets
-  Future<AssetDto> createAsset(AssetDto asset) async {
+  Future<AssetDto> createAsset(CreateAssetRequest request) async {
     final response = await _dio.post(
       '/assets',
-      data: asset.toJson(),
+      data: request.toJson(),
     );
 
     final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
@@ -26,31 +28,65 @@ class AssetRemoteDataSource {
   }
 
   /// Get all assets for the current user
-  /// GET /api/v1/assets
+  /// GET /api/v1/assets with pagination
   Future<List<AssetDto>> getAssets({
     String? type,
+    String? symbol,
+    String? currency,
     int page = 1,
     int perPage = 20,
-    String sortBy = 'created_at',
-    String sortOrder = 'desc',
   }) async {
+    print('🟣 [AssetDataSource] GET /assets (page: $page, perPage: $perPage)');
+    
     final response = await _dio.get(
       '/assets',
       queryParameters: {
         if (type != null) 'type': type,
+        if (symbol != null) 'symbol': symbol,
+        if (currency != null) 'currency': currency,
         'page': page,
         'per_page': perPage,
-        'sort_by': sortBy,
-        'sort_order': sortOrder,
       },
     );
 
-    final apiResponse = PaginatedApiResponse<Map<String, dynamic>>.fromJson(
+    print('🟣 [AssetDataSource] Response status: ${response.statusCode}');
+    print('🟣 [AssetDataSource] Response data: ${response.data}');
+
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
       response.data,
       (json) => json as Map<String, dynamic>,
     );
 
-    return apiResponse.data.map((json) => AssetDto.fromJson(json)).toList();
+    print('🟣 [AssetDataSource] ApiResponse success: ${apiResponse.success}');
+    print('🟣 [AssetDataSource] ApiResponse data keys: ${apiResponse.data.keys}');
+
+    // API returns {assets: [...], pagination: {...}}
+    final data = apiResponse.data;
+    final assetsList = data['assets'] as List<dynamic>;
+    
+    print('🟣 [AssetDataSource] Assets list length: ${assetsList.length}');
+    
+    final dtos = <AssetDto>[];
+    for (var i = 0; i < assetsList.length; i++) {
+      try {
+        final json = assetsList[i] as Map<String, dynamic>;
+        print('🟣 [AssetDataSource] Parsing asset $i: ${json['name']}');
+        print('🟣 [AssetDataSource] JSON keys: ${json.keys.toList()}');
+        print('🟣 [AssetDataSource] Full JSON: $json');
+        
+        final dto = AssetDto.fromJson(json);
+        print('✅ [AssetDataSource] Successfully parsed: ${dto.name}');
+        dtos.add(dto);
+      } catch (e, stack) {
+        print('❌ [AssetDataSource] Failed to parse asset $i: $e');
+        print('❌ [AssetDataSource] Stack: $stack');
+        print('❌ [AssetDataSource] JSON was: ${assetsList[i]}');
+        rethrow;
+      }
+    }
+    
+    print('✅ [AssetDataSource] Returning ${dtos.length} DTOs');
+    return dtos;
   }
 
   /// Get a specific asset by ID
@@ -68,10 +104,10 @@ class AssetRemoteDataSource {
 
   /// Update an existing asset
   /// PUT /api/v1/assets/{id}
-  Future<AssetDto> updateAsset(String id, AssetDto asset) async {
+  Future<AssetDto> updateAsset(String id, UpdateAssetRequest request) async {
     final response = await _dio.put(
       '/assets/$id',
-      data: asset.toJson(),
+      data: request.toJson(),
     );
 
     final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(

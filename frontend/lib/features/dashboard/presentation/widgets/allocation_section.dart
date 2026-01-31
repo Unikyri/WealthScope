@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 /// Allocation Section Widget
 /// Displays asset allocation using a pie chart
 class AllocationSection extends StatelessWidget {
-  final List<AssetAllocation> allocations;
+  final List<AssetTypeBreakdown> allocations;
 
   const AllocationSection({
     super.key,
@@ -79,8 +79,8 @@ class AllocationSection extends StatelessWidget {
       final color = colors[index % colors.length];
 
       return PieChartSectionData(
-        value: allocation.percentage,
-        title: '${allocation.percentage.toStringAsFixed(0)}%',
+        value: allocation.percent,
+        title: '${allocation.percent.toStringAsFixed(0)}%',
         color: color,
         radius: 50,
         titleStyle: const TextStyle(
@@ -94,7 +94,7 @@ class AllocationSection extends StatelessWidget {
 }
 
 class _AllocationLegend extends StatelessWidget {
-  final List<AssetAllocation> allocations;
+  final List<AssetTypeBreakdown> allocations;
 
   const _AllocationLegend({required this.allocations});
 
@@ -138,7 +138,7 @@ class _AllocationLegend extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      allocation.label,
+                      _formatTypeName(allocation.type),
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w500,
                       ),
@@ -158,5 +158,28 @@ class _AllocationLegend extends StatelessWidget {
         );
       }).toList(),
     );
+  }
+
+  String _formatTypeName(String type) {
+    switch (type.toLowerCase()) {
+      case 'stock':
+        return 'Stocks';
+      case 'etf':
+        return 'ETFs';
+      case 'crypto':
+        return 'Cryptocurrency';
+      case 'bond':
+        return 'Bonds';
+      case 'real_estate':
+        return 'Real Estate';
+      case 'gold':
+        return 'Gold';
+      case 'cash':
+        return 'Cash';
+      case 'other':
+        return 'Other';
+      default:
+        return type.toUpperCase();
+    }
   }
 }

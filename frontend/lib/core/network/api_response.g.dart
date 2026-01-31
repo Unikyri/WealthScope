@@ -52,7 +52,7 @@ Map<String, dynamic> _$PaginatedApiResponseToJson<T>(
 
 ResponseMeta _$ResponseMetaFromJson(Map<String, dynamic> json) => ResponseMeta(
       requestId: json['request_id'] as String,
-      timestamp: json['timestamp'] as String,
+      timestamp: json['timestamp'] as String?,
     );
 
 Map<String, dynamic> _$ResponseMetaToJson(ResponseMeta instance) =>
@@ -64,7 +64,7 @@ Map<String, dynamic> _$ResponseMetaToJson(ResponseMeta instance) =>
 PaginatedMeta _$PaginatedMetaFromJson(Map<String, dynamic> json) =>
     PaginatedMeta(
       requestId: json['request_id'] as String,
-      timestamp: json['timestamp'] as String,
+      timestamp: json['timestamp'] as String?,
       pagination:
           Pagination.fromJson(json['pagination'] as Map<String, dynamic>),
     );

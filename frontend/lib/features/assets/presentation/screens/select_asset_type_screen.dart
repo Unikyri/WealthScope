@@ -13,10 +13,11 @@ class SelectAssetTypeScreen extends ConsumerWidget {
   static const Map<AssetType, IconData> _assetTypeIcons = {
     AssetType.stock: Icons.trending_up,
     AssetType.etf: Icons.pie_chart,
-    AssetType.realEstate: Icons.home,
-    AssetType.gold: Icons.diamond,
     AssetType.bond: Icons.account_balance,
     AssetType.crypto: Icons.currency_bitcoin,
+    AssetType.realEstate: Icons.home,
+    AssetType.gold: Icons.diamond,
+    AssetType.cash: Icons.account_balance_wallet,
     AssetType.other: Icons.category,
   };
 
@@ -24,10 +25,10 @@ class SelectAssetTypeScreen extends ConsumerWidget {
     // Navigate to specific form based on asset type
     if (type == AssetType.stock || type == AssetType.etf) {
       // Use dedicated stock/ETF form
-      context.push('/assets/add-stock?type=${type.label.toLowerCase()}');
+      context.push('/assets/add-stock?type=${type.toApiString()}');
     } else {
       // Use generic asset form for other types
-      context.go('/assets/add', extra: {'type': type});
+      context.push('/assets/add?type=${type.toApiString()}');
     }
   }
 

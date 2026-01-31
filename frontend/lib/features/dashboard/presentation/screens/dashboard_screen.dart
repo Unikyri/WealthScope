@@ -8,9 +8,7 @@ import 'package:wealthscope_app/features/dashboard/presentation/widgets/empty_da
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/error_view.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/last_updated_indicator.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_summary_card.dart';
-import 'package:wealthscope_app/features/dashboard/presentation/widgets/price_status_chip.dart';
-import 'package:wealthscope_app/features/dashboard/presentation/widgets/risk_alerts_section.dart';
-import 'package:wealthscope_app/features/dashboard/presentation/widgets/top_assets_section.dart';
+import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
 import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
 
 /// Dashboard Screen
@@ -47,11 +45,20 @@ class DashboardScreen extends ConsumerWidget {
           ],
         ),
         actions: [
+          // Refresh button
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              ref.invalidate(portfolioSummaryProvider);
+            },
+            tooltip: 'Refresh',
+          ),
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {
               // TODO: Navigate to notifications
             },
+            tooltip: 'Notifications',
           ),
         ],
       ),
@@ -66,42 +73,75 @@ class DashboardScreen extends ConsumerWidget {
           child: summaryAsync.when(
             data: (summary) {
               // Check if portfolio is empty
-              if (summary.totalValue == 0 && summary.allocations.isEmpty) {
+              if (summary.totalValue == 0 && summary.breakdownByType.isEmpty) {
                 return EmptyDashboard(
                   onAddAsset: () => context.go('/assets/select-type'),
                 );
               }
 
+              print('🔴 [Dashboard] Portfolio summary loaded successfully');
+              print('🔴 [Dashboard] Total value: \$${summary.totalValue}');
+              print('🔴 [Dashboard] Asset count: ${summary.assetCount}');
+              
+              final assetsAsync = ref.watch(allAssetsProvider);
+              print('🔴 [Dashboard] Watching allAssetsProvider...');
+
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // Main Portfolio Card
                   PortfolioSummaryCard(summary: summary),
                   const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: LastUpdatedIndicator(
-                          lastUpdated: summary.lastUpdated,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      PriceStatusChip(
-                        lastUpdated: summary.lastUpdated,
-                        isMarketOpen: summary.isMarketOpen,
-                      ),
-                    ],
-                  ),
+                  LastUpdatedIndicator(lastUpdated: summary.lastUpdated),
                   const SizedBox(height: 24),
-                  if (summary.allocations.isNotEmpty) ...[
-                    EnhancedAllocationSection(allocations: summary.allocations),
+
+                  // Quick Stats Row
+                  _QuickStatsRow(summary: summary),
+                  const SizedBox(height: 24),
+
+                  // Asset Allocation Pie Chart
+                  if (summary.breakdownByType.isNotEmpty) ...[
+                    EnhancedAllocationSection(
+                      allocations: summary.breakdownByType,
+                    ),
                     const SizedBox(height: 24),
                   ],
-                  // Always show risk alerts section (shows positive message when empty)
-                  RiskAlertsSection(alerts: summary.alerts),
-                  const SizedBox(height: 24),
-                  if (summary.topAssets.isNotEmpty) ...[
-                    TopAssetsSection(topAssets: summary.topAssets),
-                  ],
+
+                  // Top Assets Section
+                  assetsAsync.when(
+                    data: (assets) {
+                      print('✅ [Dashboard] Assets loaded: ${assets.length}');
+                      if (assets.isEmpty) {
+                        print('⚠️ [Dashboard] No assets to display');
+                        return const SizedBox.shrink();
+                      }
+                      
+                      print('🔴 [Dashboard] Sorting ${assets.length} assets by value...');
+                      // Sort by total value and take top 3
+                      final sortedAssets = List<dynamic>.from(assets)
+                        ..sort((a, b) => 
+                          (b.totalValue ?? 0).compareTo(a.totalValue ?? 0));
+                      final topAssets = sortedAssets.take(3).toList();
+                      
+                      print('🔴 [Dashboard] Top ${topAssets.length} assets selected');
+                      for (var asset in topAssets) {
+                        print('   - ${asset.name}: \$${asset.totalValue}');
+                      }
+
+                      return _TopAssetsCard(assets: topAssets);
+                    },
+                    loading: () {
+                      print('⏳ [Dashboard] Assets loading...');
+                      return const SizedBox.shrink();
+                    },
+                    error: (error, stack) {
+                      print('❌ [Dashboard] Assets error: $error');
+                      print('❌ [Dashboard] Stack: $stack');
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                  
+                  const SizedBox(height: 80), // Space for FAB
                 ],
               );
             },
@@ -130,3 +170,295 @@ extension StringExtension on String {
   }
 }
 
+/// Quick Stats Row Widget
+class _QuickStatsRow extends StatelessWidget {
+  final dynamic summary;
+
+  const _QuickStatsRow({required this.summary});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Row(
+      children: [
+        Expanded(
+          child: _StatCard(
+            icon: Icons.account_balance_wallet,
+            label: 'Assets',
+            value: '${summary.assetCount}',
+            color: theme.colorScheme.primary,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _StatCard(
+            icon: Icons.trending_up,
+            label: 'Gain/Loss',
+            value: _formatCurrency(summary.gainLoss),
+            color: summary.gainLoss >= 0 ? Colors.green : Colors.red,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _StatCard(
+            icon: Icons.pie_chart,
+            label: 'Types',
+            value: '${summary.breakdownByType.length}',
+            color: theme.colorScheme.secondary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatCurrency(double value) {
+    if (value.abs() >= 1000000000) {
+      return '\$${(value / 1000000000).toStringAsFixed(2)}B';
+    } else if (value.abs() >= 1000000) {
+      return '\$${(value / 1000000).toStringAsFixed(2)}M';
+    } else if (value.abs() >= 1000) {
+      return '\$${(value / 1000).toStringAsFixed(2)}K';
+    }
+    return '\$${value.toStringAsFixed(2)}';
+  }
+}
+
+/// Stat Card Widget
+class _StatCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  const _StatCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withOpacity(0.6),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Top Assets Card Widget
+class _TopAssetsCard extends ConsumerWidget {
+  final List<dynamic> assets;
+
+  const _TopAssetsCard({required this.assets});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Top Assets',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => context.go('/assets'),
+                  child: const Text('View All'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ...assets.asMap().entries.map((entry) {
+              final index = entry.key;
+              final asset = entry.value;
+              final isLast = index == assets.length - 1;
+
+              return Column(
+                children: [
+                  _AssetListItem(asset: asset),
+                  if (!isLast) const Divider(height: 24),
+                ],
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Asset List Item Widget
+class _AssetListItem extends StatelessWidget {
+  final dynamic asset;
+
+  const _AssetListItem({required this.asset});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return InkWell(
+      onTap: () => context.push('/assets/${asset.id}'),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          children: [
+            // Asset Icon
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: _getTypeColor(asset.type.toApiString(), theme).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                _getTypeIcon(asset.type.toApiString()),
+                color: _getTypeColor(asset.type.toApiString(), theme),
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            // Asset Info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    asset.name,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (asset.symbol != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      asset.symbol!,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            // Value
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  _formatCurrency(asset.totalValue ?? 0),
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${asset.quantity.toStringAsFixed(0)} units',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  IconData _getTypeIcon(String type) {
+    switch (type.toLowerCase()) {
+      case 'stock':
+        return Icons.show_chart;
+      case 'etf':
+        return Icons.pie_chart;
+      case 'bond':
+        return Icons.receipt_long;
+      case 'crypto':
+        return Icons.currency_bitcoin;
+      case 'real_estate':
+        return Icons.home;
+      case 'gold':
+        return Icons.star;
+      case 'cash':
+        return Icons.account_balance_wallet;
+      default:
+        return Icons.inventory_2;
+    }
+  }
+
+  Color _getTypeColor(String type, ThemeData theme) {
+    switch (type.toLowerCase()) {
+      case 'stock':
+        return Colors.blue;
+      case 'etf':
+        return Colors.purple;
+      case 'bond':
+        return Colors.green;
+      case 'crypto':
+        return Colors.orange;
+      case 'real_estate':
+        return Colors.brown;
+      case 'gold':
+        return Colors.amber;
+      case 'cash':
+        return Colors.teal;
+      default:
+        return theme.colorScheme.primary;
+    }
+  }
+
+  String _formatCurrency(double value) {
+    if (value >= 1000000000) {
+      return '\$${(value / 1000000000).toStringAsFixed(2)}B';
+    } else if (value >= 1000000) {
+      return '\$${(value / 1000000).toStringAsFixed(2)}M';
+    } else if (value >= 1000) {
+      return '\$${(value / 1000).toStringAsFixed(2)}K';
+    }
+    return '\$${value.toStringAsFixed(2)}';
+  }
+}

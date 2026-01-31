@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 /// Interactive Pie Chart Widget for Portfolio Distribution
 /// Displays asset allocation by type with touch interactions and animations
 class AllocationPieChart extends StatefulWidget {
-  final List<AssetAllocation> allocations;
+  final List<AssetTypeBreakdown> allocations;
   final int? selectedIndex;
   final Function(int?)? onSectionTouched;
 
@@ -78,10 +78,10 @@ class _AllocationPieChartState extends State<AllocationPieChart> {
       
       return PieChartSectionData(
         color: _getTypeColor(allocation.type),
-        value: allocation.percentage,
+        value: allocation.percent,
         title: isSelected
-            ? '${_getTypeLabel(allocation.type)}\n${allocation.percentage.toStringAsFixed(1)}%'
-            : '${allocation.percentage.toStringAsFixed(0)}%',
+            ? '${_getTypeLabel(allocation.type)}\n${allocation.percent.toStringAsFixed(1)}%'
+            : '${allocation.percent.toStringAsFixed(0)}%',
         radius: radius,
         titleStyle: TextStyle(
           fontSize: fontSize,
@@ -108,7 +108,7 @@ class _AllocationPieChartState extends State<AllocationPieChart> {
   }
 
   /// Build badge widget to show exact value on selected section
-  Widget _buildBadge(AssetAllocation allocation) {
+  Widget _buildBadge(AssetTypeBreakdown allocation) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -143,14 +143,16 @@ class _AllocationPieChartState extends State<AllocationPieChart> {
         return 'Stocks';
       case AssetType.etf:
         return 'ETFs';
+      case AssetType.bond:
+        return 'Bonds';
+      case AssetType.crypto:
+        return 'Crypto';
       case AssetType.realEstate:
         return 'Real Estate';
       case AssetType.gold:
         return 'Gold';
-      case AssetType.crypto:
-        return 'Crypto';
-      case AssetType.bond:
-        return 'Bonds';
+      case AssetType.cash:
+        return 'Cash';
       case AssetType.other:
         return 'Other';
     }
@@ -166,14 +168,16 @@ class _AllocationPieChartState extends State<AllocationPieChart> {
         return Colors.blue;
       case AssetType.etf:
         return Colors.indigo;
+      case AssetType.bond:
+        return Colors.purple;
+      case AssetType.crypto:
+        return Colors.orange;
       case AssetType.realEstate:
         return Colors.green;
       case AssetType.gold:
         return Colors.amber;
-      case AssetType.crypto:
-        return Colors.orange;
-      case AssetType.bond:
-        return Colors.purple;
+      case AssetType.cash:
+        return Colors.cyan;
       case AssetType.other:
         return Colors.grey;
     }

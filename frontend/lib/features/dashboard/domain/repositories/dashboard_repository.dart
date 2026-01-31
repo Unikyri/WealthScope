@@ -7,7 +7,4 @@ import 'package:fpdart/fpdart.dart';
 abstract class DashboardRepository {
   /// Fetch portfolio summary for the current user
   Future<Either<Failure, PortfolioSummary>> getPortfolioSummary();
-  
-  /// Refresh portfolio data
-  Future<Either<Failure, void>> refreshPortfolio();
 }

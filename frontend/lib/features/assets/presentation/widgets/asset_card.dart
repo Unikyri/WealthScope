@@ -125,7 +125,7 @@ class AssetCard extends StatelessWidget {
                   if (hasGainLoss) const SizedBox(height: 4),
                   // Total Value
                   Text(
-                    '${asset.currency.symbol}${_formatValue(asset.currentValue ?? asset.totalInvested)}',
+                    '${asset.currency.symbol}${_formatValue(asset.totalValue ?? asset.totalInvested)}',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -163,6 +163,8 @@ class AssetCard extends StatelessWidget {
         return Icons.home;
       case AssetType.gold:
         return Icons.diamond;
+      case AssetType.cash:
+        return Icons.account_balance_wallet;
       case AssetType.other:
         return Icons.business;
     }
@@ -183,6 +185,8 @@ class AssetCard extends StatelessWidget {
         return const Color(0xFF4CAF50); // Green
       case AssetType.gold:
         return const Color(0xFFFFD700); // Gold
+      case AssetType.cash:
+        return const Color(0xFF00BCD4); // Cyan
       case AssetType.other:
         return theme.colorScheme.surfaceContainerHighest;
     }
@@ -202,6 +206,8 @@ class AssetCard extends StatelessWidget {
         return 'properties';
       case AssetType.gold:
         return 'oz';
+      case AssetType.cash:
+        return asset.currency.code;
       case AssetType.other:
         return 'units';
     }
@@ -218,6 +224,7 @@ class AssetCard extends StatelessWidget {
       case AssetType.etf:
       case AssetType.bond:
       case AssetType.realEstate:
+      case AssetType.cash:
       case AssetType.other:
         return asset.quantity % 1 == 0 ? 0 : 2;
     }

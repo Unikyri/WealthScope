@@ -10,96 +10,45 @@ _$PortfolioSummaryDtoImpl _$$PortfolioSummaryDtoImplFromJson(
         Map<String, dynamic> json) =>
     _$PortfolioSummaryDtoImpl(
       totalValue: (json['total_value'] as num).toDouble(),
-      totalGain: (json['total_gain'] as num).toDouble(),
-      totalGainPercentage: (json['total_gain_percentage'] as num).toDouble(),
-      dayChange: (json['day_change'] as num).toDouble(),
-      dayChangePercentage: (json['day_change_percentage'] as num).toDouble(),
+      totalInvested: (json['total_invested'] as num).toDouble(),
+      gainLoss: (json['gain_loss'] as num).toDouble(),
+      gainLossPercent: (json['gain_loss_percent'] as num).toDouble(),
       assetCount: (json['asset_count'] as num?)?.toInt() ?? 0,
-      allocations: (json['allocations'] as List<dynamic>?)
-              ?.map(
-                  (e) => AssetAllocationDto.fromJson(e as Map<String, dynamic>))
+      breakdownByType: (json['breakdown_by_type'] as List<dynamic>?)
+              ?.map((e) =>
+                  AssetTypeBreakdownDto.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
-      topAssets: (json['top_assets'] as List<dynamic>?)
-              ?.map((e) => TopAssetDto.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
-      alerts: (json['alerts'] as List<dynamic>?)
-              ?.map((e) => RiskAlertDto.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
-      lastUpdated: DateTime.parse(json['last_updated'] as String),
-      isMarketOpen: json['is_market_open'] as bool?,
+      lastUpdated: json['last_updated'] as String?,
     );
 
 Map<String, dynamic> _$$PortfolioSummaryDtoImplToJson(
         _$PortfolioSummaryDtoImpl instance) =>
     <String, dynamic>{
       'total_value': instance.totalValue,
-      'total_gain': instance.totalGain,
-      'total_gain_percentage': instance.totalGainPercentage,
-      'day_change': instance.dayChange,
-      'day_change_percentage': instance.dayChangePercentage,
+      'total_invested': instance.totalInvested,
+      'gain_loss': instance.gainLoss,
+      'gain_loss_percent': instance.gainLossPercent,
       'asset_count': instance.assetCount,
-      'allocations': instance.allocations.map((e) => e.toJson()).toList(),
-      'top_assets': instance.topAssets.map((e) => e.toJson()).toList(),
-      'alerts': instance.alerts.map((e) => e.toJson()).toList(),
-      'last_updated': instance.lastUpdated.toIso8601String(),
-      'is_market_open': instance.isMarketOpen,
+      'breakdown_by_type':
+          instance.breakdownByType.map((e) => e.toJson()).toList(),
+      'last_updated': instance.lastUpdated,
     };
 
-_$AssetAllocationDtoImpl _$$AssetAllocationDtoImplFromJson(
+_$AssetTypeBreakdownDtoImpl _$$AssetTypeBreakdownDtoImplFromJson(
         Map<String, dynamic> json) =>
-    _$AssetAllocationDtoImpl(
-      type: json['type'] as String,
-      label: json['label'] as String,
-      value: (json['value'] as num).toDouble(),
-      percentage: (json['percentage'] as num).toDouble(),
-    );
-
-Map<String, dynamic> _$$AssetAllocationDtoImplToJson(
-        _$AssetAllocationDtoImpl instance) =>
-    <String, dynamic>{
-      'type': instance.type,
-      'label': instance.label,
-      'value': instance.value,
-      'percentage': instance.percentage,
-    };
-
-_$TopAssetDtoImpl _$$TopAssetDtoImplFromJson(Map<String, dynamic> json) =>
-    _$TopAssetDtoImpl(
-      id: json['id'] as String,
-      name: json['name'] as String,
+    _$AssetTypeBreakdownDtoImpl(
       type: json['type'] as String,
       value: (json['value'] as num).toDouble(),
-      gain: (json['gain'] as num).toDouble(),
-      gainPercentage: (json['gain_percentage'] as num).toDouble(),
+      percent: (json['percent'] as num).toDouble(),
+      count: (json['count'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$TopAssetDtoImplToJson(_$TopAssetDtoImpl instance) =>
+Map<String, dynamic> _$$AssetTypeBreakdownDtoImplToJson(
+        _$AssetTypeBreakdownDtoImpl instance) =>
     <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
       'type': instance.type,
       'value': instance.value,
-      'gain': instance.gain,
-      'gain_percentage': instance.gainPercentage,
-    };
-
-_$RiskAlertDtoImpl _$$RiskAlertDtoImplFromJson(Map<String, dynamic> json) =>
-    _$RiskAlertDtoImpl(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      message: json['message'] as String,
-      severity: json['severity'] as String,
-      timestamp: DateTime.parse(json['timestamp'] as String),
-    );
-
-Map<String, dynamic> _$$RiskAlertDtoImplToJson(_$RiskAlertDtoImpl instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'title': instance.title,
-      'message': instance.message,
-      'severity': instance.severity,
-      'timestamp': instance.timestamp.toIso8601String(),
+      'percent': instance.percent,
+      'count': instance.count,
     };

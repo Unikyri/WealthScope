@@ -32,7 +32,7 @@ class AssetsListScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () => context.push('/assets/add'),
+            onPressed: () => context.push('/assets/select-type'),
             tooltip: 'Add Asset',
           ),
         ],
@@ -51,10 +51,14 @@ class AssetsListScreen extends ConsumerWidget {
           Expanded(
             child: assetsAsync.when(
               data: (assets) {
+                print('🟠 [AssetsList] Received ${assets.length} assets');
+                
                 // Empty state with pull-to-refresh support
                 if (assets.isEmpty) {
+                  print('⚠️ [AssetsList] Assets list is empty, showing empty view');
                   return RefreshIndicator(
                     onRefresh: () async {
+                      print('🔄 [AssetsList] Refreshing assets...');
                       // Invalidate provider to force reload
                       ref.invalidate(allAssetsProvider);
                       // Wait for the refresh to complete
@@ -70,9 +74,11 @@ class AssetsListScreen extends ConsumerWidget {
                   );
                 }
 
+                print('✅ [AssetsList] Building list with ${assets.length} items');
                 // Data state - show list with pull-to-refresh
                 return RefreshIndicator(
                   onRefresh: () async {
+                    print('🔄 [AssetsList] Refreshing assets...');
                     // Invalidate provider to force reload
                     ref.invalidate(allAssetsProvider);
                     // Wait for the refresh to complete
@@ -144,13 +150,17 @@ class AssetsListScreen extends ConsumerWidget {
                 );
               },
               loading: () {
+                print('⏳ [AssetsList] Loading assets...');
                 // Loading state - show skeleton
                 return const AssetListSkeleton();
               },
               error: (error, stack) {
+                print('❌ [AssetsList] Error loading assets: $error');
+                print('❌ [AssetsList] Stack: $stack');
                 // Error state with pull-to-refresh support
                 return RefreshIndicator(
                   onRefresh: () async {
+                    print('🔄 [AssetsList] Retrying after error...');
                     // Invalidate provider to retry
                     ref.invalidate(allAssetsProvider);
                     // Wait for the refresh to complete
@@ -163,6 +173,7 @@ class AssetsListScreen extends ConsumerWidget {
                       child: ErrorView(
                         message: error.toString(),
                         onRetry: () {
+                          print('🔄 [AssetsList] Retry button pressed');
                           // Retry fetching assets
                           ref.invalidate(allAssetsProvider);
                         },
@@ -176,7 +187,7 @@ class AssetsListScreen extends ConsumerWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/assets/add'),
+        onPressed: () => context.push('/assets/select-type'),
         icon: const Icon(Icons.add),
         label: const Text('Add Asset'),
       ),

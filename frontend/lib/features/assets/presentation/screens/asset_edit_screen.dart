@@ -10,6 +10,7 @@ import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart'
 import 'package:wealthscope_app/features/assets/domain/entities/currency.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/providers/dashboard_providers.dart';
 
 /// Asset Edit Screen
 /// Allows editing an existing asset by pre-populating the form with current data
@@ -32,10 +33,11 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
   static const Map<AssetType, IconData> _assetTypeIcons = {
     AssetType.stock: Icons.trending_up,
     AssetType.etf: Icons.pie_chart,
-    AssetType.realEstate: Icons.home,
-    AssetType.gold: Icons.diamond,
     AssetType.bond: Icons.account_balance,
     AssetType.crypto: Icons.currency_bitcoin,
+    AssetType.realEstate: Icons.home,
+    AssetType.gold: Icons.diamond,
+    AssetType.cash: Icons.account_balance_wallet,
     AssetType.other: Icons.category,
   };
   
@@ -43,6 +45,7 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
   late TextEditingController _nameController;
   late TextEditingController _quantityController;
   late TextEditingController _priceController;
+  late TextEditingController _currentPriceController;
   late TextEditingController _notesController;
   
   // Metadata controllers
@@ -74,6 +77,7 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
     _nameController = TextEditingController();
     _quantityController = TextEditingController();
     _priceController = TextEditingController();
+    _currentPriceController = TextEditingController();
     _notesController = TextEditingController();
     _exchangeController = TextEditingController();
     _sectorController = TextEditingController();
@@ -98,6 +102,7 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
           _nameController.text = asset.name;
           _quantityController.text = asset.quantity.toString();
           _priceController.text = asset.purchasePrice.toString();
+          _currentPriceController.text = asset.currentPrice?.toString() ?? '';
           _notesController.text = asset.notes ?? '';
           _selectedDate = asset.purchaseDate;
           _selectedCurrency = asset.currency;
@@ -144,7 +149,7 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
     _symbolController.dispose();
     _nameController.dispose();
     _quantityController.dispose();
-    _priceController.dispose();
+    _priceController.dispose();    _currentPriceController.dispose();    _currentPriceController.dispose();
     _notesController.dispose();
     _exchangeController.dispose();
     _sectorController.dispose();
@@ -203,6 +208,19 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
         }
       }
       
+      // Parse current price if provided
+      final double? newCurrentPrice = _currentPriceController.text.trim().isNotEmpty
+          ? double.tryParse(_currentPriceController.text)
+          : _originalAsset!.currentPrice;
+      
+      // Calculate values based on current price
+      final quantity = double.parse(_quantityController.text);
+      final purchasePrice = double.parse(_priceController.text);
+      final totalCost = quantity * purchasePrice;
+      final totalValue = newCurrentPrice != null ? quantity * newCurrentPrice : totalCost;
+      final gainLoss = totalValue - totalCost;
+      final gainLossPercent = totalCost > 0 ? (gainLoss / totalCost) * 100 : 0.0;
+      
       // Create updated asset
       final updatedAsset = StockAsset(
         id: _originalAsset!.id,
@@ -210,18 +228,20 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
         type: _originalAsset!.type,
         symbol: _symbolController.text.trim().toUpperCase(),
         name: _nameController.text.trim(),
-        quantity: double.parse(_quantityController.text),
-        purchasePrice: double.parse(_priceController.text),
+        quantity: quantity,
+        purchasePrice: purchasePrice,
         purchaseDate: _selectedDate,
         currency: _selectedCurrency,
         metadata: metadata,
         notes: _notesController.text.trim().isEmpty 
             ? null 
             : _notesController.text.trim(),
-        // Preserve fields that shouldn't be edited
-        currentPrice: _originalAsset!.currentPrice,
-        currentValue: _originalAsset!.currentValue,
-        lastPriceUpdate: _originalAsset!.lastPriceUpdate,
+        // Updated calculated fields
+        currentPrice: newCurrentPrice,
+        totalCost: totalCost,
+        totalValue: totalValue,
+        gainLoss: gainLoss,
+        gainLossPercent: gainLossPercent,
         isActive: _originalAsset!.isActive,
         createdAt: _originalAsset!.createdAt,
         updatedAt: DateTime.now(),
@@ -233,6 +253,8 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
       // Invalidate cache to refresh data
       ref.invalidate(assetDetailProvider(widget.assetId));
       ref.invalidate(allAssetsProvider);
+      // Invalidate portfolio summary to update totals
+      ref.invalidate(portfolioSummaryProvider);
       
       if (!mounted) return;
       
@@ -282,8 +304,9 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
               child: Text(
                 'Save',
                 style: TextStyle(
-                  color: theme.colorScheme.onPrimary,
+                  color: theme.colorScheme.primary,
                   fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
             ),
@@ -388,6 +411,9 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
           const SizedBox(height: 16),
           
           _buildPriceField(),
+          const SizedBox(height: 16),
+          
+          _buildCurrentPriceField(),
           const SizedBox(height: 16),
           
           _buildDateField(),
@@ -497,6 +523,25 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
         FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
       ],
       validator: AssetValidators.validatePrice,
+      enabled: !_isLoading,
+    );
+  }
+
+  Widget _buildCurrentPriceField() {
+    return TextFormField(
+      controller: _currentPriceController,
+      decoration: InputDecoration(
+        labelText: 'Current Price',
+        hintText: 'Enter current market price',
+        border: const OutlineInputBorder(),
+        prefixIcon: const Icon(Icons.trending_up),
+        suffixText: _selectedCurrency.code,
+        helperText: 'Optional - updates total value and gains',
+      ),
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+      ],
       enabled: !_isLoading,
     );
   }

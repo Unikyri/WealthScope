@@ -30,8 +30,21 @@ class SelectedAssetType extends _$SelectedAssetType {
 class AllAssets extends _$AllAssets {
   @override
   Future<List<StockAsset>> build() async {
-    final repository = ref.watch(assetRepositoryProvider);
-    return await repository.getAssets();
+    print('🟢 [AllAssetsProvider] Building provider...');
+    try {
+      final repository = ref.watch(assetRepositoryProvider);
+      print('🟢 [AllAssetsProvider] Calling repository.getAssets()...');
+      final assets = await repository.getAssets();
+      print('✅ [AllAssetsProvider] Received ${assets.length} assets');
+      for (var asset in assets) {
+        print('   - ${asset.name} (${asset.type.name}): \$${asset.totalValue}');
+      }
+      return assets;
+    } catch (e, stack) {
+      print('❌ [AllAssetsProvider] Error: $e');
+      print('❌ [AllAssetsProvider] Stack: $stack');
+      rethrow;
+    }
   }
 
   /// Optimistically remove an asset from the list
@@ -56,16 +69,23 @@ class AllAssets extends _$AllAssets {
 /// This provider automatically updates when the filter changes
 @riverpod
 Future<List<StockAsset>> filteredAssets(FilteredAssetsRef ref) async {
+  print('🟡 [FilteredAssetsProvider] Building...');
   final selectedType = ref.watch(selectedAssetTypeProvider);
+  print('🟡 [FilteredAssetsProvider] Selected type: ${selectedType?.name ?? "ALL"}');
+  
   final allAssetsList = await ref.watch(allAssetsProvider.future);
+  print('🟡 [FilteredAssetsProvider] All assets count: ${allAssetsList.length}');
 
   // If no filter is selected, return all assets
   if (selectedType == null) {
+    print('🟡 [FilteredAssetsProvider] No filter, returning all ${allAssetsList.length} assets');
     return allAssetsList;
   }
 
   // Filter by selected type
-  return allAssetsList.where((asset) => asset.type == selectedType).toList();
+  final filtered = allAssetsList.where((asset) => asset.type == selectedType).toList();
+  print('🟡 [FilteredAssetsProvider] Filtered to ${filtered.length} assets');
+  return filtered;
 }
 
 /// Provider for asset search functionality

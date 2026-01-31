@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 /// Enhanced Allocation Section with Interactive Pie Chart
 /// Demonstrates usage of AllocationPieChart widget
 class EnhancedAllocationSection extends StatelessWidget {
-  final List<AssetAllocation> allocations;
+  final List<AssetTypeBreakdown> allocations;
 
   const EnhancedAllocationSection({
     super.key,
@@ -55,7 +55,7 @@ class EnhancedAllocationSection extends StatelessWidget {
 
 /// Legend showing asset type breakdown with colors and values
 class _AllocationLegend extends StatelessWidget {
-  final List<AssetAllocation> allocations;
+  final List<AssetTypeBreakdown> allocations;
 
   const _AllocationLegend({required this.allocations});
 
@@ -83,7 +83,7 @@ class _AllocationLegend extends StatelessWidget {
               // Asset type label
               Expanded(
                 child: Text(
-                  allocation.label,
+                  _formatTypeName(allocation.type),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w500,
                   ),
@@ -91,7 +91,7 @@ class _AllocationLegend extends StatelessWidget {
               ),
               // Percentage
               Text(
-                '${allocation.percentage.toStringAsFixed(1)}%',
+                '${allocation.percent.toStringAsFixed(1)}%',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.colorScheme.primary,
@@ -134,6 +134,29 @@ class _AllocationLegend extends StatelessWidget {
         return Colors.purple;
       default:
         return Colors.grey;
+    }
+  }
+
+  String _formatTypeName(String type) {
+    switch (type.toLowerCase()) {
+      case 'stock':
+        return 'Stocks';
+      case 'etf':
+        return 'ETFs';
+      case 'crypto':
+        return 'Cryptocurrency';
+      case 'bond':
+        return 'Bonds';
+      case 'real_estate':
+        return 'Real Estate';
+      case 'gold':
+        return 'Gold';
+      case 'cash':
+        return 'Cash';
+      case 'other':
+        return 'Other';
+      default:
+        return type.toUpperCase();
     }
   }
 }
