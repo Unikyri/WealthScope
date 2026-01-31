@@ -189,7 +189,7 @@ class AppTheme {
       ),
       
       // Card
-      cardTheme: CardThemeData(
+      cardTheme: CardTheme(
         elevation: 0,
         color: Colors.white,
         surfaceTintColor: Colors.transparent,
@@ -372,7 +372,7 @@ class AppTheme {
       ),
       
       // Card
-      cardTheme: CardThemeData(
+      cardTheme: CardTheme(
         elevation: 0,
         color: const Color(0xFF1E293B),
         surfaceTintColor: Colors.transparent,
