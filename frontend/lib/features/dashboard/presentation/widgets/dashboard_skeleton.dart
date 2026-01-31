@@ -9,8 +9,14 @@ class DashboardSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final baseColor = theme.colorScheme.surfaceVariant;
-    final highlightColor = theme.colorScheme.surface;
+    final isDark = theme.brightness == Brightness.dark;
+    final baseColor = isDark 
+        ? theme.colorScheme.surfaceContainerHighest 
+        : theme.colorScheme.surfaceContainerHighest;
+    final highlightColor = isDark 
+        ? theme.colorScheme.surfaceContainerLow 
+        : theme.colorScheme.surface;
+    final shimmerColor = theme.colorScheme.surfaceContainerHighest;
 
     return Shimmer.fromColors(
       baseColor: baseColor,
@@ -22,7 +28,7 @@ class DashboardSkeleton extends StatelessWidget {
           Container(
             height: 180,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: shimmerColor,
               borderRadius: BorderRadius.circular(12),
             ),
           ),
@@ -31,7 +37,7 @@ class DashboardSkeleton extends StatelessWidget {
           Container(
             height: 280,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: shimmerColor,
               borderRadius: BorderRadius.circular(12),
             ),
           ),
@@ -40,7 +46,7 @@ class DashboardSkeleton extends StatelessWidget {
           Container(
             height: 120,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: shimmerColor,
               borderRadius: BorderRadius.circular(12),
             ),
           ),
@@ -49,7 +55,7 @@ class DashboardSkeleton extends StatelessWidget {
           Container(
             height: 200,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: shimmerColor,
               borderRadius: BorderRadius.circular(12),
             ),
           ),

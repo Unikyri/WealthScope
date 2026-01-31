@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/dashboard/domain/entities/portfolio_summary.dart';
 
 /// Portfolio Summary Card Widget
@@ -16,6 +17,7 @@ class PortfolioSummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isPositive = summary.totalGain >= 0;
+    final changeColor = AppTheme.getChangeColor(summary.totalGain);
 
     return Card(
       elevation: 4,
@@ -63,14 +65,14 @@ class PortfolioSummaryCard extends StatelessWidget {
                   children: [
                     Icon(
                       isPositive ? Icons.arrow_upward : Icons.arrow_downward,
-                      color: isPositive ? Colors.greenAccent : Colors.redAccent,
+                      color: changeColor,
                       size: 16,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       '${isPositive ? "+" : ""}\$${summary.totalGain.abs().toStringAsFixed(0)} (${summary.totalGainPercentage.toStringAsFixed(1)}%)',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: isPositive ? Colors.greenAccent : Colors.redAccent,
+                        color: changeColor,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

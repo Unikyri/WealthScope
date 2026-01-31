@@ -26,13 +26,15 @@ class AssetCardSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final baseColor = theme.colorScheme.surfaceContainerHighest;
+    final highlightColor = theme.colorScheme.surfaceContainerLow;
+    final shimmerColor = theme.colorScheme.surfaceContainerHighest;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Shimmer.fromColors(
-        baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
-        highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
+        baseColor: baseColor,
+        highlightColor: highlightColor,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -42,7 +44,7 @@ class AssetCardSkeleton extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: shimmerColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
@@ -58,7 +60,7 @@ class AssetCardSkeleton extends StatelessWidget {
                       width: 120,
                       height: 16,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: shimmerColor,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -68,7 +70,7 @@ class AssetCardSkeleton extends StatelessWidget {
                       width: 80,
                       height: 12,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: shimmerColor,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -85,7 +87,7 @@ class AssetCardSkeleton extends StatelessWidget {
                     width: 50,
                     height: 14,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: shimmerColor,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -95,7 +97,7 @@ class AssetCardSkeleton extends StatelessWidget {
                     width: 70,
                     height: 16,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: shimmerColor,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),

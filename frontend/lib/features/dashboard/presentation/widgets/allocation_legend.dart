@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/dashboard/domain/entities/portfolio_summary.dart';
 
@@ -114,25 +115,25 @@ class AllocationLegend extends StatelessWidget {
   }
 
   /// Get color for asset type
-  /// Returns consistent colors matching the pie chart
+  /// Returns consistent colors matching the pie chart using theme colors
   Color _getTypeColor(String typeString) {
     final type = _parseAssetType(typeString);
 
     switch (type) {
       case AssetType.stock:
-        return Colors.blue;
+        return AppTheme.getChartColor(0);  // Indigo
       case AssetType.etf:
-        return Colors.indigo;
+        return AppTheme.getChartColor(4);  // Violet
       case AssetType.realEstate:
-        return Colors.green;
+        return AppTheme.getChartColor(1);  // Emerald
       case AssetType.gold:
-        return Colors.amber;
+        return AppTheme.getChartColor(2);  // Amber
       case AssetType.crypto:
-        return Colors.orange;
+        return AppTheme.getChartColor(6);  // Orange
       case AssetType.bond:
-        return Colors.purple;
+        return AppTheme.getChartColor(3);  // Pink
       case AssetType.other:
-        return Colors.grey;
+        return AppTheme.neutralColor;
     }
   }
 
