@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/dashboard/domain/entities/portfolio_summary.dart';
 import 'package:intl/intl.dart';
 
@@ -50,8 +51,8 @@ class _TopAssetItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final numberFormat = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
+    final gainColor = AppTheme.getChangeColor(asset.gain);
     final isGainPositive = asset.gain >= 0;
-    final gainColor = isGainPositive ? Colors.green : Colors.red;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),

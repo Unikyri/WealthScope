@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
 
@@ -17,6 +18,7 @@ class AssetDetailHeader extends StatelessWidget {
     final theme = Theme.of(context);
     final gainLoss = asset.gainLoss;
     final isPositive = gainLoss != null && gainLoss >= 0;
+    final changeColor = AppTheme.getChangeColor(gainLoss ?? 0);
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -86,9 +88,7 @@ class AssetDetailHeader extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: isPositive
-                    ? Colors.green.withOpacity(0.2)
-                    : Colors.red.withOpacity(0.2),
+                color: changeColor.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -97,13 +97,13 @@ class AssetDetailHeader extends StatelessWidget {
                   Icon(
                     isPositive ? Icons.trending_up : Icons.trending_down,
                     size: 20,
-                    color: isPositive ? Colors.green : Colors.red,
+                    color: changeColor,
                   ),
                   const SizedBox(width: 4),
                   Text(
                     '${isPositive ? '+' : ''}${asset.currency.symbol}${_formatPrice(gainLoss)} (${asset.gainLossPercent!.toStringAsFixed(2)}%)',
                     style: theme.textTheme.titleMedium?.copyWith(
-                      color: isPositive ? Colors.green : Colors.red,
+                      color: changeColor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
