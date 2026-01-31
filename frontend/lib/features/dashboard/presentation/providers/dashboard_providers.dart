@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wealthscope_app/core/network/dio_client_provider.dart';
 import 'package:wealthscope_app/features/dashboard/data/datasources/dashboard_remote_source.dart';

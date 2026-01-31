@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/providers/dashboard_providers.dart';
-import 'package:wealthscope_app/features/dashboard/presentation/widgets/allocation_section.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/enhanced_allocation_section_with_legend.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/dashboard_skeleton.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/empty_dashboard.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/error_view.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/last_updated_indicator.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_summary_card.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/price_status_chip.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/risk_alerts_section.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/top_assets_section.dart';
 import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
@@ -74,15 +76,29 @@ class DashboardScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   PortfolioSummaryCard(summary: summary),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: LastUpdatedIndicator(
+                          lastUpdated: summary.lastUpdated,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      PriceStatusChip(
+                        lastUpdated: summary.lastUpdated,
+                        isMarketOpen: summary.isMarketOpen,
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 24),
                   if (summary.allocations.isNotEmpty) ...[
-                    AllocationSection(allocations: summary.allocations),
+                    EnhancedAllocationSection(allocations: summary.allocations),
                     const SizedBox(height: 24),
                   ],
-                  if (summary.alerts.isNotEmpty) ...[
-                    RiskAlertsSection(alerts: summary.alerts),
-                    const SizedBox(height: 24),
-                  ],
+                  // Always show risk alerts section (shows positive message when empty)
+                  RiskAlertsSection(alerts: summary.alerts),
+                  const SizedBox(height: 24),
                   if (summary.topAssets.isNotEmpty) ...[
                     TopAssetsSection(topAssets: summary.topAssets),
                   ],

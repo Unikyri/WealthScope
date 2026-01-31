@@ -40,7 +40,7 @@ class _RealEstateFormScreenState extends ConsumerState<RealEstateFormScreen> {
       initialDate: now,
       firstDate: DateTime(1900),
       lastDate: now,
-      helpText: 'Seleccionar fecha de compra',
+      helpText: 'Select purchase date',
     );
 
     if (picked != null) {
@@ -58,7 +58,7 @@ class _RealEstateFormScreenState extends ConsumerState<RealEstateFormScreen> {
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Bien raíz agregado exitosamente'),
+            content: Text('Real estate added successfully'),
             backgroundColor: Colors.green,
           ),
         );
@@ -76,12 +76,12 @@ class _RealEstateFormScreenState extends ConsumerState<RealEstateFormScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nuevo Bien Raíz'),
+        title: const Text('New Real Estate'),
         actions: [
           TextButton(
             onPressed: _handleSubmit,
             child: Text(
-              'Guardar',
+              'Save',
               style: TextStyle(color: theme.colorScheme.onPrimary),
             ),
           ),
@@ -177,8 +177,8 @@ class _NameField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
-        labelText: 'Nombre de la propiedad *',
-        hintText: 'Ej: Apartamento en Miami',
+        labelText: 'Property name *',
+        hintText: 'E.g.: Apartment in Miami',
         border: const OutlineInputBorder(),
         errorText: errorText,
         prefixIcon: const Icon(Icons.home),
@@ -207,7 +207,7 @@ class _EstimatedValueField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
-        labelText: 'Valor estimado *',
+        labelText: 'Estimated value *',
         hintText: '250000',
         prefixText: 'USD ',
         border: const OutlineInputBorder(),
@@ -241,7 +241,7 @@ class _AddressField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
-        labelText: 'Dirección *',
+        labelText: 'Address *',
         hintText: '123 Main St, Miami, FL',
         border: const OutlineInputBorder(),
         errorText: errorText,
@@ -301,7 +301,7 @@ class _AreaField extends StatelessWidget {
           child: DropdownButtonFormField<AreaUnit>(
             value: currentUnit,
             decoration: const InputDecoration(
-              labelText: 'Unidad',
+              labelText: 'Unit',
               border: OutlineInputBorder(),
             ),
             items: AreaUnit.values
@@ -337,7 +337,7 @@ class _PropertyTypeDropdown extends StatelessWidget {
     return DropdownButtonFormField<PropertyType>(
       value: value,
       decoration: const InputDecoration(
-        labelText: 'Tipo de propiedad',
+        labelText: 'Property type',
         border: OutlineInputBorder(),
         prefixIcon: Icon(Icons.business),
       ),
@@ -371,13 +371,13 @@ class _PurchaseDateField extends StatelessWidget {
     final dateFormat = DateFormat('dd/MM/yyyy');
     final displayText = purchaseDate != null
         ? dateFormat.format(purchaseDate!)
-        : 'Seleccionar fecha';
+        : 'Select date';
 
     return InkWell(
       onTap: onTap,
       child: InputDecorator(
         decoration: InputDecoration(
-          labelText: 'Fecha de compra',
+          labelText: 'Purchase date',
           border: const OutlineInputBorder(),
           errorText: errorText,
           prefixIcon: const Icon(Icons.calendar_today),
@@ -425,8 +425,8 @@ class _InfoCard extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Los campos marcados con * son obligatorios. '
-              'El valor estimado será usado para calcular tu patrimonio total.',
+              'Fields marked with * are required. '
+              'The estimated value will be used to calculate your total net worth.',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurface.withOpacity(0.7),
               ),

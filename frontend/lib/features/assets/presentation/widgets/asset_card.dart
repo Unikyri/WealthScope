@@ -78,6 +78,18 @@ class AssetCard extends StatelessWidget {
                         color: theme.colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
+                    // Current Price (if available and has symbol)
+                    if (asset.currentPrice != null && asset.symbol.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          '${asset.currency.symbol}${asset.currentPrice!.toStringAsFixed(2)}',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withOpacity(0.5),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -86,18 +98,31 @@ class AssetCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  // Percentage Change
+                  // Percentage Change with direction indicator
                   if (hasGainLoss)
-                    Text(
-                      '${isPositive ? '+' : ''}${asset.gainLossPercent!.toStringAsFixed(1)}%',
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        color: isPositive
-                            ? theme.colorScheme.tertiary
-                            : theme.colorScheme.error,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isPositive ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                          color: isPositive
+                              ? theme.colorScheme.tertiary
+                              : theme.colorScheme.error,
+                          size: 20,
+                        ),
+                        Text(
+                          '${isPositive ? '+' : ''}${asset.gainLossPercent!.toStringAsFixed(1)}%',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: isPositive
+                                ? theme.colorScheme.tertiary
+                                : theme.colorScheme.error,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
                     ),
-                  const SizedBox(height: 4),
+                  if (hasGainLoss) const SizedBox(height: 4),
                   // Total Value
                   Text(
                     '${asset.currency.symbol}${_formatValue(asset.currentValue ?? asset.totalInvested)}',

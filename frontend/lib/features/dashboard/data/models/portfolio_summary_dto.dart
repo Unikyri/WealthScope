@@ -17,6 +17,8 @@ class PortfolioSummaryDto with _$PortfolioSummaryDto {
     @Default([]) List<AssetAllocationDto> allocations,
     @JsonKey(name: 'top_assets') @Default([]) List<TopAssetDto> topAssets,
     @Default([]) List<RiskAlertDto> alerts,
+    @JsonKey(name: 'last_updated') required DateTime lastUpdated,
+    @JsonKey(name: 'is_market_open') bool? isMarketOpen,
   }) = _PortfolioSummaryDto;
 
   const PortfolioSummaryDto._();
@@ -89,6 +91,8 @@ extension PortfolioSummaryDtoX on PortfolioSummaryDto {
       allocations: allocations.map((a) => a.toDomain()).toList(),
       topAssets: topAssets.map((a) => a.toDomain()).toList(),
       alerts: alerts.map((a) => a.toDomain()).toList(),
+      lastUpdated: lastUpdated,
+      isMarketOpen: isMarketOpen,
     );
   }
 }
