@@ -16,12 +16,12 @@ class LogoutConfirmationDialog extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     
     return AlertDialog(
-      title: const Text('Cerrar sesión'),
-      content: const Text('¿Estás seguro que deseas cerrar sesión?'),
+      title: const Text('Sign Out'),
+      content: const Text('Are you sure you want to sign out?'),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancelar'),
+          child: const Text('Cancel'),
         ),
         TextButton(
           onPressed: () {
@@ -31,7 +31,7 @@ class LogoutConfirmationDialog extends StatelessWidget {
           style: TextButton.styleFrom(
             foregroundColor: colorScheme.error,
           ),
-          child: const Text('Cerrar sesión'),
+          child: const Text('Sign Out'),
         ),
       ],
     );

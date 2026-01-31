@@ -19,14 +19,14 @@ class ProfileScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Perfil'),
+        title: const Text('Profile'),
         centerTitle: true,
       ),
       body: profileAsync.when(
         data: (profile) {
           if (profile == null) {
             return const Center(
-              child: Text('No hay sesión activa'),
+              child: Text('No active session'),
             );
           }
 
@@ -77,7 +77,7 @@ class ProfileScreen extends ConsumerWidget {
                   Icons.person_outline,
                   color: colorScheme.onSurface,
                 ),
-                title: const Text('Editar perfil'),
+                title: const Text('Edit Profile'),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   // TODO: Navigate to edit profile
@@ -88,7 +88,7 @@ class ProfileScreen extends ConsumerWidget {
                   Icons.notifications_outlined,
                   color: colorScheme.onSurface,
                 ),
-                title: const Text('Notificaciones'),
+                title: const Text('Notifications'),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   // TODO: Navigate to notifications settings
@@ -99,7 +99,7 @@ class ProfileScreen extends ConsumerWidget {
                   Icons.security_outlined,
                   color: colorScheme.onSurface,
                 ),
-                title: const Text('Seguridad'),
+                title: const Text('Security'),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   // TODO: Navigate to security settings
@@ -110,7 +110,7 @@ class ProfileScreen extends ConsumerWidget {
                   Icons.help_outline,
                   color: colorScheme.onSurface,
                 ),
-                title: const Text('Ayuda'),
+                title: const Text('Help'),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   // TODO: Navigate to help
@@ -124,7 +124,7 @@ class ProfileScreen extends ConsumerWidget {
                   color: colorScheme.error,
                 ),
                 title: Text(
-                  'Cerrar sesión',
+                  'Sign Out',
                   style: TextStyle(color: colorScheme.error),
                 ),
                 onTap: () => _showLogoutConfirmation(context, ref),
@@ -147,7 +147,7 @@ class ProfileScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Error al cargar el perfil',
+                'Error loading profile',
                 style: textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
