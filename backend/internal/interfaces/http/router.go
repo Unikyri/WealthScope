@@ -111,7 +111,7 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		// Auth routes (protected with rate limiting)
 		auth := v1.Group("/auth")
 		auth.Use(authRateLimiter.Middleware()) // Rate limit: 5 attempts per minute
-		auth.Use(middleware.AuthMiddleware(deps.Config.Supabase.JWTSecret))
+		auth.Use(middleware.AuthMiddleware(deps.Config.Supabase.URL))
 		{
 			auth.POST("/sync", authHandler.Sync)
 			auth.GET("/me", authHandler.Me)
@@ -119,7 +119,7 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 
 		// Asset routes (protected)
 		assets := v1.Group("/assets")
-		assets.Use(middleware.AuthMiddleware(deps.Config.Supabase.JWTSecret))
+		assets.Use(middleware.AuthMiddleware(deps.Config.Supabase.URL))
 		{
 			assets.POST("", assetHandler.Create)
 			assets.GET("", assetHandler.List)
@@ -130,7 +130,7 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 
 		// Portfolio routes (protected)
 		portfolio := v1.Group("/portfolio")
-		portfolio.Use(middleware.AuthMiddleware(deps.Config.Supabase.JWTSecret))
+		portfolio.Use(middleware.AuthMiddleware(deps.Config.Supabase.URL))
 		{
 			portfolio.GET("/summary", portfolioHandler.GetSummary)
 			portfolio.GET("/risk", portfolioHandler.GetRisk)
