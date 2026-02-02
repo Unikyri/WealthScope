@@ -8,22 +8,12 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/Unikyri/WealthScope/backend/internal/domain/services"
 )
 
-// Quote represents a market quote for a symbol.
-//
-//nolint:govet // fieldalignment: readability over micro-optimization for DTO
-type Quote struct {
-	UpdatedAt     time.Time `json:"updated_at"`
-	Price         float64   `json:"price"`
-	Change        float64   `json:"change"`
-	ChangePercent float64   `json:"change_percent"`
-	Symbol        string    `json:"symbol"`
-	MarketState   string    `json:"market_state"`
-	Currency      string    `json:"currency,omitempty"`
-}
-
 // YahooFinanceClient fetches quotes from Yahoo Finance public endpoints.
+// Implements services.MarketDataClient.
 //
 // Source endpoint used:
 // - https://query1.finance.yahoo.com/v7/finance/quote?symbols=AAPL,MSFT
@@ -44,7 +34,7 @@ func NewYahooFinanceClient(httpClient *http.Client) *YahooFinanceClient {
 }
 
 // GetQuote fetches a single quote.
-func (c *YahooFinanceClient) GetQuote(ctx context.Context, symbol string) (*Quote, error) {
+func (c *YahooFinanceClient) GetQuote(ctx context.Context, symbol string) (*services.Quote, error) {
 	quotes, err := c.GetQuotes(ctx, []string{symbol})
 	if err != nil {
 		return nil, err
@@ -57,9 +47,9 @@ func (c *YahooFinanceClient) GetQuote(ctx context.Context, symbol string) (*Quot
 }
 
 // GetQuotes fetches quotes for multiple symbols.
-func (c *YahooFinanceClient) GetQuotes(ctx context.Context, symbols []string) (map[string]*Quote, error) {
+func (c *YahooFinanceClient) GetQuotes(ctx context.Context, symbols []string) (map[string]*services.Quote, error) {
 	if len(symbols) == 0 {
-		return map[string]*Quote{}, nil
+		return map[string]*services.Quote{}, nil
 	}
 
 	symbolsCSV := strings.Join(normalizeSymbols(symbols), ",")
@@ -95,15 +85,16 @@ func (c *YahooFinanceClient) GetQuotes(ctx context.Context, symbols []string) (m
 		return nil, fmt.Errorf("failed to decode yahoo finance response: %w", err)
 	}
 
-	out := make(map[string]*Quote, len(payload.QuoteResponse.Result))
+	out := make(map[string]*services.Quote, len(payload.QuoteResponse.Result))
 	now := time.Now().UTC()
+	source := c.Name()
 
 	for _, r := range payload.QuoteResponse.Result {
 		if r.Symbol == "" {
 			continue
 		}
 
-		out[strings.ToUpper(r.Symbol)] = &Quote{
+		out[strings.ToUpper(r.Symbol)] = &services.Quote{
 			Symbol:        r.Symbol,
 			Price:         r.RegularMarketPrice,
 			Change:        r.RegularMarketChange,
@@ -111,10 +102,30 @@ func (c *YahooFinanceClient) GetQuotes(ctx context.Context, symbols []string) (m
 			MarketState:   r.MarketState,
 			Currency:      r.Currency,
 			UpdatedAt:     now,
+			Source:        source,
 		}
 	}
 
 	return out, nil
+}
+
+// GetHistoricalPrices returns historical OHLCV; not implemented for Yahoo public API in US-6.1.
+func (c *YahooFinanceClient) GetHistoricalPrices(ctx context.Context, symbol string, from, to time.Time) ([]services.PricePoint, error) {
+	_ = ctx
+	_ = symbol
+	_ = from
+	_ = to
+	return nil, nil
+}
+
+// SupportsSymbol returns true for any non-empty symbol (Yahoo handles equities).
+func (c *YahooFinanceClient) SupportsSymbol(symbol string) bool {
+	return strings.TrimSpace(symbol) != ""
+}
+
+// Name returns the provider name for logging and PriceHistory.Source.
+func (c *YahooFinanceClient) Name() string {
+	return "yahoo_finance"
 }
 
 func normalizeSymbols(symbols []string) []string {
