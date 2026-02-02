@@ -9,30 +9,31 @@ import (
 
 	"github.com/Unikyri/WealthScope/backend/internal/domain/entities"
 	"github.com/Unikyri/WealthScope/backend/internal/domain/repositories"
+	domainsvc "github.com/Unikyri/WealthScope/backend/internal/domain/services"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/marketdata"
 )
 
 // PricingService fetches and caches market prices for listed assets.
 type PricingService struct {
-	client *marketdata.YahooFinanceClient
-	cache  *marketdata.TTLCache[*marketdata.Quote]
+	client domainsvc.MarketDataClient
+	cache  *marketdata.TTLCache[*domainsvc.Quote]
 
 	ttl time.Duration
 }
 
-func NewPricingService(client *marketdata.YahooFinanceClient, ttl time.Duration) *PricingService {
+func NewPricingService(client domainsvc.MarketDataClient, ttl time.Duration) *PricingService {
 	if ttl <= 0 {
 		ttl = time.Minute
 	}
 	return &PricingService{
 		client: client,
-		cache:  marketdata.NewTTLCache[*marketdata.Quote](ttl),
+		cache:  marketdata.NewTTLCache[*domainsvc.Quote](ttl),
 		ttl:    ttl,
 	}
 }
 
 // GetQuote returns a quote for a symbol using cache-first strategy.
-func (s *PricingService) GetQuote(ctx context.Context, symbol string) (*marketdata.Quote, error) {
+func (s *PricingService) GetQuote(ctx context.Context, symbol string) (*domainsvc.Quote, error) {
 	if q, ok := s.cache.Get(symbol); ok && q != nil {
 		return q, nil
 	}
@@ -45,9 +46,9 @@ func (s *PricingService) GetQuote(ctx context.Context, symbol string) (*marketda
 }
 
 // GetQuotes returns quotes for multiple symbols (cache-first, falls back to API).
-func (s *PricingService) GetQuotes(ctx context.Context, symbols []string) (map[string]*marketdata.Quote, error) {
+func (s *PricingService) GetQuotes(ctx context.Context, symbols []string) (map[string]*domainsvc.Quote, error) {
 	need := make([]string, 0, len(symbols))
-	out := make(map[string]*marketdata.Quote, len(symbols))
+	out := make(map[string]*domainsvc.Quote, len(symbols))
 
 	for _, sym := range symbols {
 		if q, ok := s.cache.Get(sym); ok && q != nil {
@@ -116,6 +117,10 @@ func (s *PricingService) UpdateAssetPrices(
 
 		// Persist history record
 		if priceRepo != nil {
+			source := q.Source
+			if source == "" {
+				source = s.client.Name()
+			}
 			_ = priceRepo.Insert(ctx, &entities.PriceHistory{
 				Symbol:        q.Symbol,
 				Price:         q.Price,
@@ -123,7 +128,7 @@ func (s *PricingService) UpdateAssetPrices(
 				ChangePercent: q.ChangePercent,
 				MarketState:   q.MarketState,
 				RecordedAt:    q.UpdatedAt,
-				Source:        "yahoo_finance",
+				Source:        source,
 			})
 		}
 	}

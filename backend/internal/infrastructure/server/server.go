@@ -12,7 +12,8 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Unikyri/WealthScope/backend/internal/application/jobs"
-	"github.com/Unikyri/WealthScope/backend/internal/application/services"
+	appsvc "github.com/Unikyri/WealthScope/backend/internal/application/services"
+	domainsvc "github.com/Unikyri/WealthScope/backend/internal/domain/services"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/config"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/database"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/marketdata"
@@ -98,8 +99,13 @@ func (s *Server) runPriceUpdateLoop() {
 	assetRepo := infraRepo.NewPostgresAssetRepository(s.db.DB)
 	priceRepo := infraRepo.NewPostgresPriceHistoryRepository(s.db.DB)
 
-	client := marketdata.NewYahooFinanceClient(nil)
-	pricingSvc := services.NewPricingService(client, time.Minute)
+	registry := marketdata.NewProviderRegistry(s.logger)
+	if s.cfg.MarketData.YahooFinanceEnabled {
+		registry.Register(domainsvc.CategoryEquity, marketdata.NewYahooFinanceClient(nil))
+	}
+	// Alpha Vantage / Finnhub registered in US-6.2 when enabled and keys present
+
+	pricingSvc := appsvc.NewPricingService(registry, time.Minute)
 	job := jobs.NewPriceUpdateJob(pricingSvc, assetRepo, priceRepo, s.logger)
 
 	ticker := time.NewTicker(interval)

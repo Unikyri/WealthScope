@@ -11,11 +11,12 @@ import (
 //
 //nolint:govet // fieldalignment: keep grouped sub-configs for readability
 type Config struct {
-	Pricing  PricingConfig
-	Database DatabaseConfig
-	Server   ServerConfig
-	Log      LogConfig
-	Supabase SupabaseConfig
+	Pricing    PricingConfig
+	MarketData MarketDataConfig
+	Database   DatabaseConfig
+	Server     ServerConfig
+	Log        LogConfig
+	Supabase   SupabaseConfig
 }
 
 // ServerConfig holds server-specific configuration
@@ -32,6 +33,18 @@ type DatabaseConfig struct {
 // PricingConfig holds pricing/market data configuration
 type PricingConfig struct {
 	UpdateIntervalSeconds int
+}
+
+// MarketDataConfig holds multi-provider market data API keys and enabled flags.
+// If a provider is disabled or has no key (where required), it is not registered.
+// Yahoo can be enabled without a key (public endpoint).
+type MarketDataConfig struct {
+	AlphaVantageAPIKey   string
+	AlphaVantageEnabled  bool
+	FinnhubAPIKey        string
+	FinnhubEnabled       bool
+	YahooFinanceAPIKey   string
+	YahooFinanceEnabled  bool
 }
 
 // SupabaseConfig holds Supabase configuration
@@ -67,6 +80,12 @@ func Load() *Config {
 	viper.SetDefault("SERVER_MODE", "debug")
 	viper.SetDefault("DATABASE_URL", "")
 	viper.SetDefault("PRICING_UPDATE_INTERVAL_SECONDS", 300)
+	viper.SetDefault("MARKETDATA_ALPHA_VANTAGE_API_KEY", "")
+	viper.SetDefault("MARKETDATA_ALPHA_VANTAGE_ENABLED", false)
+	viper.SetDefault("MARKETDATA_FINNHUB_API_KEY", "")
+	viper.SetDefault("MARKETDATA_FINNHUB_ENABLED", false)
+	viper.SetDefault("MARKETDATA_YAHOO_FINANCE_API_KEY", "")
+	viper.SetDefault("MARKETDATA_YAHOO_FINANCE_ENABLED", true)
 	viper.SetDefault("SUPABASE_URL", "")
 	viper.SetDefault("SUPABASE_ANON_KEY", "")
 	viper.SetDefault("SUPABASE_SERVICE_KEY", "")
@@ -84,6 +103,14 @@ func Load() *Config {
 		},
 		Pricing: PricingConfig{
 			UpdateIntervalSeconds: viper.GetInt("PRICING_UPDATE_INTERVAL_SECONDS"),
+		},
+		MarketData: MarketDataConfig{
+			AlphaVantageAPIKey:   viper.GetString("MARKETDATA_ALPHA_VANTAGE_API_KEY"),
+			AlphaVantageEnabled: viper.GetBool("MARKETDATA_ALPHA_VANTAGE_ENABLED"),
+			FinnhubAPIKey:       viper.GetString("MARKETDATA_FINNHUB_API_KEY"),
+			FinnhubEnabled:      viper.GetBool("MARKETDATA_FINNHUB_ENABLED"),
+			YahooFinanceAPIKey:  viper.GetString("MARKETDATA_YAHOO_FINANCE_API_KEY"),
+			YahooFinanceEnabled: viper.GetBool("MARKETDATA_YAHOO_FINANCE_ENABLED"),
 		},
 		Supabase: SupabaseConfig{
 			URL:        viper.GetString("SUPABASE_URL"),
