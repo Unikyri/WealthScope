@@ -30,6 +30,8 @@ type Quote struct {
 }
 
 // PricePoint is an OHLCV data point for historical series.
+//
+//nolint:govet // fieldalignment: readability over micro-optimization for DTO
 type PricePoint struct {
 	Timestamp time.Time
 	Open      float64

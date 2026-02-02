@@ -7,11 +7,14 @@ import (
 	"time"
 
 	"github.com/Unikyri/WealthScope/backend/internal/domain/services"
+
 	"go.uber.org/zap"
 )
 
 // ProviderRegistry implements services.MarketDataClient by delegating to a list of
 // clients per category and applying fallback on error.
+//
+//nolint:govet // fieldalignment: keep logger and map grouped for readability
 type ProviderRegistry struct {
 	mu         sync.RWMutex
 	providers  map[services.AssetCategory][]services.MarketDataClient

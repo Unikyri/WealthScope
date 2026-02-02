@@ -38,13 +38,15 @@ type PricingConfig struct {
 // MarketDataConfig holds multi-provider market data API keys and enabled flags.
 // If a provider is disabled or has no key (where required), it is not registered.
 // Yahoo can be enabled without a key (public endpoint).
+//
+//nolint:govet // fieldalignment: keep grouped by provider for readability
 type MarketDataConfig struct {
-	AlphaVantageAPIKey   string
-	AlphaVantageEnabled  bool
-	FinnhubAPIKey        string
-	FinnhubEnabled       bool
-	YahooFinanceAPIKey   string
-	YahooFinanceEnabled  bool
+	AlphaVantageAPIKey  string
+	AlphaVantageEnabled bool
+	FinnhubAPIKey       string
+	FinnhubEnabled      bool
+	YahooFinanceAPIKey  string
+	YahooFinanceEnabled bool
 }
 
 // SupabaseConfig holds Supabase configuration
@@ -105,7 +107,7 @@ func Load() *Config {
 			UpdateIntervalSeconds: viper.GetInt("PRICING_UPDATE_INTERVAL_SECONDS"),
 		},
 		MarketData: MarketDataConfig{
-			AlphaVantageAPIKey:   viper.GetString("MARKETDATA_ALPHA_VANTAGE_API_KEY"),
+			AlphaVantageAPIKey:  viper.GetString("MARKETDATA_ALPHA_VANTAGE_API_KEY"),
 			AlphaVantageEnabled: viper.GetBool("MARKETDATA_ALPHA_VANTAGE_ENABLED"),
 			FinnhubAPIKey:       viper.GetString("MARKETDATA_FINNHUB_API_KEY"),
 			FinnhubEnabled:      viper.GetBool("MARKETDATA_FINNHUB_ENABLED"),

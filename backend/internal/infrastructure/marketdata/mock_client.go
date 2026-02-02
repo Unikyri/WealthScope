@@ -13,11 +13,13 @@ import (
 // MockClient implements services.MarketDataClient for tests.
 // Configure FailSymbols to make GetQuote/GetQuotes return an error for those symbols.
 // Quotes for other symbols return fixed data (price 100, etc.).
+//
+//nolint:govet // fieldalignment: keep maps and mutex grouped for test readability
 type MockClient struct {
-	NameStr      string
-	FailSymbols  map[string]bool // symbol -> true to fail
-	Supported    map[string]bool // symbol -> true to support; nil = support all
-	mu           sync.RWMutex
+	NameStr     string
+	FailSymbols map[string]bool // symbol -> true to fail
+	Supported   map[string]bool // symbol -> true to support; nil = support all
+	mu          sync.RWMutex
 }
 
 // NewMockClient returns a mock client with the given name.
