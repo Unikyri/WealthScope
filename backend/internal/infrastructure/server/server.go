@@ -136,6 +136,7 @@ func (s *Server) runPriceUpdateLoop() {
 // setupMarketDataProviders configures the market data providers with rate limiting.
 // Fallback order for equities: Yahoo Finance (primary) -> Finnhub -> Alpha Vantage
 // Fallback order for crypto: CoinGecko (primary) -> Binance
+// Fallback order for forex: Frankfurter (primary) -> ExchangeRate API
 func (s *Server) setupMarketDataProviders() domainsvc.MarketDataClient {
 	registry := marketdata.NewProviderRegistry(s.logger)
 
@@ -211,6 +212,39 @@ func (s *Server) setupMarketDataProviders() domainsvc.MarketDataClient {
 		registry.Register(domainsvc.CategoryCrypto, binance)
 		s.logger.Info("Registered Binance provider",
 			zap.Int("rate_limit_per_min", binanceRateLimit))
+	}
+
+	// ==================== FOREX PROVIDERS ====================
+
+	// Create shared forex symbol mapper for category detection and symbol translation
+	forexMapper := marketdata.NewForexSymbolMapper()
+	registry.SetForexMapper(forexMapper)
+
+	// 6. Frankfurter (primary forex - free, reliable, uses ECB data)
+	if s.cfg.MarketData.FrankfurterEnabled {
+		frankfurterRateLimit := s.cfg.MarketData.FrankfurterRateLimit
+		if frankfurterRateLimit <= 0 {
+			frankfurterRateLimit = 30 // no official limit, be conservative
+		}
+		frankfurterLimiter := marketdata.NewRateLimiter(frankfurterRateLimit, time.Minute)
+		frankfurter := marketdata.NewFrankfurterClient(frankfurterLimiter, forexMapper)
+		registry.Register(domainsvc.CategoryForex, frankfurter)
+		s.logger.Info("Registered Frankfurter provider",
+			zap.Int("rate_limit_per_min", frankfurterRateLimit))
+	}
+
+	// 7. ExchangeRate API (secondary forex - backup, 1500 req/month free tier)
+	if s.cfg.MarketData.ExchangeRateEnabled {
+		erRateLimit := s.cfg.MarketData.ExchangeRateRateLimit
+		if erRateLimit <= 0 {
+			erRateLimit = 5 // very conservative for monthly limit
+		}
+		erLimiter := marketdata.NewRateLimiter(erRateLimit, time.Minute)
+		exchangeRate := marketdata.NewExchangeRateClient(s.cfg.MarketData.ExchangeRateAPIKey, erLimiter, forexMapper)
+		registry.Register(domainsvc.CategoryForex, exchangeRate)
+		s.logger.Info("Registered ExchangeRate provider",
+			zap.Int("rate_limit_per_min", erRateLimit),
+			zap.Bool("has_api_key", s.cfg.MarketData.ExchangeRateAPIKey != ""))
 	}
 
 	return registry
