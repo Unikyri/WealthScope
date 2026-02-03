@@ -17,19 +17,21 @@ import (
 //
 // Source endpoint used:
 // - https://query1.finance.yahoo.com/v7/finance/quote?symbols=AAPL,MSFT
+//
+//nolint:govet // fieldalignment: keep logical field grouping for readability
 type YahooFinanceClient struct {
-	httpClient *http.Client
-	baseURL    string
+	httpClient  *http.Client
+	baseURL     string
+	rateLimiter *RateLimiter
 }
 
 // NewYahooFinanceClient creates a new YahooFinanceClient.
-func NewYahooFinanceClient(httpClient *http.Client) *YahooFinanceClient {
-	if httpClient == nil {
-		httpClient = &http.Client{Timeout: 10 * time.Second}
-	}
+// rateLimiter is optional and can be nil for no rate limiting.
+func NewYahooFinanceClient(rateLimiter *RateLimiter) *YahooFinanceClient {
 	return &YahooFinanceClient{
-		httpClient: httpClient,
-		baseURL:    "https://query1.finance.yahoo.com",
+		httpClient:  &http.Client{Timeout: 10 * time.Second},
+		baseURL:     "https://query1.finance.yahoo.com",
+		rateLimiter: rateLimiter,
 	}
 }
 
@@ -50,6 +52,12 @@ func (c *YahooFinanceClient) GetQuote(ctx context.Context, symbol string) (*serv
 func (c *YahooFinanceClient) GetQuotes(ctx context.Context, symbols []string) (map[string]*services.Quote, error) {
 	if len(symbols) == 0 {
 		return map[string]*services.Quote{}, nil
+	}
+
+	if c.rateLimiter != nil {
+		if err := c.rateLimiter.Wait(ctx); err != nil {
+			return nil, fmt.Errorf("yahoo_finance: rate limit wait: %w", err)
+		}
 	}
 
 	symbolsCSV := strings.Join(normalizeSymbols(symbols), ",")

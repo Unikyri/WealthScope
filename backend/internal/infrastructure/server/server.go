@@ -99,13 +99,14 @@ func (s *Server) runPriceUpdateLoop() {
 	assetRepo := infraRepo.NewPostgresAssetRepository(s.db.DB)
 	priceRepo := infraRepo.NewPostgresPriceHistoryRepository(s.db.DB)
 
-	registry := marketdata.NewProviderRegistry(s.logger)
-	if s.cfg.MarketData.YahooFinanceEnabled {
-		registry.Register(domainsvc.CategoryEquity, marketdata.NewYahooFinanceClient(nil))
-	}
-	// Alpha Vantage / Finnhub registered in US-6.2 when enabled and keys present
+	// Setup market data providers with fallback order: Yahoo -> Finnhub -> Alpha Vantage
+	registry := s.setupMarketDataProviders()
 
-	pricingSvc := appsvc.NewPricingService(registry, time.Minute)
+	cacheTTL := time.Duration(s.cfg.MarketData.CacheTTLSeconds) * time.Second
+	if cacheTTL <= 0 {
+		cacheTTL = time.Minute
+	}
+	pricingSvc := appsvc.NewPricingService(registry, cacheTTL)
 	job := jobs.NewPriceUpdateJob(pricingSvc, assetRepo, priceRepo, s.logger)
 
 	ticker := time.NewTicker(interval)
@@ -130,4 +131,51 @@ func (s *Server) runPriceUpdateLoop() {
 		}
 		cancel()
 	}
+}
+
+// setupMarketDataProviders configures the market data providers with rate limiting.
+// Fallback order for equities: Yahoo Finance (primary) -> Finnhub -> Alpha Vantage
+func (s *Server) setupMarketDataProviders() domainsvc.MarketDataClient {
+	registry := marketdata.NewProviderRegistry(s.logger)
+
+	// 1. Yahoo Finance (primary - no API key needed, highest rate limit)
+	if s.cfg.MarketData.YahooFinanceEnabled {
+		yahooRateLimit := s.cfg.MarketData.YahooRateLimit
+		if yahooRateLimit <= 0 {
+			yahooRateLimit = 100 // default conservative limit
+		}
+		yahooLimiter := marketdata.NewRateLimiter(yahooRateLimit, time.Minute)
+		yahoo := marketdata.NewYahooFinanceClient(yahooLimiter)
+		registry.Register(domainsvc.CategoryEquity, yahoo)
+		s.logger.Info("Registered Yahoo Finance provider",
+			zap.Int("rate_limit_per_min", yahooRateLimit))
+	}
+
+	// 2. Finnhub (secondary - requires API key, 60 req/min free tier)
+	if s.cfg.MarketData.FinnhubEnabled && s.cfg.MarketData.FinnhubAPIKey != "" {
+		finnhubRateLimit := s.cfg.MarketData.FinnhubRateLimit
+		if finnhubRateLimit <= 0 {
+			finnhubRateLimit = 60
+		}
+		finnhubLimiter := marketdata.NewRateLimiter(finnhubRateLimit, time.Minute)
+		finnhub := marketdata.NewFinnhubClient(s.cfg.MarketData.FinnhubAPIKey, finnhubLimiter)
+		registry.Register(domainsvc.CategoryEquity, finnhub)
+		s.logger.Info("Registered Finnhub provider",
+			zap.Int("rate_limit_per_min", finnhubRateLimit))
+	}
+
+	// 3. Alpha Vantage (tertiary - requires API key, limited 25 req/day free tier)
+	if s.cfg.MarketData.AlphaVantageEnabled && s.cfg.MarketData.AlphaVantageAPIKey != "" {
+		alphaRateLimit := s.cfg.MarketData.AlphaVantageRateLimit
+		if alphaRateLimit <= 0 {
+			alphaRateLimit = 5 // very conservative for 25/day limit
+		}
+		alphaLimiter := marketdata.NewRateLimiter(alphaRateLimit, time.Minute)
+		alpha := marketdata.NewAlphaVantageClient(s.cfg.MarketData.AlphaVantageAPIKey, alphaLimiter)
+		registry.Register(domainsvc.CategoryEquity, alpha)
+		s.logger.Info("Registered Alpha Vantage provider",
+			zap.Int("rate_limit_per_min", alphaRateLimit))
+	}
+
+	return registry
 }
