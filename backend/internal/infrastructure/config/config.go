@@ -65,6 +65,15 @@ type MarketDataConfig struct {
 	BinanceEnabled   bool
 	BinanceRateLimit int // requests per minute
 
+	// Frankfurter (forex - no API key required)
+	FrankfurterEnabled   bool
+	FrankfurterRateLimit int // requests per minute
+
+	// ExchangeRate API (forex)
+	ExchangeRateAPIKey    string
+	ExchangeRateEnabled   bool
+	ExchangeRateRateLimit int // requests per minute
+
 	// Cache settings
 	CacheTTLSeconds int
 }
@@ -110,13 +119,18 @@ func Load() *Config {
 	viper.SetDefault("MARKETDATA_FINNHUB_RATE_LIMIT", 60) // 60 req/min free tier
 	viper.SetDefault("MARKETDATA_YAHOO_FINANCE_API_KEY", "")
 	viper.SetDefault("MARKETDATA_YAHOO_FINANCE_ENABLED", true)
-	viper.SetDefault("MARKETDATA_YAHOO_RATE_LIMIT", 100)    // conservative limit
-	viper.SetDefault("MARKETDATA_COINGECKO_API_KEY", "")    // optional for free tier
-	viper.SetDefault("MARKETDATA_COINGECKO_ENABLED", true)  // enable crypto by default
-	viper.SetDefault("MARKETDATA_COINGECKO_RATE_LIMIT", 10) // 10-30 req/min free tier
-	viper.SetDefault("MARKETDATA_BINANCE_ENABLED", true)    // enable crypto by default
-	viper.SetDefault("MARKETDATA_BINANCE_RATE_LIMIT", 100)  // conservative for 1200/min limit
-	viper.SetDefault("MARKETDATA_CACHE_TTL_SECONDS", 60)    // 1 minute cache
+	viper.SetDefault("MARKETDATA_YAHOO_RATE_LIMIT", 100)      // conservative limit
+	viper.SetDefault("MARKETDATA_COINGECKO_API_KEY", "")      // optional for free tier
+	viper.SetDefault("MARKETDATA_COINGECKO_ENABLED", true)    // enable crypto by default
+	viper.SetDefault("MARKETDATA_COINGECKO_RATE_LIMIT", 10)   // 10-30 req/min free tier
+	viper.SetDefault("MARKETDATA_BINANCE_ENABLED", true)      // enable crypto by default
+	viper.SetDefault("MARKETDATA_BINANCE_RATE_LIMIT", 100)    // conservative for 1200/min limit
+	viper.SetDefault("MARKETDATA_FRANKFURTER_ENABLED", true)  // enable forex by default
+	viper.SetDefault("MARKETDATA_FRANKFURTER_RATE_LIMIT", 30) // no official limit, be conservative
+	viper.SetDefault("MARKETDATA_EXCHANGERATE_API_KEY", "")   // optional for free tier
+	viper.SetDefault("MARKETDATA_EXCHANGERATE_ENABLED", true) // enable forex by default
+	viper.SetDefault("MARKETDATA_EXCHANGERATE_RATE_LIMIT", 5) // conservative for 1500/month limit
+	viper.SetDefault("MARKETDATA_CACHE_TTL_SECONDS", 60)      // 1 minute cache
 	viper.SetDefault("SUPABASE_URL", "")
 	viper.SetDefault("SUPABASE_ANON_KEY", "")
 	viper.SetDefault("SUPABASE_SERVICE_KEY", "")
@@ -150,6 +164,11 @@ func Load() *Config {
 			CoinGeckoRateLimit:    viper.GetInt("MARKETDATA_COINGECKO_RATE_LIMIT"),
 			BinanceEnabled:        viper.GetBool("MARKETDATA_BINANCE_ENABLED"),
 			BinanceRateLimit:      viper.GetInt("MARKETDATA_BINANCE_RATE_LIMIT"),
+			FrankfurterEnabled:    viper.GetBool("MARKETDATA_FRANKFURTER_ENABLED"),
+			FrankfurterRateLimit:  viper.GetInt("MARKETDATA_FRANKFURTER_RATE_LIMIT"),
+			ExchangeRateAPIKey:    viper.GetString("MARKETDATA_EXCHANGERATE_API_KEY"),
+			ExchangeRateEnabled:   viper.GetBool("MARKETDATA_EXCHANGERATE_ENABLED"),
+			ExchangeRateRateLimit: viper.GetInt("MARKETDATA_EXCHANGERATE_RATE_LIMIT"),
 			CacheTTLSeconds:       viper.GetInt("MARKETDATA_CACHE_TTL_SECONDS"),
 		},
 		Supabase: SupabaseConfig{

@@ -93,3 +93,73 @@ func TestProviderRegistry_Name(t *testing.T) {
 	registry := NewProviderRegistry(nil)
 	assert.Equal(t, "market_data_registry", registry.Name())
 }
+
+func TestProviderRegistry_resolveCategoryForex(t *testing.T) {
+	logger := zap.NewNop()
+	registry := NewProviderRegistry(logger)
+
+	// Without forex mapper, should return default (equity)
+	assert.Equal(t, services.CategoryEquity, registry.resolveCategory("EUR/USD"))
+
+	// With forex mapper
+	forexMapper := NewForexSymbolMapper()
+	registry.SetForexMapper(forexMapper)
+
+	assert.Equal(t, services.CategoryForex, registry.resolveCategory("EUR/USD"))
+	assert.Equal(t, services.CategoryForex, registry.resolveCategory("EURUSD"))
+	assert.Equal(t, services.CategoryForex, registry.resolveCategory("gbp/jpy"))
+	assert.Equal(t, services.CategoryEquity, registry.resolveCategory("AAPL")) // Not forex
+}
+
+func TestProviderRegistry_resolveCategoryCryptoBeforeForex(t *testing.T) {
+	logger := zap.NewNop()
+	registry := NewProviderRegistry(logger)
+
+	cryptoMapper := NewCryptoSymbolMapper()
+	forexMapper := NewForexSymbolMapper()
+	registry.SetCryptoMapper(cryptoMapper)
+	registry.SetForexMapper(forexMapper)
+
+	// Crypto should be detected before forex
+	assert.Equal(t, services.CategoryCrypto, registry.resolveCategory("BTC"))
+	assert.Equal(t, services.CategoryCrypto, registry.resolveCategory("ETH"))
+	assert.Equal(t, services.CategoryForex, registry.resolveCategory("EUR/USD"))
+	assert.Equal(t, services.CategoryEquity, registry.resolveCategory("AAPL"))
+}
+
+func TestProviderRegistry_GetQuote_ForexCategory(t *testing.T) {
+	ctx := context.Background()
+	logger := zap.NewNop()
+	registry := NewProviderRegistry(logger)
+
+	// Set up forex mapper
+	forexMapper := NewForexSymbolMapper()
+	registry.SetForexMapper(forexMapper)
+
+	// Register forex provider
+	mockForex := NewMockClient("mock_forex")
+	registry.Register(services.CategoryForex, mockForex)
+
+	// Register equity provider (should not be used for forex)
+	mockEquity := NewMockClient("mock_equity")
+	registry.Register(services.CategoryEquity, mockEquity)
+
+	// Get forex quote - should use forex provider
+	q, err := registry.GetQuote(ctx, "EUR/USD")
+	require.NoError(t, err)
+	require.NotNil(t, q)
+	assert.Equal(t, "mock_forex", q.Source)
+}
+
+func TestProviderRegistry_SetForexMapper(t *testing.T) {
+	registry := NewProviderRegistry(nil)
+
+	// Initially nil
+	assert.Nil(t, registry.forexMapper)
+
+	forexMapper := NewForexSymbolMapper()
+	registry.SetForexMapper(forexMapper)
+
+	assert.NotNil(t, registry.forexMapper)
+	assert.Same(t, forexMapper, registry.forexMapper)
+}

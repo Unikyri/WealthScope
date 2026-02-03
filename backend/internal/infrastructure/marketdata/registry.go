@@ -21,6 +21,7 @@ type ProviderRegistry struct {
 	defaultCat   services.AssetCategory
 	logger       *zap.Logger
 	cryptoMapper *CryptoSymbolMapper
+	forexMapper  *ForexSymbolMapper
 }
 
 // NewProviderRegistry creates a registry with default category equity and optional logger.
@@ -49,11 +50,22 @@ func (r *ProviderRegistry) SetCryptoMapper(mapper *CryptoSymbolMapper) {
 	r.cryptoMapper = mapper
 }
 
+// SetForexMapper sets the forex symbol mapper for automatic category detection.
+func (r *ProviderRegistry) SetForexMapper(mapper *ForexSymbolMapper) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.forexMapper = mapper
+}
+
 // resolveCategory returns the category for a symbol based on symbol detection.
-// Crypto symbols are detected using the CryptoSymbolMapper; others default to equity.
+// Crypto symbols are detected using the CryptoSymbolMapper,
+// forex symbols using ForexSymbolMapper; others default to equity.
 func (r *ProviderRegistry) resolveCategory(symbol string) services.AssetCategory {
 	if r.cryptoMapper != nil && r.cryptoMapper.IsCryptoSymbol(symbol) {
 		return services.CategoryCrypto
+	}
+	if r.forexMapper != nil && r.forexMapper.IsForexSymbol(symbol) {
+		return services.CategoryForex
 	}
 	return r.defaultCat
 }
