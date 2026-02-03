@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:wealthscope_app/features/ai/domain/entities/chat_message.dart';
 
 class ChatBubble extends StatelessWidget {
@@ -11,14 +12,15 @@ class ChatBubble extends StatelessWidget {
     this.isLast = false,
   });
 
+  bool get isUser => message.role == MessageRole.user;
+
   @override
   Widget build(BuildContext context) {
-    final isUser = message.role == MessageRole.user;
     final theme = Theme.of(context);
 
     return Padding(
       padding: EdgeInsets.only(
-        bottom: isLast ? 8 : 16,
+        bottom: isLast ? 0 : 12,
       ),
       child: Row(
         mainAxisAlignment:
@@ -26,75 +28,61 @@ class ChatBubble extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser) ...[
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: theme.colorScheme.primary,
-              child: Icon(
-                Icons.psychology,
-                size: 18,
-                color: theme.colorScheme.onPrimary,
-              ),
-            ),
+            _Avatar(isUser: false),
             const SizedBox(width: 8),
           ],
           Flexible(
-            child: Column(
-              crossAxisAlignment:
-                  isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isUser
-                        ? theme.colorScheme.primary
-                        : message.isError
-                            ? theme.colorScheme.errorContainer
-                            : theme.colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.only(
-                      topLeft: const Radius.circular(16),
-                      topRight: const Radius.circular(16),
-                      bottomLeft: Radius.circular(isUser ? 16 : 4),
-                      bottomRight: Radius.circular(isUser ? 4 : 16),
-                    ),
-                  ),
-                  child: Text(
-                    message.content,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: isUser
-                          ? theme.colorScheme.onPrimary
-                          : message.isError
-                              ? theme.colorScheme.onErrorContainer
-                              : theme.colorScheme.onSurface,
-                    ),
+            child: GestureDetector(
+              onLongPress: () => _copyMessage(context),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: isUser
+                      ? theme.colorScheme.primary
+                      : message.isError
+                          ? theme.colorScheme.errorContainer
+                          : theme.colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.only(
+                    topLeft: const Radius.circular(16),
+                    topRight: const Radius.circular(16),
+                    bottomLeft: Radius.circular(isUser ? 16 : 4),
+                    bottomRight: Radius.circular(isUser ? 4 : 16),
                   ),
                 ),
-                const SizedBox(height: 4),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Text(
-                    _formatTime(message.timestamp),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SelectableText(
+                      message.content,
+                      style: TextStyle(
+                        color: isUser
+                            ? theme.colorScheme.onPrimary
+                            : message.isError
+                                ? theme.colorScheme.onErrorContainer
+                                : theme.colorScheme.onSurface,
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _formatTime(message.timestamp),
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: isUser
+                            ? theme.colorScheme.onPrimary.withOpacity(0.7)
+                            : theme.colorScheme.onSurface.withOpacity(0.5),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
           if (isUser) ...[
             const SizedBox(width: 8),
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: theme.colorScheme.primaryContainer,
-              child: Icon(
-                Icons.person,
-                size: 18,
-                color: theme.colorScheme.onPrimaryContainer,
-              ),
-            ),
+            _Avatar(isUser: true),
           ],
         ],
       ),
@@ -102,17 +90,42 @@ class ChatBubble extends StatelessWidget {
   }
 
   String _formatTime(DateTime timestamp) {
-    final now = DateTime.now();
-    final difference = now.difference(timestamp);
+    final hour = timestamp.hour.toString().padLeft(2, '0');
+    final minute = timestamp.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
 
-    if (difference.inMinutes < 1) {
-      return 'Just now';
-    } else if (difference.inHours < 1) {
-      return '${difference.inMinutes}m ago';
-    } else if (difference.inDays < 1) {
-      return '${difference.inHours}h ago';
-    } else {
-      return '${timestamp.hour}:${timestamp.minute.toString().padLeft(2, '0')}';
-    }
+  void _copyMessage(BuildContext context) {
+    Clipboard.setData(ClipboardData(text: message.content));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Message copied'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+}
+
+class _Avatar extends StatelessWidget {
+  final bool isUser;
+
+  const _Avatar({required this.isUser});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return CircleAvatar(
+      radius: 16,
+      backgroundColor:
+          isUser ? theme.colorScheme.secondary : theme.colorScheme.primary,
+      child: Icon(
+        isUser ? Icons.person : Icons.smart_toy,
+        size: 18,
+        color: isUser
+            ? theme.colorScheme.onSecondary
+            : theme.colorScheme.onPrimary,
+      ),
+    );
   }
 }
