@@ -52,22 +52,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     ref.listen<LoginState>(
       loginNotifierProvider,
       (previous, next) {
-        if (next.errorMessage != null && next.errorMessage!.isNotEmpty) {
+        if (next.errorMessage != null && next.errorMessage!.isNotEmpty && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(next.errorMessage!),
               backgroundColor: theme.colorScheme.error,
               behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 4),
               action: SnackBarAction(
                 label: 'OK',
                 textColor: Colors.white,
                 onPressed: () {
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  }
+                  ref.read(loginNotifierProvider.notifier).clearError();
                 },
               ),
             ),
           );
-          ref.read(loginNotifierProvider.notifier).clearError();
         }
       },
     );
