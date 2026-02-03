@@ -5,13 +5,14 @@ import (
 	"time"
 )
 
-// AssetCategory represents the market category for provider selection (equity, crypto, forex).
+// AssetCategory represents the market category for provider selection (equity, crypto, forex, metal).
 type AssetCategory string
 
 const (
 	CategoryEquity AssetCategory = "equity"
 	CategoryCrypto AssetCategory = "crypto"
 	CategoryForex  AssetCategory = "forex"
+	CategoryMetal  AssetCategory = "metal"
 )
 
 // Quote is the domain DTO for a price snapshot of a symbol.
