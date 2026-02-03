@@ -41,20 +41,29 @@ type PricingConfig struct {
 //
 //nolint:govet // fieldalignment: keep grouped by provider for readability
 type MarketDataConfig struct {
-	// Alpha Vantage
+	// Alpha Vantage (equities)
 	AlphaVantageAPIKey    string
 	AlphaVantageEnabled   bool
 	AlphaVantageRateLimit int // requests per minute
 
-	// Finnhub
+	// Finnhub (equities)
 	FinnhubAPIKey    string
 	FinnhubEnabled   bool
 	FinnhubRateLimit int // requests per minute
 
-	// Yahoo Finance
+	// Yahoo Finance (equities)
 	YahooFinanceAPIKey  string
 	YahooFinanceEnabled bool
 	YahooRateLimit      int // requests per minute
+
+	// CoinGecko (crypto)
+	CoinGeckoAPIKey    string
+	CoinGeckoEnabled   bool
+	CoinGeckoRateLimit int // requests per minute
+
+	// Binance (crypto)
+	BinanceEnabled   bool
+	BinanceRateLimit int // requests per minute
 
 	// Cache settings
 	CacheTTLSeconds int
@@ -101,8 +110,13 @@ func Load() *Config {
 	viper.SetDefault("MARKETDATA_FINNHUB_RATE_LIMIT", 60) // 60 req/min free tier
 	viper.SetDefault("MARKETDATA_YAHOO_FINANCE_API_KEY", "")
 	viper.SetDefault("MARKETDATA_YAHOO_FINANCE_ENABLED", true)
-	viper.SetDefault("MARKETDATA_YAHOO_RATE_LIMIT", 100) // conservative limit
-	viper.SetDefault("MARKETDATA_CACHE_TTL_SECONDS", 60) // 1 minute cache
+	viper.SetDefault("MARKETDATA_YAHOO_RATE_LIMIT", 100)    // conservative limit
+	viper.SetDefault("MARKETDATA_COINGECKO_API_KEY", "")    // optional for free tier
+	viper.SetDefault("MARKETDATA_COINGECKO_ENABLED", true)  // enable crypto by default
+	viper.SetDefault("MARKETDATA_COINGECKO_RATE_LIMIT", 10) // 10-30 req/min free tier
+	viper.SetDefault("MARKETDATA_BINANCE_ENABLED", true)    // enable crypto by default
+	viper.SetDefault("MARKETDATA_BINANCE_RATE_LIMIT", 100)  // conservative for 1200/min limit
+	viper.SetDefault("MARKETDATA_CACHE_TTL_SECONDS", 60)    // 1 minute cache
 	viper.SetDefault("SUPABASE_URL", "")
 	viper.SetDefault("SUPABASE_ANON_KEY", "")
 	viper.SetDefault("SUPABASE_SERVICE_KEY", "")
@@ -131,6 +145,11 @@ func Load() *Config {
 			YahooFinanceAPIKey:    viper.GetString("MARKETDATA_YAHOO_FINANCE_API_KEY"),
 			YahooFinanceEnabled:   viper.GetBool("MARKETDATA_YAHOO_FINANCE_ENABLED"),
 			YahooRateLimit:        viper.GetInt("MARKETDATA_YAHOO_RATE_LIMIT"),
+			CoinGeckoAPIKey:       viper.GetString("MARKETDATA_COINGECKO_API_KEY"),
+			CoinGeckoEnabled:      viper.GetBool("MARKETDATA_COINGECKO_ENABLED"),
+			CoinGeckoRateLimit:    viper.GetInt("MARKETDATA_COINGECKO_RATE_LIMIT"),
+			BinanceEnabled:        viper.GetBool("MARKETDATA_BINANCE_ENABLED"),
+			BinanceRateLimit:      viper.GetInt("MARKETDATA_BINANCE_RATE_LIMIT"),
 			CacheTTLSeconds:       viper.GetInt("MARKETDATA_CACHE_TTL_SECONDS"),
 		},
 		Supabase: SupabaseConfig{
