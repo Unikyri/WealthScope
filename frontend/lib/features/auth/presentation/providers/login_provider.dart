@@ -23,12 +23,13 @@ class LoginState {
   LoginState copyWith({
     bool? isLoading,
     String? errorMessage,
+    bool clearError = false,
     bool? obscurePassword,
     bool? isButtonDisabled,
   }) {
     return LoginState(
       isLoading: isLoading ?? this.isLoading,
-      errorMessage: errorMessage,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       obscurePassword: obscurePassword ?? this.obscurePassword,
       isButtonDisabled: isButtonDisabled ?? this.isButtonDisabled,
     );
@@ -50,7 +51,7 @@ class LoginNotifier extends _$LoginNotifier {
 
   /// Clear error message
   void clearError() {
-    state = state.copyWith(errorMessage: '');
+    state = state.copyWith(clearError: true);
   }
 
   /// Start 3-second cooldown after error

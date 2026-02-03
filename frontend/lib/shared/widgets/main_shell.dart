@@ -31,8 +31,10 @@ class _MainBottomNavigationBar extends StatelessWidget {
       selectedIndex = 0;
     } else if (location.startsWith('/assets')) {
       selectedIndex = 1;
-    } else if (location.startsWith('/profile')) {
+    } else if (location.startsWith('/ai-chat')) {
       selectedIndex = 2;
+    } else if (location.startsWith('/profile')) {
+      selectedIndex = 3;
     }
 
     return NavigationBar(
@@ -46,6 +48,9 @@ class _MainBottomNavigationBar extends StatelessWidget {
             context.go('/assets');
             break;
           case 2:
+            context.go('/ai-chat');
+            break;
+          case 3:
             context.go('/profile');
             break;
         }
@@ -60,6 +65,11 @@ class _MainBottomNavigationBar extends StatelessWidget {
           icon: Icon(Icons.account_balance_wallet_outlined),
           selectedIcon: Icon(Icons.account_balance_wallet),
           label: 'Assets',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.psychology_outlined),
+          selectedIcon: Icon(Icons.psychology),
+          label: 'AI Advisor',
         ),
         NavigationDestination(
           icon: Icon(Icons.person_outline),
