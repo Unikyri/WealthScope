@@ -137,7 +137,7 @@ func Load() *Config {
 	viper.SetDefault("MARKETDATA_EXCHANGERATE_RATE_LIMIT", 5) // conservative for 1500/month limit
 	viper.SetDefault("MARKETDATA_METALS_API_KEY", "")         // required for metals
 	viper.SetDefault("MARKETDATA_METALS_API_ENABLED", false)  // disabled by default (requires API key)
-	viper.SetDefault("MARKETDATA_METALS_API_RATE_LIMIT", 3)   // very conservative for 100/month free tier
+	viper.SetDefault("MARKETDATA_METALS_API_RATE_LIMIT", 2)   // very conservative for 50/month free tier
 	viper.SetDefault("MARKETDATA_CACHE_TTL_SECONDS", 60)      // 1 minute cache
 	viper.SetDefault("SUPABASE_URL", "")
 	viper.SetDefault("SUPABASE_ANON_KEY", "")

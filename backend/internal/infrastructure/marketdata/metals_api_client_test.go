@@ -16,7 +16,7 @@ func TestMetalsAPIClient_GetQuote(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/latest", r.URL.Path)
 		assert.Equal(t, "USD", r.URL.Query().Get("base"))
-		assert.Contains(t, r.URL.Query().Get("symbols"), "XAU")
+		assert.Contains(t, r.URL.Query().Get("currencies"), "XAU")
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -45,7 +45,7 @@ func TestMetalsAPIClient_GetQuote(t *testing.T) {
 	assert.Equal(t, "XAU", quote.Symbol)
 	assert.InDelta(t, 2069.66, quote.Price, 0.01)
 	assert.Equal(t, "USD", quote.Currency)
-	assert.Equal(t, "metals_api", quote.Source)
+	assert.Equal(t, "metalprice_api", quote.Source)
 }
 
 func TestMetalsAPIClient_GetQuote_InverseRate(t *testing.T) {
@@ -158,7 +158,7 @@ func TestMetalsAPIClient_SupportsSymbol(t *testing.T) {
 
 func TestMetalsAPIClient_Name(t *testing.T) {
 	client := NewMetalsAPIClient("test_key", nil, nil)
-	assert.Equal(t, "metals_api", client.Name())
+	assert.Equal(t, "metalprice_api", client.Name())
 }
 
 func TestMetalsAPIClient_determineMarketState(t *testing.T) {

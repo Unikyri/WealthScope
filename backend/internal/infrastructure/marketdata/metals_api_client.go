@@ -14,13 +14,14 @@ import (
 )
 
 const (
-	metalsAPIBaseURL        = "https://metals-api.com/api"
-	metalsAPIDefaultTimeout = 15 * time.Second
+	metalPriceAPIBaseURL        = "https://api.metalpriceapi.com/v1"
+	metalPriceAPIDefaultTimeout = 15 * time.Second
 )
 
-// MetalsAPIClient implements services.MarketDataClient for Metals-API.
-// Metals-API provides precious metals pricing data (gold, silver, platinum, palladium).
-// Requires an API key. Free tier: 100 requests/month.
+// MetalsAPIClient implements services.MarketDataClient for MetalPriceAPI.
+// MetalPriceAPI provides precious metals pricing data (gold, silver, platinum, palladium).
+// Requires an API key. Free tier: 50 requests/month.
+// Docs: https://metalpriceapi.com/documentation
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type MetalsAPIClient struct {
@@ -31,15 +32,15 @@ type MetalsAPIClient struct {
 	symbolMapper *MetalsSymbolMapper
 }
 
-// NewMetalsAPIClient creates a new Metals-API client.
+// NewMetalsAPIClient creates a new MetalPriceAPI client.
 // apiKey is required. If rateLimiter is nil, no rate limiting is applied.
 func NewMetalsAPIClient(apiKey string, rateLimiter *RateLimiter, mapper *MetalsSymbolMapper) *MetalsAPIClient {
 	return &MetalsAPIClient{
 		httpClient: &http.Client{
-			Timeout: metalsAPIDefaultTimeout,
+			Timeout: metalPriceAPIDefaultTimeout,
 		},
 		apiKey:       apiKey,
-		baseURL:      metalsAPIBaseURL,
+		baseURL:      metalPriceAPIBaseURL,
 		rateLimiter:  rateLimiter,
 		symbolMapper: mapper,
 	}
@@ -84,19 +85,19 @@ func (c *MetalsAPIClient) GetQuote(ctx context.Context, symbol string) (*service
 	// Build URL for /latest endpoint
 	u, err := url.Parse(c.baseURL)
 	if err != nil {
-		return nil, fmt.Errorf("metals_api: parse base URL: %w", err)
+		return nil, fmt.Errorf("metalprice_api: parse base URL: %w", err)
 	}
 	u.Path = u.Path + "/latest"
 
 	q := u.Query()
-	q.Set("access_key", c.apiKey)
+	q.Set("api_key", c.apiKey)
 	q.Set("base", "USD")
-	q.Set("symbols", apiSymbol)
+	q.Set("currencies", apiSymbol)
 	u.RawQuery = q.Encode()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {
-		return nil, fmt.Errorf("metals_api: create request: %w", err)
+		return nil, fmt.Errorf("metalprice_api: create request: %w", err)
 	}
 
 	req.Header.Set("Accept", "application/json")
@@ -138,7 +139,7 @@ func (c *MetalsAPIClient) GetQuote(ctx context.Context, symbol string) (*service
 	return &services.Quote{
 		Symbol:        apiSymbol,
 		Price:         price,
-		Change:        0, // Metals-API doesn't provide change in /latest
+		Change:        0, // MetalPriceAPI doesn't provide change in /latest
 		ChangePercent: 0,
 		MarketState:   c.determineMarketState(),
 		Currency:      "USD",
@@ -148,7 +149,7 @@ func (c *MetalsAPIClient) GetQuote(ctx context.Context, symbol string) (*service
 }
 
 // extractPrice extracts the USD price from the rates map.
-// Metals-API returns both inverse rates (XAU: 0.00048) and direct prices (USDXAU: 2069).
+// MetalPriceAPI returns both inverse rates (XAU: 0.00048) and direct prices (USDXAU: 2069).
 // We prefer the direct price if available, otherwise calculate from inverse.
 func (c *MetalsAPIClient) extractPrice(rates map[string]float64, apiSymbol string) (float64, bool) {
 	// Try direct USD price first (e.g., "USDXAU")
@@ -205,9 +206,9 @@ func (c *MetalsAPIClient) GetQuotes(ctx context.Context, symbols []string) (map[
 	u.Path = u.Path + "/latest"
 
 	q := u.Query()
-	q.Set("access_key", c.apiKey)
+	q.Set("api_key", c.apiKey)
 	q.Set("base", "USD")
-	q.Set("symbols", strings.Join(apiSymbols, ","))
+	q.Set("currencies", strings.Join(apiSymbols, ","))
 	u.RawQuery = q.Encode()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
@@ -283,7 +284,7 @@ func (c *MetalsAPIClient) GetHistoricalPrices(ctx context.Context, symbol string
 		return nil, nil
 	}
 
-	// Limit to avoid excessive API calls (free tier has 100/month)
+	// Limit to avoid excessive API calls (free tier has 50/month)
 	maxDates := 30
 	if len(dates) > maxDates {
 		// Sample evenly
@@ -334,9 +335,9 @@ func (c *MetalsAPIClient) fetchHistoricalPrice(ctx context.Context, apiSymbol st
 	u.Path = fmt.Sprintf("%s/%s", u.Path, date.Format("2006-01-02"))
 
 	q := u.Query()
-	q.Set("access_key", c.apiKey)
+	q.Set("api_key", c.apiKey)
 	q.Set("base", "USD")
-	q.Set("symbols", apiSymbol)
+	q.Set("currencies", apiSymbol)
 	u.RawQuery = q.Encode()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
@@ -413,7 +414,7 @@ func (c *MetalsAPIClient) SupportsSymbol(symbol string) bool {
 
 // Name returns the provider name.
 func (c *MetalsAPIClient) Name() string {
-	return "metals_api"
+	return "metalprice_api"
 }
 
 // determineMarketState returns the market state for precious metals.
