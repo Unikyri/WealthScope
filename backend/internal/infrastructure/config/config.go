@@ -35,18 +35,29 @@ type PricingConfig struct {
 	UpdateIntervalSeconds int
 }
 
-// MarketDataConfig holds multi-provider market data API keys and enabled flags.
+// MarketDataConfig holds multi-provider market data API keys, enabled flags, and rate limits.
 // If a provider is disabled or has no key (where required), it is not registered.
 // Yahoo can be enabled without a key (public endpoint).
 //
 //nolint:govet // fieldalignment: keep grouped by provider for readability
 type MarketDataConfig struct {
-	AlphaVantageAPIKey  string
-	AlphaVantageEnabled bool
-	FinnhubAPIKey       string
-	FinnhubEnabled      bool
+	// Alpha Vantage
+	AlphaVantageAPIKey    string
+	AlphaVantageEnabled   bool
+	AlphaVantageRateLimit int // requests per minute
+
+	// Finnhub
+	FinnhubAPIKey    string
+	FinnhubEnabled   bool
+	FinnhubRateLimit int // requests per minute
+
+	// Yahoo Finance
 	YahooFinanceAPIKey  string
 	YahooFinanceEnabled bool
+	YahooRateLimit      int // requests per minute
+
+	// Cache settings
+	CacheTTLSeconds int
 }
 
 // SupabaseConfig holds Supabase configuration
@@ -84,10 +95,14 @@ func Load() *Config {
 	viper.SetDefault("PRICING_UPDATE_INTERVAL_SECONDS", 300)
 	viper.SetDefault("MARKETDATA_ALPHA_VANTAGE_API_KEY", "")
 	viper.SetDefault("MARKETDATA_ALPHA_VANTAGE_ENABLED", false)
+	viper.SetDefault("MARKETDATA_ALPHA_VANTAGE_RATE_LIMIT", 5) // 5 req/min (conservative for 25/day free tier)
 	viper.SetDefault("MARKETDATA_FINNHUB_API_KEY", "")
 	viper.SetDefault("MARKETDATA_FINNHUB_ENABLED", false)
+	viper.SetDefault("MARKETDATA_FINNHUB_RATE_LIMIT", 60) // 60 req/min free tier
 	viper.SetDefault("MARKETDATA_YAHOO_FINANCE_API_KEY", "")
 	viper.SetDefault("MARKETDATA_YAHOO_FINANCE_ENABLED", true)
+	viper.SetDefault("MARKETDATA_YAHOO_RATE_LIMIT", 100) // conservative limit
+	viper.SetDefault("MARKETDATA_CACHE_TTL_SECONDS", 60) // 1 minute cache
 	viper.SetDefault("SUPABASE_URL", "")
 	viper.SetDefault("SUPABASE_ANON_KEY", "")
 	viper.SetDefault("SUPABASE_SERVICE_KEY", "")
@@ -107,12 +122,16 @@ func Load() *Config {
 			UpdateIntervalSeconds: viper.GetInt("PRICING_UPDATE_INTERVAL_SECONDS"),
 		},
 		MarketData: MarketDataConfig{
-			AlphaVantageAPIKey:  viper.GetString("MARKETDATA_ALPHA_VANTAGE_API_KEY"),
-			AlphaVantageEnabled: viper.GetBool("MARKETDATA_ALPHA_VANTAGE_ENABLED"),
-			FinnhubAPIKey:       viper.GetString("MARKETDATA_FINNHUB_API_KEY"),
-			FinnhubEnabled:      viper.GetBool("MARKETDATA_FINNHUB_ENABLED"),
-			YahooFinanceAPIKey:  viper.GetString("MARKETDATA_YAHOO_FINANCE_API_KEY"),
-			YahooFinanceEnabled: viper.GetBool("MARKETDATA_YAHOO_FINANCE_ENABLED"),
+			AlphaVantageAPIKey:    viper.GetString("MARKETDATA_ALPHA_VANTAGE_API_KEY"),
+			AlphaVantageEnabled:   viper.GetBool("MARKETDATA_ALPHA_VANTAGE_ENABLED"),
+			AlphaVantageRateLimit: viper.GetInt("MARKETDATA_ALPHA_VANTAGE_RATE_LIMIT"),
+			FinnhubAPIKey:         viper.GetString("MARKETDATA_FINNHUB_API_KEY"),
+			FinnhubEnabled:        viper.GetBool("MARKETDATA_FINNHUB_ENABLED"),
+			FinnhubRateLimit:      viper.GetInt("MARKETDATA_FINNHUB_RATE_LIMIT"),
+			YahooFinanceAPIKey:    viper.GetString("MARKETDATA_YAHOO_FINANCE_API_KEY"),
+			YahooFinanceEnabled:   viper.GetBool("MARKETDATA_YAHOO_FINANCE_ENABLED"),
+			YahooRateLimit:        viper.GetInt("MARKETDATA_YAHOO_RATE_LIMIT"),
+			CacheTTLSeconds:       viper.GetInt("MARKETDATA_CACHE_TTL_SECONDS"),
 		},
 		Supabase: SupabaseConfig{
 			URL:        viper.GetString("SUPABASE_URL"),
