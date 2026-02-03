@@ -135,8 +135,15 @@ func (s *Server) runPriceUpdateLoop() {
 
 // setupMarketDataProviders configures the market data providers with rate limiting.
 // Fallback order for equities: Yahoo Finance (primary) -> Finnhub -> Alpha Vantage
+// Fallback order for crypto: CoinGecko (primary) -> Binance
 func (s *Server) setupMarketDataProviders() domainsvc.MarketDataClient {
 	registry := marketdata.NewProviderRegistry(s.logger)
+
+	// Create shared crypto symbol mapper for category detection and symbol translation
+	cryptoMapper := marketdata.NewCryptoSymbolMapper()
+	registry.SetCryptoMapper(cryptoMapper)
+
+	// ==================== EQUITY PROVIDERS ====================
 
 	// 1. Yahoo Finance (primary - no API key needed, highest rate limit)
 	if s.cfg.MarketData.YahooFinanceEnabled {
@@ -175,6 +182,35 @@ func (s *Server) setupMarketDataProviders() domainsvc.MarketDataClient {
 		registry.Register(domainsvc.CategoryEquity, alpha)
 		s.logger.Info("Registered Alpha Vantage provider",
 			zap.Int("rate_limit_per_min", alphaRateLimit))
+	}
+
+	// ==================== CRYPTO PROVIDERS ====================
+
+	// 4. CoinGecko (primary crypto - comprehensive data, free tier available)
+	if s.cfg.MarketData.CoinGeckoEnabled {
+		geckoRateLimit := s.cfg.MarketData.CoinGeckoRateLimit
+		if geckoRateLimit <= 0 {
+			geckoRateLimit = 10 // conservative for free tier
+		}
+		geckoLimiter := marketdata.NewRateLimiter(geckoRateLimit, time.Minute)
+		gecko := marketdata.NewCoinGeckoClient(s.cfg.MarketData.CoinGeckoAPIKey, geckoLimiter, cryptoMapper)
+		registry.Register(domainsvc.CategoryCrypto, gecko)
+		s.logger.Info("Registered CoinGecko provider",
+			zap.Int("rate_limit_per_min", geckoRateLimit),
+			zap.Bool("has_api_key", s.cfg.MarketData.CoinGeckoAPIKey != ""))
+	}
+
+	// 5. Binance (secondary crypto - fast real-time data, no API key needed)
+	if s.cfg.MarketData.BinanceEnabled {
+		binanceRateLimit := s.cfg.MarketData.BinanceRateLimit
+		if binanceRateLimit <= 0 {
+			binanceRateLimit = 100 // conservative for 1200/min limit
+		}
+		binanceLimiter := marketdata.NewRateLimiter(binanceRateLimit, time.Minute)
+		binance := marketdata.NewBinanceClient(binanceLimiter, cryptoMapper)
+		registry.Register(domainsvc.CategoryCrypto, binance)
+		s.logger.Info("Registered Binance provider",
+			zap.Int("rate_limit_per_min", binanceRateLimit))
 	}
 
 	return registry

@@ -16,10 +16,11 @@ import (
 //
 //nolint:govet // fieldalignment: keep logger and map grouped for readability
 type ProviderRegistry struct {
-	mu         sync.RWMutex
-	providers  map[services.AssetCategory][]services.MarketDataClient
-	defaultCat services.AssetCategory
-	logger     *zap.Logger
+	mu           sync.RWMutex
+	providers    map[services.AssetCategory][]services.MarketDataClient
+	defaultCat   services.AssetCategory
+	logger       *zap.Logger
+	cryptoMapper *CryptoSymbolMapper
 }
 
 // NewProviderRegistry creates a registry with default category equity and optional logger.
@@ -41,9 +42,19 @@ func (r *ProviderRegistry) Register(category services.AssetCategory, client serv
 	r.providers[category] = append(r.providers[category], client)
 }
 
-// resolveCategory returns the category for a symbol; for US-6.1 we default to equity.
+// SetCryptoMapper sets the crypto symbol mapper for automatic category detection.
+func (r *ProviderRegistry) SetCryptoMapper(mapper *CryptoSymbolMapper) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.cryptoMapper = mapper
+}
+
+// resolveCategory returns the category for a symbol based on symbol detection.
+// Crypto symbols are detected using the CryptoSymbolMapper; others default to equity.
 func (r *ProviderRegistry) resolveCategory(symbol string) services.AssetCategory {
-	_ = symbol
+	if r.cryptoMapper != nil && r.cryptoMapper.IsCryptoSymbol(symbol) {
+		return services.CategoryCrypto
+	}
 	return r.defaultCat
 }
 
