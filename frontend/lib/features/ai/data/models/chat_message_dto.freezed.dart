@@ -21,10 +21,9 @@ ChatMessageDTO _$ChatMessageDTOFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$ChatMessageDTO {
   String get id => throw _privateConstructorUsedError;
-  String get content => throw _privateConstructorUsedError;
   String get role => throw _privateConstructorUsedError;
-  String get timestamp => throw _privateConstructorUsedError;
-  bool get isError => throw _privateConstructorUsedError;
+  String get content => throw _privateConstructorUsedError;
+  String get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this ChatMessageDTO to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -42,8 +41,7 @@ abstract class $ChatMessageDTOCopyWith<$Res> {
           ChatMessageDTO value, $Res Function(ChatMessageDTO) then) =
       _$ChatMessageDTOCopyWithImpl<$Res, ChatMessageDTO>;
   @useResult
-  $Res call(
-      {String id, String content, String role, String timestamp, bool isError});
+  $Res call({String id, String role, String content, String createdAt});
 }
 
 /// @nodoc
@@ -62,32 +60,27 @@ class _$ChatMessageDTOCopyWithImpl<$Res, $Val extends ChatMessageDTO>
   @override
   $Res call({
     Object? id = null,
-    Object? content = null,
     Object? role = null,
-    Object? timestamp = null,
-    Object? isError = null,
+    Object? content = null,
+    Object? createdAt = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      content: null == content
-          ? _value.content
-          : content // ignore: cast_nullable_to_non_nullable
-              as String,
       role: null == role
           ? _value.role
           : role // ignore: cast_nullable_to_non_nullable
               as String,
-      timestamp: null == timestamp
-          ? _value.timestamp
-          : timestamp // ignore: cast_nullable_to_non_nullable
+      content: null == content
+          ? _value.content
+          : content // ignore: cast_nullable_to_non_nullable
               as String,
-      isError: null == isError
-          ? _value.isError
-          : isError // ignore: cast_nullable_to_non_nullable
-              as bool,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 }
@@ -100,8 +93,7 @@ abstract class _$$ChatMessageDTOImplCopyWith<$Res>
       __$$ChatMessageDTOImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String id, String content, String role, String timestamp, bool isError});
+  $Res call({String id, String role, String content, String createdAt});
 }
 
 /// @nodoc
@@ -118,32 +110,27 @@ class __$$ChatMessageDTOImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? content = null,
     Object? role = null,
-    Object? timestamp = null,
-    Object? isError = null,
+    Object? content = null,
+    Object? createdAt = null,
   }) {
     return _then(_$ChatMessageDTOImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      content: null == content
-          ? _value.content
-          : content // ignore: cast_nullable_to_non_nullable
-              as String,
       role: null == role
           ? _value.role
           : role // ignore: cast_nullable_to_non_nullable
               as String,
-      timestamp: null == timestamp
-          ? _value.timestamp
-          : timestamp // ignore: cast_nullable_to_non_nullable
+      content: null == content
+          ? _value.content
+          : content // ignore: cast_nullable_to_non_nullable
               as String,
-      isError: null == isError
-          ? _value.isError
-          : isError // ignore: cast_nullable_to_non_nullable
-              as bool,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -153,10 +140,9 @@ class __$$ChatMessageDTOImplCopyWithImpl<$Res>
 class _$ChatMessageDTOImpl extends _ChatMessageDTO {
   const _$ChatMessageDTOImpl(
       {required this.id,
-      required this.content,
       required this.role,
-      required this.timestamp,
-      this.isError = false})
+      required this.content,
+      required this.createdAt})
       : super._();
 
   factory _$ChatMessageDTOImpl.fromJson(Map<String, dynamic> json) =>
@@ -165,18 +151,15 @@ class _$ChatMessageDTOImpl extends _ChatMessageDTO {
   @override
   final String id;
   @override
-  final String content;
-  @override
   final String role;
   @override
-  final String timestamp;
+  final String content;
   @override
-  @JsonKey()
-  final bool isError;
+  final String createdAt;
 
   @override
   String toString() {
-    return 'ChatMessageDTO(id: $id, content: $content, role: $role, timestamp: $timestamp, isError: $isError)';
+    return 'ChatMessageDTO(id: $id, role: $role, content: $content, createdAt: $createdAt)';
   }
 
   @override
@@ -185,17 +168,15 @@ class _$ChatMessageDTOImpl extends _ChatMessageDTO {
         (other.runtimeType == runtimeType &&
             other is _$ChatMessageDTOImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.content, content) || other.content == content) &&
             (identical(other.role, role) || other.role == role) &&
-            (identical(other.timestamp, timestamp) ||
-                other.timestamp == timestamp) &&
-            (identical(other.isError, isError) || other.isError == isError));
+            (identical(other.content, content) || other.content == content) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, content, role, timestamp, isError);
+  int get hashCode => Object.hash(runtimeType, id, role, content, createdAt);
 
   /// Create a copy of ChatMessageDTO
   /// with the given fields replaced by the non-null parameter values.
@@ -217,10 +198,9 @@ class _$ChatMessageDTOImpl extends _ChatMessageDTO {
 abstract class _ChatMessageDTO extends ChatMessageDTO {
   const factory _ChatMessageDTO(
       {required final String id,
-      required final String content,
       required final String role,
-      required final String timestamp,
-      final bool isError}) = _$ChatMessageDTOImpl;
+      required final String content,
+      required final String createdAt}) = _$ChatMessageDTOImpl;
   const _ChatMessageDTO._() : super._();
 
   factory _ChatMessageDTO.fromJson(Map<String, dynamic> json) =
@@ -229,13 +209,11 @@ abstract class _ChatMessageDTO extends ChatMessageDTO {
   @override
   String get id;
   @override
-  String get content;
-  @override
   String get role;
   @override
-  String get timestamp;
+  String get content;
   @override
-  bool get isError;
+  String get createdAt;
 
   /// Create a copy of ChatMessageDTO
   /// with the given fields replaced by the non-null parameter values.

@@ -10,10 +10,9 @@ class ChatMessageDTO with _$ChatMessageDTO {
   
   const factory ChatMessageDTO({
     required String id,
-    required String content,
     required String role,
-    required String timestamp,
-    @Default(false) bool isError,
+    required String content,
+    required String createdAt,
   }) = _ChatMessageDTO;
 
   factory ChatMessageDTO.fromJson(Map<String, dynamic> json) =>
@@ -22,24 +21,10 @@ class ChatMessageDTO with _$ChatMessageDTO {
   ChatMessage toDomain() {
     return ChatMessage(
       id: id,
+      role: role,
       content: content,
-      role: _roleFromString(role),
-      timestamp: DateTime.parse(timestamp),
-      isError: isError,
+      createdAt: DateTime.parse(createdAt),
     );
-  }
-
-  static MessageRole _roleFromString(String role) {
-    switch (role.toLowerCase()) {
-      case 'user':
-        return MessageRole.user;
-      case 'assistant':
-        return MessageRole.assistant;
-      case 'system':
-        return MessageRole.system;
-      default:
-        return MessageRole.assistant;
-    }
   }
 }
 
@@ -47,10 +32,9 @@ extension ChatMessageToDTO on ChatMessage {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'role': role,
       'content': content,
-      'role': role.name,
-      'timestamp': timestamp.toIso8601String(),
-      'isError': isError,
+      'created_at': createdAt.toIso8601String(),
     };
   }
 }

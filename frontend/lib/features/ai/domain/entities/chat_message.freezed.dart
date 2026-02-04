@@ -14,13 +14,20 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
+ChatMessage _$ChatMessageFromJson(Map<String, dynamic> json) {
+  return _ChatMessage.fromJson(json);
+}
+
 /// @nodoc
 mixin _$ChatMessage {
   String get id => throw _privateConstructorUsedError;
+  String get role =>
+      throw _privateConstructorUsedError; // 'user' or 'assistant'
   String get content => throw _privateConstructorUsedError;
-  MessageRole get role => throw _privateConstructorUsedError;
-  DateTime get timestamp => throw _privateConstructorUsedError;
-  bool get isError => throw _privateConstructorUsedError;
+  DateTime get createdAt => throw _privateConstructorUsedError;
+
+  /// Serializes this ChatMessage to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of ChatMessage
   /// with the given fields replaced by the non-null parameter values.
@@ -35,12 +42,7 @@ abstract class $ChatMessageCopyWith<$Res> {
           ChatMessage value, $Res Function(ChatMessage) then) =
       _$ChatMessageCopyWithImpl<$Res, ChatMessage>;
   @useResult
-  $Res call(
-      {String id,
-      String content,
-      MessageRole role,
-      DateTime timestamp,
-      bool isError});
+  $Res call({String id, String role, String content, DateTime createdAt});
 }
 
 /// @nodoc
@@ -59,32 +61,27 @@ class _$ChatMessageCopyWithImpl<$Res, $Val extends ChatMessage>
   @override
   $Res call({
     Object? id = null,
-    Object? content = null,
     Object? role = null,
-    Object? timestamp = null,
-    Object? isError = null,
+    Object? content = null,
+    Object? createdAt = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
+      role: null == role
+          ? _value.role
+          : role // ignore: cast_nullable_to_non_nullable
+              as String,
       content: null == content
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
-      role: null == role
-          ? _value.role
-          : role // ignore: cast_nullable_to_non_nullable
-              as MessageRole,
-      timestamp: null == timestamp
-          ? _value.timestamp
-          : timestamp // ignore: cast_nullable_to_non_nullable
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      isError: null == isError
-          ? _value.isError
-          : isError // ignore: cast_nullable_to_non_nullable
-              as bool,
     ) as $Val);
   }
 }
@@ -97,12 +94,7 @@ abstract class _$$ChatMessageImplCopyWith<$Res>
       __$$ChatMessageImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String id,
-      String content,
-      MessageRole role,
-      DateTime timestamp,
-      bool isError});
+  $Res call({String id, String role, String content, DateTime createdAt});
 }
 
 /// @nodoc
@@ -119,61 +111,56 @@ class __$$ChatMessageImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? content = null,
     Object? role = null,
-    Object? timestamp = null,
-    Object? isError = null,
+    Object? content = null,
+    Object? createdAt = null,
   }) {
     return _then(_$ChatMessageImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
+      role: null == role
+          ? _value.role
+          : role // ignore: cast_nullable_to_non_nullable
+              as String,
       content: null == content
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
-      role: null == role
-          ? _value.role
-          : role // ignore: cast_nullable_to_non_nullable
-              as MessageRole,
-      timestamp: null == timestamp
-          ? _value.timestamp
-          : timestamp // ignore: cast_nullable_to_non_nullable
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      isError: null == isError
-          ? _value.isError
-          : isError // ignore: cast_nullable_to_non_nullable
-              as bool,
     ));
   }
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class _$ChatMessageImpl implements _ChatMessage {
   const _$ChatMessageImpl(
       {required this.id,
-      required this.content,
       required this.role,
-      required this.timestamp,
-      this.isError = false});
+      required this.content,
+      required this.createdAt});
+
+  factory _$ChatMessageImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ChatMessageImplFromJson(json);
 
   @override
   final String id;
   @override
+  final String role;
+// 'user' or 'assistant'
+  @override
   final String content;
   @override
-  final MessageRole role;
-  @override
-  final DateTime timestamp;
-  @override
-  @JsonKey()
-  final bool isError;
+  final DateTime createdAt;
 
   @override
   String toString() {
-    return 'ChatMessage(id: $id, content: $content, role: $role, timestamp: $timestamp, isError: $isError)';
+    return 'ChatMessage(id: $id, role: $role, content: $content, createdAt: $createdAt)';
   }
 
   @override
@@ -182,16 +169,15 @@ class _$ChatMessageImpl implements _ChatMessage {
         (other.runtimeType == runtimeType &&
             other is _$ChatMessageImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.content, content) || other.content == content) &&
             (identical(other.role, role) || other.role == role) &&
-            (identical(other.timestamp, timestamp) ||
-                other.timestamp == timestamp) &&
-            (identical(other.isError, isError) || other.isError == isError));
+            (identical(other.content, content) || other.content == content) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, content, role, timestamp, isError);
+  int get hashCode => Object.hash(runtimeType, id, role, content, createdAt);
 
   /// Create a copy of ChatMessage
   /// with the given fields replaced by the non-null parameter values.
@@ -200,31 +186,439 @@ class _$ChatMessageImpl implements _ChatMessage {
   @pragma('vm:prefer-inline')
   _$$ChatMessageImplCopyWith<_$ChatMessageImpl> get copyWith =>
       __$$ChatMessageImplCopyWithImpl<_$ChatMessageImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$ChatMessageImplToJson(
+      this,
+    );
+  }
 }
 
 abstract class _ChatMessage implements ChatMessage {
   const factory _ChatMessage(
       {required final String id,
+      required final String role,
       required final String content,
-      required final MessageRole role,
-      required final DateTime timestamp,
-      final bool isError}) = _$ChatMessageImpl;
+      required final DateTime createdAt}) = _$ChatMessageImpl;
+
+  factory _ChatMessage.fromJson(Map<String, dynamic> json) =
+      _$ChatMessageImpl.fromJson;
 
   @override
   String get id;
   @override
+  String get role; // 'user' or 'assistant'
+  @override
   String get content;
   @override
-  MessageRole get role;
-  @override
-  DateTime get timestamp;
-  @override
-  bool get isError;
+  DateTime get createdAt;
 
   /// Create a copy of ChatMessage
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ChatMessageImplCopyWith<_$ChatMessageImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+ChatResponse _$ChatResponseFromJson(Map<String, dynamic> json) {
+  return _ChatResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$ChatResponse {
+  ChatMessage get message => throw _privateConstructorUsedError;
+  String get conversationId => throw _privateConstructorUsedError;
+  int? get tokensUsed => throw _privateConstructorUsedError;
+
+  /// Serializes this ChatResponse to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of ChatResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $ChatResponseCopyWith<ChatResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $ChatResponseCopyWith<$Res> {
+  factory $ChatResponseCopyWith(
+          ChatResponse value, $Res Function(ChatResponse) then) =
+      _$ChatResponseCopyWithImpl<$Res, ChatResponse>;
+  @useResult
+  $Res call({ChatMessage message, String conversationId, int? tokensUsed});
+
+  $ChatMessageCopyWith<$Res> get message;
+}
+
+/// @nodoc
+class _$ChatResponseCopyWithImpl<$Res, $Val extends ChatResponse>
+    implements $ChatResponseCopyWith<$Res> {
+  _$ChatResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of ChatResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? message = null,
+    Object? conversationId = null,
+    Object? tokensUsed = freezed,
+  }) {
+    return _then(_value.copyWith(
+      message: null == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as ChatMessage,
+      conversationId: null == conversationId
+          ? _value.conversationId
+          : conversationId // ignore: cast_nullable_to_non_nullable
+              as String,
+      tokensUsed: freezed == tokensUsed
+          ? _value.tokensUsed
+          : tokensUsed // ignore: cast_nullable_to_non_nullable
+              as int?,
+    ) as $Val);
+  }
+
+  /// Create a copy of ChatResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ChatMessageCopyWith<$Res> get message {
+    return $ChatMessageCopyWith<$Res>(_value.message, (value) {
+      return _then(_value.copyWith(message: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$ChatResponseImplCopyWith<$Res>
+    implements $ChatResponseCopyWith<$Res> {
+  factory _$$ChatResponseImplCopyWith(
+          _$ChatResponseImpl value, $Res Function(_$ChatResponseImpl) then) =
+      __$$ChatResponseImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({ChatMessage message, String conversationId, int? tokensUsed});
+
+  @override
+  $ChatMessageCopyWith<$Res> get message;
+}
+
+/// @nodoc
+class __$$ChatResponseImplCopyWithImpl<$Res>
+    extends _$ChatResponseCopyWithImpl<$Res, _$ChatResponseImpl>
+    implements _$$ChatResponseImplCopyWith<$Res> {
+  __$$ChatResponseImplCopyWithImpl(
+      _$ChatResponseImpl _value, $Res Function(_$ChatResponseImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of ChatResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? message = null,
+    Object? conversationId = null,
+    Object? tokensUsed = freezed,
+  }) {
+    return _then(_$ChatResponseImpl(
+      message: null == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as ChatMessage,
+      conversationId: null == conversationId
+          ? _value.conversationId
+          : conversationId // ignore: cast_nullable_to_non_nullable
+              as String,
+      tokensUsed: freezed == tokensUsed
+          ? _value.tokensUsed
+          : tokensUsed // ignore: cast_nullable_to_non_nullable
+              as int?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$ChatResponseImpl implements _ChatResponse {
+  const _$ChatResponseImpl(
+      {required this.message, required this.conversationId, this.tokensUsed});
+
+  factory _$ChatResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ChatResponseImplFromJson(json);
+
+  @override
+  final ChatMessage message;
+  @override
+  final String conversationId;
+  @override
+  final int? tokensUsed;
+
+  @override
+  String toString() {
+    return 'ChatResponse(message: $message, conversationId: $conversationId, tokensUsed: $tokensUsed)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ChatResponseImpl &&
+            (identical(other.message, message) || other.message == message) &&
+            (identical(other.conversationId, conversationId) ||
+                other.conversationId == conversationId) &&
+            (identical(other.tokensUsed, tokensUsed) ||
+                other.tokensUsed == tokensUsed));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, message, conversationId, tokensUsed);
+
+  /// Create a copy of ChatResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ChatResponseImplCopyWith<_$ChatResponseImpl> get copyWith =>
+      __$$ChatResponseImplCopyWithImpl<_$ChatResponseImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$ChatResponseImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _ChatResponse implements ChatResponse {
+  const factory _ChatResponse(
+      {required final ChatMessage message,
+      required final String conversationId,
+      final int? tokensUsed}) = _$ChatResponseImpl;
+
+  factory _ChatResponse.fromJson(Map<String, dynamic> json) =
+      _$ChatResponseImpl.fromJson;
+
+  @override
+  ChatMessage get message;
+  @override
+  String get conversationId;
+  @override
+  int? get tokensUsed;
+
+  /// Create a copy of ChatResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ChatResponseImplCopyWith<_$ChatResponseImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+InsightsResponse _$InsightsResponseFromJson(Map<String, dynamic> json) {
+  return _InsightsResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$InsightsResponse {
+  String get summary => throw _privateConstructorUsedError;
+  List<String> get keyPoints => throw _privateConstructorUsedError;
+  String? get briefing => throw _privateConstructorUsedError;
+
+  /// Serializes this InsightsResponse to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of InsightsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $InsightsResponseCopyWith<InsightsResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $InsightsResponseCopyWith<$Res> {
+  factory $InsightsResponseCopyWith(
+          InsightsResponse value, $Res Function(InsightsResponse) then) =
+      _$InsightsResponseCopyWithImpl<$Res, InsightsResponse>;
+  @useResult
+  $Res call({String summary, List<String> keyPoints, String? briefing});
+}
+
+/// @nodoc
+class _$InsightsResponseCopyWithImpl<$Res, $Val extends InsightsResponse>
+    implements $InsightsResponseCopyWith<$Res> {
+  _$InsightsResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of InsightsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? summary = null,
+    Object? keyPoints = null,
+    Object? briefing = freezed,
+  }) {
+    return _then(_value.copyWith(
+      summary: null == summary
+          ? _value.summary
+          : summary // ignore: cast_nullable_to_non_nullable
+              as String,
+      keyPoints: null == keyPoints
+          ? _value.keyPoints
+          : keyPoints // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      briefing: freezed == briefing
+          ? _value.briefing
+          : briefing // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$InsightsResponseImplCopyWith<$Res>
+    implements $InsightsResponseCopyWith<$Res> {
+  factory _$$InsightsResponseImplCopyWith(_$InsightsResponseImpl value,
+          $Res Function(_$InsightsResponseImpl) then) =
+      __$$InsightsResponseImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String summary, List<String> keyPoints, String? briefing});
+}
+
+/// @nodoc
+class __$$InsightsResponseImplCopyWithImpl<$Res>
+    extends _$InsightsResponseCopyWithImpl<$Res, _$InsightsResponseImpl>
+    implements _$$InsightsResponseImplCopyWith<$Res> {
+  __$$InsightsResponseImplCopyWithImpl(_$InsightsResponseImpl _value,
+      $Res Function(_$InsightsResponseImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of InsightsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? summary = null,
+    Object? keyPoints = null,
+    Object? briefing = freezed,
+  }) {
+    return _then(_$InsightsResponseImpl(
+      summary: null == summary
+          ? _value.summary
+          : summary // ignore: cast_nullable_to_non_nullable
+              as String,
+      keyPoints: null == keyPoints
+          ? _value._keyPoints
+          : keyPoints // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      briefing: freezed == briefing
+          ? _value.briefing
+          : briefing // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$InsightsResponseImpl implements _InsightsResponse {
+  const _$InsightsResponseImpl(
+      {required this.summary,
+      required final List<String> keyPoints,
+      this.briefing})
+      : _keyPoints = keyPoints;
+
+  factory _$InsightsResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$InsightsResponseImplFromJson(json);
+
+  @override
+  final String summary;
+  final List<String> _keyPoints;
+  @override
+  List<String> get keyPoints {
+    if (_keyPoints is EqualUnmodifiableListView) return _keyPoints;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_keyPoints);
+  }
+
+  @override
+  final String? briefing;
+
+  @override
+  String toString() {
+    return 'InsightsResponse(summary: $summary, keyPoints: $keyPoints, briefing: $briefing)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$InsightsResponseImpl &&
+            (identical(other.summary, summary) || other.summary == summary) &&
+            const DeepCollectionEquality()
+                .equals(other._keyPoints, _keyPoints) &&
+            (identical(other.briefing, briefing) ||
+                other.briefing == briefing));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, summary,
+      const DeepCollectionEquality().hash(_keyPoints), briefing);
+
+  /// Create a copy of InsightsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$InsightsResponseImplCopyWith<_$InsightsResponseImpl> get copyWith =>
+      __$$InsightsResponseImplCopyWithImpl<_$InsightsResponseImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$InsightsResponseImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _InsightsResponse implements InsightsResponse {
+  const factory _InsightsResponse(
+      {required final String summary,
+      required final List<String> keyPoints,
+      final String? briefing}) = _$InsightsResponseImpl;
+
+  factory _InsightsResponse.fromJson(Map<String, dynamic> json) =
+      _$InsightsResponseImpl.fromJson;
+
+  @override
+  String get summary;
+  @override
+  List<String> get keyPoints;
+  @override
+  String? get briefing;
+
+  /// Create a copy of InsightsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$InsightsResponseImplCopyWith<_$InsightsResponseImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

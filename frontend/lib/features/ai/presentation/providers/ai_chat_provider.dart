@@ -18,63 +18,64 @@ AIRepository aiRepository(AiRepositoryRef ref) {
 // Chat State Provider
 @riverpod
 class AiChat extends _$AiChat {
+  String? _conversationId;
+
   @override
   Future<List<ChatMessage>> build() async {
-    // Load initial chat history
-    final repository = ref.read(aiRepositoryProvider);
-    final result = await repository.getChatHistory();
-    
-    return result.fold(
-      (failure) => [],
-      (messages) => messages,
-    );
+    // Load existing conversation or start fresh
+    return [];
   }
 
   Future<void> sendMessage(String content) async {
-    if (content.trim().isEmpty) return;
-
-    // Add user message immediately
+    final currentMessages = state.value ?? [];
+    
+    // Add user message immediately (optimistic update)
     final userMessage = ChatMessage(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: 'temp_${DateTime.now().millisecondsSinceEpoch}',
+      role: 'user',
       content: content,
-      role: MessageRole.user,
-      timestamp: DateTime.now(),
+      createdAt: DateTime.now(),
     );
-
-    state = AsyncData([...?state.value, userMessage]);
+    
+    state = AsyncData([...currentMessages, userMessage]);
     
     // Set typing indicator
     ref.read(aiIsTypingProvider.notifier).state = true;
-
-    // Send message to backend
-    final repository = ref.read(aiRepositoryProvider);
-    final result = await repository.sendMessage(content);
-
-    result.fold(
-      (failure) {
-        // Add error message
-        final errorMessage = ChatMessage(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          content: 'Sorry, I encountered an error: ${failure.message}',
-          role: MessageRole.assistant,
-          timestamp: DateTime.now(),
-          isError: true,
-        );
-        state = AsyncData([...?state.value, errorMessage]);
-      },
-      (aiResponse) {
-        // Add AI response
-        state = AsyncData([...?state.value, aiResponse]);
-      },
-    );
-
-    // Clear typing indicator
-    ref.read(aiIsTypingProvider.notifier).state = false;
+    
+    try {
+      final repository = ref.read(aiRepositoryProvider);
+      final result = await repository.sendMessage(
+        message: content,
+        conversationId: _conversationId,
+      );
+      
+      await result.fold(
+        (failure) {
+          // Remove optimistic user message on error
+          state = AsyncData(currentMessages);
+          throw Exception(failure.message);
+        },
+        (response) {
+          _conversationId = response.conversationId;
+          
+          // Add AI response
+          state = AsyncData([
+            ...state.value ?? [],
+            response.message,
+          ]);
+        },
+      );
+    } catch (e) {
+      // Remove optimistic user message on error
+      state = AsyncData(currentMessages);
+      rethrow;
+    } finally {
+      ref.read(aiIsTypingProvider.notifier).state = false;
+    }
   }
 
-  Future<void> newConversation() async {
-    final repository = ref.read(aiRepositoryProvider);
-    await repository.clearHistory();
+  void newConversation() {
+    _conversationId = null;
     state = const AsyncData([]);
   }
 }
