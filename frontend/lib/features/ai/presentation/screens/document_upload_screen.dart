@@ -5,6 +5,7 @@ import 'package:wealthscope_app/features/ai/domain/entities/ocr_result.dart';
 import 'package:wealthscope_app/features/ai/presentation/providers/ocr_provider.dart';
 import 'package:wealthscope_app/features/ai/presentation/screens/extracted_assets_screen.dart';
 import 'package:wealthscope_app/features/ai/presentation/services/document_picker_service.dart';
+import 'package:wealthscope_app/features/ai/presentation/widgets/processing_view.dart';
 
 /// Document Upload Screen
 /// Main screen for uploading documents with multiple options (camera, gallery, PDF)
@@ -27,7 +28,7 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
         title: const Text('Import from Document'),
       ),
       body: _isProcessing
-          ? const _ProcessingView()
+          ? const ProcessingView()
           : _selectedFile != null
               ? _PreviewView(
                   file: _selectedFile!,
@@ -309,38 +310,6 @@ class _PreviewView extends StatelessWidget {
             onPressed: onRemove,
             icon: const Icon(Icons.close),
             label: const Text('Remove'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Processing View
-/// Shown while document is being processed
-class _ProcessingView extends StatelessWidget {
-  const _ProcessingView();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator(),
-          const SizedBox(height: 24),
-          Text(
-            'Processing document...',
-            style: theme.textTheme.titleMedium,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'This may take a few moments',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
-            ),
           ),
         ],
       ),
