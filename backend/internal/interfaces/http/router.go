@@ -24,6 +24,7 @@ type RouterDeps struct {
 	Config      *config.Config
 	DB          *database.DB
 	NewsService *services.NewsService
+	AIService   *services.AIService
 }
 
 // NewRouter creates and configures a new Gin router
@@ -103,6 +104,12 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		newsHandler = handlers.NewNewsHandler(deps.NewsService)
 	}
 
+	// Initialize chat handler
+	var chatHandler *handlers.ChatHandler
+	if deps.AIService != nil {
+		chatHandler = handlers.NewChatHandler(deps.AIService)
+	}
+
 	// Health check (public)
 	router.GET("/health", healthHandler.Health)
 
@@ -151,6 +158,21 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 				news.GET("/trending", newsHandler.GetTrendingNews)
 				news.GET("/search", newsHandler.SearchNews)
 				news.GET("/symbol/:symbol", newsHandler.GetNewsBySymbol)
+			}
+		}
+
+		// AI routes (protected)
+		if chatHandler != nil {
+			ai := v1.Group("/ai")
+			ai.Use(middleware.AuthMiddleware(deps.Config.Supabase.URL))
+			{
+				ai.GET("/welcome", chatHandler.Welcome)
+				ai.POST("/chat", chatHandler.Chat)
+				ai.POST("/conversations", chatHandler.CreateConversation)
+				ai.GET("/conversations", chatHandler.ListConversations)
+				ai.GET("/conversations/:id", chatHandler.GetConversation)
+				ai.PUT("/conversations/:id", chatHandler.UpdateConversation)
+				ai.DELETE("/conversations/:id", chatHandler.DeleteConversation)
 			}
 		}
 	}

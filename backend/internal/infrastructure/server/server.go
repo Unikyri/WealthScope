@@ -14,6 +14,7 @@ import (
 	"github.com/Unikyri/WealthScope/backend/internal/application/jobs"
 	appsvc "github.com/Unikyri/WealthScope/backend/internal/application/services"
 	domainsvc "github.com/Unikyri/WealthScope/backend/internal/domain/services"
+	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/ai"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/config"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/database"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/marketdata"
@@ -43,11 +44,15 @@ func (s *Server) Run() {
 	// Setup news providers
 	newsService := s.setupNewsProviders()
 
+	// Setup AI service
+	aiService := s.setupAIService()
+
 	// Create router with dependencies
 	r := router.NewRouter(router.RouterDeps{
 		Config:      s.cfg,
 		DB:          s.db,
 		NewsService: newsService,
+		AIService:   aiService,
 	})
 
 	// Create HTTP server
@@ -318,4 +323,62 @@ func (s *Server) setupNewsProviders() *appsvc.NewsService {
 	}
 
 	return appsvc.NewNewsService(providers, cacheTTL, s.logger)
+}
+
+// setupAIService configures the AI service with Gemini client.
+func (s *Server) setupAIService() *appsvc.AIService {
+	if !s.cfg.AI.GeminiEnabled || s.cfg.AI.GeminiAPIKey == "" {
+		s.logger.Warn("AI service is disabled or API key not configured")
+		return nil
+	}
+
+	if s.db == nil {
+		s.logger.Warn("AI service requires database connection for conversation storage")
+		return nil
+	}
+
+	// Create rate limiter
+	rateLimit := s.cfg.AI.GeminiRateLimit
+	if rateLimit <= 0 {
+		rateLimit = 30
+	}
+	rateLimiter := marketdata.NewRateLimiter(rateLimit, time.Minute)
+
+	// Create Gemini client
+	geminiClient, err := ai.NewGeminiClient(
+		s.cfg.AI.GeminiAPIKey,
+		s.cfg.AI.GeminiModel,
+		rateLimiter,
+		s.logger,
+	)
+	if err != nil {
+		s.logger.Error("Failed to create Gemini client", zap.Error(err))
+		return nil
+	}
+
+	// Create repositories
+	conversationRepo := infraRepo.NewPostgresConversationRepository(s.db.DB)
+	messageRepo := infraRepo.NewPostgresMessageRepository(s.db.DB)
+
+	// Create prompt builder
+	promptBuilder := ai.NewPromptBuilder()
+
+	// Create AI service
+	aiService := appsvc.NewAIService(
+		geminiClient,
+		promptBuilder,
+		conversationRepo,
+		messageRepo,
+		s.cfg.AI.MaxConversations,
+		s.cfg.AI.MaxMessagesPerConv,
+		s.logger,
+	)
+
+	s.logger.Info("Registered AI service",
+		zap.String("model", s.cfg.AI.GeminiModel),
+		zap.Int("rate_limit_per_min", rateLimit),
+		zap.Int("max_conversations", s.cfg.AI.MaxConversations),
+		zap.Int("max_messages_per_conv", s.cfg.AI.MaxMessagesPerConv))
+
+	return aiService
 }
