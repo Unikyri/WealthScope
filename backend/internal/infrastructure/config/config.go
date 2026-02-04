@@ -14,6 +14,7 @@ type Config struct {
 	Pricing    PricingConfig
 	MarketData MarketDataConfig
 	News       NewsConfig
+	AI         AIConfig
 	Database   DatabaseConfig
 	Server     ServerConfig
 	Log        LogConfig
@@ -102,6 +103,16 @@ type NewsConfig struct {
 	NewsCacheTTLSeconds int
 }
 
+// AIConfig holds AI provider configuration (Google Gemini)
+type AIConfig struct {
+	GeminiAPIKey       string
+	GeminiModel        string
+	GeminiEnabled      bool
+	GeminiRateLimit    int // requests per minute
+	MaxConversations   int // max conversations per user
+	MaxMessagesPerConv int // max messages per conversation
+}
+
 // SupabaseConfig holds Supabase configuration
 type SupabaseConfig struct {
 	URL        string
@@ -165,6 +176,12 @@ func Load() *Config {
 	viper.SetDefault("NEWS_MARKETAUX_ENABLED", true)          // enable news by default
 	viper.SetDefault("NEWS_MARKETAUX_RATE_LIMIT", 5)          // 100/day free tier
 	viper.SetDefault("NEWS_CACHE_TTL_SECONDS", 300)           // 5 minute cache for news
+	viper.SetDefault("GEMINI_API_KEY", "")                    // required for AI features
+	viper.SetDefault("GEMINI_MODEL", "gemini-3-flash-preview")
+	viper.SetDefault("GEMINI_ENABLED", true)              // enable AI by default
+	viper.SetDefault("GEMINI_RATE_LIMIT", 30)             // 30 req/min
+	viper.SetDefault("GEMINI_MAX_CONVERSATIONS", 50)      // max conversations per user
+	viper.SetDefault("GEMINI_MAX_MESSAGES_PER_CONV", 100) // max messages per conversation
 	viper.SetDefault("SUPABASE_URL", "")
 	viper.SetDefault("SUPABASE_ANON_KEY", "")
 	viper.SetDefault("SUPABASE_SERVICE_KEY", "")
@@ -216,6 +233,14 @@ func Load() *Config {
 			MarketauxEnabled:    viper.GetBool("NEWS_MARKETAUX_ENABLED"),
 			MarketauxRateLimit:  viper.GetInt("NEWS_MARKETAUX_RATE_LIMIT"),
 			NewsCacheTTLSeconds: viper.GetInt("NEWS_CACHE_TTL_SECONDS"),
+		},
+		AI: AIConfig{
+			GeminiAPIKey:       viper.GetString("GEMINI_API_KEY"),
+			GeminiModel:        viper.GetString("GEMINI_MODEL"),
+			GeminiEnabled:      viper.GetBool("GEMINI_ENABLED"),
+			GeminiRateLimit:    viper.GetInt("GEMINI_RATE_LIMIT"),
+			MaxConversations:   viper.GetInt("GEMINI_MAX_CONVERSATIONS"),
+			MaxMessagesPerConv: viper.GetInt("GEMINI_MAX_MESSAGES_PER_CONV"),
 		},
 		Supabase: SupabaseConfig{
 			URL:        viper.GetString("SUPABASE_URL"),
