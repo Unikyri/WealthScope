@@ -12,7 +12,7 @@ class ChatBubble extends StatelessWidget {
     this.isLast = false,
   });
 
-  bool get isUser => message.role == MessageRole.user;
+  bool get isUser => message.role == 'user';
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +42,7 @@ class ChatBubble extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isUser
                       ? theme.colorScheme.primary
-                      : message.isError
-                          ? theme.colorScheme.errorContainer
-                          : theme.colorScheme.surfaceContainerHighest,
+                      : theme.colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.only(
                     topLeft: const Radius.circular(16),
                     topRight: const Radius.circular(16),
@@ -60,14 +58,12 @@ class ChatBubble extends StatelessWidget {
                       style: TextStyle(
                         color: isUser
                             ? theme.colorScheme.onPrimary
-                            : message.isError
-                                ? theme.colorScheme.onErrorContainer
-                                : theme.colorScheme.onSurface,
+                            : theme.colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      _formatTime(message.timestamp),
+                      _formatTime(message.createdAt),
                       style: TextStyle(
                         fontSize: 10,
                         color: isUser

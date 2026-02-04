@@ -6,19 +6,37 @@ class AIRemoteDataSource {
 
   AIRemoteDataSource(this._dio);
 
-  Future<ChatMessageDTO> sendMessage(String message) async {
+  Future<Map<String, dynamic>> sendMessage({
+    required String message,
+    String? conversationId,
+  }) async {
     try {
       final response = await _dio.post(
-        '/api/ai/chat',
+        '/api/v1/ai/chat',
         data: {
           'message': message,
-          'timestamp': DateTime.now().toIso8601String(),
+          if (conversationId != null) 'conversation_id': conversationId,
         },
       );
 
-      return ChatMessageDTO.fromJson(response.data);
+      return response.data['data'];
     } on DioException catch (e) {
       throw Exception('Failed to send message: ${e.message}');
+    }
+  }
+
+  Future<Map<String, dynamic>> getInsights({bool includeBriefing = true}) async {
+    try {
+      final response = await _dio.get(
+        '/api/v1/ai/insights',
+        queryParameters: {
+          'include_briefing': includeBriefing,
+        },
+      );
+
+      return response.data['data'];
+    } on DioException catch (e) {
+      throw Exception('Failed to get insights: ${e.message}');
     }
   }
 

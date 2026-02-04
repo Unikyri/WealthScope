@@ -11,10 +11,38 @@ class AIRepositoryImpl implements AIRepository {
   AIRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<Either<Failure, ChatMessage>> sendMessage(String message) async {
+  Future<Either<Failure, ChatResponse>> sendMessage({
+    required String message,
+    String? conversationId,
+  }) async {
     try {
-      final dto = await _remoteDataSource.sendMessage(message);
-      return Right(dto.toDomain());
+      final data = await _remoteDataSource.sendMessage(
+        message: message,
+        conversationId: conversationId,
+      );
+      
+      return Right(ChatResponse(
+        message: ChatMessage.fromJson(data['message']),
+        conversationId: data['conversation_id'],
+        tokensUsed: data['tokens_used'],
+      ));
+    } on DioException catch (e) {
+      return Left(ServerFailure(e.message ?? 'Server error'));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, InsightsResponse>> getInsights({
+    bool includeBriefing = true,
+  }) async {
+    try {
+      final data = await _remoteDataSource.getInsights(
+        includeBriefing: includeBriefing,
+      );
+      
+      return Right(InsightsResponse.fromJson(data));
     } on DioException catch (e) {
       return Left(ServerFailure(e.message ?? 'Server error'));
     } catch (e) {
