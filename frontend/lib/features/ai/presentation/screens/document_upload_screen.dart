@@ -83,7 +83,6 @@ class _UploadOptionsView extends ConsumerWidget {
     final theme = Theme.of(context);
     final pickerService = ref.read(documentPickerServiceProvider);
 
-
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -93,20 +92,12 @@ class _UploadOptionsView extends ConsumerWidget {
           Icon(
             Icons.document_scanner,
             size: 80,
-<<<<<<< HEAD
             color: theme.colorScheme.primary.withOpacity(0.5),
-=======
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
->>>>>>> 253-t-761-create-documentuploadscreen
           ),
           const SizedBox(height: 24),
           Text(
             'Import Assets from Document',
-<<<<<<< HEAD
             style: theme.textTheme.headlineSmall,
-=======
-            style: Theme.of(context).textTheme.headlineSmall,
->>>>>>> 253-t-761-create-documentuploadscreen
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
@@ -279,7 +270,6 @@ class _PreviewView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-<<<<<<< HEAD
           // Preview
           Expanded(
             child: Container(
