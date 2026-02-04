@@ -67,8 +67,10 @@ dependencies:
   # UI Effects
   shimmer: ^3.0.0
 
-  # Image Picker
+  # Image Picker & File Selection
   image_picker: ^1.0.7
+  file_picker: ^6.1.1
+  permission_handler: ^11.2.0
 
   # UI
   cupertino_icons: ^1.0.8

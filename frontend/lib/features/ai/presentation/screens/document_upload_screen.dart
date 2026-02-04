@@ -1,17 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
-<<<<<<< HEAD
 import 'package:wealthscope_app/features/ai/domain/entities/ocr_result.dart';
 import 'package:wealthscope_app/features/ai/presentation/providers/ocr_provider.dart';
 import 'package:wealthscope_app/features/ai/presentation/screens/extracted_assets_screen.dart';
+import 'package:wealthscope_app/features/ai/presentation/services/document_picker_service.dart';
 
 /// Document Upload Screen
 /// Main screen for uploading documents with multiple options (camera, gallery, PDF)
-=======
-
->>>>>>> 253-t-761-create-documentuploadscreen
 class DocumentUploadScreen extends ConsumerStatefulWidget {
   const DocumentUploadScreen({super.key});
 
@@ -26,11 +22,6 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
-    final theme = Theme.of(context);
-
-=======
->>>>>>> 253-t-761-create-documentuploadscreen
     return Scaffold(
       appBar: AppBar(
         title: const Text('Import from Document'),
@@ -56,7 +47,6 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
     setState(() => _isProcessing = true);
 
     try {
-<<<<<<< HEAD
       final result =
           await ref.read(ocrProvider.notifier).processDocument(_selectedFile!);
 
@@ -64,21 +54,6 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => ExtractedAssetsScreen(result: result),
-=======
-      // TODO: Implement OCR processing
-      // final result = await ref.read(ocrProvider.notifier).processDocument(_selectedFile!);
-
-      if (mounted) {
-        // TODO: Navigate to extracted assets screen
-        // Navigator.of(context).push(
-        //   MaterialPageRoute(
-        //     builder: (context) => ExtractedAssetsScreen(result: result),
-        //   ),
-        // );
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('OCR processing not yet implemented'),
->>>>>>> 253-t-761-create-documentuploadscreen
           ),
         );
       }
@@ -96,23 +71,19 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
   }
 }
 
-<<<<<<< HEAD
 /// Upload Options View
 /// Displays three upload options: camera, gallery, and PDF
-=======
->>>>>>> 253-t-761-create-documentuploadscreen
-class _UploadOptionsView extends StatelessWidget {
+class _UploadOptionsView extends ConsumerWidget {
   final Function(File) onImageSelected;
 
   const _UploadOptionsView({required this.onImageSelected});
 
   @override
-  Widget build(BuildContext context) {
-<<<<<<< HEAD
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final pickerService = ref.read(documentPickerServiceProvider);
 
-=======
->>>>>>> 253-t-761-create-documentuploadscreen
+
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -141,15 +112,9 @@ class _UploadOptionsView extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Upload a bank statement, brokerage report, or screenshot to automatically extract your assets.',
-<<<<<<< HEAD
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurface.withOpacity(0.6),
             ),
-=======
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                ),
->>>>>>> 253-t-761-create-documentuploadscreen
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 48),
@@ -159,49 +124,31 @@ class _UploadOptionsView extends StatelessWidget {
             icon: Icons.camera_alt,
             title: 'Take Photo',
             subtitle: 'Capture a document using camera',
-<<<<<<< HEAD
-            onTap: () => _pickImage(ImageSource.camera),
-=======
-            onTap: () => _pickImage(context, ImageSource.camera),
->>>>>>> 253-t-761-create-documentuploadscreen
+            onTap: () => _pickFromCamera(context, pickerService),
           ),
           const SizedBox(height: 16),
           _UploadOption(
             icon: Icons.photo_library,
             title: 'Choose from Gallery',
             subtitle: 'Select an existing image',
-<<<<<<< HEAD
-            onTap: () => _pickImage(ImageSource.gallery),
-=======
-            onTap: () => _pickImage(context, ImageSource.gallery),
->>>>>>> 253-t-761-create-documentuploadscreen
+            onTap: () => _pickFromGallery(context, pickerService),
           ),
           const SizedBox(height: 16),
           _UploadOption(
             icon: Icons.picture_as_pdf,
             title: 'Upload PDF',
             subtitle: 'Select a PDF document',
-<<<<<<< HEAD
-            onTap: _pickPDF,
-=======
-            onTap: () => _pickPDF(context),
->>>>>>> 253-t-761-create-documentuploadscreen
+            onTap: () => _pickPDF(context, pickerService),
           ),
 
           const Spacer(),
 
           // Supported formats
           Text(
-            'Supported formats: JPG, PNG, PDF',
-<<<<<<< HEAD
+            'Supported formats: JPG, PNG, PDF (max 10MB)',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurface.withOpacity(0.6),
             ),
-=======
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                ),
->>>>>>> 253-t-761-create-documentuploadscreen
             textAlign: TextAlign.center,
           ),
         ],
@@ -209,55 +156,72 @@ class _UploadOptionsView extends StatelessWidget {
     );
   }
 
-<<<<<<< HEAD
-  Future<void> _pickImage(ImageSource source) async {
-=======
-  Future<void> _pickImage(BuildContext context, ImageSource source) async {
->>>>>>> 253-t-761-create-documentuploadscreen
-    final picker = ImagePicker();
-    final image = await picker.pickImage(
-      source: source,
-      maxWidth: 2000,
-      maxHeight: 2000,
-      imageQuality: 85,
-    );
-
-    if (image != null) {
-      onImageSelected(File(image.path));
+  Future<void> _pickFromCamera(
+    BuildContext context,
+    DocumentPickerService pickerService,
+  ) async {
+    final file = await pickerService.pickFromCamera(context);
+    if (file != null) {
+      if (!pickerService.isFileSizeValid(file)) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('File size exceeds 10MB limit'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+      onImageSelected(file);
     }
   }
 
-<<<<<<< HEAD
-  Future<void> _pickPDF() async {
-=======
-  Future<void> _pickPDF(BuildContext context) async {
->>>>>>> 253-t-761-create-documentuploadscreen
-    // TODO: Implement PDF picker using file_picker package
-    // final result = await FilePicker.platform.pickFiles(
-    //   type: FileType.custom,
-    //   allowedExtensions: ['pdf'],
-    // );
-<<<<<<< HEAD
-    // if (result != null && result.files.single.path != null) {
-    //   onImageSelected(File(result.files.single.path!));
-    // }
+  Future<void> _pickFromGallery(
+    BuildContext context,
+    DocumentPickerService pickerService,
+  ) async {
+    final file = await pickerService.pickFromGallery(context);
+    if (file != null) {
+      if (!pickerService.isFileSizeValid(file)) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('File size exceeds 10MB limit'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+      onImageSelected(file);
+    }
+  }
+
+  Future<void> _pickPDF(
+    BuildContext context,
+    DocumentPickerService pickerService,
+  ) async {
+    final file = await pickerService.pickPDF();
+    if (file != null) {
+      if (!pickerService.isFileSizeValid(file)) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('File size exceeds 10MB limit'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+      onImageSelected(file);
+    }
   }
 }
 
 /// Upload Option Card
 /// Individual card for each upload option
-=======
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('PDF upload not yet implemented'),
-        ),
-      );
-    }
-  }
-}
-
->>>>>>> 253-t-761-create-documentuploadscreen
 class _UploadOption extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -273,7 +237,6 @@ class _UploadOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
     final theme = Theme.of(context);
 
     return Card(
@@ -284,13 +247,6 @@ class _UploadOption extends StatelessWidget {
             icon,
             color: theme.colorScheme.primary,
           ),
-=======
-    return Card(
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          child: Icon(icon, color: Theme.of(context).colorScheme.primary),
->>>>>>> 253-t-761-create-documentuploadscreen
         ),
         title: Text(title),
         subtitle: Text(subtitle),
@@ -301,11 +257,8 @@ class _UploadOption extends StatelessWidget {
   }
 }
 
-<<<<<<< HEAD
 /// Preview View
 /// Shows preview of selected file before processing
-=======
->>>>>>> 253-t-761-create-documentuploadscreen
 class _PreviewView extends StatelessWidget {
   final File file;
   final VoidCallback onRemove;
@@ -319,11 +272,8 @@ class _PreviewView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
     final theme = Theme.of(context);
 
-=======
->>>>>>> 253-t-761-create-documentuploadscreen
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -369,42 +319,6 @@ class _PreviewView extends StatelessWidget {
             onPressed: onRemove,
             icon: const Icon(Icons.close),
             label: const Text('Remove'),
-=======
-          Text(
-            'Document Preview',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: Card(
-              clipBehavior: Clip.antiAlias,
-              child: Image.file(
-                file,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: onRemove,
-                  icon: const Icon(Icons.delete_outline),
-                  label: const Text('Remove'),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                flex: 2,
-                child: FilledButton.icon(
-                  onPressed: onProcess,
-                  icon: const Icon(Icons.auto_awesome),
-                  label: const Text('Process Document'),
-                ),
-              ),
-            ],
->>>>>>> 253-t-761-create-documentuploadscreen
           ),
         ],
       ),
@@ -412,21 +326,15 @@ class _PreviewView extends StatelessWidget {
   }
 }
 
-<<<<<<< HEAD
 /// Processing View
 /// Shown while document is being processed
-=======
->>>>>>> 253-t-761-create-documentuploadscreen
 class _ProcessingView extends StatelessWidget {
   const _ProcessingView();
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
     final theme = Theme.of(context);
 
-=======
->>>>>>> 253-t-761-create-documentuploadscreen
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -435,7 +343,6 @@ class _ProcessingView extends StatelessWidget {
           const SizedBox(height: 24),
           Text(
             'Processing document...',
-<<<<<<< HEAD
             style: theme.textTheme.titleMedium,
           ),
           const SizedBox(height: 8),
@@ -444,16 +351,6 @@ class _ProcessingView extends StatelessWidget {
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurface.withOpacity(0.6),
             ),
-=======
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Extracting asset information using AI',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                ),
->>>>>>> 253-t-761-create-documentuploadscreen
           ),
         ],
       ),
