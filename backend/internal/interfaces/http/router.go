@@ -21,8 +21,9 @@ import (
 
 // RouterDeps holds all dependencies needed by the router
 type RouterDeps struct {
-	Config *config.Config
-	DB     *database.DB
+	Config      *config.Config
+	DB          *database.DB
+	NewsService *services.NewsService
 }
 
 // NewRouter creates and configures a new Gin router
@@ -96,6 +97,12 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 	)
 	portfolioHandler := handlers.NewPortfolioHandler(getPortfolioSummaryUC, getPortfolioRiskUC)
 
+	// Initialize news handler
+	var newsHandler *handlers.NewsHandler
+	if deps.NewsService != nil {
+		newsHandler = handlers.NewNewsHandler(deps.NewsService)
+	}
+
 	// Health check (public)
 	router.GET("/health", healthHandler.Health)
 
@@ -134,6 +141,17 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		{
 			portfolio.GET("/summary", portfolioHandler.GetSummary)
 			portfolio.GET("/risk", portfolioHandler.GetRisk)
+		}
+
+		// News routes (public - no auth required for general news)
+		if newsHandler != nil {
+			news := v1.Group("/news")
+			{
+				news.GET("", newsHandler.GetNews)
+				news.GET("/trending", newsHandler.GetTrendingNews)
+				news.GET("/search", newsHandler.SearchNews)
+				news.GET("/symbol/:symbol", newsHandler.GetNewsBySymbol)
+			}
 		}
 	}
 

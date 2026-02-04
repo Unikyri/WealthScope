@@ -13,6 +13,7 @@ import (
 type Config struct {
 	Pricing    PricingConfig
 	MarketData MarketDataConfig
+	News       NewsConfig
 	Database   DatabaseConfig
 	Server     ServerConfig
 	Log        LogConfig
@@ -83,6 +84,24 @@ type MarketDataConfig struct {
 	CacheTTLSeconds int
 }
 
+// NewsConfig holds news provider configuration
+//
+//nolint:govet // fieldalignment: keep grouped by provider for readability
+type NewsConfig struct {
+	// NewsData.io
+	NewsDataAPIKey    string
+	NewsDataEnabled   bool
+	NewsDataRateLimit int // requests per minute
+
+	// Marketaux
+	MarketauxAPIKey    string
+	MarketauxEnabled   bool
+	MarketauxRateLimit int // requests per minute
+
+	// Cache settings
+	NewsCacheTTLSeconds int
+}
+
 // SupabaseConfig holds Supabase configuration
 type SupabaseConfig struct {
 	URL        string
@@ -139,6 +158,13 @@ func Load() *Config {
 	viper.SetDefault("MARKETDATA_METALS_API_ENABLED", false)  // disabled by default (requires API key)
 	viper.SetDefault("MARKETDATA_METALS_API_RATE_LIMIT", 2)   // very conservative for 50/month free tier
 	viper.SetDefault("MARKETDATA_CACHE_TTL_SECONDS", 60)      // 1 minute cache
+	viper.SetDefault("NEWS_NEWSDATA_API_KEY", "")             // required for news
+	viper.SetDefault("NEWS_NEWSDATA_ENABLED", true)           // enable news by default
+	viper.SetDefault("NEWS_NEWSDATA_RATE_LIMIT", 10)          // 200/day free tier
+	viper.SetDefault("NEWS_MARKETAUX_API_KEY", "")            // required for news
+	viper.SetDefault("NEWS_MARKETAUX_ENABLED", true)          // enable news by default
+	viper.SetDefault("NEWS_MARKETAUX_RATE_LIMIT", 5)          // 100/day free tier
+	viper.SetDefault("NEWS_CACHE_TTL_SECONDS", 300)           // 5 minute cache for news
 	viper.SetDefault("SUPABASE_URL", "")
 	viper.SetDefault("SUPABASE_ANON_KEY", "")
 	viper.SetDefault("SUPABASE_SERVICE_KEY", "")
@@ -181,6 +207,15 @@ func Load() *Config {
 			MetalsAPIEnabled:      viper.GetBool("MARKETDATA_METALS_API_ENABLED"),
 			MetalsAPIRateLimit:    viper.GetInt("MARKETDATA_METALS_API_RATE_LIMIT"),
 			CacheTTLSeconds:       viper.GetInt("MARKETDATA_CACHE_TTL_SECONDS"),
+		},
+		News: NewsConfig{
+			NewsDataAPIKey:      viper.GetString("NEWS_NEWSDATA_API_KEY"),
+			NewsDataEnabled:     viper.GetBool("NEWS_NEWSDATA_ENABLED"),
+			NewsDataRateLimit:   viper.GetInt("NEWS_NEWSDATA_RATE_LIMIT"),
+			MarketauxAPIKey:     viper.GetString("NEWS_MARKETAUX_API_KEY"),
+			MarketauxEnabled:    viper.GetBool("NEWS_MARKETAUX_ENABLED"),
+			MarketauxRateLimit:  viper.GetInt("NEWS_MARKETAUX_RATE_LIMIT"),
+			NewsCacheTTLSeconds: viper.GetInt("NEWS_CACHE_TTL_SECONDS"),
 		},
 		Supabase: SupabaseConfig{
 			URL:        viper.GetString("SUPABASE_URL"),

@@ -17,6 +17,7 @@ import (
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/config"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/database"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/marketdata"
+	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/news"
 	infraRepo "github.com/Unikyri/WealthScope/backend/internal/infrastructure/repositories"
 	router "github.com/Unikyri/WealthScope/backend/internal/interfaces/http"
 )
@@ -39,10 +40,14 @@ func New(cfg *config.Config, logger *zap.Logger, db *database.DB) *Server {
 
 // Run starts the HTTP server with graceful shutdown
 func (s *Server) Run() {
+	// Setup news providers
+	newsService := s.setupNewsProviders()
+
 	// Create router with dependencies
 	r := router.NewRouter(router.RouterDeps{
-		Config: s.cfg,
-		DB:     s.db,
+		Config:      s.cfg,
+		DB:          s.db,
+		NewsService: newsService,
 	})
 
 	// Create HTTP server
@@ -268,4 +273,49 @@ func (s *Server) setupMarketDataProviders() domainsvc.MarketDataClient {
 	}
 
 	return registry
+}
+
+// setupNewsProviders configures news providers with rate limiting and fallback.
+// Fallback order: Marketaux (primary, better for financial news) -> NewsData.io
+func (s *Server) setupNewsProviders() *appsvc.NewsService {
+	var providers []domainsvc.NewsClient
+
+	// 1. Marketaux (primary - financial news with sentiment and entity recognition)
+	if s.cfg.News.MarketauxEnabled && s.cfg.News.MarketauxAPIKey != "" {
+		marketauxRateLimit := s.cfg.News.MarketauxRateLimit
+		if marketauxRateLimit <= 0 {
+			marketauxRateLimit = 5 // conservative for 100/day free tier
+		}
+		marketauxLimiter := marketdata.NewRateLimiter(marketauxRateLimit, time.Minute)
+		marketaux := news.NewMarketauxClient(s.cfg.News.MarketauxAPIKey, marketauxLimiter)
+		providers = append(providers, marketaux)
+		s.logger.Info("Registered Marketaux news provider",
+			zap.Int("rate_limit_per_min", marketauxRateLimit))
+	}
+
+	// 2. NewsData.io (fallback - general business news)
+	if s.cfg.News.NewsDataEnabled && s.cfg.News.NewsDataAPIKey != "" {
+		newsDataRateLimit := s.cfg.News.NewsDataRateLimit
+		if newsDataRateLimit <= 0 {
+			newsDataRateLimit = 10 // conservative for 200/day free tier
+		}
+		newsDataLimiter := marketdata.NewRateLimiter(newsDataRateLimit, time.Minute)
+		newsData := news.NewNewsDataClient(s.cfg.News.NewsDataAPIKey, newsDataLimiter)
+		providers = append(providers, newsData)
+		s.logger.Info("Registered NewsData.io news provider",
+			zap.Int("rate_limit_per_min", newsDataRateLimit))
+	}
+
+	if len(providers) == 0 {
+		s.logger.Warn("No news providers configured - news endpoints will return errors")
+		return nil
+	}
+
+	// Create news service with caching
+	cacheTTL := time.Duration(s.cfg.News.NewsCacheTTLSeconds) * time.Second
+	if cacheTTL <= 0 {
+		cacheTTL = 5 * time.Minute // default 5 minute cache for news
+	}
+
+	return appsvc.NewNewsService(providers, cacheTTL, s.logger)
 }
