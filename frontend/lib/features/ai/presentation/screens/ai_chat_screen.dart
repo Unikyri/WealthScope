@@ -41,10 +41,10 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
     if (message.isEmpty) return;
 
     _messageController.clear();
-    
+
     // Send message via provider
     await ref.read(aiChatProvider.notifier).sendMessage(message);
-    
+
     _scrollToBottom();
   }
 
@@ -58,7 +58,8 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => ref.read(aiChatProvider.notifier).newConversation(),
+            onPressed: () =>
+                ref.read(aiChatProvider.notifier).newConversation(),
             tooltip: 'New conversation',
           ),
         ],
@@ -100,14 +101,14 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
               ),
             ),
           ),
-          
+
           // Typing indicator
           if (ref.watch(aiIsTypingProvider))
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: TypingIndicator(),
             ),
-          
+
           // Input field
           _MessageInput(
             controller: _messageController,
@@ -121,40 +122,83 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
   }
 }
 
-class _EmptyChat extends StatelessWidget {
+class _EmptyChat extends ConsumerWidget {
   const _EmptyChat();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
+    final sampleQuestions = [
+      'How is my portfolio performing?',
+      'What are my top holdings?',
+      'Should I rebalance my portfolio?',
+      'What is my asset allocation?',
+    ];
+
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.chat_bubble_outline,
-            size: 64,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Ask me anything about your portfolio!',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'I can help with:\n• Portfolio analysis\n• Investment advice\n• Market questions',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.psychology_outlined,
+              size: 80,
+              color: theme.colorScheme.primary,
             ),
-          ),
-        ],
+            const SizedBox(height: 24),
+            Text(
+              'AI Financial Advisor',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'How can I help you today?',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.7),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+            Text(
+              'Sample Questions',
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ...sampleQuestions.map((question) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      ref.read(aiChatProvider.notifier).sendMessage(question);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                    ),
+                    child: Text(question),
+                  ),
+                ),
+              );
+            }),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _MessageInput extends StatelessWidget {
+class _MessageInput extends StatefulWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
   final VoidCallback onSend;
@@ -168,52 +212,109 @@ class _MessageInput extends StatelessWidget {
   });
 
   @override
+  State<_MessageInput> createState() => _MessageInputState();
+}
+
+class _MessageInputState extends State<_MessageInput> {
+  bool _hasText = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_onTextChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onTextChanged);
+    super.dispose();
+  }
+
+  void _onTextChanged() {
+    final hasText = widget.controller.text.trim().isNotEmpty;
+    if (hasText != _hasText) {
+      setState(() {
+        _hasText = hasText;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final canSend = _hasText && !widget.isLoading;
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
+        color: theme.colorScheme.surface,
+        border: Border(
+          top: BorderSide(
+            color: theme.colorScheme.outline.withOpacity(0.2),
           ),
-        ],
+        ),
       ),
       child: SafeArea(
         child: Row(
           children: [
             Expanded(
               child: TextField(
-                controller: controller,
-                focusNode: focusNode,
+                controller: widget.controller,
+                focusNode: widget.focusNode,
                 decoration: InputDecoration(
                   hintText: 'Type a message...',
+                  hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withOpacity(0.5),
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide(
+                      color: theme.colorScheme.outline.withOpacity(0.3),
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide(
+                      color: theme.colorScheme.outline.withOpacity(0.3),
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide(
+                      color: theme.colorScheme.primary,
+                      width: 2,
+                    ),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
+                    horizontal: 20,
                     vertical: 12,
                   ),
+                  filled: true,
+                  fillColor: theme.colorScheme.surfaceContainerHighest,
                 ),
                 maxLines: null,
+                textCapitalization: TextCapitalization.sentences,
+                keyboardType: TextInputType.multiline,
                 textInputAction: TextInputAction.send,
-                onSubmitted: (_) => onSend(),
-                enabled: !isLoading,
+                onSubmitted: (_) => canSend ? widget.onSend() : null,
+                enabled: !widget.isLoading,
               ),
             ),
             const SizedBox(width: 8),
-            IconButton.filled(
-              onPressed: isLoading ? null : onSend,
-              icon: isLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.send),
+            IconButton(
+              onPressed: canSend ? widget.onSend : null,
+              icon: Icon(
+                Icons.send,
+                color: canSend
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurface.withOpacity(0.3),
+              ),
+              style: IconButton.styleFrom(
+                backgroundColor: canSend
+                    ? theme.colorScheme.primaryContainer
+                    : theme.colorScheme.surfaceContainerHighest,
+                padding: const EdgeInsets.all(12),
+              ),
             ),
           ],
         ),
