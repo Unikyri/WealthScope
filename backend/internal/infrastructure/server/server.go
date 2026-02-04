@@ -137,6 +137,7 @@ func (s *Server) runPriceUpdateLoop() {
 // Fallback order for equities: Yahoo Finance (primary) -> Finnhub -> Alpha Vantage
 // Fallback order for crypto: CoinGecko (primary) -> Binance
 // Fallback order for forex: Frankfurter (primary) -> ExchangeRate API
+// Fallback order for metals: MetalPriceAPI (primary)
 func (s *Server) setupMarketDataProviders() domainsvc.MarketDataClient {
 	registry := marketdata.NewProviderRegistry(s.logger)
 
@@ -245,6 +246,25 @@ func (s *Server) setupMarketDataProviders() domainsvc.MarketDataClient {
 		s.logger.Info("Registered ExchangeRate provider",
 			zap.Int("rate_limit_per_min", erRateLimit),
 			zap.Bool("has_api_key", s.cfg.MarketData.ExchangeRateAPIKey != ""))
+	}
+
+	// ==================== METALS PROVIDERS ====================
+
+	// Create shared metals symbol mapper for category detection
+	metalsMapper := marketdata.NewMetalsSymbolMapper()
+	registry.SetMetalsMapper(metalsMapper)
+
+	// 8. MetalPriceAPI (precious metals - requires API key, 50 req/month free tier)
+	if s.cfg.MarketData.MetalsAPIEnabled && s.cfg.MarketData.MetalsAPIKey != "" {
+		metalsRateLimit := s.cfg.MarketData.MetalsAPIRateLimit
+		if metalsRateLimit <= 0 {
+			metalsRateLimit = 2 // very conservative for 50/month limit
+		}
+		metalsLimiter := marketdata.NewRateLimiter(metalsRateLimit, time.Minute)
+		metalsAPI := marketdata.NewMetalsAPIClient(s.cfg.MarketData.MetalsAPIKey, metalsLimiter, metalsMapper)
+		registry.Register(domainsvc.CategoryMetal, metalsAPI)
+		s.logger.Info("Registered MetalPriceAPI provider",
+			zap.Int("rate_limit_per_min", metalsRateLimit))
 	}
 
 	return registry

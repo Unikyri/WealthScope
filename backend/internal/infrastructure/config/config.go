@@ -74,6 +74,11 @@ type MarketDataConfig struct {
 	ExchangeRateEnabled   bool
 	ExchangeRateRateLimit int // requests per minute
 
+	// Metals-API (precious metals - gold, silver, platinum, palladium)
+	MetalsAPIKey       string
+	MetalsAPIEnabled   bool
+	MetalsAPIRateLimit int // requests per minute
+
 	// Cache settings
 	CacheTTLSeconds int
 }
@@ -130,6 +135,9 @@ func Load() *Config {
 	viper.SetDefault("MARKETDATA_EXCHANGERATE_API_KEY", "")   // optional for free tier
 	viper.SetDefault("MARKETDATA_EXCHANGERATE_ENABLED", true) // enable forex by default
 	viper.SetDefault("MARKETDATA_EXCHANGERATE_RATE_LIMIT", 5) // conservative for 1500/month limit
+	viper.SetDefault("MARKETDATA_METALS_API_KEY", "")         // required for metals
+	viper.SetDefault("MARKETDATA_METALS_API_ENABLED", false)  // disabled by default (requires API key)
+	viper.SetDefault("MARKETDATA_METALS_API_RATE_LIMIT", 2)   // very conservative for 50/month free tier
 	viper.SetDefault("MARKETDATA_CACHE_TTL_SECONDS", 60)      // 1 minute cache
 	viper.SetDefault("SUPABASE_URL", "")
 	viper.SetDefault("SUPABASE_ANON_KEY", "")
@@ -169,6 +177,9 @@ func Load() *Config {
 			ExchangeRateAPIKey:    viper.GetString("MARKETDATA_EXCHANGERATE_API_KEY"),
 			ExchangeRateEnabled:   viper.GetBool("MARKETDATA_EXCHANGERATE_ENABLED"),
 			ExchangeRateRateLimit: viper.GetInt("MARKETDATA_EXCHANGERATE_RATE_LIMIT"),
+			MetalsAPIKey:          viper.GetString("MARKETDATA_METALS_API_KEY"),
+			MetalsAPIEnabled:      viper.GetBool("MARKETDATA_METALS_API_ENABLED"),
+			MetalsAPIRateLimit:    viper.GetInt("MARKETDATA_METALS_API_RATE_LIMIT"),
 			CacheTTLSeconds:       viper.GetInt("MARKETDATA_CACHE_TTL_SECONDS"),
 		},
 		Supabase: SupabaseConfig{

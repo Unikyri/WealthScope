@@ -163,3 +163,84 @@ func TestProviderRegistry_SetForexMapper(t *testing.T) {
 	assert.NotNil(t, registry.forexMapper)
 	assert.Same(t, forexMapper, registry.forexMapper)
 }
+
+func TestProviderRegistry_resolveCategoryMetal(t *testing.T) {
+	logger := zap.NewNop()
+	registry := NewProviderRegistry(logger)
+
+	// Without metals mapper, should return default (equity)
+	assert.Equal(t, services.CategoryEquity, registry.resolveCategory("GOLD"))
+	assert.Equal(t, services.CategoryEquity, registry.resolveCategory("XAU"))
+
+	// With metals mapper
+	metalsMapper := NewMetalsSymbolMapper()
+	registry.SetMetalsMapper(metalsMapper)
+
+	assert.Equal(t, services.CategoryMetal, registry.resolveCategory("GOLD"))
+	assert.Equal(t, services.CategoryMetal, registry.resolveCategory("XAU"))
+	assert.Equal(t, services.CategoryMetal, registry.resolveCategory("SILVER"))
+	assert.Equal(t, services.CategoryMetal, registry.resolveCategory("XAG"))
+	assert.Equal(t, services.CategoryMetal, registry.resolveCategory("PLATINUM"))
+	assert.Equal(t, services.CategoryMetal, registry.resolveCategory("PALLADIUM"))
+	assert.Equal(t, services.CategoryEquity, registry.resolveCategory("AAPL")) // Not metal
+}
+
+func TestProviderRegistry_resolveCategoryAllMappers(t *testing.T) {
+	logger := zap.NewNop()
+	registry := NewProviderRegistry(logger)
+
+	cryptoMapper := NewCryptoSymbolMapper()
+	forexMapper := NewForexSymbolMapper()
+	metalsMapper := NewMetalsSymbolMapper()
+	registry.SetCryptoMapper(cryptoMapper)
+	registry.SetForexMapper(forexMapper)
+	registry.SetMetalsMapper(metalsMapper)
+
+	// Test priority: Crypto -> Forex -> Metal -> Equity
+	assert.Equal(t, services.CategoryCrypto, registry.resolveCategory("BTC"))
+	assert.Equal(t, services.CategoryCrypto, registry.resolveCategory("ETH"))
+	assert.Equal(t, services.CategoryForex, registry.resolveCategory("EUR/USD"))
+	assert.Equal(t, services.CategoryForex, registry.resolveCategory("GBPJPY"))
+	assert.Equal(t, services.CategoryMetal, registry.resolveCategory("GOLD"))
+	assert.Equal(t, services.CategoryMetal, registry.resolveCategory("XAU"))
+	assert.Equal(t, services.CategoryMetal, registry.resolveCategory("SILVER"))
+	assert.Equal(t, services.CategoryEquity, registry.resolveCategory("AAPL"))
+	assert.Equal(t, services.CategoryEquity, registry.resolveCategory("TSLA"))
+}
+
+func TestProviderRegistry_GetQuote_MetalCategory(t *testing.T) {
+	ctx := context.Background()
+	logger := zap.NewNop()
+	registry := NewProviderRegistry(logger)
+
+	// Set up metals mapper
+	metalsMapper := NewMetalsSymbolMapper()
+	registry.SetMetalsMapper(metalsMapper)
+
+	// Register metals provider
+	mockMetals := NewMockClient("mock_metals")
+	registry.Register(services.CategoryMetal, mockMetals)
+
+	// Register equity provider (should not be used for metals)
+	mockEquity := NewMockClient("mock_equity")
+	registry.Register(services.CategoryEquity, mockEquity)
+
+	// Get metal quote - should use metals provider
+	q, err := registry.GetQuote(ctx, "GOLD")
+	require.NoError(t, err)
+	require.NotNil(t, q)
+	assert.Equal(t, "mock_metals", q.Source)
+}
+
+func TestProviderRegistry_SetMetalsMapper(t *testing.T) {
+	registry := NewProviderRegistry(nil)
+
+	// Initially nil
+	assert.Nil(t, registry.metalsMapper)
+
+	metalsMapper := NewMetalsSymbolMapper()
+	registry.SetMetalsMapper(metalsMapper)
+
+	assert.NotNil(t, registry.metalsMapper)
+	assert.Same(t, metalsMapper, registry.metalsMapper)
+}
