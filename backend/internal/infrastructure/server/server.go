@@ -53,14 +53,19 @@ func (s *Server) Run() {
 	// Setup document processor for OCR
 	documentProcessor := s.setupDocumentProcessor(geminiClient)
 
+	// Setup scenario services for what-if simulations
+	scenarioEngine, historicalAnalyzer := s.setupScenarioServices()
+
 	// Create router with dependencies
 	r := router.NewRouter(router.RouterDeps{
-		Config:            s.cfg,
-		DB:                s.db,
-		NewsService:       newsService,
-		AIService:         aiService,
-		InsightService:    insightService,
-		DocumentProcessor: documentProcessor,
+		Config:             s.cfg,
+		DB:                 s.db,
+		NewsService:        newsService,
+		AIService:          aiService,
+		InsightService:     insightService,
+		DocumentProcessor:  documentProcessor,
+		ScenarioEngine:     scenarioEngine,
+		HistoricalAnalyzer: historicalAnalyzer,
 	})
 
 	// Configure multipart memory limit for file uploads (10MB)
@@ -471,4 +476,26 @@ func (s *Server) setupInsightService(newsService *appsvc.NewsService, geminiClie
 	s.logger.Info("Registered Insight service")
 
 	return insightService
+}
+
+// setupScenarioServices configures the scenario simulation services.
+func (s *Server) setupScenarioServices() (*appsvc.ScenarioEngine, *appsvc.HistoricalAnalyzer) {
+	if s.db == nil {
+		s.logger.Warn("Scenario services require database connection")
+		return nil, nil
+	}
+
+	// Create repositories
+	assetRepo := infraRepo.NewPostgresAssetRepository(s.db.DB)
+	priceHistoryRepo := infraRepo.NewPostgresPriceHistoryRepository(s.db.DB)
+
+	// Create scenario engine
+	scenarioEngine := appsvc.NewScenarioEngine(assetRepo, s.logger)
+
+	// Create historical analyzer
+	historicalAnalyzer := appsvc.NewHistoricalAnalyzer(priceHistoryRepo, s.logger)
+
+	s.logger.Info("Registered Scenario simulation services")
+
+	return scenarioEngine, historicalAnalyzer
 }

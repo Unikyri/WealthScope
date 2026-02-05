@@ -21,12 +21,14 @@ import (
 
 // RouterDeps holds all dependencies needed by the router
 type RouterDeps struct {
-	Config            *config.Config
-	DB                *database.DB
-	NewsService       *services.NewsService
-	AIService         *services.AIService
-	InsightService    *services.InsightService
-	DocumentProcessor *services.DocumentProcessor
+	Config             *config.Config
+	DB                 *database.DB
+	NewsService        *services.NewsService
+	AIService          *services.AIService
+	InsightService     *services.InsightService
+	DocumentProcessor  *services.DocumentProcessor
+	ScenarioEngine     *services.ScenarioEngine
+	HistoricalAnalyzer *services.HistoricalAnalyzer
 }
 
 // NewRouter creates and configures a new Gin router
@@ -124,6 +126,12 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		ocrHandler = handlers.NewOCRHandler(deps.DocumentProcessor)
 	}
 
+	// Initialize scenario handler
+	var scenarioHandler *handlers.ScenarioHandler
+	if deps.ScenarioEngine != nil {
+		scenarioHandler = handlers.NewScenarioHandler(deps.ScenarioEngine, deps.HistoricalAnalyzer)
+	}
+
 	// Health check (public)
 	router.GET("/health", healthHandler.Health)
 
@@ -176,7 +184,7 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		}
 
 		// AI routes (protected)
-		if chatHandler != nil || insightsHandler != nil || ocrHandler != nil {
+		if chatHandler != nil || insightsHandler != nil || ocrHandler != nil || scenarioHandler != nil {
 			ai := v1.Group("/ai")
 			ai.Use(middleware.AuthMiddleware(deps.Config.Supabase.URL))
 			{
@@ -205,6 +213,13 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 				if ocrHandler != nil {
 					ai.POST("/ocr", ocrHandler.ProcessDocument)
 					ai.POST("/ocr/confirm", ocrHandler.CreateAssetsFromOCR)
+				}
+
+				// Scenario simulation routes
+				if scenarioHandler != nil {
+					ai.POST("/simulate", scenarioHandler.Simulate)
+					ai.GET("/scenarios/templates", scenarioHandler.GetTemplates)
+					ai.GET("/scenarios/historical", scenarioHandler.GetHistoricalStats)
 				}
 			}
 		}
