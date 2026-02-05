@@ -190,6 +190,119 @@ func (c *GeminiClient) buildContents(messages []Message) []*genai.Content {
 	return contents
 }
 
+// AnalyzeImage sends an image to Gemini Vision for analysis.
+// This method supports multimodal content (image + text prompt).
+// Supported MIME types: image/jpeg, image/png, image/webp, image/gif, application/pdf
+func (c *GeminiClient) AnalyzeImage(ctx context.Context, imageData []byte, mimeType, prompt string) (string, error) {
+	if c.rateLimiter != nil {
+		if err := c.rateLimiter.Wait(ctx); err != nil {
+			return "", fmt.Errorf("gemini: rate limit wait: %w", err)
+		}
+	}
+
+	if len(imageData) == 0 {
+		return "", fmt.Errorf("gemini: image data is empty")
+	}
+
+	c.logger.Debug("sending image analysis request to Gemini",
+		zap.String("model", c.model),
+		zap.String("mime_type", mimeType),
+		zap.Int("image_size", len(imageData)),
+		zap.Int("prompt_length", len(prompt)))
+
+	// Build multimodal content with image and text
+	contents := []*genai.Content{{
+		Role: "user",
+		Parts: []*genai.Part{
+			{
+				InlineData: &genai.Blob{
+					MIMEType: mimeType,
+					Data:     imageData,
+				},
+			},
+			{Text: prompt},
+		},
+	}}
+
+	// Call the API
+	result, err := c.client.Models.GenerateContent(ctx, c.model, contents, nil)
+	if err != nil {
+		c.logger.Error("gemini vision API error", zap.Error(err))
+		return "", fmt.Errorf("gemini: vision analysis failed: %w", err)
+	}
+
+	// Extract text from response
+	text := result.Text()
+	if text == "" {
+		return "", fmt.Errorf("gemini: empty vision response")
+	}
+
+	c.logger.Debug("received vision response from Gemini",
+		zap.Int("response_length", len(text)))
+
+	return text, nil
+}
+
+// AnalyzeImageWithSystemPrompt sends an image to Gemini Vision with a system instruction.
+func (c *GeminiClient) AnalyzeImageWithSystemPrompt(ctx context.Context, imageData []byte, mimeType, prompt, systemPrompt string) (string, error) {
+	if c.rateLimiter != nil {
+		if err := c.rateLimiter.Wait(ctx); err != nil {
+			return "", fmt.Errorf("gemini: rate limit wait: %w", err)
+		}
+	}
+
+	if len(imageData) == 0 {
+		return "", fmt.Errorf("gemini: image data is empty")
+	}
+
+	c.logger.Debug("sending image analysis request to Gemini with system prompt",
+		zap.String("model", c.model),
+		zap.String("mime_type", mimeType),
+		zap.Int("image_size", len(imageData)))
+
+	// Build multimodal content with image and text
+	contents := []*genai.Content{{
+		Role: "user",
+		Parts: []*genai.Part{
+			{
+				InlineData: &genai.Blob{
+					MIMEType: mimeType,
+					Data:     imageData,
+				},
+			},
+			{Text: prompt},
+		},
+	}}
+
+	// Build config with system instruction
+	config := &genai.GenerateContentConfig{}
+	if systemPrompt != "" {
+		config.SystemInstruction = &genai.Content{
+			Parts: []*genai.Part{
+				{Text: systemPrompt},
+			},
+		}
+	}
+
+	// Call the API
+	result, err := c.client.Models.GenerateContent(ctx, c.model, contents, config)
+	if err != nil {
+		c.logger.Error("gemini vision API error", zap.Error(err))
+		return "", fmt.Errorf("gemini: vision analysis failed: %w", err)
+	}
+
+	// Extract text from response
+	text := result.Text()
+	if text == "" {
+		return "", fmt.Errorf("gemini: empty vision response")
+	}
+
+	c.logger.Debug("received vision response from Gemini",
+		zap.Int("response_length", len(text)))
+
+	return text, nil
+}
+
 // Close closes the Gemini client.
 // Note: The genai.Client doesn't have a Close method, but we keep this
 // for interface consistency and future cleanup needs.

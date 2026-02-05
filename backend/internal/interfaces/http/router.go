@@ -21,11 +21,12 @@ import (
 
 // RouterDeps holds all dependencies needed by the router
 type RouterDeps struct {
-	Config         *config.Config
-	DB             *database.DB
-	NewsService    *services.NewsService
-	AIService      *services.AIService
-	InsightService *services.InsightService
+	Config            *config.Config
+	DB                *database.DB
+	NewsService       *services.NewsService
+	AIService         *services.AIService
+	InsightService    *services.InsightService
+	DocumentProcessor *services.DocumentProcessor
 }
 
 // NewRouter creates and configures a new Gin router
@@ -117,6 +118,12 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		insightsHandler = handlers.NewInsightsHandler(deps.InsightService)
 	}
 
+	// Initialize OCR handler
+	var ocrHandler *handlers.OCRHandler
+	if deps.DocumentProcessor != nil {
+		ocrHandler = handlers.NewOCRHandler(deps.DocumentProcessor)
+	}
+
 	// Health check (public)
 	router.GET("/health", healthHandler.Health)
 
@@ -169,7 +176,7 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		}
 
 		// AI routes (protected)
-		if chatHandler != nil || insightsHandler != nil {
+		if chatHandler != nil || insightsHandler != nil || ocrHandler != nil {
 			ai := v1.Group("/ai")
 			ai.Use(middleware.AuthMiddleware(deps.Config.Supabase.URL))
 			{
@@ -192,6 +199,12 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 					ai.GET("/insights/unread/count", insightsHandler.GetUnreadCount)
 					ai.GET("/insights/:id", insightsHandler.GetInsightByID)
 					ai.PUT("/insights/:id/read", insightsHandler.MarkAsRead)
+				}
+
+				// OCR routes
+				if ocrHandler != nil {
+					ai.POST("/ocr", ocrHandler.ProcessDocument)
+					ai.POST("/ocr/confirm", ocrHandler.CreateAssetsFromOCR)
 				}
 			}
 		}

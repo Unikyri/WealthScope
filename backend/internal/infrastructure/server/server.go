@@ -50,14 +50,21 @@ func (s *Server) Run() {
 	// Setup insight service
 	insightService := s.setupInsightService(newsService, geminiClient, promptBuilder)
 
+	// Setup document processor for OCR
+	documentProcessor := s.setupDocumentProcessor(geminiClient)
+
 	// Create router with dependencies
 	r := router.NewRouter(router.RouterDeps{
-		Config:         s.cfg,
-		DB:             s.db,
-		NewsService:    newsService,
-		AIService:      aiService,
-		InsightService: insightService,
+		Config:            s.cfg,
+		DB:                s.db,
+		NewsService:       newsService,
+		AIService:         aiService,
+		InsightService:    insightService,
+		DocumentProcessor: documentProcessor,
 	})
+
+	// Configure multipart memory limit for file uploads (10MB)
+	r.MaxMultipartMemory = 10 << 20 // 10 MB
 
 	// Create HTTP server
 	srv := &http.Server{
@@ -396,6 +403,33 @@ func (s *Server) setupAIService() (*appsvc.AIService, *ai.GeminiClient, *ai.Prom
 		zap.Int("max_messages_per_conv", s.cfg.AI.MaxMessagesPerConv))
 
 	return aiService, geminiClient, promptBuilder
+}
+
+// setupDocumentProcessor configures the document processor for OCR.
+func (s *Server) setupDocumentProcessor(geminiClient *ai.GeminiClient) *appsvc.DocumentProcessor {
+	if geminiClient == nil {
+		s.logger.Warn("Document processor requires Gemini client")
+		return nil
+	}
+
+	if s.db == nil {
+		s.logger.Warn("Document processor requires database connection")
+		return nil
+	}
+
+	// Create asset repository
+	assetRepo := infraRepo.NewPostgresAssetRepository(s.db.DB)
+
+	// Create document processor
+	processor := appsvc.NewDocumentProcessor(
+		geminiClient,
+		assetRepo,
+		s.logger,
+	)
+
+	s.logger.Info("Registered Document Processor for OCR")
+
+	return processor
 }
 
 // setupInsightService configures the insight service for proactive financial advice.
