@@ -23,6 +23,1063 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/ai/chat": {
+            "post": {
+                "description": "Sends a message to the AI and returns the response",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI"
+                ],
+                "summary": "Send a message to the AI",
+                "parameters": [
+                    {
+                        "description": "Chat request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ChatRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.ChatResponseDTO"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ai/conversations": {
+            "get": {
+                "description": "Lists all conversations for the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI"
+                ],
+                "summary": "List conversations",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Limit (default 20, max 100)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset (default 0)",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.ConversationListResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new AI conversation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI"
+                ],
+                "summary": "Create a new conversation",
+                "parameters": [
+                    {
+                        "description": "Create conversation request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CreateConversationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.ConversationResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ai/conversations/{id}": {
+            "get": {
+                "description": "Gets a conversation with all its messages",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI"
+                ],
+                "summary": "Get a conversation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Conversation ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.ConversationWithMessagesResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates a conversation's title",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI"
+                ],
+                "summary": "Update a conversation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Conversation ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UpdateConversationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a conversation and all its messages",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI"
+                ],
+                "summary": "Delete a conversation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Conversation ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ai/insights": {
+            "get": {
+                "description": "Lists all insights for the authenticated user with optional filters",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI Insights"
+                ],
+                "summary": "List user insights",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by type (daily_briefing, alert, recommendation)",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by category (risk, performance, opportunity, general)",
+                        "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by priority (high, medium, low)",
+                        "name": "priority",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Show only unread insights",
+                        "name": "unread",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit (default 20, max 100)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset (default 0)",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.InsightListResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ai/insights/daily": {
+            "get": {
+                "description": "Gets or generates today's daily briefing for the user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI Insights"
+                ],
+                "summary": "Get today's daily briefing",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.InsightResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ai/insights/generate": {
+            "post": {
+                "description": "Forces generation of new insights based on current portfolio analysis",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI Insights"
+                ],
+                "summary": "Generate new insights",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/handlers.InsightResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ai/insights/unread/count": {
+            "get": {
+                "description": "Returns the count of unread insights for the user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI Insights"
+                ],
+                "summary": "Get unread insight count",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.UnreadCountResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ai/insights/{id}": {
+            "get": {
+                "description": "Retrieves a specific insight by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI Insights"
+                ],
+                "summary": "Get insight by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Insight ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.InsightResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ai/insights/{id}/read": {
+            "put": {
+                "description": "Marks a specific insight as read",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI Insights"
+                ],
+                "summary": "Mark insight as read",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Insight ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ai/ocr": {
+            "post": {
+                "description": "Extract financial assets from a document image using OCR",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI OCR"
+                ],
+                "summary": "Process document with OCR",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Document file (image or PDF)",
+                        "name": "document",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Hint about document type (bank_statement, portfolio_report)",
+                        "name": "document_hint",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.OCRResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ai/ocr/confirm": {
+            "post": {
+                "description": "Confirm and create assets extracted from OCR processing",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI OCR"
+                ],
+                "summary": "Create assets from OCR results",
+                "parameters": [
+                    {
+                        "description": "Assets to create",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ConfirmOCRAssetsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.ConfirmOCRAssetsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ai/scenarios/historical": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns historical volatility, drawdown, and other statistics for a symbol",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Scenarios"
+                ],
+                "summary": "Get historical statistics for a symbol",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Asset symbol (e.g., AAPL)",
+                        "name": "symbol",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "1Y",
+                        "description": "Analysis period (1M, 3M, 6M, 1Y)",
+                        "name": "period",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.HistoricalStats"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ai/scenarios/templates": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a list of predefined scenario templates that users can run",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Scenarios"
+                ],
+                "summary": "Get predefined scenario templates",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.TemplatesResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ai/simulate": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Simulates investment scenarios like buying/selling assets, market movements, or portfolio rebalancing",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Scenarios"
+                ],
+                "summary": "Run a what-if scenario simulation",
+                "parameters": [
+                    {
+                        "description": "Simulation parameters",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SimulateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.SimulateResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ai/welcome": {
+            "get": {
+                "description": "Gets a personalized welcome message and conversation starters",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI"
+                ],
+                "summary": "Get welcome message",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.WelcomeResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/assets": {
             "get": {
                 "security": [
@@ -76,13 +1133,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.ListAssetsResponse"
+                                            "$ref": "#/definitions/handlers.ListAssetsResponse"
                                         }
                                     }
                                 }
@@ -92,13 +1149,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -127,7 +1184,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_interfaces_http_handlers.CreateAssetRequest"
+                            "$ref": "#/definitions/handlers.CreateAssetRequest"
                         }
                     }
                 ],
@@ -137,13 +1194,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.AssetResponse"
+                                            "$ref": "#/definitions/handlers.AssetResponse"
                                         }
                                     }
                                 }
@@ -153,19 +1210,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -201,13 +1258,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.AssetResponse"
+                                            "$ref": "#/definitions/handlers.AssetResponse"
                                         }
                                     }
                                 }
@@ -217,19 +1274,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -265,7 +1322,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_interfaces_http_handlers.UpdateAssetRequest"
+                            "$ref": "#/definitions/handlers.UpdateAssetRequest"
                         }
                     }
                 ],
@@ -275,13 +1332,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.AssetResponse"
+                                            "$ref": "#/definitions/handlers.AssetResponse"
                                         }
                                     }
                                 }
@@ -291,19 +1348,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -335,25 +1392,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -380,13 +1437,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.UserResponse"
+                                            "$ref": "#/definitions/handlers.UserResponse"
                                         }
                                     }
                                 }
@@ -396,13 +1453,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -432,7 +1489,7 @@ const docTemplate = `{
                         "name": "request",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/internal_interfaces_http_handlers.SyncRequest"
+                            "$ref": "#/definitions/handlers.SyncRequest"
                         }
                     }
                 ],
@@ -442,13 +1499,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.SyncResponse"
+                                            "$ref": "#/definitions/handlers.SyncResponse"
                                         }
                                     }
                                 }
@@ -460,13 +1517,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.SyncResponse"
+                                            "$ref": "#/definitions/handlers.SyncResponse"
                                         }
                                     }
                                 }
@@ -476,13 +1533,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -504,13 +1561,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.PingResponse"
+                                            "$ref": "#/definitions/handlers.PingResponse"
                                         }
                                     }
                                 }
@@ -541,13 +1598,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.PortfolioRiskResponse"
+                                            "$ref": "#/definitions/handlers.PortfolioRiskResponse"
                                         }
                                     }
                                 }
@@ -559,7 +1616,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -577,7 +1634,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -614,13 +1671,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.PortfolioSummaryResponse"
+                                            "$ref": "#/definitions/handlers.PortfolioSummaryResponse"
                                         }
                                     }
                                 }
@@ -632,7 +1689,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -650,7 +1707,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -682,13 +1739,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.HealthResponse"
+                                            "$ref": "#/definitions/handlers.HealthResponse"
                                         }
                                     }
                                 }
@@ -700,7 +1757,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_Unikyri_WealthScope_backend_internal_infrastructure_database.HealthStatus": {
+        "database.HealthStatus": {
             "type": "object",
             "properties": {
                 "connected": {
@@ -726,41 +1783,296 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Unikyri_WealthScope_backend_pkg_response.ErrorInfo": {
+        "dto.ConfirmAsset": {
             "type": "object",
+            "required": [
+                "currency",
+                "name",
+                "purchase_price",
+                "quantity",
+                "type"
+            ],
             "properties": {
-                "code": {
+                "currency": {
+                    "description": "Currency is the currency code (required)",
                     "type": "string"
                 },
-                "message": {
+                "name": {
+                    "description": "Name is the asset name (required)",
+                    "type": "string"
+                },
+                "purchase_price": {
+                    "description": "PurchasePrice is the unit price (required, must be non-negative)",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "quantity": {
+                    "description": "Quantity is the number of units (required, must be positive)",
+                    "type": "number"
+                },
+                "symbol": {
+                    "description": "Symbol is the ticker symbol (optional)",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Type is the asset type (required)",
                     "type": "string"
                 }
             }
         },
-        "github_com_Unikyri_WealthScope_backend_pkg_response.Meta": {
+        "dto.ConfirmOCRAssetsRequest": {
+            "type": "object",
+            "required": [
+                "assets"
+            ],
+            "properties": {
+                "assets": {
+                    "description": "Assets contains the list of assets to confirm/create",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/dto.ConfirmAsset"
+                    }
+                }
+            }
+        },
+        "dto.ConfirmOCRAssetsResponse": {
             "type": "object",
             "properties": {
-                "request_id": {
+                "asset_ids": {
+                    "description": "AssetIDs contains the IDs of the created assets",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "created_count": {
+                    "description": "CreatedCount is the number of assets successfully created",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ExtractedAssetResponse": {
+            "type": "object",
+            "properties": {
+                "confidence": {
+                    "description": "Confidence is the OCR confidence score (0.0 to 1.0)",
+                    "type": "number"
+                },
+                "currency": {
+                    "description": "Currency is the currency code",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name is the name of the asset",
+                    "type": "string"
+                },
+                "purchase_price": {
+                    "description": "PurchasePrice is the unit price",
+                    "type": "number"
+                },
+                "quantity": {
+                    "description": "Quantity is the number of units held",
+                    "type": "number"
+                },
+                "symbol": {
+                    "description": "Symbol is the ticker symbol (optional)",
+                    "type": "string"
+                },
+                "total_value": {
+                    "description": "TotalValue is the calculated total value (quantity * price)",
+                    "type": "number"
+                },
+                "type": {
+                    "description": "Type is the asset category",
                     "type": "string"
                 }
             }
         },
-        "github_com_Unikyri_WealthScope_backend_pkg_response.Response": {
+        "dto.OCRResponse": {
             "type": "object",
             "properties": {
-                "data": {},
-                "error": {
-                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.ErrorInfo"
+                "assets": {
+                    "description": "Assets contains all extracted financial assets",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ExtractedAssetResponse"
+                    }
                 },
-                "meta": {
-                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Meta"
+                "document_type": {
+                    "description": "DocumentType identifies the type of document processed",
+                    "type": "string"
                 },
-                "success": {
-                    "type": "boolean"
+                "warnings": {
+                    "description": "Warnings contains any issues encountered during extraction",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
-        "internal_interfaces_http_handlers.AssetResponse": {
+        "entities.AllocationItem": {
+            "type": "object",
+            "properties": {
+                "percent": {
+                    "type": "number"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "entities.ChangeDetail": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "difference": {
+                    "type": "number"
+                },
+                "new_value": {
+                    "type": "number"
+                },
+                "old_value": {
+                    "type": "number"
+                },
+                "type": {
+                    "description": "increase, decrease, new, removed",
+                    "type": "string"
+                }
+            }
+        },
+        "entities.NewAssetParams": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "purchase_price": {
+                    "type": "number"
+                },
+                "quantity": {
+                    "type": "number"
+                },
+                "symbol": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.PortfolioState": {
+            "type": "object",
+            "properties": {
+                "allocation": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.AllocationItem"
+                    }
+                },
+                "asset_count": {
+                    "type": "integer"
+                },
+                "gain_loss": {
+                    "type": "number"
+                },
+                "gain_loss_percent": {
+                    "type": "number"
+                },
+                "total_invested": {
+                    "type": "number"
+                },
+                "total_value": {
+                    "type": "number"
+                }
+            }
+        },
+        "entities.ScenarioParams": {
+            "type": "object",
+            "properties": {
+                "asset_id": {
+                    "description": "For buy/sell scenarios",
+                    "type": "string"
+                },
+                "asset_types": {
+                    "description": "Affected asset types (empty = all)",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "change_percent": {
+                    "description": "For market move scenarios",
+                    "type": "number"
+                },
+                "new_asset": {
+                    "description": "For new asset scenarios",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entities.NewAssetParams"
+                        }
+                    ]
+                },
+                "price": {
+                    "type": "number"
+                },
+                "quantity": {
+                    "type": "number"
+                },
+                "target_allocation": {
+                    "description": "For rebalance scenarios",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "number",
+                        "format": "float64"
+                    }
+                }
+            }
+        },
+        "entities.ScenarioTemplate": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parameters": {
+                    "$ref": "#/definitions/entities.ScenarioParams"
+                },
+                "type": {
+                    "$ref": "#/definitions/entities.ScenarioType"
+                }
+            }
+        },
+        "entities.ScenarioType": {
+            "type": "string",
+            "enum": [
+                "buy_asset",
+                "sell_asset",
+                "market_move",
+                "new_asset",
+                "rebalance"
+            ],
+            "x-enum-varnames": [
+                "ScenarioBuyAsset",
+                "ScenarioSellAsset",
+                "ScenarioMarketMove",
+                "ScenarioNewAsset",
+                "ScenarioRebalance"
+            ]
+        },
+        "handlers.AssetResponse": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -817,7 +2129,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.AssetTypeBreakdownResponse": {
+        "handlers.AssetTypeBreakdownResponse": {
             "type": "object",
             "properties": {
                 "count": {
@@ -834,7 +2146,88 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.CreateAssetRequest": {
+        "handlers.ChatRequest": {
+            "type": "object",
+            "required": [
+                "message"
+            ],
+            "properties": {
+                "conversation_id": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string",
+                    "maxLength": 4000,
+                    "minLength": 1
+                }
+            }
+        },
+        "handlers.ChatResponseDTO": {
+            "type": "object",
+            "properties": {
+                "ai_message": {
+                    "$ref": "#/definitions/handlers.MessageResponse"
+                },
+                "conversation_id": {
+                    "type": "string"
+                },
+                "user_message": {
+                    "$ref": "#/definitions/handlers.MessageResponse"
+                }
+            }
+        },
+        "handlers.ConversationListResponse": {
+            "type": "object",
+            "properties": {
+                "conversations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.ConversationResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "offset": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handlers.ConversationResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.ConversationWithMessagesResponse": {
+            "type": "object",
+            "properties": {
+                "conversation": {
+                    "$ref": "#/definitions/handlers.ConversationResponse"
+                },
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.MessageResponse"
+                    }
+                }
+            }
+        },
+        "handlers.CreateAssetRequest": {
             "type": "object",
             "required": [
                 "name",
@@ -892,11 +2285,20 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.HealthResponse": {
+        "handlers.CreateConversationRequest": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            }
+        },
+        "handlers.HealthResponse": {
             "type": "object",
             "properties": {
                 "database": {
-                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_internal_infrastructure_database.HealthStatus"
+                    "$ref": "#/definitions/database.HealthStatus"
                 },
                 "status": {
                     "type": "string"
@@ -909,21 +2311,105 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.ListAssetsResponse": {
+        "handlers.InsightListResponse": {
+            "type": "object",
+            "properties": {
+                "insights": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.InsightResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "offset": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "unread_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handlers.InsightResponse": {
+            "type": "object",
+            "properties": {
+                "action_items": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "category": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_read": {
+                    "type": "boolean"
+                },
+                "priority": {
+                    "type": "string"
+                },
+                "related_symbols": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.ListAssetsResponse": {
             "type": "object",
             "properties": {
                 "assets": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_interfaces_http_handlers.AssetResponse"
+                        "$ref": "#/definitions/handlers.AssetResponse"
                     }
                 },
                 "pagination": {
-                    "$ref": "#/definitions/internal_interfaces_http_handlers.PaginationInfo"
+                    "$ref": "#/definitions/handlers.PaginationInfo"
                 }
             }
         },
-        "internal_interfaces_http_handlers.PaginationInfo": {
+        "handlers.MessageResponse": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "conversation_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.PaginationInfo": {
             "type": "object",
             "properties": {
                 "page": {
@@ -940,7 +2426,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.PingResponse": {
+        "handlers.PingResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -948,13 +2434,13 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.PortfolioRiskResponse": {
+        "handlers.PortfolioRiskResponse": {
             "type": "object",
             "properties": {
                 "alerts": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_interfaces_http_handlers.RiskAlertResponse"
+                        "$ref": "#/definitions/handlers.RiskAlertResponse"
                     }
                 },
                 "diversification_level": {
@@ -967,7 +2453,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.PortfolioSummaryResponse": {
+        "handlers.PortfolioSummaryResponse": {
             "type": "object",
             "properties": {
                 "asset_count": {
@@ -976,7 +2462,7 @@ const docTemplate = `{
                 "breakdown_by_type": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_interfaces_http_handlers.AssetTypeBreakdownResponse"
+                        "$ref": "#/definitions/handlers.AssetTypeBreakdownResponse"
                     }
                 },
                 "gain_loss": {
@@ -996,7 +2482,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.RiskAlertResponse": {
+        "handlers.RiskAlertResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -1025,7 +2511,36 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.SyncRequest": {
+        "handlers.SimulateRequest": {
+            "type": "object"
+        },
+        "handlers.SimulateResponse": {
+            "type": "object",
+            "properties": {
+                "ai_analysis": {
+                    "type": "string"
+                },
+                "changes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.ChangeDetail"
+                    }
+                },
+                "current_state": {
+                    "$ref": "#/definitions/entities.PortfolioState"
+                },
+                "projected_state": {
+                    "$ref": "#/definitions/entities.PortfolioState"
+                },
+                "warnings": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "handlers.SyncRequest": {
             "type": "object",
             "properties": {
                 "display_name": {
@@ -1033,18 +2548,37 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.SyncResponse": {
+        "handlers.SyncResponse": {
             "type": "object",
             "properties": {
                 "created": {
                     "type": "boolean"
                 },
                 "user": {
-                    "$ref": "#/definitions/internal_interfaces_http_handlers.UserResponse"
+                    "$ref": "#/definitions/handlers.UserResponse"
                 }
             }
         },
-        "internal_interfaces_http_handlers.UpdateAssetRequest": {
+        "handlers.TemplatesResponse": {
+            "type": "object",
+            "properties": {
+                "templates": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.ScenarioTemplate"
+                    }
+                }
+            }
+        },
+        "handlers.UnreadCountResponse": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handlers.UpdateAssetRequest": {
             "type": "object",
             "properties": {
                 "currency": {
@@ -1096,7 +2630,20 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.UserResponse": {
+        "handlers.UpdateConversationRequest": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "minLength": 1
+                }
+            }
+        },
+        "handlers.UserResponse": {
             "type": "object",
             "properties": {
                 "avatar_url": {
@@ -1116,6 +2663,89 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
+                }
+            }
+        },
+        "handlers.WelcomeResponse": {
+            "type": "object",
+            "properties": {
+                "conversation_starters": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.ErrorInfo": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.Meta": {
+            "type": "object",
+            "properties": {
+                "request_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.Response": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "error": {
+                    "$ref": "#/definitions/response.ErrorInfo"
+                },
+                "meta": {
+                    "$ref": "#/definitions/response.Meta"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "services.HistoricalStats": {
+            "type": "object",
+            "properties": {
+                "average_return": {
+                    "type": "number"
+                },
+                "best_day": {
+                    "type": "number"
+                },
+                "data_points": {
+                    "type": "integer"
+                },
+                "max_drawdown": {
+                    "type": "number"
+                },
+                "negative_days": {
+                    "type": "integer"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "positive_days": {
+                    "type": "integer"
+                },
+                "symbol": {
+                    "type": "string"
+                },
+                "volatility": {
+                    "type": "number"
+                },
+                "worst_day": {
+                    "type": "number"
                 }
             }
         }
