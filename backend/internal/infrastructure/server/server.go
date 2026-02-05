@@ -120,7 +120,17 @@ func (s *Server) runPriceUpdateLoop() {
 	if cacheTTL <= 0 {
 		cacheTTL = time.Minute
 	}
-	pricingSvc := appsvc.NewPricingService(registry, cacheTTL)
+
+	// Metals have a much longer cache TTL due to very limited API quota (50 req/month)
+	metalsCacheTTL := time.Duration(s.cfg.Pricing.MetalsUpdateIntervalHours) * time.Hour
+	if metalsCacheTTL <= 0 {
+		metalsCacheTTL = 12 * time.Hour // Default 12 hours for metals
+	}
+
+	pricingSvc := appsvc.NewPricingServiceWithMetalsTTL(registry, cacheTTL, metalsCacheTTL)
+	s.logger.Info("Configured pricing service",
+		zap.Duration("cache_ttl", cacheTTL),
+		zap.Duration("metals_cache_ttl", metalsCacheTTL))
 	job := jobs.NewPriceUpdateJob(pricingSvc, assetRepo, priceRepo, s.logger)
 
 	ticker := time.NewTicker(interval)
