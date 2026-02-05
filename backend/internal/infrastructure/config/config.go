@@ -35,6 +35,10 @@ type DatabaseConfig struct {
 // PricingConfig holds pricing/market data configuration
 type PricingConfig struct {
 	UpdateIntervalSeconds int
+	// MetalsUpdateIntervalHours controls how often metals prices are updated.
+	// Set to 0 to use the default interval. Default: 12 hours (to save API quota).
+	// MetalPriceAPI free tier only allows ~50 requests/month.
+	MetalsUpdateIntervalHours int
 }
 
 // MarketDataConfig holds multi-provider market data API keys, enabled flags, and rate limits.
@@ -146,6 +150,7 @@ func Load() *Config {
 	viper.SetDefault("SERVER_MODE", "debug")
 	viper.SetDefault("DATABASE_URL", "")
 	viper.SetDefault("PRICING_UPDATE_INTERVAL_SECONDS", 300)
+	viper.SetDefault("PRICING_METALS_UPDATE_INTERVAL_HOURS", 12) // 12 hours for metals (limited API quota)
 	viper.SetDefault("MARKETDATA_ALPHA_VANTAGE_API_KEY", "")
 	viper.SetDefault("MARKETDATA_ALPHA_VANTAGE_ENABLED", false)
 	viper.SetDefault("MARKETDATA_ALPHA_VANTAGE_RATE_LIMIT", 5) // 5 req/min (conservative for 25/day free tier)
@@ -198,7 +203,8 @@ func Load() *Config {
 			URL: viper.GetString("DATABASE_URL"),
 		},
 		Pricing: PricingConfig{
-			UpdateIntervalSeconds: viper.GetInt("PRICING_UPDATE_INTERVAL_SECONDS"),
+			UpdateIntervalSeconds:     viper.GetInt("PRICING_UPDATE_INTERVAL_SECONDS"),
+			MetalsUpdateIntervalHours: viper.GetInt("PRICING_METALS_UPDATE_INTERVAL_HOURS"),
 		},
 		MarketData: MarketDataConfig{
 			AlphaVantageAPIKey:    viper.GetString("MARKETDATA_ALPHA_VANTAGE_API_KEY"),

@@ -21,10 +21,11 @@ import (
 
 // RouterDeps holds all dependencies needed by the router
 type RouterDeps struct {
-	Config      *config.Config
-	DB          *database.DB
-	NewsService *services.NewsService
-	AIService   *services.AIService
+	Config         *config.Config
+	DB             *database.DB
+	NewsService    *services.NewsService
+	AIService      *services.AIService
+	InsightService *services.InsightService
 }
 
 // NewRouter creates and configures a new Gin router
@@ -110,6 +111,12 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		chatHandler = handlers.NewChatHandler(deps.AIService)
 	}
 
+	// Initialize insights handler
+	var insightsHandler *handlers.InsightsHandler
+	if deps.InsightService != nil {
+		insightsHandler = handlers.NewInsightsHandler(deps.InsightService)
+	}
+
 	// Health check (public)
 	router.GET("/health", healthHandler.Health)
 
@@ -162,17 +169,30 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		}
 
 		// AI routes (protected)
-		if chatHandler != nil {
+		if chatHandler != nil || insightsHandler != nil {
 			ai := v1.Group("/ai")
 			ai.Use(middleware.AuthMiddleware(deps.Config.Supabase.URL))
 			{
-				ai.GET("/welcome", chatHandler.Welcome)
-				ai.POST("/chat", chatHandler.Chat)
-				ai.POST("/conversations", chatHandler.CreateConversation)
-				ai.GET("/conversations", chatHandler.ListConversations)
-				ai.GET("/conversations/:id", chatHandler.GetConversation)
-				ai.PUT("/conversations/:id", chatHandler.UpdateConversation)
-				ai.DELETE("/conversations/:id", chatHandler.DeleteConversation)
+				// Chat routes
+				if chatHandler != nil {
+					ai.GET("/welcome", chatHandler.Welcome)
+					ai.POST("/chat", chatHandler.Chat)
+					ai.POST("/conversations", chatHandler.CreateConversation)
+					ai.GET("/conversations", chatHandler.ListConversations)
+					ai.GET("/conversations/:id", chatHandler.GetConversation)
+					ai.PUT("/conversations/:id", chatHandler.UpdateConversation)
+					ai.DELETE("/conversations/:id", chatHandler.DeleteConversation)
+				}
+
+				// Insights routes
+				if insightsHandler != nil {
+					ai.GET("/insights", insightsHandler.GetInsights)
+					ai.GET("/insights/daily", insightsHandler.GetDailyBriefing)
+					ai.POST("/insights/generate", insightsHandler.GenerateInsights)
+					ai.GET("/insights/unread/count", insightsHandler.GetUnreadCount)
+					ai.GET("/insights/:id", insightsHandler.GetInsightByID)
+					ai.PUT("/insights/:id/read", insightsHandler.MarkAsRead)
+				}
 			}
 		}
 	}

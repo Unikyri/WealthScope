@@ -44,15 +44,19 @@ func (s *Server) Run() {
 	// Setup news providers
 	newsService := s.setupNewsProviders()
 
-	// Setup AI service
-	aiService := s.setupAIService()
+	// Setup AI service and related services
+	aiService, geminiClient, promptBuilder := s.setupAIService()
+
+	// Setup insight service
+	insightService := s.setupInsightService(newsService, geminiClient, promptBuilder)
 
 	// Create router with dependencies
 	r := router.NewRouter(router.RouterDeps{
-		Config:      s.cfg,
-		DB:          s.db,
-		NewsService: newsService,
-		AIService:   aiService,
+		Config:         s.cfg,
+		DB:             s.db,
+		NewsService:    newsService,
+		AIService:      aiService,
+		InsightService: insightService,
 	})
 
 	// Create HTTP server
@@ -116,7 +120,17 @@ func (s *Server) runPriceUpdateLoop() {
 	if cacheTTL <= 0 {
 		cacheTTL = time.Minute
 	}
-	pricingSvc := appsvc.NewPricingService(registry, cacheTTL)
+
+	// Metals have a much longer cache TTL due to very limited API quota (50 req/month)
+	metalsCacheTTL := time.Duration(s.cfg.Pricing.MetalsUpdateIntervalHours) * time.Hour
+	if metalsCacheTTL <= 0 {
+		metalsCacheTTL = 12 * time.Hour // Default 12 hours for metals
+	}
+
+	pricingSvc := appsvc.NewPricingServiceWithMetalsTTL(registry, cacheTTL, metalsCacheTTL)
+	s.logger.Info("Configured pricing service",
+		zap.Duration("cache_ttl", cacheTTL),
+		zap.Duration("metals_cache_ttl", metalsCacheTTL))
 	job := jobs.NewPriceUpdateJob(pricingSvc, assetRepo, priceRepo, s.logger)
 
 	ticker := time.NewTicker(interval)
@@ -326,15 +340,16 @@ func (s *Server) setupNewsProviders() *appsvc.NewsService {
 }
 
 // setupAIService configures the AI service with Gemini client.
-func (s *Server) setupAIService() *appsvc.AIService {
+// Returns the AIService, GeminiClient, and PromptBuilder for use by other services.
+func (s *Server) setupAIService() (*appsvc.AIService, *ai.GeminiClient, *ai.PromptBuilder) {
 	if !s.cfg.AI.GeminiEnabled || s.cfg.AI.GeminiAPIKey == "" {
 		s.logger.Warn("AI service is disabled or API key not configured")
-		return nil
+		return nil, nil, nil
 	}
 
 	if s.db == nil {
 		s.logger.Warn("AI service requires database connection for conversation storage")
-		return nil
+		return nil, nil, nil
 	}
 
 	// Create rate limiter
@@ -353,7 +368,7 @@ func (s *Server) setupAIService() *appsvc.AIService {
 	)
 	if err != nil {
 		s.logger.Error("Failed to create Gemini client", zap.Error(err))
-		return nil
+		return nil, nil, nil
 	}
 
 	// Create repositories
@@ -380,5 +395,46 @@ func (s *Server) setupAIService() *appsvc.AIService {
 		zap.Int("max_conversations", s.cfg.AI.MaxConversations),
 		zap.Int("max_messages_per_conv", s.cfg.AI.MaxMessagesPerConv))
 
-	return aiService
+	return aiService, geminiClient, promptBuilder
+}
+
+// setupInsightService configures the insight service for proactive financial advice.
+func (s *Server) setupInsightService(newsService *appsvc.NewsService, geminiClient *ai.GeminiClient, promptBuilder *ai.PromptBuilder) *appsvc.InsightService {
+	if geminiClient == nil {
+		s.logger.Warn("Insight service requires Gemini client")
+		return nil
+	}
+
+	if s.db == nil {
+		s.logger.Warn("Insight service requires database connection")
+		return nil
+	}
+
+	// Create repositories
+	assetRepo := infraRepo.NewPostgresAssetRepository(s.db.DB)
+	insightRepo := infraRepo.NewPostgresInsightRepository(s.db.DB)
+
+	// Create risk service
+	riskService := appsvc.NewRiskService()
+
+	// Create portfolio analyzer
+	analyzer := appsvc.NewPortfolioAnalyzer(
+		assetRepo,
+		riskService,
+		newsService,
+		s.logger,
+	)
+
+	// Create insight service
+	insightService := appsvc.NewInsightService(
+		analyzer,
+		geminiClient,
+		promptBuilder,
+		insightRepo,
+		s.logger,
+	)
+
+	s.logger.Info("Registered Insight service")
+
+	return insightService
 }

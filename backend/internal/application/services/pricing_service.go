@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -14,44 +15,89 @@ import (
 )
 
 // PricingService fetches and caches market prices for listed assets.
+// It uses separate caches for regular assets and metals (which have stricter API limits).
+//
+//nolint:govet // fieldalignment: keep logical field grouping for readability
 type PricingService struct {
-	client domainsvc.MarketDataClient
-	cache  *marketdata.TTLCache[*domainsvc.Quote]
+	client      domainsvc.MarketDataClient
+	cache       *marketdata.TTLCache[*domainsvc.Quote]
+	metalsCache *marketdata.TTLCache[*domainsvc.Quote]
 
-	ttl time.Duration
+	ttl       time.Duration
+	metalsTTL time.Duration
 }
 
+// NewPricingService creates a new PricingService with standard cache TTL.
 func NewPricingService(client domainsvc.MarketDataClient, ttl time.Duration) *PricingService {
+	return NewPricingServiceWithMetalsTTL(client, ttl, 12*time.Hour)
+}
+
+// NewPricingServiceWithMetalsTTL creates a new PricingService with custom metals cache TTL.
+// Metal APIs (like MetalPriceAPI) have very limited quotas (50 req/month),
+// so we cache metal prices for much longer (default 12 hours).
+func NewPricingServiceWithMetalsTTL(client domainsvc.MarketDataClient, ttl, metalsTTL time.Duration) *PricingService {
 	if ttl <= 0 {
 		ttl = time.Minute
 	}
+	if metalsTTL <= 0 {
+		metalsTTL = 12 * time.Hour // Very long TTL for metals due to API quota limits
+	}
 	return &PricingService{
-		client: client,
-		cache:  marketdata.NewTTLCache[*domainsvc.Quote](ttl),
-		ttl:    ttl,
+		client:      client,
+		cache:       marketdata.NewTTLCache[*domainsvc.Quote](ttl),
+		metalsCache: marketdata.NewTTLCache[*domainsvc.Quote](metalsTTL),
+		ttl:         ttl,
+		metalsTTL:   metalsTTL,
 	}
 }
 
+// isMetalSymbol checks if a symbol represents a precious metal.
+// Uses a simple heuristic to detect gold, silver, platinum, palladium.
+func isMetalSymbol(symbol string) bool {
+	symbol = strings.ToUpper(strings.TrimSpace(symbol))
+	metalSymbols := map[string]bool{
+		"GOLD": true, "XAU": true, "GLD": true, "XAUUSD": true,
+		"SILVER": true, "XAG": true, "SLV": true, "XAGUSD": true,
+		"PLATINUM": true, "XPT": true, "PLAT": true, "XPTUSD": true,
+		"PALLADIUM": true, "XPD": true, "PALL": true, "XPDUSD": true,
+	}
+	return metalSymbols[symbol]
+}
+
 // GetQuote returns a quote for a symbol using cache-first strategy.
+// Metal symbols use a separate cache with longer TTL to conserve API quota.
 func (s *PricingService) GetQuote(ctx context.Context, symbol string) (*domainsvc.Quote, error) {
-	if q, ok := s.cache.Get(symbol); ok && q != nil {
+	// Choose cache based on symbol type
+	cache := s.cache
+	if isMetalSymbol(symbol) {
+		cache = s.metalsCache
+	}
+
+	if q, ok := cache.Get(symbol); ok && q != nil {
 		return q, nil
 	}
 	q, err := s.client.GetQuote(ctx, symbol)
 	if err != nil {
 		return nil, err
 	}
-	s.cache.Set(symbol, q)
+	cache.Set(symbol, q)
 	return q, nil
 }
 
 // GetQuotes returns quotes for multiple symbols (cache-first, falls back to API).
+// Metal symbols use a separate cache with longer TTL to conserve API quota.
 func (s *PricingService) GetQuotes(ctx context.Context, symbols []string) (map[string]*domainsvc.Quote, error) {
 	need := make([]string, 0, len(symbols))
 	out := make(map[string]*domainsvc.Quote, len(symbols))
 
 	for _, sym := range symbols {
-		if q, ok := s.cache.Get(sym); ok && q != nil {
+		// Choose cache based on symbol type
+		cache := s.cache
+		if isMetalSymbol(sym) {
+			cache = s.metalsCache
+		}
+
+		if q, ok := cache.Get(sym); ok && q != nil {
 			out[sym] = q
 			continue
 		}
@@ -69,7 +115,12 @@ func (s *PricingService) GetQuotes(ctx context.Context, symbols []string) (map[s
 
 	for sym, q := range fetched {
 		out[sym] = q
-		s.cache.Set(sym, q)
+		// Store in appropriate cache
+		if isMetalSymbol(sym) {
+			s.metalsCache.Set(sym, q)
+		} else {
+			s.cache.Set(sym, q)
+		}
 	}
 
 	return out, nil
