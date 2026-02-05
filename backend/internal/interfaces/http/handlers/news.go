@@ -6,18 +6,18 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/Unikyri/WealthScope/backend/internal/application/services"
-	domainsvc "github.com/Unikyri/WealthScope/backend/internal/domain/services"
+	appsvc "github.com/Unikyri/WealthScope/backend/internal/application/services"
+	"github.com/Unikyri/WealthScope/backend/internal/domain/services"
 	"github.com/Unikyri/WealthScope/backend/pkg/response"
 )
 
 // NewsHandler handles news-related HTTP requests.
 type NewsHandler struct {
-	newsService *services.NewsService
+	newsService *appsvc.NewsService
 }
 
 // NewNewsHandler creates a new NewsHandler.
-func NewNewsHandler(newsService *services.NewsService) *NewsHandler {
+func NewNewsHandler(newsService *appsvc.NewsService) *NewsHandler {
 	return &NewsHandler{
 		newsService: newsService,
 	}
@@ -25,19 +25,27 @@ func NewNewsHandler(newsService *services.NewsService) *NewsHandler {
 
 // NewsListResponse represents the response for news list endpoints.
 type NewsListResponse struct {
-	Articles []domainsvc.NewsArticle `json:"articles"`
-	Total    int                     `json:"total"`
-	Page     int                     `json:"page"`
-	Limit    int                     `json:"limit"`
+	Articles []services.NewsArticle `json:"articles"`
+	Total    int                    `json:"total"`
+	Page     int                    `json:"page"`
+	Limit    int                    `json:"limit"`
 }
 
 // GetNews handles GET /api/v1/news
-// Query parameters:
-//   - symbols: Comma-separated stock symbols (e.g., "AAPL,TSLA")
-//   - q: Search keywords
-//   - language: Language code (default "en")
-//   - limit: Max articles (default 10, max 50)
-//   - page: Pagination (default 1)
+// @Summary Get latest financial news
+// @Description Fetch latest financial news with optional filtering by symbols, keywords, language
+// @Tags News
+// @Accept json
+// @Produce json
+// @Param symbols query string false "Comma-separated stock symbols (e.g., AAPL,TSLA)"
+// @Param q query string false "Search keywords"
+// @Param language query string false "Language code (default: en)"
+// @Param limit query int false "Max articles (default 10, max 50)"
+// @Param page query int false "Page number (default 1)"
+// @Success 200 {object} response.Response{data=NewsListResponse}
+// @Failure 400 {object} response.Response
+// @Failure 500 {object} response.Response
+// @Router /api/v1/news [get]
 func (h *NewsHandler) GetNews(c *gin.Context) {
 	// Parse query parameters
 	symbolsParam := c.Query("symbols")
@@ -66,7 +74,7 @@ func (h *NewsHandler) GetNews(c *gin.Context) {
 	}
 
 	// Build query
-	query := domainsvc.NewsQuery{
+	query := services.NewsQuery{
 		Symbols:  symbols,
 		Keywords: keywords,
 		Language: language,
@@ -91,11 +99,17 @@ func (h *NewsHandler) GetNews(c *gin.Context) {
 }
 
 // GetNewsBySymbol handles GET /api/v1/news/symbol/:symbol
-// Path parameters:
-//   - symbol: Stock symbol (e.g., "AAPL")
-//
-// Query parameters:
-//   - limit: Max articles (default 10, max 50)
+// @Summary Get news for a specific symbol
+// @Description Fetch financial news related to a specific stock or crypto symbol
+// @Tags News
+// @Accept json
+// @Produce json
+// @Param symbol path string true "Stock symbol (e.g., AAPL)"
+// @Param limit query int false "Max articles (default 10, max 50)"
+// @Success 200 {object} response.Response{data=NewsListResponse}
+// @Failure 400 {object} response.Response
+// @Failure 500 {object} response.Response
+// @Router /api/v1/news/symbol/{symbol} [get]
 func (h *NewsHandler) GetNewsBySymbol(c *gin.Context) {
 	symbol := strings.TrimSpace(strings.ToUpper(c.Param("symbol")))
 	if symbol == "" {
@@ -128,8 +142,15 @@ func (h *NewsHandler) GetNewsBySymbol(c *gin.Context) {
 }
 
 // GetTrendingNews handles GET /api/v1/news/trending
-// Query parameters:
-//   - limit: Max articles (default 10, max 50)
+// @Summary Get trending financial news
+// @Description Fetch top trending financial news articles
+// @Tags News
+// @Accept json
+// @Produce json
+// @Param limit query int false "Max articles (default 10, max 50)"
+// @Success 200 {object} response.Response{data=NewsListResponse}
+// @Failure 500 {object} response.Response
+// @Router /api/v1/news/trending [get]
 func (h *NewsHandler) GetTrendingNews(c *gin.Context) {
 	limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
 	if err != nil || limit <= 0 {
@@ -156,9 +177,17 @@ func (h *NewsHandler) GetTrendingNews(c *gin.Context) {
 }
 
 // SearchNews handles GET /api/v1/news/search
-// Query parameters:
-//   - q: Search keywords (required)
-//   - limit: Max articles (default 10, max 50)
+// @Summary Search financial news
+// @Description Search for financial news articles by keywords
+// @Tags News
+// @Accept json
+// @Produce json
+// @Param q query string true "Search keywords"
+// @Param limit query int false "Max articles (default 10, max 50)"
+// @Success 200 {object} response.Response{data=NewsListResponse}
+// @Failure 400 {object} response.Response
+// @Failure 500 {object} response.Response
+// @Router /api/v1/news/search [get]
 func (h *NewsHandler) SearchNews(c *gin.Context) {
 	keywords := c.Query("q")
 	if keywords == "" {
