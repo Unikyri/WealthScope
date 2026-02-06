@@ -1,6 +1,7 @@
 package http
 
 import (
+	"context"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -21,14 +22,21 @@ import (
 
 // RouterDeps holds all dependencies needed by the router
 type RouterDeps struct {
-	Config             *config.Config
-	DB                 *database.DB
-	NewsService        *services.NewsService
-	AIService          *services.AIService
-	InsightService     *services.InsightService
-	DocumentProcessor  *services.DocumentProcessor
-	ScenarioEngine     *services.ScenarioEngine
-	HistoricalAnalyzer *services.HistoricalAnalyzer
+	Config              *config.Config
+	DB                  *database.DB
+	NewsService         *services.NewsService
+	AIService           *services.AIService
+	InsightService      *services.InsightService
+	DocumentProcessor   *services.DocumentProcessor
+	ScenarioEngine      *services.ScenarioEngine
+	HistoricalAnalyzer  *services.HistoricalAnalyzer
+	PortfolioAnalyzer   *services.PortfolioAnalyzer
+	HealthScorer        *services.HealthScorer
+	CorrelationDetector *services.CorrelationDetector
+	AlertGenerator      *services.AlertGenerator
+	GeminiClient        interface {
+		GenerateWithThinking(ctx context.Context, prompt, systemPrompt string, thinkingLevel int) (string, error)
+	}
 }
 
 // NewRouter creates and configures a new Gin router
@@ -132,6 +140,19 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		scenarioHandler = handlers.NewScenarioHandler(deps.ScenarioEngine, deps.HistoricalAnalyzer)
 	}
 
+	// Initialize briefing handler for autonomous portfolio agent
+	var briefingHandler *handlers.BriefingHandler
+	if deps.PortfolioAnalyzer != nil && deps.HealthScorer != nil && assetRepo != nil {
+		briefingHandler = handlers.NewBriefingHandler(
+			deps.PortfolioAnalyzer,
+			deps.HealthScorer,
+			deps.AlertGenerator,
+			assetRepo,
+			nil, // AI client passed separately if available
+			nil, // logger
+		)
+	}
+
 	// Health check (public)
 	router.GET("/health", healthHandler.Health)
 
@@ -184,7 +205,7 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		}
 
 		// AI routes (protected)
-		if chatHandler != nil || insightsHandler != nil || ocrHandler != nil || scenarioHandler != nil {
+		if chatHandler != nil || insightsHandler != nil || ocrHandler != nil || scenarioHandler != nil || briefingHandler != nil {
 			ai := v1.Group("/ai")
 			ai.Use(middleware.AuthMiddleware(deps.Config.Supabase.URL))
 			{
@@ -220,6 +241,11 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 					ai.POST("/simulate", scenarioHandler.Simulate)
 					ai.GET("/scenarios/templates", scenarioHandler.GetTemplates)
 					ai.GET("/scenarios/historical", scenarioHandler.GetHistoricalStats)
+				}
+
+				// Autonomous briefing routes
+				if briefingHandler != nil {
+					ai.GET("/briefing", briefingHandler.GetBriefing)
 				}
 			}
 		}
