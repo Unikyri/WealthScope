@@ -72,6 +72,11 @@ dependencies:
   file_picker: ^8.1.7
   permission_handler: ^11.2.0
 
+  # WebView & URL Launcher
+  webview_flutter: ^4.4.3
+  url_launcher: ^6.2.2
+  share_plus: ^7.2.1
+
   # UI
   cupertino_icons: ^1.0.8
 

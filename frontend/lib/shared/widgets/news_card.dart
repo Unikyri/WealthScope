@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/news/domain/entities/news_article.dart';
 
 /// Sentiment types for news articles
@@ -62,7 +62,7 @@ class NewsCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       elevation: 2,
       child: InkWell(
-        onTap: onTap ?? () => _openArticle(article.url),
+        onTap: onTap ?? () => _openArticle(context, article),
         child: isCompact ? _buildCompactLayout(context) : _buildFullLayout(context),
       ),
     );
@@ -422,11 +422,10 @@ class NewsCard extends StatelessWidget {
     }
   }
 
-  /// Open article in external browser
-  Future<void> _openArticle(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
+  /// Open article in in-app webview
+  static void _openArticle(BuildContext context, NewsArticle article) {
+    context.push(
+      '/news/article?url=${Uri.encodeComponent(article.url)}&title=${Uri.encodeComponent(article.title)}',
+    );
   }
 }
