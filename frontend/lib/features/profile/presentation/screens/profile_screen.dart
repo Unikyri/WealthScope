@@ -75,6 +75,17 @@ class ProfileScreen extends ConsumerWidget {
               // Profile Options
               ListTile(
                 leading: Icon(
+                  Icons.settings_outlined,
+                  color: colorScheme.onSurface,
+                ),
+                title: const Text('Settings'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  context.push('/settings');
+                },
+              ),
+              ListTile(
+                leading: Icon(
                   Icons.person_outline,
                   color: colorScheme.onSurface,
                 ),
