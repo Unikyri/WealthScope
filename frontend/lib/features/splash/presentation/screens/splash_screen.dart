@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wealthscope_app/features/auth/data/providers/auth_service_provider.dart';
+import 'package:wealthscope_app/features/onboarding/presentation/providers/onboarding_provider.dart';
 
 /// Splash Screen with automatic session verification
 ///
@@ -39,6 +40,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       // Check if Supabase is initialized
       if (!Supabase.instance.isInitialized) {
         throw Exception('Supabase not initialized. Check your configuration.');
+      }
+
+      // Check if onboarding has been completed
+      final onboardingState = await ref.read(onboardingProvider.future);
+      if (!onboardingState) {
+        // First time user - show onboarding
+        if (!mounted) return;
+        context.go('/onboarding');
+        return;
       }
 
       final authService = ref.read(authServiceProvider);

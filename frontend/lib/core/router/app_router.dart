@@ -12,6 +12,7 @@ import 'package:wealthscope_app/features/ai/presentation/screens/ai_advisor_scre
 import 'package:wealthscope_app/features/ai/presentation/screens/ai_chat_screen.dart';
 import 'package:wealthscope_app/features/ai/presentation/screens/what_if_screen.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'package:wealthscope_app/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:wealthscope_app/features/profile/presentation/screens/profile_screen.dart';
 import 'package:wealthscope_app/features/splash/presentation/screens/splash_screen.dart';
 import 'package:wealthscope_app/shared/widgets/main_shell.dart';
@@ -35,6 +36,11 @@ class AppRouter {
         path: '/splash',
         name: 'splash',
         builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding',
+        name: 'onboarding',
+        builder: (context, state) => const OnboardingScreen(),
       ),
       GoRoute(
         path: '/login',
