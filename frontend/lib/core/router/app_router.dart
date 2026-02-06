@@ -13,6 +13,8 @@ import 'package:wealthscope_app/features/ai/presentation/screens/ai_chat_screen.
 import 'package:wealthscope_app/features/ai/presentation/screens/document_upload_screen.dart';
 import 'package:wealthscope_app/features/ai/presentation/screens/what_if_screen.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'package:wealthscope_app/features/news/presentation/screens/article_webview_screen.dart';
+import 'package:wealthscope_app/features/news/presentation/screens/news_screen.dart';
 import 'package:wealthscope_app/features/notifications/presentation/screens/notifications_screen.dart';
 import 'package:wealthscope_app/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:wealthscope_app/features/profile/presentation/screens/profile_screen.dart';
@@ -145,6 +147,25 @@ class AppRouter {
             path: '/notifications',
             name: 'notifications',
             builder: (context, state) => const NotificationsScreen(),
+          ),
+          GoRoute(
+            path: '/news',
+            name: 'news',
+            builder: (context, state) => const NewsScreen(),
+            routes: [
+              GoRoute(
+                path: 'article',
+                name: 'article-webview',
+                builder: (context, state) {
+                  final url = state.uri.queryParameters['url'] ?? '';
+                  final title = state.uri.queryParameters['title'] ?? 'Article';
+                  return ArticleWebViewScreen(
+                    url: url,
+                    title: title,
+                  );
+                },
+              ),
+            ],
           ),
           GoRoute(
             path: '/settings',
