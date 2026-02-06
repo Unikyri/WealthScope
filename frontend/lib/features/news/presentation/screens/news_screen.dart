@@ -4,6 +4,7 @@ import 'package:wealthscope_app/features/news/domain/entities/news_article.dart'
 import 'package:wealthscope_app/features/news/presentation/providers/news_provider.dart';
 import 'package:wealthscope_app/shared/widgets/news_card.dart';
 import 'package:wealthscope_app/features/news/presentation/widgets/news_list_skeleton.dart';
+import 'package:wealthscope_app/shared/widgets/empty_state.dart';
 
 /// News Screen with filtering, search, and pagination
 class NewsScreen extends ConsumerStatefulWidget {
@@ -157,33 +158,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
   }
 
   Widget _buildEmptyState() {
-    final theme = Theme.of(context);
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.article_outlined,
-            size: 64,
-            color: theme.colorScheme.onSurface.withOpacity(0.3),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No news found',
-            style: theme.textTheme.titleLarge?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Try adjusting your filters or search',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.4),
-            ),
-          ),
-        ],
-      ),
-    );
+    return const EmptyState.news();
   }
 
   /// Get related symbols for an article (mock implementation)
