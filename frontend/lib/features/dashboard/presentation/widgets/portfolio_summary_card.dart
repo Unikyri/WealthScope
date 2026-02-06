@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/dashboard/domain/entities/portfolio_summary.dart';
+import 'package:wealthscope_app/core/currency/currency_extensions.dart';
 
 /// Portfolio Summary Card Widget
 /// Displays the total portfolio value with gain/loss indicator
-class PortfolioSummaryCard extends StatelessWidget {
+class PortfolioSummaryCard extends ConsumerWidget {
   final PortfolioSummary summary;
 
   const PortfolioSummaryCard({
@@ -14,7 +16,7 @@ class PortfolioSummaryCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isPositive = summary.gainLoss >= 0;
     final changeColor = AppTheme.getChangeColor(summary.gainLoss);
@@ -81,7 +83,7 @@ class PortfolioSummaryCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              _formatCurrency(summary.totalValue),
+              _formatCurrency(summary.totalValue, ref),
               style: theme.textTheme.displaySmall?.copyWith(
                 color: theme.colorScheme.onPrimary,
                 fontSize: 40,
@@ -121,7 +123,7 @@ class PortfolioSummaryCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${isPositive ? "+" : ""}${_formatCurrency(summary.gainLoss.abs())}',
+                        '${isPositive ? "+" : ""}${_formatCurrency(summary.gainLoss.abs(), ref)}',
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: changeColor,
                           fontWeight: FontWeight.bold,
@@ -144,18 +146,21 @@ class PortfolioSummaryCard extends StatelessWidget {
     );
   }
 
-  String _formatCurrency(double value) {
-    if (value >= 1000000000) {
+  String _formatCurrency(double value, WidgetRef ref) {
+    final converted = ref.convertFromUsd(value);
+    final currency = ref.getCurrentCurrency();
+    
+    if (converted >= 1000000000) {
       // Billions
-      return '\$${(value / 1000000000).toStringAsFixed(2)}B';
-    } else if (value >= 1000000) {
+      return '${currency.symbol}${(converted / 1000000000).toStringAsFixed(2)}B';
+    } else if (converted >= 1000000) {
       // Millions
-      return '\$${(value / 1000000).toStringAsFixed(2)}M';
-    } else if (value >= 1000) {
+      return '${currency.symbol}${(converted / 1000000).toStringAsFixed(2)}M';
+    } else if (converted >= 1000) {
       // Thousands
-      return '\$${(value / 1000).toStringAsFixed(2)}K';
+      return '${currency.symbol}${(converted / 1000).toStringAsFixed(2)}K';
     } else {
-      return NumberFormat.currency(symbol: '\$', decimalDigits: 2).format(value);
+      return ref.formatCurrency(value);
     }
   }
 }

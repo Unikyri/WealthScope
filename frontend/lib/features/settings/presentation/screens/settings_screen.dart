@@ -5,6 +5,8 @@ import 'package:wealthscope_app/features/auth/presentation/providers/logout_prov
 import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
 import 'package:wealthscope_app/core/theme/theme_provider.dart';
 import 'package:wealthscope_app/shared/widgets/theme_selection_dialog.dart';
+import 'package:wealthscope_app/core/currency/currency_provider.dart';
+import 'package:wealthscope_app/shared/widgets/currency_selector_dialog.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -15,6 +17,7 @@ class SettingsScreen extends ConsumerWidget {
     final authState = ref.watch(authStateProvider);
     final userEmail = authState.userEmail;
     final currentTheme = ref.watch(themeModeProvider);
+    final currentCurrencyAsync = ref.watch(selectedCurrencyProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -134,9 +137,16 @@ class SettingsScreen extends ConsumerWidget {
             context,
             icon: Icons.attach_money,
             title: 'Currency',
-            subtitle: 'USD',
+            subtitle: currentCurrencyAsync.when(
+              data: (currency) => '${currency.flag} ${currency.code}',
+              loading: () => 'Loading...',
+              error: (_, __) => 'USD',
+            ),
             onTap: () {
-              // TODO: Navigate to currency settings
+              showDialog(
+                context: context,
+                builder: (context) => const CurrencySelectorDialog(),
+              );
             },
           ),
           const Divider(height: 32),
