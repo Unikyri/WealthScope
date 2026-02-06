@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:wealthscope_app/core/currency/currency_extensions.dart';
 
 /// Data model for portfolio history points
 class PortfolioHistoryPoint {
@@ -14,7 +16,7 @@ class PortfolioHistoryPoint {
 }
 
 /// Chart widget displaying portfolio value over time
-class PortfolioHistoryChart extends StatelessWidget {
+class PortfolioHistoryChart extends ConsumerWidget {
   final List<PortfolioHistoryPoint> data;
   final String period;
   final ValueChanged<String>? onPeriodChanged;
@@ -27,7 +29,7 @@ class PortfolioHistoryChart extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -47,8 +49,8 @@ class PortfolioHistoryChart extends StatelessWidget {
 
     final isPositive = data.last.value >= data.first.value;
     final lineColor = isPositive 
-        ? const Color(0xFF26A69A) 
-        : const Color(0xFFEF5350);
+        ? const Color(0xFF00BFA5) 
+        : const Color(0xFFFF5252);
     final change = data.last.value - data.first.value;
     final changePercent = (change / data.first.value) * 100;
 
@@ -70,7 +72,7 @@ class PortfolioHistoryChart extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '\$${data.last.value.toStringAsFixed(2)}',
+                  ref.formatCurrency(data.last.value),
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -78,10 +80,14 @@ class PortfolioHistoryChart extends StatelessWidget {
               ],
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                color: lineColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
+                color: lineColor.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: lineColor.withOpacity(0.4),
+                  width: 1.5,
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -89,7 +95,8 @@ class PortfolioHistoryChart extends StatelessWidget {
                   Icon(
                     isPositive ? Icons.trending_up : Icons.trending_down,
                     color: lineColor,
-                    size: 16,
+                    size: 18,
+                    weight: 700,
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -200,7 +207,7 @@ class PortfolioHistoryChart extends StatelessWidget {
                       if (spot.spotIndex >= data.length) return null;
                       final point = data[spot.spotIndex];
                       return LineTooltipItem(
-                        '\$${point.value.toStringAsFixed(2)}\n',
+                        '${ref.formatCurrency(point.value)}\n',
                         theme.textTheme.titleMedium!.copyWith(
                           color: colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
@@ -331,13 +338,16 @@ class PortfolioHistoryChart extends StatelessWidget {
   }
 
   /// Format value with K/M suffix
-  String _formatValue(double value) {
-    if (value >= 1000000) {
-      return '\$${(value / 1000000).toStringAsFixed(1)}M';
-    } else if (value >= 1000) {
-      return '\$${(value / 1000).toStringAsFixed(0)}K';
+  String _formatValue(double value, WidgetRef ref) {
+    final converted = ref.convertFromUsd(value);
+    final currency = ref.getCurrentCurrency();
+    
+    if (converted >= 1000000) {
+      return '${currency.symbol}${(converted / 1000000).toStringAsFixed(1)}M';
+    } else if (converted >= 1000) {
+      return '${currency.symbol}${(converted / 1000).toStringAsFixed(0)}K';
     } else {
-      return '\$${value.toStringAsFixed(0)}';
+      return '${currency.symbol}${converted.toStringAsFixed(0)}';
     }
   }
 }
@@ -358,10 +368,14 @@ class _PeriodSelector extends StatelessWidget {
     const periods = ['1W', '1M', '3M', '6M', '1Y', 'ALL'];
 
     return Container(
-      height: 36,
+      height: 40,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(8),
+        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant.withOpacity(0.5),
+          width: 1,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -372,12 +386,20 @@ class _PeriodSelector extends StatelessWidget {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeInOut,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+              margin: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 color: isSelected
                     ? theme.colorScheme.primary
                     : Colors.transparent,
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: isSelected ? [
+                  BoxShadow(
+                    color: theme.colorScheme.primary.withOpacity(0.3),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ] : null,
               ),
               child: Text(
                 period,
@@ -386,7 +408,7 @@ class _PeriodSelector extends StatelessWidget {
                       ? theme.colorScheme.onPrimary
                       : theme.colorScheme.onSurfaceVariant,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  fontSize: 12,
+                  fontSize: 13,
                 ),
               ),
             ),

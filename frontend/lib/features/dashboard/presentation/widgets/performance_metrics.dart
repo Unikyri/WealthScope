@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wealthscope_app/features/dashboard/domain/entities/portfolio_performance.dart';
+import 'package:wealthscope_app/core/currency/currency_extensions.dart';
 
 /// Performance metrics widget displaying Today, Week, Month, and YTD changes
-class PerformanceMetrics extends StatelessWidget {
+class PerformanceMetrics extends ConsumerWidget {
   final PortfolioPerformance performance;
 
   const PerformanceMetrics({
@@ -11,15 +13,16 @@ class PerformanceMetrics extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
     return Card(
-      elevation: 0,
+      elevation: 2,
+      shadowColor: theme.colorScheme.primary.withOpacity(0.1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+          color: theme.colorScheme.outlineVariant.withOpacity(0.5),
           width: 1,
         ),
       ),
@@ -92,7 +95,7 @@ class PerformanceMetrics extends StatelessWidget {
 }
 
 /// Individual metric tile
-class _MetricTile extends StatelessWidget {
+class _MetricTile extends ConsumerWidget {
   final String label;
   final double value;
   final double percent;
@@ -104,21 +107,28 @@ class _MetricTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isPositive = value >= 0;
     final color = isPositive
-        ? const Color(0xFF26A69A)
-        : const Color(0xFFEF5350);
+        ? const Color(0xFF00BFA5)
+        : const Color(0xFFFF5252);
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        gradient: LinearGradient(
+          colors: [
+            color.withOpacity(0.08),
+            color.withOpacity(0.03),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: color.withOpacity(0.2),
-          width: 1,
+          color: color.withOpacity(0.3),
+          width: 1.5,
         ),
       ),
       child: Column(
@@ -136,15 +146,16 @@ class _MetricTile extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(4),
+                  color: color.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
                   isPositive ? Icons.arrow_upward : Icons.arrow_downward,
-                  size: 14,
+                  size: 16,
                   color: color,
+                  weight: 700,
                 ),
               ),
               const SizedBox(width: 6),
@@ -162,7 +173,7 @@ class _MetricTile extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '${isPositive ? '+' : ''}\$${value.abs().toStringAsFixed(2)}',
+            '${isPositive ? '+' : ''}${ref.formatCurrency(value.abs())}',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurface,
               fontWeight: FontWeight.w500,

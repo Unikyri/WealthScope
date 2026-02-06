@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wealthscope_app/core/theme/app_theme.dart';
+import 'package:wealthscope_app/core/theme/theme_provider.dart';
 import 'router.dart';
 
 class WealthScopeApp extends ConsumerWidget {
@@ -9,6 +10,7 @@ class WealthScopeApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
+    final themeMode = ref.watch(themeModeProvider);
     
     return MaterialApp.router(
       title: 'WealthScope',
@@ -16,7 +18,7 @@ class WealthScopeApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: themeMode.toFlutterThemeMode(),
     );
   }
 }
