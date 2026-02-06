@@ -14,6 +14,7 @@ import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfoli
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/quick_actions_row.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/performance_metrics.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
+import 'package:wealthscope_app/features/notifications/presentation/providers/notifications_provider.dart';
 import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
 import 'package:wealthscope_app/shared/widgets/speed_dial_fab.dart';
 
@@ -27,6 +28,10 @@ class DashboardScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final summaryAsync = ref.watch(portfolioSummaryProvider);
     final currentUserEmail = ref.watch(currentUserProvider)?.email;
+    final unreadCount = ref.watch(unreadNotificationsCountProvider);
+    
+    // Format badge label: show "9+" for 10 or more
+    final badgeLabel = unreadCount > 9 ? '9+' : '$unreadCount';
 
     // Extract first name from email
     final userName = currentUserEmail?.split('@').first.capitalize() ?? 'User';
@@ -75,9 +80,13 @@ class DashboardScreen extends ConsumerWidget {
               ),
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.notifications_outlined),
+                  icon: Badge(
+                    label: Text(badgeLabel),
+                    isLabelVisible: unreadCount > 0,
+                    child: const Icon(Icons.notifications_outlined),
+                  ),
                   onPressed: () {
-                    // TODO: Navigate to notifications
+                    context.push('/notifications');
                   },
                   tooltip: 'Notifications',
                 ),
