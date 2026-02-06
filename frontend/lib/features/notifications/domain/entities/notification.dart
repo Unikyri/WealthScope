@@ -43,8 +43,9 @@ class AppNotification {
 }
 
 enum NotificationType {
-  alert,
-  insight,
-  milestone,
   priceAlert,
+  portfolioUpdate,
+  aiInsight,
+  documentProcessed,
+  system,
 }
