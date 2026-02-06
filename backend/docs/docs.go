@@ -23,6 +23,50 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/ai/briefing": {
+            "get": {
+                "description": "Generates AI-powered portfolio briefing with highlights, recommendations, and health score",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI Portfolio"
+                ],
+                "summary": "Get autonomous portfolio briefing",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.BriefingResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/ai/chat": {
             "post": {
                 "description": "Sends a message to the AI and returns the response",
@@ -43,7 +87,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_interfaces_http_handlers.ChatRequest"
+                            "$ref": "#/definitions/handlers.ChatRequest"
                         }
                     }
                 ],
@@ -53,13 +97,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.ChatResponseDTO"
+                                            "$ref": "#/definitions/handlers.ChatResponseDTO"
                                         }
                                     }
                                 }
@@ -69,19 +113,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -117,13 +161,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.ConversationListResponse"
+                                            "$ref": "#/definitions/handlers.ConversationListResponse"
                                         }
                                     }
                                 }
@@ -133,13 +177,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -163,7 +207,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_interfaces_http_handlers.CreateConversationRequest"
+                            "$ref": "#/definitions/handlers.CreateConversationRequest"
                         }
                     }
                 ],
@@ -173,13 +217,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.ConversationResponse"
+                                            "$ref": "#/definitions/handlers.ConversationResponse"
                                         }
                                     }
                                 }
@@ -189,19 +233,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -232,13 +276,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.ConversationWithMessagesResponse"
+                                            "$ref": "#/definitions/handlers.ConversationWithMessagesResponse"
                                         }
                                     }
                                 }
@@ -248,25 +292,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -297,7 +341,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_interfaces_http_handlers.UpdateConversationRequest"
+                            "$ref": "#/definitions/handlers.UpdateConversationRequest"
                         }
                     }
                 ],
@@ -305,31 +349,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -356,31 +400,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -440,13 +484,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.InsightListResponse"
+                                            "$ref": "#/definitions/handlers.InsightListResponse"
                                         }
                                     }
                                 }
@@ -456,13 +500,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -484,13 +528,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.InsightResponse"
+                                            "$ref": "#/definitions/handlers.InsightResponse"
                                         }
                                     }
                                 }
@@ -500,13 +544,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -528,7 +572,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -536,7 +580,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/internal_interfaces_http_handlers.InsightResponse"
+                                                "$ref": "#/definitions/handlers.InsightResponse"
                                             }
                                         }
                                     }
@@ -547,13 +591,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -575,13 +619,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.UnreadCountResponse"
+                                            "$ref": "#/definitions/handlers.UnreadCountResponse"
                                         }
                                     }
                                 }
@@ -591,13 +635,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -628,13 +672,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.InsightResponse"
+                                            "$ref": "#/definitions/handlers.InsightResponse"
                                         }
                                     }
                                 }
@@ -644,25 +688,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -691,31 +735,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -755,13 +799,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_internal_application_dto.OCRResponse"
+                                            "$ref": "#/definitions/dto.OCRResponse"
                                         }
                                     }
                                 }
@@ -771,19 +815,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -809,7 +853,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_internal_application_dto.ConfirmOCRAssetsRequest"
+                            "$ref": "#/definitions/dto.ConfirmOCRAssetsRequest"
                         }
                     }
                 ],
@@ -819,13 +863,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_internal_application_dto.ConfirmOCRAssetsResponse"
+                                            "$ref": "#/definitions/dto.ConfirmOCRAssetsResponse"
                                         }
                                     }
                                 }
@@ -835,19 +879,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -890,13 +934,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_internal_application_services.HistoricalStats"
+                                            "$ref": "#/definitions/services.HistoricalStats"
                                         }
                                     }
                                 }
@@ -906,19 +950,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -945,13 +989,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.TemplatesResponse"
+                                            "$ref": "#/definitions/handlers.TemplatesResponse"
                                         }
                                     }
                                 }
@@ -961,7 +1005,7 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -992,7 +1036,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_interfaces_http_handlers.SimulateRequest"
+                            "$ref": "#/definitions/handlers.SimulateRequest"
                         }
                     }
                 ],
@@ -1002,13 +1046,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.SimulateResponse"
+                                            "$ref": "#/definitions/handlers.SimulateResponse"
                                         }
                                     }
                                 }
@@ -1018,19 +1062,88 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ai/simulate/chain": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Simulates a chain of sequential investment scenarios",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Scenarios"
+                ],
+                "summary": "Run a multi-step what-if scenario simulation",
+                "parameters": [
+                    {
+                        "description": "Chain parameters",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.ScenarioChainRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entities.ChainResult"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1052,13 +1165,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.WelcomeResponse"
+                                            "$ref": "#/definitions/handlers.WelcomeResponse"
                                         }
                                     }
                                 }
@@ -1068,13 +1181,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1133,13 +1246,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.ListAssetsResponse"
+                                            "$ref": "#/definitions/handlers.ListAssetsResponse"
                                         }
                                     }
                                 }
@@ -1149,13 +1262,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1184,7 +1297,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_interfaces_http_handlers.CreateAssetRequest"
+                            "$ref": "#/definitions/handlers.CreateAssetRequest"
                         }
                     }
                 ],
@@ -1194,13 +1307,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.AssetResponse"
+                                            "$ref": "#/definitions/handlers.AssetResponse"
                                         }
                                     }
                                 }
@@ -1210,19 +1323,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1258,13 +1371,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.AssetResponse"
+                                            "$ref": "#/definitions/handlers.AssetResponse"
                                         }
                                     }
                                 }
@@ -1274,19 +1387,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1322,7 +1435,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_interfaces_http_handlers.UpdateAssetRequest"
+                            "$ref": "#/definitions/handlers.UpdateAssetRequest"
                         }
                     }
                 ],
@@ -1332,13 +1445,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.AssetResponse"
+                                            "$ref": "#/definitions/handlers.AssetResponse"
                                         }
                                     }
                                 }
@@ -1348,19 +1461,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1392,25 +1505,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1437,13 +1550,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.UserResponse"
+                                            "$ref": "#/definitions/handlers.UserResponse"
                                         }
                                     }
                                 }
@@ -1453,13 +1566,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1489,7 +1602,7 @@ const docTemplate = `{
                         "name": "request",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/internal_interfaces_http_handlers.SyncRequest"
+                            "$ref": "#/definitions/handlers.SyncRequest"
                         }
                     }
                 ],
@@ -1499,13 +1612,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.SyncResponse"
+                                            "$ref": "#/definitions/handlers.SyncResponse"
                                         }
                                     }
                                 }
@@ -1517,13 +1630,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.SyncResponse"
+                                            "$ref": "#/definitions/handlers.SyncResponse"
                                         }
                                     }
                                 }
@@ -1533,13 +1646,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1596,13 +1709,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.NewsListResponse"
+                                            "$ref": "#/definitions/handlers.NewsListResponse"
                                         }
                                     }
                                 }
@@ -1612,13 +1725,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1658,13 +1771,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.NewsListResponse"
+                                            "$ref": "#/definitions/handlers.NewsListResponse"
                                         }
                                     }
                                 }
@@ -1674,13 +1787,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1720,13 +1833,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.NewsListResponse"
+                                            "$ref": "#/definitions/handlers.NewsListResponse"
                                         }
                                     }
                                 }
@@ -1736,13 +1849,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1775,13 +1888,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.NewsListResponse"
+                                            "$ref": "#/definitions/handlers.NewsListResponse"
                                         }
                                     }
                                 }
@@ -1791,7 +1904,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1813,13 +1926,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.PingResponse"
+                                            "$ref": "#/definitions/handlers.PingResponse"
                                         }
                                     }
                                 }
@@ -1850,13 +1963,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.PortfolioRiskResponse"
+                                            "$ref": "#/definitions/handlers.PortfolioRiskResponse"
                                         }
                                     }
                                 }
@@ -1868,7 +1981,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -1886,7 +1999,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -1923,13 +2036,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.PortfolioSummaryResponse"
+                                            "$ref": "#/definitions/handlers.PortfolioSummaryResponse"
                                         }
                                     }
                                 }
@@ -1941,7 +2054,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -1959,7 +2072,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -1991,13 +2104,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_interfaces_http_handlers.HealthResponse"
+                                            "$ref": "#/definitions/handlers.HealthResponse"
                                         }
                                     }
                                 }
@@ -2009,7 +2122,33 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_Unikyri_WealthScope_backend_internal_application_dto.ConfirmAsset": {
+        "database.HealthStatus": {
+            "type": "object",
+            "properties": {
+                "connected": {
+                    "type": "boolean"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "idle": {
+                    "type": "integer"
+                },
+                "in_use": {
+                    "type": "integer"
+                },
+                "latency": {
+                    "type": "string"
+                },
+                "max_open_connections": {
+                    "type": "integer"
+                },
+                "open_connections": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ConfirmAsset": {
             "type": "object",
             "required": [
                 "currency",
@@ -2046,7 +2185,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Unikyri_WealthScope_backend_internal_application_dto.ConfirmOCRAssetsRequest": {
+        "dto.ConfirmOCRAssetsRequest": {
             "type": "object",
             "required": [
                 "assets"
@@ -2057,12 +2196,12 @@ const docTemplate = `{
                     "type": "array",
                     "minItems": 1,
                     "items": {
-                        "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_internal_application_dto.ConfirmAsset"
+                        "$ref": "#/definitions/dto.ConfirmAsset"
                     }
                 }
             }
         },
-        "github_com_Unikyri_WealthScope_backend_internal_application_dto.ConfirmOCRAssetsResponse": {
+        "dto.ConfirmOCRAssetsResponse": {
             "type": "object",
             "properties": {
                 "asset_ids": {
@@ -2078,7 +2217,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Unikyri_WealthScope_backend_internal_application_dto.ExtractedAssetResponse": {
+        "dto.ExtractedAssetResponse": {
             "type": "object",
             "properties": {
                 "confidence": {
@@ -2115,14 +2254,14 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Unikyri_WealthScope_backend_internal_application_dto.OCRResponse": {
+        "dto.OCRResponse": {
             "type": "object",
             "properties": {
                 "assets": {
                     "description": "Assets contains all extracted financial assets",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_internal_application_dto.ExtractedAssetResponse"
+                        "$ref": "#/definitions/dto.ExtractedAssetResponse"
                     }
                 },
                 "document_type": {
@@ -2138,42 +2277,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Unikyri_WealthScope_backend_internal_application_services.HistoricalStats": {
-            "type": "object",
-            "properties": {
-                "average_return": {
-                    "type": "number"
-                },
-                "best_day": {
-                    "type": "number"
-                },
-                "data_points": {
-                    "type": "integer"
-                },
-                "max_drawdown": {
-                    "type": "number"
-                },
-                "negative_days": {
-                    "type": "integer"
-                },
-                "period": {
-                    "type": "string"
-                },
-                "positive_days": {
-                    "type": "integer"
-                },
-                "symbol": {
-                    "type": "string"
-                },
-                "volatility": {
-                    "type": "number"
-                },
-                "worst_day": {
-                    "type": "number"
-                }
-            }
-        },
-        "github_com_Unikyri_WealthScope_backend_internal_domain_entities.AllocationItem": {
+        "entities.AllocationItem": {
             "type": "object",
             "properties": {
                 "percent": {
@@ -2187,7 +2291,28 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Unikyri_WealthScope_backend_internal_domain_entities.ChangeDetail": {
+        "entities.ChainResult": {
+            "type": "object",
+            "properties": {
+                "final_state": {
+                    "$ref": "#/definitions/entities.PortfolioState"
+                },
+                "risk": {
+                    "$ref": "#/definitions/entities.RiskAssessment"
+                },
+                "steps": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.StepResult"
+                    }
+                },
+                "total_impact": {
+                    "description": "Initial vs Final total value",
+                    "type": "number"
+                }
+            }
+        },
+        "entities.ChangeDetail": {
             "type": "object",
             "properties": {
                 "description": {
@@ -2208,7 +2333,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Unikyri_WealthScope_backend_internal_domain_entities.NewAssetParams": {
+        "entities.NewAssetParams": {
             "type": "object",
             "properties": {
                 "name": {
@@ -2228,13 +2353,13 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Unikyri_WealthScope_backend_internal_domain_entities.PortfolioState": {
+        "entities.PortfolioState": {
             "type": "object",
             "properties": {
                 "allocation": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_internal_domain_entities.AllocationItem"
+                        "$ref": "#/definitions/entities.AllocationItem"
                     }
                 },
                 "asset_count": {
@@ -2254,7 +2379,49 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Unikyri_WealthScope_backend_internal_domain_entities.ScenarioParams": {
+        "entities.RiskAssessment": {
+            "type": "object",
+            "properties": {
+                "factors": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "level": {
+                    "description": "low, medium, high, critical",
+                    "type": "string"
+                },
+                "recommendation": {
+                    "type": "string"
+                },
+                "score": {
+                    "description": "0-100 high is risky",
+                    "type": "integer"
+                },
+                "warnings": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "entities.ScenarioChainRequest": {
+            "type": "object",
+            "properties": {
+                "steps": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.ScenarioStep"
+                    }
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.ScenarioParams": {
             "type": "object",
             "properties": {
                 "asset_id": {
@@ -2276,7 +2443,7 @@ const docTemplate = `{
                     "description": "For new asset scenarios",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_internal_domain_entities.NewAssetParams"
+                            "$ref": "#/definitions/entities.NewAssetParams"
                         }
                     ]
                 },
@@ -2296,7 +2463,47 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Unikyri_WealthScope_backend_internal_domain_entities.ScenarioTemplate": {
+        "entities.ScenarioResult": {
+            "type": "object",
+            "properties": {
+                "ai_analysis": {
+                    "type": "string"
+                },
+                "changes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.ChangeDetail"
+                    }
+                },
+                "current_state": {
+                    "$ref": "#/definitions/entities.PortfolioState"
+                },
+                "projected_state": {
+                    "$ref": "#/definitions/entities.PortfolioState"
+                },
+                "warnings": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "entities.ScenarioStep": {
+            "type": "object",
+            "properties": {
+                "order": {
+                    "type": "integer"
+                },
+                "parameters": {
+                    "$ref": "#/definitions/entities.ScenarioParams"
+                },
+                "type": {
+                    "$ref": "#/definitions/entities.ScenarioType"
+                }
+            }
+        },
+        "entities.ScenarioTemplate": {
             "type": "object",
             "properties": {
                 "description": {
@@ -2309,14 +2516,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "parameters": {
-                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_internal_domain_entities.ScenarioParams"
+                    "$ref": "#/definitions/entities.ScenarioParams"
                 },
                 "type": {
-                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_internal_domain_entities.ScenarioType"
+                    "$ref": "#/definitions/entities.ScenarioType"
                 }
             }
         },
-        "github_com_Unikyri_WealthScope_backend_internal_domain_entities.ScenarioType": {
+        "entities.ScenarioType": {
             "type": "string",
             "enum": [
                 "buy_asset",
@@ -2333,109 +2540,18 @@ const docTemplate = `{
                 "ScenarioRebalance"
             ]
         },
-        "github_com_Unikyri_WealthScope_backend_internal_domain_services.NewsArticle": {
+        "entities.StepResult": {
             "type": "object",
             "properties": {
-                "content": {
-                    "type": "string"
+                "result": {
+                    "$ref": "#/definitions/entities.ScenarioResult"
                 },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "image_url": {
-                    "type": "string"
-                },
-                "provider": {
-                    "type": "string"
-                },
-                "published_at": {
-                    "type": "string"
-                },
-                "sentiment": {
-                    "description": "-1 (negative) to +1 (positive)",
-                    "type": "number"
-                },
-                "source": {
-                    "type": "string"
-                },
-                "symbols": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "title": {
-                    "type": "string"
-                },
-                "url": {
-                    "type": "string"
+                "step": {
+                    "$ref": "#/definitions/entities.ScenarioStep"
                 }
             }
         },
-        "github_com_Unikyri_WealthScope_backend_internal_infrastructure_database.HealthStatus": {
-            "type": "object",
-            "properties": {
-                "connected": {
-                    "type": "boolean"
-                },
-                "error": {
-                    "type": "string"
-                },
-                "idle": {
-                    "type": "integer"
-                },
-                "in_use": {
-                    "type": "integer"
-                },
-                "latency": {
-                    "type": "string"
-                },
-                "max_open_connections": {
-                    "type": "integer"
-                },
-                "open_connections": {
-                    "type": "integer"
-                }
-            }
-        },
-        "github_com_Unikyri_WealthScope_backend_pkg_response.ErrorInfo": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "string"
-                },
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_Unikyri_WealthScope_backend_pkg_response.Meta": {
-            "type": "object",
-            "properties": {
-                "request_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_Unikyri_WealthScope_backend_pkg_response.Response": {
-            "type": "object",
-            "properties": {
-                "data": {},
-                "error": {
-                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.ErrorInfo"
-                },
-                "meta": {
-                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Meta"
-                },
-                "success": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "internal_interfaces_http_handlers.AssetResponse": {
+        "handlers.AssetResponse": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -2492,7 +2608,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.AssetTypeBreakdownResponse": {
+        "handlers.AssetTypeBreakdownResponse": {
             "type": "object",
             "properties": {
                 "count": {
@@ -2509,7 +2625,49 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.ChatRequest": {
+        "handlers.BriefingResponse": {
+            "type": "object",
+            "properties": {
+                "alerts": {
+                    "description": "Portfolio alerts",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/services.PortfolioAlert"
+                    }
+                },
+                "briefing": {
+                    "description": "AI-generated narrative",
+                    "type": "string"
+                },
+                "generated_at": {
+                    "description": "Timestamp",
+                    "type": "string"
+                },
+                "health_score": {
+                    "description": "Portfolio health",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/services.HealthScore"
+                        }
+                    ]
+                },
+                "highlights": {
+                    "description": "Key events",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.Highlight"
+                    }
+                },
+                "recommendations": {
+                    "description": "Action items",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "handlers.ChatRequest": {
             "type": "object",
             "required": [
                 "message"
@@ -2525,27 +2683,27 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.ChatResponseDTO": {
+        "handlers.ChatResponseDTO": {
             "type": "object",
             "properties": {
                 "ai_message": {
-                    "$ref": "#/definitions/internal_interfaces_http_handlers.MessageResponse"
+                    "$ref": "#/definitions/handlers.MessageResponse"
                 },
                 "conversation_id": {
                     "type": "string"
                 },
                 "user_message": {
-                    "$ref": "#/definitions/internal_interfaces_http_handlers.MessageResponse"
+                    "$ref": "#/definitions/handlers.MessageResponse"
                 }
             }
         },
-        "internal_interfaces_http_handlers.ConversationListResponse": {
+        "handlers.ConversationListResponse": {
             "type": "object",
             "properties": {
                 "conversations": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_interfaces_http_handlers.ConversationResponse"
+                        "$ref": "#/definitions/handlers.ConversationResponse"
                     }
                 },
                 "limit": {
@@ -2559,7 +2717,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.ConversationResponse": {
+        "handlers.ConversationResponse": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -2576,21 +2734,21 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.ConversationWithMessagesResponse": {
+        "handlers.ConversationWithMessagesResponse": {
             "type": "object",
             "properties": {
                 "conversation": {
-                    "$ref": "#/definitions/internal_interfaces_http_handlers.ConversationResponse"
+                    "$ref": "#/definitions/handlers.ConversationResponse"
                 },
                 "messages": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_interfaces_http_handlers.MessageResponse"
+                        "$ref": "#/definitions/handlers.MessageResponse"
                     }
                 }
             }
         },
-        "internal_interfaces_http_handlers.CreateAssetRequest": {
+        "handlers.CreateAssetRequest": {
             "type": "object",
             "required": [
                 "name",
@@ -2648,7 +2806,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.CreateConversationRequest": {
+        "handlers.CreateConversationRequest": {
             "type": "object",
             "properties": {
                 "title": {
@@ -2657,11 +2815,11 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.HealthResponse": {
+        "handlers.HealthResponse": {
             "type": "object",
             "properties": {
                 "database": {
-                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_internal_infrastructure_database.HealthStatus"
+                    "$ref": "#/definitions/database.HealthStatus"
                 },
                 "status": {
                     "type": "string"
@@ -2674,13 +2832,34 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.InsightListResponse": {
+        "handlers.Highlight": {
+            "type": "object",
+            "properties": {
+                "asset": {
+                    "description": "Asset name or symbol",
+                    "type": "string"
+                },
+                "change": {
+                    "description": "\"+5.2%\" or \"Volatility increased\"",
+                    "type": "string"
+                },
+                "message": {
+                    "description": "Optional detailed message",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "\"gain\", \"loss\", \"alert\"",
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.InsightListResponse": {
             "type": "object",
             "properties": {
                 "insights": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_interfaces_http_handlers.InsightResponse"
+                        "$ref": "#/definitions/handlers.InsightResponse"
                     }
                 },
                 "limit": {
@@ -2697,7 +2876,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.InsightResponse": {
+        "handlers.InsightResponse": {
             "type": "object",
             "properties": {
                 "action_items": {
@@ -2738,21 +2917,21 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.ListAssetsResponse": {
+        "handlers.ListAssetsResponse": {
             "type": "object",
             "properties": {
                 "assets": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_interfaces_http_handlers.AssetResponse"
+                        "$ref": "#/definitions/handlers.AssetResponse"
                     }
                 },
                 "pagination": {
-                    "$ref": "#/definitions/internal_interfaces_http_handlers.PaginationInfo"
+                    "$ref": "#/definitions/handlers.PaginationInfo"
                 }
             }
         },
-        "internal_interfaces_http_handlers.MessageResponse": {
+        "handlers.MessageResponse": {
             "type": "object",
             "properties": {
                 "content": {
@@ -2772,13 +2951,13 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.NewsListResponse": {
+        "handlers.NewsListResponse": {
             "type": "object",
             "properties": {
                 "articles": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_internal_domain_services.NewsArticle"
+                        "$ref": "#/definitions/services.NewsArticle"
                     }
                 },
                 "limit": {
@@ -2792,7 +2971,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.PaginationInfo": {
+        "handlers.PaginationInfo": {
             "type": "object",
             "properties": {
                 "page": {
@@ -2809,7 +2988,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.PingResponse": {
+        "handlers.PingResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -2817,13 +2996,13 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.PortfolioRiskResponse": {
+        "handlers.PortfolioRiskResponse": {
             "type": "object",
             "properties": {
                 "alerts": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_interfaces_http_handlers.RiskAlertResponse"
+                        "$ref": "#/definitions/handlers.RiskAlertResponse"
                     }
                 },
                 "diversification_level": {
@@ -2836,7 +3015,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.PortfolioSummaryResponse": {
+        "handlers.PortfolioSummaryResponse": {
             "type": "object",
             "properties": {
                 "asset_count": {
@@ -2845,7 +3024,7 @@ const docTemplate = `{
                 "breakdown_by_type": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_interfaces_http_handlers.AssetTypeBreakdownResponse"
+                        "$ref": "#/definitions/handlers.AssetTypeBreakdownResponse"
                     }
                 },
                 "gain_loss": {
@@ -2865,7 +3044,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.RiskAlertResponse": {
+        "handlers.RiskAlertResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -2894,24 +3073,10 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.SimulateRequest": {
-            "type": "object",
-            "required": [
-                "type"
-            ],
-            "properties": {
-                "parameters": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "type": {
-                    "type": "string"
-                }
-            }
+        "handlers.SimulateRequest": {
+            "type": "object"
         },
-        "internal_interfaces_http_handlers.SimulateResponse": {
+        "handlers.SimulateResponse": {
             "type": "object",
             "properties": {
                 "ai_analysis": {
@@ -2920,14 +3085,14 @@ const docTemplate = `{
                 "changes": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_internal_domain_entities.ChangeDetail"
+                        "$ref": "#/definitions/entities.ChangeDetail"
                     }
                 },
                 "current_state": {
-                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_internal_domain_entities.PortfolioState"
+                    "$ref": "#/definitions/entities.PortfolioState"
                 },
                 "projected_state": {
-                    "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_internal_domain_entities.PortfolioState"
+                    "$ref": "#/definitions/entities.PortfolioState"
                 },
                 "warnings": {
                     "type": "array",
@@ -2937,7 +3102,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.SyncRequest": {
+        "handlers.SyncRequest": {
             "type": "object",
             "properties": {
                 "display_name": {
@@ -2945,29 +3110,29 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.SyncResponse": {
+        "handlers.SyncResponse": {
             "type": "object",
             "properties": {
                 "created": {
                     "type": "boolean"
                 },
                 "user": {
-                    "$ref": "#/definitions/internal_interfaces_http_handlers.UserResponse"
+                    "$ref": "#/definitions/handlers.UserResponse"
                 }
             }
         },
-        "internal_interfaces_http_handlers.TemplatesResponse": {
+        "handlers.TemplatesResponse": {
             "type": "object",
             "properties": {
                 "templates": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Unikyri_WealthScope_backend_internal_domain_entities.ScenarioTemplate"
+                        "$ref": "#/definitions/entities.ScenarioTemplate"
                     }
                 }
             }
         },
-        "internal_interfaces_http_handlers.UnreadCountResponse": {
+        "handlers.UnreadCountResponse": {
             "type": "object",
             "properties": {
                 "count": {
@@ -2975,7 +3140,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.UpdateAssetRequest": {
+        "handlers.UpdateAssetRequest": {
             "type": "object",
             "properties": {
                 "currency": {
@@ -3027,7 +3192,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.UpdateConversationRequest": {
+        "handlers.UpdateConversationRequest": {
             "type": "object",
             "required": [
                 "title"
@@ -3040,7 +3205,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.UserResponse": {
+        "handlers.UserResponse": {
             "type": "object",
             "properties": {
                 "avatar_url": {
@@ -3063,7 +3228,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_interfaces_http_handlers.WelcomeResponse": {
+        "handlers.WelcomeResponse": {
             "type": "object",
             "properties": {
                 "conversation_starters": {
@@ -3074,6 +3239,212 @@ const docTemplate = `{
                 },
                 "message": {
                     "type": "string"
+                }
+            }
+        },
+        "response.ErrorInfo": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.Meta": {
+            "type": "object",
+            "properties": {
+                "request_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.Response": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "error": {
+                    "$ref": "#/definitions/response.ErrorInfo"
+                },
+                "meta": {
+                    "$ref": "#/definitions/response.Meta"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "services.AlertSeverity": {
+            "type": "string",
+            "enum": [
+                "info",
+                "warning",
+                "critical"
+            ],
+            "x-enum-varnames": [
+                "AlertSeverityInfo",
+                "AlertSeverityWarning",
+                "AlertSeverityCritical"
+            ]
+        },
+        "services.AlertType": {
+            "type": "string",
+            "enum": [
+                "price",
+                "concentration",
+                "correlation",
+                "health",
+                "performance"
+            ],
+            "x-enum-varnames": [
+                "AlertTypePrice",
+                "AlertTypeConcentration",
+                "AlertTypeCorrelation",
+                "AlertTypeHealth",
+                "AlertTypePerformance"
+            ]
+        },
+        "services.HealthScore": {
+            "type": "object",
+            "properties": {
+                "correlation": {
+                    "description": "10% weight - placeholder",
+                    "type": "integer"
+                },
+                "diversification": {
+                    "description": "25% weight",
+                    "type": "integer"
+                },
+                "liquidity": {
+                    "description": "10% weight",
+                    "type": "integer"
+                },
+                "overall": {
+                    "description": "0-100 weighted average",
+                    "type": "integer"
+                },
+                "performance": {
+                    "description": "15% weight",
+                    "type": "integer"
+                },
+                "risk_level": {
+                    "description": "20% weight",
+                    "type": "integer"
+                },
+                "sector_balance": {
+                    "description": "20% weight",
+                    "type": "integer"
+                },
+                "suggestions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "services.HistoricalStats": {
+            "type": "object",
+            "properties": {
+                "average_return": {
+                    "type": "number"
+                },
+                "best_day": {
+                    "type": "number"
+                },
+                "data_points": {
+                    "type": "integer"
+                },
+                "max_drawdown": {
+                    "type": "number"
+                },
+                "negative_days": {
+                    "type": "integer"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "positive_days": {
+                    "type": "integer"
+                },
+                "symbol": {
+                    "type": "string"
+                },
+                "volatility": {
+                    "type": "number"
+                },
+                "worst_day": {
+                    "type": "number"
+                }
+            }
+        },
+        "services.NewsArticle": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "provider": {
+                    "type": "string"
+                },
+                "published_at": {
+                    "type": "string"
+                },
+                "sentiment": {
+                    "description": "-1 (negative) to +1 (positive)",
+                    "type": "number"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "symbols": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "services.PortfolioAlert": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "asset": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "severity": {
+                    "$ref": "#/definitions/services.AlertSeverity"
+                },
+                "type": {
+                    "$ref": "#/definitions/services.AlertType"
                 }
             }
         }

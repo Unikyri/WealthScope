@@ -1,6 +1,23 @@
 basePath: /
 definitions:
-  github_com_Unikyri_WealthScope_backend_internal_application_dto.ConfirmAsset:
+  database.HealthStatus:
+    properties:
+      connected:
+        type: boolean
+      error:
+        type: string
+      idle:
+        type: integer
+      in_use:
+        type: integer
+      latency:
+        type: string
+      max_open_connections:
+        type: integer
+      open_connections:
+        type: integer
+    type: object
+  dto.ConfirmAsset:
     properties:
       currency:
         description: Currency is the currency code (required)
@@ -28,18 +45,18 @@ definitions:
     - quantity
     - type
     type: object
-  github_com_Unikyri_WealthScope_backend_internal_application_dto.ConfirmOCRAssetsRequest:
+  dto.ConfirmOCRAssetsRequest:
     properties:
       assets:
         description: Assets contains the list of assets to confirm/create
         items:
-          $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_internal_application_dto.ConfirmAsset'
+          $ref: '#/definitions/dto.ConfirmAsset'
         minItems: 1
         type: array
     required:
     - assets
     type: object
-  github_com_Unikyri_WealthScope_backend_internal_application_dto.ConfirmOCRAssetsResponse:
+  dto.ConfirmOCRAssetsResponse:
     properties:
       asset_ids:
         description: AssetIDs contains the IDs of the created assets
@@ -50,7 +67,7 @@ definitions:
         description: CreatedCount is the number of assets successfully created
         type: integer
     type: object
-  github_com_Unikyri_WealthScope_backend_internal_application_dto.ExtractedAssetResponse:
+  dto.ExtractedAssetResponse:
     properties:
       confidence:
         description: Confidence is the OCR confidence score (0.0 to 1.0)
@@ -77,12 +94,12 @@ definitions:
         description: Type is the asset category
         type: string
     type: object
-  github_com_Unikyri_WealthScope_backend_internal_application_dto.OCRResponse:
+  dto.OCRResponse:
     properties:
       assets:
         description: Assets contains all extracted financial assets
         items:
-          $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_internal_application_dto.ExtractedAssetResponse'
+          $ref: '#/definitions/dto.ExtractedAssetResponse'
         type: array
       document_type:
         description: DocumentType identifies the type of document processed
@@ -93,30 +110,7 @@ definitions:
           type: string
         type: array
     type: object
-  github_com_Unikyri_WealthScope_backend_internal_application_services.HistoricalStats:
-    properties:
-      average_return:
-        type: number
-      best_day:
-        type: number
-      data_points:
-        type: integer
-      max_drawdown:
-        type: number
-      negative_days:
-        type: integer
-      period:
-        type: string
-      positive_days:
-        type: integer
-      symbol:
-        type: string
-      volatility:
-        type: number
-      worst_day:
-        type: number
-    type: object
-  github_com_Unikyri_WealthScope_backend_internal_domain_entities.AllocationItem:
+  entities.AllocationItem:
     properties:
       percent:
         type: number
@@ -125,7 +119,21 @@ definitions:
       value:
         type: number
     type: object
-  github_com_Unikyri_WealthScope_backend_internal_domain_entities.ChangeDetail:
+  entities.ChainResult:
+    properties:
+      final_state:
+        $ref: '#/definitions/entities.PortfolioState'
+      risk:
+        $ref: '#/definitions/entities.RiskAssessment'
+      steps:
+        items:
+          $ref: '#/definitions/entities.StepResult'
+        type: array
+      total_impact:
+        description: Initial vs Final total value
+        type: number
+    type: object
+  entities.ChangeDetail:
     properties:
       description:
         type: string
@@ -139,7 +147,7 @@ definitions:
         description: increase, decrease, new, removed
         type: string
     type: object
-  github_com_Unikyri_WealthScope_backend_internal_domain_entities.NewAssetParams:
+  entities.NewAssetParams:
     properties:
       name:
         type: string
@@ -152,11 +160,11 @@ definitions:
       type:
         type: string
     type: object
-  github_com_Unikyri_WealthScope_backend_internal_domain_entities.PortfolioState:
+  entities.PortfolioState:
     properties:
       allocation:
         items:
-          $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_internal_domain_entities.AllocationItem'
+          $ref: '#/definitions/entities.AllocationItem'
         type: array
       asset_count:
         type: integer
@@ -169,7 +177,35 @@ definitions:
       total_value:
         type: number
     type: object
-  github_com_Unikyri_WealthScope_backend_internal_domain_entities.ScenarioParams:
+  entities.RiskAssessment:
+    properties:
+      factors:
+        items:
+          type: string
+        type: array
+      level:
+        description: low, medium, high, critical
+        type: string
+      recommendation:
+        type: string
+      score:
+        description: 0-100 high is risky
+        type: integer
+      warnings:
+        items:
+          type: string
+        type: array
+    type: object
+  entities.ScenarioChainRequest:
+    properties:
+      steps:
+        items:
+          $ref: '#/definitions/entities.ScenarioStep'
+        type: array
+      user_id:
+        type: string
+    type: object
+  entities.ScenarioParams:
     properties:
       asset_id:
         description: For buy/sell scenarios
@@ -184,7 +220,7 @@ definitions:
         type: number
       new_asset:
         allOf:
-        - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_internal_domain_entities.NewAssetParams'
+        - $ref: '#/definitions/entities.NewAssetParams'
         description: For new asset scenarios
       price:
         type: number
@@ -197,7 +233,33 @@ definitions:
         description: For rebalance scenarios
         type: object
     type: object
-  github_com_Unikyri_WealthScope_backend_internal_domain_entities.ScenarioTemplate:
+  entities.ScenarioResult:
+    properties:
+      ai_analysis:
+        type: string
+      changes:
+        items:
+          $ref: '#/definitions/entities.ChangeDetail'
+        type: array
+      current_state:
+        $ref: '#/definitions/entities.PortfolioState'
+      projected_state:
+        $ref: '#/definitions/entities.PortfolioState'
+      warnings:
+        items:
+          type: string
+        type: array
+    type: object
+  entities.ScenarioStep:
+    properties:
+      order:
+        type: integer
+      parameters:
+        $ref: '#/definitions/entities.ScenarioParams'
+      type:
+        $ref: '#/definitions/entities.ScenarioType'
+    type: object
+  entities.ScenarioTemplate:
     properties:
       description:
         type: string
@@ -206,11 +268,11 @@ definitions:
       name:
         type: string
       parameters:
-        $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_internal_domain_entities.ScenarioParams'
+        $ref: '#/definitions/entities.ScenarioParams'
       type:
-        $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_internal_domain_entities.ScenarioType'
+        $ref: '#/definitions/entities.ScenarioType'
     type: object
-  github_com_Unikyri_WealthScope_backend_internal_domain_entities.ScenarioType:
+  entities.ScenarioType:
     enum:
     - buy_asset
     - sell_asset
@@ -224,74 +286,14 @@ definitions:
     - ScenarioMarketMove
     - ScenarioNewAsset
     - ScenarioRebalance
-  github_com_Unikyri_WealthScope_backend_internal_domain_services.NewsArticle:
+  entities.StepResult:
     properties:
-      content:
-        type: string
-      description:
-        type: string
-      id:
-        type: string
-      image_url:
-        type: string
-      provider:
-        type: string
-      published_at:
-        type: string
-      sentiment:
-        description: -1 (negative) to +1 (positive)
-        type: number
-      source:
-        type: string
-      symbols:
-        items:
-          type: string
-        type: array
-      title:
-        type: string
-      url:
-        type: string
+      result:
+        $ref: '#/definitions/entities.ScenarioResult'
+      step:
+        $ref: '#/definitions/entities.ScenarioStep'
     type: object
-  github_com_Unikyri_WealthScope_backend_internal_infrastructure_database.HealthStatus:
-    properties:
-      connected:
-        type: boolean
-      error:
-        type: string
-      idle:
-        type: integer
-      in_use:
-        type: integer
-      latency:
-        type: string
-      max_open_connections:
-        type: integer
-      open_connections:
-        type: integer
-    type: object
-  github_com_Unikyri_WealthScope_backend_pkg_response.ErrorInfo:
-    properties:
-      code:
-        type: string
-      message:
-        type: string
-    type: object
-  github_com_Unikyri_WealthScope_backend_pkg_response.Meta:
-    properties:
-      request_id:
-        type: string
-    type: object
-  github_com_Unikyri_WealthScope_backend_pkg_response.Response:
-    properties:
-      data: {}
-      error:
-        $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.ErrorInfo'
-      meta:
-        $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Meta'
-      success:
-        type: boolean
-    type: object
-  internal_interfaces_http_handlers.AssetResponse:
+  handlers.AssetResponse:
     properties:
       created_at:
         type: string
@@ -329,7 +331,7 @@ definitions:
       updated_at:
         type: string
     type: object
-  internal_interfaces_http_handlers.AssetTypeBreakdownResponse:
+  handlers.AssetTypeBreakdownResponse:
     properties:
       count:
         type: integer
@@ -340,7 +342,35 @@ definitions:
       value:
         type: number
     type: object
-  internal_interfaces_http_handlers.ChatRequest:
+  handlers.BriefingResponse:
+    properties:
+      alerts:
+        description: Portfolio alerts
+        items:
+          $ref: '#/definitions/services.PortfolioAlert'
+        type: array
+      briefing:
+        description: AI-generated narrative
+        type: string
+      generated_at:
+        description: Timestamp
+        type: string
+      health_score:
+        allOf:
+        - $ref: '#/definitions/services.HealthScore'
+        description: Portfolio health
+      highlights:
+        description: Key events
+        items:
+          $ref: '#/definitions/handlers.Highlight'
+        type: array
+      recommendations:
+        description: Action items
+        items:
+          type: string
+        type: array
+    type: object
+  handlers.ChatRequest:
     properties:
       conversation_id:
         type: string
@@ -351,20 +381,20 @@ definitions:
     required:
     - message
     type: object
-  internal_interfaces_http_handlers.ChatResponseDTO:
+  handlers.ChatResponseDTO:
     properties:
       ai_message:
-        $ref: '#/definitions/internal_interfaces_http_handlers.MessageResponse'
+        $ref: '#/definitions/handlers.MessageResponse'
       conversation_id:
         type: string
       user_message:
-        $ref: '#/definitions/internal_interfaces_http_handlers.MessageResponse'
+        $ref: '#/definitions/handlers.MessageResponse'
     type: object
-  internal_interfaces_http_handlers.ConversationListResponse:
+  handlers.ConversationListResponse:
     properties:
       conversations:
         items:
-          $ref: '#/definitions/internal_interfaces_http_handlers.ConversationResponse'
+          $ref: '#/definitions/handlers.ConversationResponse'
         type: array
       limit:
         type: integer
@@ -373,7 +403,7 @@ definitions:
       total:
         type: integer
     type: object
-  internal_interfaces_http_handlers.ConversationResponse:
+  handlers.ConversationResponse:
     properties:
       created_at:
         type: string
@@ -384,16 +414,16 @@ definitions:
       updated_at:
         type: string
     type: object
-  internal_interfaces_http_handlers.ConversationWithMessagesResponse:
+  handlers.ConversationWithMessagesResponse:
     properties:
       conversation:
-        $ref: '#/definitions/internal_interfaces_http_handlers.ConversationResponse'
+        $ref: '#/definitions/handlers.ConversationResponse'
       messages:
         items:
-          $ref: '#/definitions/internal_interfaces_http_handlers.MessageResponse'
+          $ref: '#/definitions/handlers.MessageResponse'
         type: array
     type: object
-  internal_interfaces_http_handlers.CreateAssetRequest:
+  handlers.CreateAssetRequest:
     properties:
       currency:
         type: string
@@ -437,16 +467,16 @@ definitions:
     - quantity
     - type
     type: object
-  internal_interfaces_http_handlers.CreateConversationRequest:
+  handlers.CreateConversationRequest:
     properties:
       title:
         maxLength: 255
         type: string
     type: object
-  internal_interfaces_http_handlers.HealthResponse:
+  handlers.HealthResponse:
     properties:
       database:
-        $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_internal_infrastructure_database.HealthStatus'
+        $ref: '#/definitions/database.HealthStatus'
       status:
         type: string
       timestamp:
@@ -454,11 +484,26 @@ definitions:
       version:
         type: string
     type: object
-  internal_interfaces_http_handlers.InsightListResponse:
+  handlers.Highlight:
+    properties:
+      asset:
+        description: Asset name or symbol
+        type: string
+      change:
+        description: '"+5.2%" or "Volatility increased"'
+        type: string
+      message:
+        description: Optional detailed message
+        type: string
+      type:
+        description: '"gain", "loss", "alert"'
+        type: string
+    type: object
+  handlers.InsightListResponse:
     properties:
       insights:
         items:
-          $ref: '#/definitions/internal_interfaces_http_handlers.InsightResponse'
+          $ref: '#/definitions/handlers.InsightResponse'
         type: array
       limit:
         type: integer
@@ -469,7 +514,7 @@ definitions:
       unread_count:
         type: integer
     type: object
-  internal_interfaces_http_handlers.InsightResponse:
+  handlers.InsightResponse:
     properties:
       action_items:
         items:
@@ -496,16 +541,16 @@ definitions:
       type:
         type: string
     type: object
-  internal_interfaces_http_handlers.ListAssetsResponse:
+  handlers.ListAssetsResponse:
     properties:
       assets:
         items:
-          $ref: '#/definitions/internal_interfaces_http_handlers.AssetResponse'
+          $ref: '#/definitions/handlers.AssetResponse'
         type: array
       pagination:
-        $ref: '#/definitions/internal_interfaces_http_handlers.PaginationInfo'
+        $ref: '#/definitions/handlers.PaginationInfo'
     type: object
-  internal_interfaces_http_handlers.MessageResponse:
+  handlers.MessageResponse:
     properties:
       content:
         type: string
@@ -518,11 +563,11 @@ definitions:
       role:
         type: string
     type: object
-  internal_interfaces_http_handlers.NewsListResponse:
+  handlers.NewsListResponse:
     properties:
       articles:
         items:
-          $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_internal_domain_services.NewsArticle'
+          $ref: '#/definitions/services.NewsArticle'
         type: array
       limit:
         type: integer
@@ -531,7 +576,7 @@ definitions:
       total:
         type: integer
     type: object
-  internal_interfaces_http_handlers.PaginationInfo:
+  handlers.PaginationInfo:
     properties:
       page:
         type: integer
@@ -542,16 +587,16 @@ definitions:
       total_pages:
         type: integer
     type: object
-  internal_interfaces_http_handlers.PingResponse:
+  handlers.PingResponse:
     properties:
       message:
         type: string
     type: object
-  internal_interfaces_http_handlers.PortfolioRiskResponse:
+  handlers.PortfolioRiskResponse:
     properties:
       alerts:
         items:
-          $ref: '#/definitions/internal_interfaces_http_handlers.RiskAlertResponse'
+          $ref: '#/definitions/handlers.RiskAlertResponse'
         type: array
       diversification_level:
         example: moderate
@@ -560,13 +605,13 @@ definitions:
         example: 35
         type: integer
     type: object
-  internal_interfaces_http_handlers.PortfolioSummaryResponse:
+  handlers.PortfolioSummaryResponse:
     properties:
       asset_count:
         type: integer
       breakdown_by_type:
         items:
-          $ref: '#/definitions/internal_interfaces_http_handlers.AssetTypeBreakdownResponse'
+          $ref: '#/definitions/handlers.AssetTypeBreakdownResponse'
         type: array
       gain_loss:
         type: number
@@ -579,7 +624,7 @@ definitions:
       total_value:
         type: number
     type: object
-  internal_interfaces_http_handlers.RiskAlertResponse:
+  handlers.RiskAlertResponse:
     properties:
       message:
         example: El 45% de tu portafolio está en un solo sector
@@ -600,59 +645,50 @@ definitions:
         example: 45.5
         type: number
     type: object
-  internal_interfaces_http_handlers.SimulateRequest:
-    properties:
-      parameters:
-        items:
-          type: integer
-        type: array
-      type:
-        type: string
-    required:
-    - type
+  handlers.SimulateRequest:
     type: object
-  internal_interfaces_http_handlers.SimulateResponse:
+  handlers.SimulateResponse:
     properties:
       ai_analysis:
         type: string
       changes:
         items:
-          $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_internal_domain_entities.ChangeDetail'
+          $ref: '#/definitions/entities.ChangeDetail'
         type: array
       current_state:
-        $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_internal_domain_entities.PortfolioState'
+        $ref: '#/definitions/entities.PortfolioState'
       projected_state:
-        $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_internal_domain_entities.PortfolioState'
+        $ref: '#/definitions/entities.PortfolioState'
       warnings:
         items:
           type: string
         type: array
     type: object
-  internal_interfaces_http_handlers.SyncRequest:
+  handlers.SyncRequest:
     properties:
       display_name:
         type: string
     type: object
-  internal_interfaces_http_handlers.SyncResponse:
+  handlers.SyncResponse:
     properties:
       created:
         type: boolean
       user:
-        $ref: '#/definitions/internal_interfaces_http_handlers.UserResponse'
+        $ref: '#/definitions/handlers.UserResponse'
     type: object
-  internal_interfaces_http_handlers.TemplatesResponse:
+  handlers.TemplatesResponse:
     properties:
       templates:
         items:
-          $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_internal_domain_entities.ScenarioTemplate'
+          $ref: '#/definitions/entities.ScenarioTemplate'
         type: array
     type: object
-  internal_interfaces_http_handlers.UnreadCountResponse:
+  handlers.UnreadCountResponse:
     properties:
       count:
         type: integer
     type: object
-  internal_interfaces_http_handlers.UpdateAssetRequest:
+  handlers.UpdateAssetRequest:
     properties:
       currency:
         type: string
@@ -691,7 +727,7 @@ definitions:
         - other
         type: string
     type: object
-  internal_interfaces_http_handlers.UpdateConversationRequest:
+  handlers.UpdateConversationRequest:
     properties:
       title:
         maxLength: 255
@@ -700,7 +736,7 @@ definitions:
     required:
     - title
     type: object
-  internal_interfaces_http_handlers.UserResponse:
+  handlers.UserResponse:
     properties:
       avatar_url:
         type: string
@@ -715,7 +751,7 @@ definitions:
       updated_at:
         type: string
     type: object
-  internal_interfaces_http_handlers.WelcomeResponse:
+  handlers.WelcomeResponse:
     properties:
       conversation_starters:
         items:
@@ -723,6 +759,148 @@ definitions:
         type: array
       message:
         type: string
+    type: object
+  response.ErrorInfo:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  response.Meta:
+    properties:
+      request_id:
+        type: string
+    type: object
+  response.Response:
+    properties:
+      data: {}
+      error:
+        $ref: '#/definitions/response.ErrorInfo'
+      meta:
+        $ref: '#/definitions/response.Meta'
+      success:
+        type: boolean
+    type: object
+  services.AlertSeverity:
+    enum:
+    - info
+    - warning
+    - critical
+    type: string
+    x-enum-varnames:
+    - AlertSeverityInfo
+    - AlertSeverityWarning
+    - AlertSeverityCritical
+  services.AlertType:
+    enum:
+    - price
+    - concentration
+    - correlation
+    - health
+    - performance
+    type: string
+    x-enum-varnames:
+    - AlertTypePrice
+    - AlertTypeConcentration
+    - AlertTypeCorrelation
+    - AlertTypeHealth
+    - AlertTypePerformance
+  services.HealthScore:
+    properties:
+      correlation:
+        description: 10% weight - placeholder
+        type: integer
+      diversification:
+        description: 25% weight
+        type: integer
+      liquidity:
+        description: 10% weight
+        type: integer
+      overall:
+        description: 0-100 weighted average
+        type: integer
+      performance:
+        description: 15% weight
+        type: integer
+      risk_level:
+        description: 20% weight
+        type: integer
+      sector_balance:
+        description: 20% weight
+        type: integer
+      suggestions:
+        items:
+          type: string
+        type: array
+    type: object
+  services.HistoricalStats:
+    properties:
+      average_return:
+        type: number
+      best_day:
+        type: number
+      data_points:
+        type: integer
+      max_drawdown:
+        type: number
+      negative_days:
+        type: integer
+      period:
+        type: string
+      positive_days:
+        type: integer
+      symbol:
+        type: string
+      volatility:
+        type: number
+      worst_day:
+        type: number
+    type: object
+  services.NewsArticle:
+    properties:
+      content:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      provider:
+        type: string
+      published_at:
+        type: string
+      sentiment:
+        description: -1 (negative) to +1 (positive)
+        type: number
+      source:
+        type: string
+      symbols:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      url:
+        type: string
+    type: object
+  services.PortfolioAlert:
+    properties:
+      action:
+        type: string
+      asset:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      message:
+        type: string
+      severity:
+        $ref: '#/definitions/services.AlertSeverity'
+      type:
+        $ref: '#/definitions/services.AlertType'
     type: object
 host: wealthscope-production.up.railway.app
 info:
@@ -752,6 +930,33 @@ info:
   title: WealthScope API
   version: 1.0.0
 paths:
+  /api/v1/ai/briefing:
+    get:
+      description: Generates AI-powered portfolio briefing with highlights, recommendations,
+        and health score
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.BriefingResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get autonomous portfolio briefing
+      tags:
+      - AI Portfolio
   /api/v1/ai/chat:
     post:
       consumes:
@@ -763,7 +968,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_interfaces_http_handlers.ChatRequest'
+          $ref: '#/definitions/handlers.ChatRequest'
       produces:
       - application/json
       responses:
@@ -771,23 +976,23 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.ChatResponseDTO'
+                  $ref: '#/definitions/handlers.ChatResponseDTO'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: Send a message to the AI
       tags:
       - AI
@@ -810,19 +1015,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.ConversationListResponse'
+                  $ref: '#/definitions/handlers.ConversationListResponse'
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: List conversations
       tags:
       - AI
@@ -836,7 +1041,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_interfaces_http_handlers.CreateConversationRequest'
+          $ref: '#/definitions/handlers.CreateConversationRequest'
       produces:
       - application/json
       responses:
@@ -844,23 +1049,23 @@ paths:
           description: Created
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.ConversationResponse'
+                  $ref: '#/definitions/handlers.ConversationResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: Create a new conversation
       tags:
       - AI
@@ -879,23 +1084,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: Delete a conversation
       tags:
       - AI
@@ -914,27 +1119,27 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.ConversationWithMessagesResponse'
+                  $ref: '#/definitions/handlers.ConversationWithMessagesResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: Get a conversation
       tags:
       - AI
@@ -953,30 +1158,30 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_interfaces_http_handlers.UpdateConversationRequest'
+          $ref: '#/definitions/handlers.UpdateConversationRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: Update a conversation
       tags:
       - AI
@@ -1015,19 +1220,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.InsightListResponse'
+                  $ref: '#/definitions/handlers.InsightListResponse'
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: List user insights
       tags:
       - AI Insights
@@ -1047,27 +1252,27 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.InsightResponse'
+                  $ref: '#/definitions/handlers.InsightResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: Get insight by ID
       tags:
       - AI Insights
@@ -1086,23 +1291,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: Mark insight as read
       tags:
       - AI Insights
@@ -1116,19 +1321,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.InsightResponse'
+                  $ref: '#/definitions/handlers.InsightResponse'
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: Get today's daily briefing
       tags:
       - AI Insights
@@ -1142,21 +1347,21 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/internal_interfaces_http_handlers.InsightResponse'
+                    $ref: '#/definitions/handlers.InsightResponse'
                   type: array
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: Generate new insights
       tags:
       - AI Insights
@@ -1170,19 +1375,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.UnreadCountResponse'
+                  $ref: '#/definitions/handlers.UnreadCountResponse'
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: Get unread insight count
       tags:
       - AI Insights
@@ -1208,23 +1413,23 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_internal_application_dto.OCRResponse'
+                  $ref: '#/definitions/dto.OCRResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: Process document with OCR
       tags:
       - AI OCR
@@ -1239,7 +1444,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_internal_application_dto.ConfirmOCRAssetsRequest'
+          $ref: '#/definitions/dto.ConfirmOCRAssetsRequest'
       produces:
       - application/json
       responses:
@@ -1247,23 +1452,23 @@ paths:
           description: Created
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_internal_application_dto.ConfirmOCRAssetsResponse'
+                  $ref: '#/definitions/dto.ConfirmOCRAssetsResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: Create assets from OCR results
       tags:
       - AI OCR
@@ -1289,23 +1494,23 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_internal_application_services.HistoricalStats'
+                  $ref: '#/definitions/services.HistoricalStats'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       security:
       - BearerAuth: []
       summary: Get historical statistics for a symbol
@@ -1322,15 +1527,15 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.TemplatesResponse'
+                  $ref: '#/definitions/handlers.TemplatesResponse'
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       security:
       - BearerAuth: []
       summary: Get predefined scenario templates
@@ -1348,7 +1553,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_interfaces_http_handlers.SimulateRequest'
+          $ref: '#/definitions/handlers.SimulateRequest'
       produces:
       - application/json
       responses:
@@ -1356,26 +1561,67 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.SimulateResponse'
+                  $ref: '#/definitions/handlers.SimulateResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       security:
       - BearerAuth: []
       summary: Run a what-if scenario simulation
+      tags:
+      - Scenarios
+  /api/v1/ai/simulate/chain:
+    post:
+      consumes:
+      - application/json
+      description: Simulates a chain of sequential investment scenarios
+      parameters:
+      - description: Chain parameters
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entities.ScenarioChainRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.ChainResult'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Run a multi-step what-if scenario simulation
       tags:
       - Scenarios
   /api/v1/ai/welcome:
@@ -1388,19 +1634,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.WelcomeResponse'
+                  $ref: '#/definitions/handlers.WelcomeResponse'
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: Get welcome message
       tags:
       - AI
@@ -1435,19 +1681,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.ListAssetsResponse'
+                  $ref: '#/definitions/handlers.ListAssetsResponse'
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       security:
       - BearerAuth: []
       summary: List user's assets
@@ -1463,7 +1709,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_interfaces_http_handlers.CreateAssetRequest'
+          $ref: '#/definitions/handlers.CreateAssetRequest'
       produces:
       - application/json
       responses:
@@ -1471,23 +1717,23 @@ paths:
           description: Created
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.AssetResponse'
+                  $ref: '#/definitions/handlers.AssetResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       security:
       - BearerAuth: []
       summary: Create a new asset
@@ -1508,19 +1754,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       security:
       - BearerAuth: []
       summary: Delete an asset
@@ -1541,23 +1787,23 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.AssetResponse'
+                  $ref: '#/definitions/handlers.AssetResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       security:
       - BearerAuth: []
       summary: Get asset by ID
@@ -1578,7 +1824,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_interfaces_http_handlers.UpdateAssetRequest'
+          $ref: '#/definitions/handlers.UpdateAssetRequest'
       produces:
       - application/json
       responses:
@@ -1586,23 +1832,23 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.AssetResponse'
+                  $ref: '#/definitions/handlers.AssetResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       security:
       - BearerAuth: []
       summary: Update an asset
@@ -1618,19 +1864,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.UserResponse'
+                  $ref: '#/definitions/handlers.UserResponse'
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       security:
       - BearerAuth: []
       summary: Get current user
@@ -1646,7 +1892,7 @@ paths:
         in: body
         name: request
         schema:
-          $ref: '#/definitions/internal_interfaces_http_handlers.SyncRequest'
+          $ref: '#/definitions/handlers.SyncRequest'
       produces:
       - application/json
       responses:
@@ -1654,28 +1900,28 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.SyncResponse'
+                  $ref: '#/definitions/handlers.SyncResponse'
               type: object
         "201":
           description: Created
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.SyncResponse'
+                  $ref: '#/definitions/handlers.SyncResponse'
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       security:
       - BearerAuth: []
       summary: Sync user from Supabase Auth
@@ -1715,19 +1961,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.NewsListResponse'
+                  $ref: '#/definitions/handlers.NewsListResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: Get latest financial news
       tags:
       - News
@@ -1753,19 +1999,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.NewsListResponse'
+                  $ref: '#/definitions/handlers.NewsListResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: Search financial news
       tags:
       - News
@@ -1791,19 +2037,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.NewsListResponse'
+                  $ref: '#/definitions/handlers.NewsListResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: Get news for a specific symbol
       tags:
       - News
@@ -1824,15 +2070,15 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.NewsListResponse'
+                  $ref: '#/definitions/handlers.NewsListResponse'
               type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: Get trending financial news
       tags:
       - News
@@ -1846,10 +2092,10 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.PingResponse'
+                  $ref: '#/definitions/handlers.PingResponse'
               type: object
       summary: Ping
       tags:
@@ -1864,16 +2110,16 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.PortfolioRiskResponse'
+                  $ref: '#/definitions/handlers.PortfolioRiskResponse'
               type: object
         "401":
           description: Unauthorized
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 error:
                   type: string
@@ -1882,7 +2128,7 @@ paths:
           description: Internal Server Error
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 error:
                   type: string
@@ -1902,16 +2148,16 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.PortfolioSummaryResponse'
+                  $ref: '#/definitions/handlers.PortfolioSummaryResponse'
               type: object
         "401":
           description: Unauthorized
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 error:
                   type: string
@@ -1920,7 +2166,7 @@ paths:
           description: Internal Server Error
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 error:
                   type: string
@@ -1941,10 +2187,10 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_Unikyri_WealthScope_backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_interfaces_http_handlers.HealthResponse'
+                  $ref: '#/definitions/handlers.HealthResponse'
               type: object
       summary: Health check
       tags:
