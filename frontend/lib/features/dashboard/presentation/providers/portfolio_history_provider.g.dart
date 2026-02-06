@@ -6,7 +6,7 @@ part of 'portfolio_history_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$portfolioHistoryHash() => r'30dc6d943d83d04ac347452606086508a358b5b9';
+String _$portfolioHistoryHash() => r'01429bd7c5145350832938d709f4a27d5a02f9a0';
 
 /// Copied from Dart SDK
 class _SystemHash {
