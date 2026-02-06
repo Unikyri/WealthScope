@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:wealthscope_app/features/ai/domain/entities/ocr_result.dart';
 import 'package:wealthscope_app/features/ai/presentation/providers/ocr_provider.dart';
 import 'package:wealthscope_app/features/ai/presentation/screens/extracted_assets_screen.dart';
+import 'package:wealthscope_app/features/ai/presentation/services/document_picker_service.dart';
+import 'package:wealthscope_app/features/ai/presentation/widgets/processing_view.dart';
 
 /// Document Upload Screen
 /// Main screen for uploading documents with multiple options (camera, gallery, PDF)
@@ -22,14 +23,12 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Import from Document'),
       ),
       body: _isProcessing
-          ? const _ProcessingView()
+          ? const ProcessingView()
           : _selectedFile != null
               ? _PreviewView(
                   file: _selectedFile!,
@@ -75,14 +74,15 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
 
 /// Upload Options View
 /// Displays three upload options: camera, gallery, and PDF
-class _UploadOptionsView extends StatelessWidget {
+class _UploadOptionsView extends ConsumerWidget {
   final Function(File) onImageSelected;
 
   const _UploadOptionsView({required this.onImageSelected});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final pickerService = ref.read(documentPickerServiceProvider);
 
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -116,28 +116,28 @@ class _UploadOptionsView extends StatelessWidget {
             icon: Icons.camera_alt,
             title: 'Take Photo',
             subtitle: 'Capture a document using camera',
-            onTap: () => _pickImage(ImageSource.camera),
+            onTap: () => _pickFromCamera(context, pickerService),
           ),
           const SizedBox(height: 16),
           _UploadOption(
             icon: Icons.photo_library,
             title: 'Choose from Gallery',
             subtitle: 'Select an existing image',
-            onTap: () => _pickImage(ImageSource.gallery),
+            onTap: () => _pickFromGallery(context, pickerService),
           ),
           const SizedBox(height: 16),
           _UploadOption(
             icon: Icons.picture_as_pdf,
             title: 'Upload PDF',
             subtitle: 'Select a PDF document',
-            onTap: _pickPDF,
+            onTap: () => _pickPDF(context, pickerService),
           ),
 
           const Spacer(),
 
           // Supported formats
           Text(
-            'Supported formats: JPG, PNG, PDF',
+            'Supported formats: JPG, PNG, PDF (max 10MB)',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurface.withOpacity(0.6),
             ),
@@ -148,29 +148,67 @@ class _UploadOptionsView extends StatelessWidget {
     );
   }
 
-  Future<void> _pickImage(ImageSource source) async {
-    final picker = ImagePicker();
-    final image = await picker.pickImage(
-      source: source,
-      maxWidth: 2000,
-      maxHeight: 2000,
-      imageQuality: 85,
-    );
-
-    if (image != null) {
-      onImageSelected(File(image.path));
+  Future<void> _pickFromCamera(
+    BuildContext context,
+    DocumentPickerService pickerService,
+  ) async {
+    final file = await pickerService.pickFromCamera(context);
+    if (file != null) {
+      if (!pickerService.isFileSizeValid(file)) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('File size exceeds 10MB limit'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+      onImageSelected(file);
     }
   }
 
-  Future<void> _pickPDF() async {
-    // TODO: Implement PDF picker using file_picker package
-    // final result = await FilePicker.platform.pickFiles(
-    //   type: FileType.custom,
-    //   allowedExtensions: ['pdf'],
-    // );
-    // if (result != null && result.files.single.path != null) {
-    //   onImageSelected(File(result.files.single.path!));
-    // }
+  Future<void> _pickFromGallery(
+    BuildContext context,
+    DocumentPickerService pickerService,
+  ) async {
+    final file = await pickerService.pickFromGallery(context);
+    if (file != null) {
+      if (!pickerService.isFileSizeValid(file)) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('File size exceeds 10MB limit'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+      onImageSelected(file);
+    }
+  }
+
+  Future<void> _pickPDF(
+    BuildContext context,
+    DocumentPickerService pickerService,
+  ) async {
+    final file = await pickerService.pickPDF();
+    if (file != null) {
+      if (!pickerService.isFileSizeValid(file)) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('File size exceeds 10MB limit'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+      onImageSelected(file);
+    }
   }
 }
 
@@ -272,38 +310,6 @@ class _PreviewView extends StatelessWidget {
             onPressed: onRemove,
             icon: const Icon(Icons.close),
             label: const Text('Remove'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Processing View
-/// Shown while document is being processed
-class _ProcessingView extends StatelessWidget {
-  const _ProcessingView();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator(),
-          const SizedBox(height: 24),
-          Text(
-            'Processing document...',
-            style: theme.textTheme.titleMedium,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'This may take a few moments',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
-            ),
           ),
         ],
       ),

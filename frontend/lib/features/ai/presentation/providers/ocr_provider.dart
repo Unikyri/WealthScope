@@ -16,12 +16,12 @@ class Ocr extends _$Ocr {
   /// Process a document and extract assets
   Future<OcrResult> processDocument(File document) async {
     state = const AsyncValue.loading();
-    
+
     try {
       // TODO: Integrate with actual OCR backend API
       // Simulate processing delay
       await Future.delayed(const Duration(seconds: 2));
-      
+
       // Mock result for now
       final result = OcrResult(
         documentType: 'bank_statement',
@@ -48,7 +48,7 @@ class Ocr extends _$Ocr {
           'processed_at': DateTime.now().toIso8601String(),
         },
       );
-      
+
       state = AsyncValue.data(result);
       return result;
     } catch (e, stack) {
@@ -60,5 +60,22 @@ class Ocr extends _$Ocr {
   /// Clear the current result
   void clear() {
     state = const AsyncValue.data(null);
+  }
+
+  /// Confirm and create assets from extracted data
+  Future<void> confirmAssets(List<ExtractedAsset> assets) async {
+    try {
+      // TODO: Integrate with actual asset creation API
+      // For now, simulate API call
+      await Future.delayed(const Duration(seconds: 1));
+
+      // This would normally call a repository to create the assets
+      // Example: await ref.read(assetRepositoryProvider).createAssets(assets);
+
+      // Clear the OCR state after successful creation
+      clear();
+    } catch (e) {
+      rethrow;
+    }
   }
 }
