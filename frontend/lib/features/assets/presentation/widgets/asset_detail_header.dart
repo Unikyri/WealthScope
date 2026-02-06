@@ -21,97 +21,98 @@ class AssetDetailHeader extends StatelessWidget {
     final changeColor = AppTheme.getChangeColor(gainLoss ?? 0);
 
     return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            theme.colorScheme.primary,
-            theme.colorScheme.primary.withOpacity(0.7),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Asset Type Icon with Hero animation
-          Hero(
-            tag: 'asset-icon-${asset.id}',
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface.withOpacity(0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                _getAssetIcon(asset.type),
-                size: 40,
-                color: theme.colorScheme.onPrimary,
-              ),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                theme.colorScheme.primary,
+                theme.colorScheme.primary.withOpacity(0.7),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
+            borderRadius: BorderRadius.circular(16),
           ),
-          const SizedBox(height: 16),
-          
-          // Asset Name
-          Text(
-            asset.name,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              color: theme.colorScheme.onPrimary,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          
-          // Symbol
-          Text(
-            asset.symbol,
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: theme.colorScheme.onPrimary.withOpacity(0.8),
-            ),
-          ),
-          const SizedBox(height: 20),
-          
-          // Current Price
-          Text(
-            '${asset.currency.symbol}${_formatPrice(asset.currentPrice ?? asset.purchasePrice)}',
-            style: theme.textTheme.displayMedium?.copyWith(
-              color: theme.colorScheme.onPrimary,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          
-          // Daily Change
-          if (gainLoss != null && asset.gainLossPercent != null)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: changeColor.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    isPositive ? Icons.trending_up : Icons.trending_down,
-                    size: 20,
-                    color: changeColor,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Asset Type Icon with Hero animation
+              Hero(
+                tag: 'asset-icon-${asset.id}',
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface.withOpacity(0.2),
+                    shape: BoxShape.circle,
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${isPositive ? '+' : ''}${asset.currency.symbol}${_formatPrice(gainLoss)} (${asset.gainLossPercent!.toStringAsFixed(2)}%)',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: changeColor,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  child: Icon(
+                    _getAssetIcon(asset.type),
+                    size: 40,
+                    color: theme.colorScheme.onPrimary,
                   ),
-                ],
+                ),
               ),
-            ),
-        ],
-      ),
+              const SizedBox(height: 16),
+
+              // Asset Name
+              Text(
+                asset.name,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: theme.colorScheme.onPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+
+              // Symbol
+              Text(
+                asset.symbol,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: theme.colorScheme.onPrimary.withOpacity(0.8),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Current Price
+              Text(
+                '${asset.currency.symbol}${_formatPrice(asset.currentPrice ?? asset.purchasePrice)}',
+                style: theme.textTheme.displayMedium?.copyWith(
+                  color: theme.colorScheme.onPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // Daily Change
+              if (gainLoss != null && asset.gainLossPercent != null)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: changeColor.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        isPositive ? Icons.trending_up : Icons.trending_down,
+                        size: 20,
+                        color: changeColor,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${isPositive ? '+' : ''}${asset.currency.symbol}${_formatPrice(gainLoss)} (${asset.gainLossPercent!.toStringAsFixed(2)}%)',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: changeColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
     );
   }
 
