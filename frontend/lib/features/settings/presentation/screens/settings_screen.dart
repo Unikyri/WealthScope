@@ -7,6 +7,7 @@ import 'package:wealthscope_app/core/theme/theme_provider.dart';
 import 'package:wealthscope_app/shared/widgets/theme_selection_dialog.dart';
 import 'package:wealthscope_app/core/currency/currency_provider.dart';
 import 'package:wealthscope_app/shared/widgets/currency_selector_dialog.dart';
+import 'package:wealthscope_app/features/notifications/presentation/providers/notification_preferences_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -56,24 +57,7 @@ class SettingsScreen extends ConsumerWidget {
 
           // Notifications Section
           _buildSectionHeader(context, 'Notifications'),
-          _buildSettingsTile(
-            context,
-            icon: Icons.notifications_outlined,
-            title: 'Push Notifications',
-            subtitle: 'Manage notification preferences',
-            onTap: () {
-              // TODO: Navigate to notification settings
-            },
-          ),
-          _buildSettingsTile(
-            context,
-            icon: Icons.campaign_outlined,
-            title: 'Price Alerts',
-            subtitle: 'Set up price alerts for assets',
-            onTap: () {
-              // TODO: Navigate to price alerts screen
-            },
-          ),
+          _buildNotificationToggles(context, ref),
           const Divider(height: 32),
 
           // Privacy & Security Section
@@ -289,6 +273,97 @@ class SettingsScreen extends ConsumerWidget {
                 )
               : null),
       onTap: onTap,
+    );
+  }
+
+  Widget _buildNotificationToggles(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final notificationPrefsAsync = ref.watch(notificationPreferencesNotifierProvider);
+
+    return notificationPrefsAsync.when(
+      data: (prefs) => Column(
+        children: [
+          SwitchListTile(
+            secondary: Icon(
+              Icons.trending_up,
+              color: theme.colorScheme.primary,
+            ),
+            title: const Text('Price Alerts'),
+            subtitle: const Text(
+              'Get notified when asset prices hit your targets',
+              style: TextStyle(fontSize: 12),
+            ),
+            value: prefs.priceAlerts,
+            onChanged: (value) {
+              ref
+                  .read(notificationPreferencesNotifierProvider.notifier)
+                  .togglePriceAlerts(value);
+            },
+          ),
+          SwitchListTile(
+            secondary: Icon(
+              Icons.today_outlined,
+              color: theme.colorScheme.primary,
+            ),
+            title: const Text('Daily Briefing'),
+            subtitle: const Text(
+              'Receive daily portfolio summaries and market updates',
+              style: TextStyle(fontSize: 12),
+            ),
+            value: prefs.dailyBriefing,
+            onChanged: (value) {
+              ref
+                  .read(notificationPreferencesNotifierProvider.notifier)
+                  .toggleDailyBriefing(value);
+            },
+          ),
+          SwitchListTile(
+            secondary: Icon(
+              Icons.account_balance_wallet_outlined,
+              color: theme.colorScheme.primary,
+            ),
+            title: const Text('Portfolio Alerts'),
+            subtitle: const Text(
+              'Important updates about your portfolio performance',
+              style: TextStyle(fontSize: 12),
+            ),
+            value: prefs.portfolioAlerts,
+            onChanged: (value) {
+              ref
+                  .read(notificationPreferencesNotifierProvider.notifier)
+                  .togglePortfolioAlerts(value);
+            },
+          ),
+          SwitchListTile(
+            secondary: Icon(
+              Icons.psychology_outlined,
+              color: theme.colorScheme.primary,
+            ),
+            title: const Text('AI Insights'),
+            subtitle: const Text(
+              'Personalized financial insights powered by AI',
+              style: TextStyle(fontSize: 12),
+            ),
+            value: prefs.aiInsights,
+            onChanged: (value) {
+              ref
+                  .read(notificationPreferencesNotifierProvider.notifier)
+                  .toggleAiInsights(value);
+            },
+          ),
+        ],
+      ),
+      loading: () => const Padding(
+        padding: EdgeInsets.all(24.0),
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      error: (err, stack) => Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text(
+          'Error loading notification preferences',
+          style: TextStyle(color: theme.colorScheme.error),
+        ),
+      ),
     );
   }
 
