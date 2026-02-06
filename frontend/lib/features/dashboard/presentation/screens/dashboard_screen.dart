@@ -2,14 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/providers/dashboard_providers.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/providers/portfolio_history_provider.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/providers/performance_provider.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/enhanced_allocation_section_with_legend.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/dashboard_skeleton.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/empty_dashboard.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/error_view.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/last_updated_indicator.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_summary_card.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_history_chart.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/quick_actions_row.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/performance_metrics.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
 import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
+import 'package:wealthscope_app/shared/widgets/speed_dial_fab.dart';
 
 /// Dashboard Screen
 /// Main screen displaying portfolio overview
@@ -26,138 +32,140 @@ class DashboardScreen extends ConsumerWidget {
     final userName = currentUserEmail?.split('@').first.capitalize() ?? 'User';
 
     return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Hello, $userName',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          // Refresh all dashboard data simultaneously
+          await Future.wait([
+            ref.refresh(portfolioSummaryProvider.future),
+            ref.refresh(allAssetsProvider.future),
+            ref.refresh(performanceProvider.future),
+          ]);
+        },
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            // Floating App Bar
+            SliverAppBar(
+              floating: true,
+              snap: true,
+              expandedHeight: 80,
+              backgroundColor: theme.colorScheme.surface,
+              elevation: 0,
+              flexibleSpace: FlexibleSpaceBar(
+                titlePadding: const EdgeInsets.only(left: 16, bottom: 16),
+                title: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Hello, $userName',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    Text(
+                      'Your Financial Summary',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.notifications_outlined),
+                  onPressed: () {
+                    // TODO: Navigate to notifications
+                  },
+                  tooltip: 'Notifications',
+                ),
+              ],
             ),
-            Text(
-              'Your Financial Summary',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+
+            // Dashboard Content
+            summaryAsync.when(
+              data: (summary) {
+                // Check if portfolio is empty
+                if (summary.totalValue == 0 && summary.breakdownByType.isEmpty) {
+                  return SliverFillRemaining(
+                    child: EmptyDashboard(
+                      onAddAsset: () => context.go('/assets/select-type'),
+                    ),
+                  );
+                }
+
+                final assetsAsync = ref.watch(allAssetsProvider);
+
+                return SliverPadding(
+                  padding: const EdgeInsets.all(16),
+                  sliver: SliverList(
+                    delegate: SliverChildListDelegate([
+                      // Main Portfolio Card
+                      PortfolioSummaryCard(summary: summary),
+                      const SizedBox(height: 8),
+                      LastUpdatedIndicator(lastUpdated: summary.lastUpdated),
+                      const SizedBox(height: 24),
+
+                      // Quick Stats Row
+                      _QuickStatsRow(summary: summary),
+                      const SizedBox(height: 24),
+
+                      // Performance Metrics
+                      const _PerformanceMetricsSection(),
+                      const SizedBox(height: 24),
+
+                      // Portfolio History Chart
+                      const _PortfolioHistorySection(),
+                      const SizedBox(height: 24),
+
+                      // Asset Allocation Pie Chart
+                      if (summary.breakdownByType.isNotEmpty) ...[
+                        EnhancedAllocationSection(
+                          allocations: summary.breakdownByType,
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+
+                      // Top Assets Section
+                      assetsAsync.when(
+                        data: (assets) {
+                          if (assets.isEmpty) {
+                            return const SizedBox.shrink();
+                          }
+
+                          // Sort by total value and take top 3
+                          final sortedAssets = List<dynamic>.from(assets)
+                            ..sort((a, b) =>
+                                (b.totalValue ?? 0).compareTo(a.totalValue ?? 0));
+                          final topAssets = sortedAssets.take(3).toList();
+
+                          return _TopAssetsCard(assets: topAssets);
+                        },
+                        loading: () => const SizedBox.shrink(),
+                        error: (error, stack) => const SizedBox.shrink(),
+                      ),
+
+                      const SizedBox(height: 80), // Space for FAB
+                    ]),
+                  ),
+                );
+              },
+              loading: () => const SliverFillRemaining(
+                child: DashboardSkeleton(),
+              ),
+              error: (error, _) => SliverFillRemaining(
+                child: ErrorView(
+                  message: error.toString(),
+                  onRetry: () => ref.invalidate(portfolioSummaryProvider),
+                ),
               ),
             ),
           ],
         ),
-        actions: [
-          // Refresh button
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              ref.invalidate(portfolioSummaryProvider);
-            },
-            tooltip: 'Refresh',
-          ),
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {
-              // TODO: Navigate to notifications
-            },
-            tooltip: 'Notifications',
-          ),
-        ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          ref.invalidate(portfolioSummaryProvider);
-          await ref.read(portfolioSummaryProvider.future);
-        },
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16),
-          child: summaryAsync.when(
-            data: (summary) {
-              // Check if portfolio is empty
-              if (summary.totalValue == 0 && summary.breakdownByType.isEmpty) {
-                return EmptyDashboard(
-                  onAddAsset: () => context.go('/assets/select-type'),
-                );
-              }
-
-              print('🔴 [Dashboard] Portfolio summary loaded successfully');
-              print('🔴 [Dashboard] Total value: \$${summary.totalValue}');
-              print('🔴 [Dashboard] Asset count: ${summary.assetCount}');
-              
-              final assetsAsync = ref.watch(allAssetsProvider);
-              print('🔴 [Dashboard] Watching allAssetsProvider...');
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Main Portfolio Card
-                  PortfolioSummaryCard(summary: summary),
-                  const SizedBox(height: 8),
-                  LastUpdatedIndicator(lastUpdated: summary.lastUpdated),
-                  const SizedBox(height: 24),
-
-                  // Quick Stats Row
-                  _QuickStatsRow(summary: summary),
-                  const SizedBox(height: 24),
-
-                  // Asset Allocation Pie Chart
-                  if (summary.breakdownByType.isNotEmpty) ...[
-                    EnhancedAllocationSection(
-                      allocations: summary.breakdownByType,
-                    ),
-                    const SizedBox(height: 24),
-                  ],
-
-                  // Top Assets Section
-                  assetsAsync.when(
-                    data: (assets) {
-                      print('✅ [Dashboard] Assets loaded: ${assets.length}');
-                      if (assets.isEmpty) {
-                        print('⚠️ [Dashboard] No assets to display');
-                        return const SizedBox.shrink();
-                      }
-                      
-                      print('🔴 [Dashboard] Sorting ${assets.length} assets by value...');
-                      // Sort by total value and take top 3
-                      final sortedAssets = List<dynamic>.from(assets)
-                        ..sort((a, b) => 
-                          (b.totalValue ?? 0).compareTo(a.totalValue ?? 0));
-                      final topAssets = sortedAssets.take(3).toList();
-                      
-                      print('🔴 [Dashboard] Top ${topAssets.length} assets selected');
-                      for (var asset in topAssets) {
-                        print('   - ${asset.name}: \$${asset.totalValue}');
-                      }
-
-                      return _TopAssetsCard(assets: topAssets);
-                    },
-                    loading: () {
-                      print('⏳ [Dashboard] Assets loading...');
-                      return const SizedBox.shrink();
-                    },
-                    error: (error, stack) {
-                      print('❌ [Dashboard] Assets error: $error');
-                      print('❌ [Dashboard] Stack: $stack');
-                      return const SizedBox.shrink();
-                    },
-                  ),
-                  
-                  const SizedBox(height: 80), // Space for FAB
-                ],
-              );
-            },
-            loading: () => const DashboardSkeleton(),
-            error: (error, _) => ErrorView(
-              message: error.toString(),
-              onRetry: () => ref.invalidate(portfolioSummaryProvider),
-            ),
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go('/assets/select-type'),
-        icon: const Icon(Icons.add),
-        label: const Text('Add Asset'),
-      ),
+      floatingActionButton: const SpeedDialFab(),
     );
   }
 }
@@ -460,5 +468,112 @@ class _AssetListItem extends StatelessWidget {
       return '\$${(value / 1000).toStringAsFixed(2)}K';
     }
     return '\$${value.toStringAsFixed(2)}';
+  }
+}
+
+/// Portfolio History Section Widget
+class _PortfolioHistorySection extends ConsumerWidget {
+  const _PortfolioHistorySection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final selectedPeriod = ref.watch(selectedPeriodProvider);
+    final historyAsync = ref.watch(portfolioHistoryProvider(selectedPeriod));
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            historyAsync.when(
+              data: (data) => PortfolioHistoryChart(
+                data: data,
+                period: selectedPeriod,
+                onPeriodChanged: (period) {
+                  ref.read(selectedPeriodProvider.notifier).setPeriod(period);
+                },
+              ),
+              loading: () => const SizedBox(
+                height: 300,
+                child: Center(child: CircularProgressIndicator()),
+              ),
+              error: (error, _) => SizedBox(
+                height: 300,
+                child: Center(
+                  child: Text(
+                    'Error loading history',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.error,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Performance Metrics Section Widget
+class _PerformanceMetricsSection extends ConsumerWidget {
+  const _PerformanceMetricsSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final performanceAsync = ref.watch(performanceProvider);
+
+    return performanceAsync.when(
+      data: (performance) => PerformanceMetrics(
+        performance: performance,
+      ),
+      loading: () => Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: const SizedBox(
+          height: 200,
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+      error: (error, _) => Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: SizedBox(
+          height: 200,
+          child: Center(
+            child: Text(
+              'Error loading performance',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.error,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
