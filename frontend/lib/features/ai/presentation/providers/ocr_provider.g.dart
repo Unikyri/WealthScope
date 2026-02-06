@@ -6,7 +6,7 @@ part of 'ocr_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$ocrHash() => r'1de8e8e4738ea279e21fafcc03311bad74c0104f';
+String _$ocrHash() => r'8473f63006b0a06610e9e83783773f0562d07a67';
 
 /// OCR Provider
 /// Manages document processing and OCR operations

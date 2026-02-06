@@ -9,6 +9,7 @@ import 'package:wealthscope_app/features/assets/presentation/screens/stock_form_
 import 'package:wealthscope_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:wealthscope_app/features/auth/presentation/screens/register_screen.dart';
 import 'package:wealthscope_app/features/ai/presentation/screens/ai_chat_screen.dart';
+import 'package:wealthscope_app/features/ai/presentation/screens/what_if_screen.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:wealthscope_app/features/profile/presentation/screens/profile_screen.dart';
 import 'package:wealthscope_app/features/splash/presentation/screens/splash_screen.dart';
@@ -114,6 +115,11 @@ class AppRouter {
             path: '/ai-chat',
             name: 'ai-chat',
             builder: (context, state) => const AIChatScreen(),
+          ),
+          GoRoute(
+            path: '/what-if',
+            name: 'what-if',
+            builder: (context, state) => const WhatIfScreen(),
           ),
         ],
       ),
