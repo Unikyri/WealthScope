@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/auth/presentation/providers/logout_provider.dart';
 import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
+import 'package:wealthscope_app/core/theme/theme_provider.dart';
+import 'package:wealthscope_app/shared/widgets/theme_selection_dialog.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -12,6 +14,7 @@ class SettingsScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final authState = ref.watch(authStateProvider);
     final userEmail = authState.userEmail;
+    final currentTheme = ref.watch(themeModeProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -110,9 +113,12 @@ class SettingsScreen extends ConsumerWidget {
             context,
             icon: Icons.palette_outlined,
             title: 'Theme',
-            subtitle: 'Light / Dark mode',
+            subtitle: currentTheme.displayName,
             onTap: () {
-              // TODO: Navigate to theme settings
+              showDialog(
+                context: context,
+                builder: (context) => const ThemeSelectionDialog(),
+              );
             },
           ),
           _buildSettingsTile(

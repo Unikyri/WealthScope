@@ -22,6 +22,15 @@ class EnhancedAllocationSection extends StatelessWidget {
     }
 
     return Card(
+      elevation: 2,
+      shadowColor: theme.colorScheme.primary.withOpacity(0.15),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: theme.colorScheme.outlineVariant.withOpacity(0.5),
+          width: 1.5,
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
