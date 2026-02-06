@@ -31,7 +31,9 @@ class _MainBottomNavigationBar extends StatelessWidget {
       selectedIndex = 0;
     } else if (location.startsWith('/assets')) {
       selectedIndex = 1;
-    } else if (location.startsWith('/ai-chat')) {
+    } else if (location.startsWith('/ai-advisor') || 
+               location.startsWith('/ai-chat') || 
+               location.startsWith('/what-if')) {
       selectedIndex = 2;
     } else if (location.startsWith('/profile')) {
       selectedIndex = 3;
@@ -48,7 +50,7 @@ class _MainBottomNavigationBar extends StatelessWidget {
             context.go('/assets');
             break;
           case 2:
-            context.go('/ai-chat');
+            context.go('/ai-advisor');
             break;
           case 3:
             context.go('/profile');
