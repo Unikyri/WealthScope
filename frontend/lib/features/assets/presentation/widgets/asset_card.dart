@@ -28,65 +28,51 @@ class AssetCard extends StatelessWidget {
     final hasGainLoss = asset.gainLoss != null;
     final isPositive = hasGainLoss && (asset.gainLossPercent ?? 0) >= 0;
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: InkWell(
         onTap: () => context.push('/assets/${asset.id}'),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Row(
             children: [
-              // Asset Type Icon
+              // Asset Type Icon - Circular like Trezor
               Container(
-                width: 48,
-                height: 48,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
-                  color: _getTypeColor(theme, asset.type).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  color: _getTypeColor(theme, asset.type),
+                  shape: BoxShape.circle,
                 ),
                 child: Icon(
                   _getTypeIcon(asset.type),
-                  color: _getTypeColor(theme, asset.type),
-                  size: 24,
+                  color: Colors.white,
+                  size: 22,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
 
               // Asset Information
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Asset Name and Symbol
+                    // Asset Name - More prominent
                     Text(
-                      _getDisplayName(),
+                      asset.name,
                       style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
-                    // Quantity with unit
-                    Text(
-                      '${asset.quantity.toStringAsFixed(_getDecimalPlaces())} ${_getUnitLabel()}',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
-                      ),
-                    ),
-                    // Current Price (if available and has symbol)
-                    if (asset.currentPrice != null && asset.symbol.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: Text(
-                          '${asset.currency.symbol}${asset.currentPrice!.toStringAsFixed(2)}',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.5),
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
                   ],
                 ),
               ),
@@ -94,39 +80,23 @@ class AssetCard extends StatelessWidget {
               // Value and Performance
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Percentage Change with direction indicator
-                  if (hasGainLoss)
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isPositive
-                              ? Icons.arrow_drop_up
-                              : Icons.arrow_drop_down,
-                          color: isPositive
-                              ? theme.colorScheme.tertiary
-                              : theme.colorScheme.error,
-                          size: 20,
-                        ),
-                        Text(
-                          '${isPositive ? '+' : ''}${asset.gainLossPercent!.toStringAsFixed(1)}%',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: isPositive
-                                ? theme.colorScheme.tertiary
-                                : theme.colorScheme.error,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  if (hasGainLoss) const SizedBox(height: 4),
-                  // Total Value
+                  // Total Value - Large and prominent like Trezor
                   Text(
                     '${asset.currency.symbol}${_formatValue(asset.totalValue ?? asset.totalInvested)}',
-                    style: theme.textTheme.titleMedium?.copyWith(
+                    style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  // Quantity - Secondary info like Trezor
+                  Text(
+                    '${asset.quantity.toStringAsFixed(_getDecimalPlaces())} ${_getUnitLabel()}',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withOpacity(0.5),
+                      fontSize: 13,
                     ),
                   ),
                 ],

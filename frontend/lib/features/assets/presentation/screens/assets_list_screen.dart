@@ -23,16 +23,28 @@ class AssetsListScreen extends ConsumerWidget {
     final selectedType = ref.watch(selectedAssetTypeProvider);
 
     return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
+        backgroundColor: theme.colorScheme.surface,
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.search),
+          onPressed: () {
+            // TODO: Implement search functionality
+          },
+          tooltip: 'Search',
+        ),
         title: Text(
-          'My Assets',
+          'My assets',
           style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add_rounded),
             onPressed: () => context.push('/assets/select-type'),
             tooltip: 'Add Asset',
           ),
@@ -207,11 +219,6 @@ class AssetsListScreen extends ConsumerWidget {
             ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/assets/select-type'),
-        icon: const Icon(Icons.add),
-        label: const Text('Add Asset'),
       ),
     );
   }

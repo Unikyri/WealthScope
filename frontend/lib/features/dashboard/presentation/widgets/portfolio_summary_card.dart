@@ -21,8 +21,8 @@ class PortfolioSummaryCard extends ConsumerWidget {
     final changeColor = AppTheme.getChangeColor(summary.gainLoss);
 
     return Card(
-      elevation: 8,
-      shadowColor: theme.colorScheme.primary.withOpacity(0.3),
+      elevation: 0,
+      shadowColor: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
@@ -31,12 +31,21 @@ class PortfolioSummaryCard extends ConsumerWidget {
           gradient: LinearGradient(
             colors: [
               theme.colorScheme.primary,
-              theme.colorScheme.primary.withOpacity(0.85),
+              theme.colorScheme.primary.withOpacity(0.75),
+              theme.colorScheme.secondary.withOpacity(0.3),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
+            stops: const [0.0, 0.5, 1.0],
           ),
           borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: theme.colorScheme.primary.withOpacity(0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -92,49 +101,61 @@ class PortfolioSummaryCard extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: theme.colorScheme.onPrimary.withOpacity(0.15),
+                color: isPositive 
+                  ? AppTheme.gainColor.withOpacity(0.15)
+                  : AppTheme.lossColor.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isPositive 
+                    ? AppTheme.gainColor.withOpacity(0.3)
+                    : AppTheme.lossColor.withOpacity(0.3),
+                  width: 1.5,
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: changeColor.withOpacity(0.25),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: changeColor.withOpacity(0.4),
-                      width: 2,
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: isPositive 
+                        ? AppTheme.gainColor 
+                        : AppTheme.lossColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      isPositive ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                      color: Colors.white,
+                      size: 20,
                     ),
                   ),
-                  child: Icon(
-                    isPositive ? Icons.trending_up : Icons.trending_down,
-                    color: changeColor,
-                    size: 24,
-                    weight: 800,
-                  ),
-                ),
                   const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${isPositive ? "+" : ""}${_formatCurrency(summary.gainLoss.abs(), ref)}',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: changeColor,
-                          fontWeight: FontWeight.bold,
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '${isPositive ? "+" : ""}${_formatCurrency(summary.gainLoss.abs(), ref)}',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: isPositive 
+                              ? AppTheme.gainColor 
+                              : AppTheme.lossColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
-                      ),
-                      Text(
-                        '${isPositive ? "+" : ""}${summary.gainLossPercent.toStringAsFixed(2)}% ${isPositive ? "gain" : "loss"}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onPrimary.withOpacity(0.8),
+                        Text(
+                          '${isPositive ? "+" : ""}${summary.gainLossPercent.toStringAsFixed(2)}%',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onPrimary.withOpacity(0.9),
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
