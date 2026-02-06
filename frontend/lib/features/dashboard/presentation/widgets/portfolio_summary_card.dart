@@ -20,7 +20,8 @@ class PortfolioSummaryCard extends StatelessWidget {
     final changeColor = AppTheme.getChangeColor(summary.gainLoss);
 
     return Card(
-      elevation: 4,
+      elevation: 8,
+      shadowColor: theme.colorScheme.primary.withOpacity(0.3),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
@@ -29,7 +30,7 @@ class PortfolioSummaryCard extends StatelessWidget {
           gradient: LinearGradient(
             colors: [
               theme.colorScheme.primary,
-              theme.colorScheme.primary.withOpacity(0.7),
+              theme.colorScheme.primary.withOpacity(0.85),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -98,18 +99,23 @@ class PortfolioSummaryCard extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: changeColor.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      isPositive ? Icons.trending_up : Icons.trending_down,
-                      color: changeColor,
-                      size: 20,
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: changeColor.withOpacity(0.25),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: changeColor.withOpacity(0.4),
+                      width: 2,
                     ),
                   ),
+                  child: Icon(
+                    isPositive ? Icons.trending_up : Icons.trending_down,
+                    color: changeColor,
+                    size: 24,
+                    weight: 800,
+                  ),
+                ),
                   const SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
