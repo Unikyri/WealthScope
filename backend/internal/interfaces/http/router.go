@@ -22,17 +22,19 @@ import (
 
 // RouterDeps holds all dependencies needed by the router
 type RouterDeps struct {
-	Config             *config.Config
-	DB                 *database.DB
-	NewsService        *services.NewsService
-	AIService          *services.AIService
-	InsightService     *services.InsightService
-	DocumentProcessor  *services.DocumentProcessor
-	ScenarioEngine     *services.ScenarioEngine
-	HistoricalAnalyzer *services.HistoricalAnalyzer
-	PortfolioAnalyzer  *services.PortfolioAnalyzer
-	HealthScorer       *services.HealthScorer
-	GeminiClient       interface {
+	Config              *config.Config
+	DB                  *database.DB
+	NewsService         *services.NewsService
+	AIService           *services.AIService
+	InsightService      *services.InsightService
+	DocumentProcessor   *services.DocumentProcessor
+	ScenarioEngine      *services.ScenarioEngine
+	HistoricalAnalyzer  *services.HistoricalAnalyzer
+	PortfolioAnalyzer   *services.PortfolioAnalyzer
+	HealthScorer        *services.HealthScorer
+	CorrelationDetector *services.CorrelationDetector
+	AlertGenerator      *services.AlertGenerator
+	GeminiClient        interface {
 		GenerateWithThinking(ctx context.Context, prompt, systemPrompt string, thinkingLevel int) (string, error)
 	}
 }
@@ -144,6 +146,7 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		briefingHandler = handlers.NewBriefingHandler(
 			deps.PortfolioAnalyzer,
 			deps.HealthScorer,
+			deps.AlertGenerator,
 			assetRepo,
 			nil, // AI client passed separately if available
 			nil, // logger

@@ -20,6 +20,7 @@ import (
 type BriefingHandler struct {
 	portfolioAnalyzer *services.PortfolioAnalyzer
 	healthScorer      *services.HealthScorer
+	alertGenerator    *services.AlertGenerator
 	assetRepo         repositories.AssetRepository
 	aiClient          *ai.GeminiClient
 	logger            *zap.Logger
@@ -29,6 +30,7 @@ type BriefingHandler struct {
 func NewBriefingHandler(
 	portfolioAnalyzer *services.PortfolioAnalyzer,
 	healthScorer *services.HealthScorer,
+	alertGenerator *services.AlertGenerator,
 	assetRepo repositories.AssetRepository,
 	aiClient *ai.GeminiClient,
 	logger *zap.Logger,
@@ -39,6 +41,7 @@ func NewBriefingHandler(
 	return &BriefingHandler{
 		portfolioAnalyzer: portfolioAnalyzer,
 		healthScorer:      healthScorer,
+		alertGenerator:    alertGenerator,
 		assetRepo:         assetRepo,
 		aiClient:          aiClient,
 		logger:            logger,
@@ -57,11 +60,12 @@ type Highlight struct {
 //
 //nolint:govet // fieldalignment: keep JSON field order for readability
 type BriefingResponse struct {
-	Briefing        string               `json:"briefing"`        // AI-generated narrative
-	Highlights      []Highlight          `json:"highlights"`      // Key events
-	Recommendations []string             `json:"recommendations"` // Action items
-	HealthScore     services.HealthScore `json:"health_score"`    // Portfolio health
-	GeneratedAt     time.Time            `json:"generated_at"`    // Timestamp
+	Briefing        string                    `json:"briefing"`        // AI-generated narrative
+	Highlights      []Highlight               `json:"highlights"`      // Key events
+	Alerts          []services.PortfolioAlert `json:"alerts"`          // Portfolio alerts
+	Recommendations []string                  `json:"recommendations"` // Action items
+	HealthScore     services.HealthScore      `json:"health_score"`    // Portfolio health
+	GeneratedAt     time.Time                 `json:"generated_at"`    // Timestamp
 }
 
 // GetBriefing handles GET /api/v1/ai/briefing
@@ -115,9 +119,16 @@ func (h *BriefingHandler) GetBriefing(c *gin.Context) {
 		recommendations = healthScore.Suggestions
 	}
 
+	// 6. Generate portfolio alerts
+	var alerts []services.PortfolioAlert
+	if h.alertGenerator != nil {
+		alerts = h.alertGenerator.GenerateAlerts(ctx, assetResult.Assets, analysis.Summary, nil)
+	}
+
 	briefingResponse := BriefingResponse{
 		Briefing:        briefingText,
 		Highlights:      highlights,
+		Alerts:          alerts,
 		Recommendations: recommendations,
 		HealthScore:     healthScore,
 		GeneratedAt:     time.Now().UTC(),
