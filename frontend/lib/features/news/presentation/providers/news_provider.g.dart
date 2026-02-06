@@ -6,7 +6,7 @@ part of 'news_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$newsHash() => r'5748ce90b23751ea01292a087354e8c1e09f0a2a';
+String _$newsHash() => r'6939dc1c336131a30f5878bc3fd6ffa200c6d830';
 
 /// News provider with pagination, filtering, and search
 ///
