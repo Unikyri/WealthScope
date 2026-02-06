@@ -5,14 +5,14 @@ import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart
 
 /// Asset Card Widget
 /// Reusable widget to display an asset in a list.
-/// 
+///
 /// Displays:
 /// - Icon based on asset type
 /// - Asset name and symbol (if applicable)
 /// - Quantity with unit label
 /// - Total value
 /// - Percentage change (green/red based on positive/negative)
-/// 
+///
 /// Tapping the card navigates to asset detail screen.
 class AssetCard extends StatelessWidget {
   const AssetCard({
@@ -37,25 +37,22 @@ class AssetCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              // Asset Type Icon with Hero animation
-              Hero(
-                tag: 'asset-icon-${asset.id}',
-                child: Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: _getTypeColor(theme, asset.type).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    _getTypeIcon(asset.type),
-                    color: _getTypeColor(theme, asset.type),
-                    size: 24,
-                  ),
+              // Asset Type Icon
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: _getTypeColor(theme, asset.type).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  _getTypeIcon(asset.type),
+                  color: _getTypeColor(theme, asset.type),
+                  size: 24,
                 ),
               ),
               const SizedBox(width: 16),
-              
+
               // Asset Information
               Expanded(
                 child: Column(
@@ -93,7 +90,7 @@ class AssetCard extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               // Value and Performance
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -104,7 +101,9 @@ class AssetCard extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          isPositive ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                          isPositive
+                              ? Icons.arrow_drop_up
+                              : Icons.arrow_drop_down,
                           color: isPositive
                               ? theme.colorScheme.tertiary
                               : theme.colorScheme.error,
@@ -142,7 +141,9 @@ class AssetCard extends StatelessWidget {
   /// Get display name with symbol if available
   String _getDisplayName() {
     final hasSymbol = asset.symbol.isNotEmpty;
-    if (hasSymbol && asset.type != AssetType.realEstate && asset.type != AssetType.gold) {
+    if (hasSymbol &&
+        asset.type != AssetType.realEstate &&
+        asset.type != AssetType.gold) {
       return '${asset.name} (${asset.symbol})';
     }
     return asset.name;
