@@ -13,8 +13,10 @@ import 'package:wealthscope_app/features/ai/presentation/screens/ai_chat_screen.
 import 'package:wealthscope_app/features/ai/presentation/screens/document_upload_screen.dart';
 import 'package:wealthscope_app/features/ai/presentation/screens/what_if_screen.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'package:wealthscope_app/features/notifications/presentation/screens/notifications_screen.dart';
 import 'package:wealthscope_app/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:wealthscope_app/features/profile/presentation/screens/profile_screen.dart';
+import 'package:wealthscope_app/features/settings/presentation/screens/settings_screen.dart';
 import 'package:wealthscope_app/features/splash/presentation/screens/splash_screen.dart';
 import 'package:wealthscope_app/shared/widgets/main_shell.dart';
 
@@ -138,6 +140,16 @@ class AppRouter {
             path: '/what-if',
             name: 'what-if',
             builder: (context, state) => const WhatIfScreen(),
+          ),
+          GoRoute(
+            path: '/notifications',
+            name: 'notifications',
+            builder: (context, state) => const NotificationsScreen(),
+          ),
+          GoRoute(
+            path: '/settings',
+            name: 'settings',
+            builder: (context, state) => const SettingsScreen(),
           ),
         ],
       ),
