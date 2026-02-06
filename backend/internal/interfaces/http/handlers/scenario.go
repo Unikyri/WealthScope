@@ -138,6 +138,69 @@ func (h *ScenarioHandler) Simulate(c *gin.Context) {
 	response.Success(c, resp)
 }
 
+// SimulateChain handles POST /api/v1/ai/simulate/chain
+// @Summary Run a multi-step what-if scenario simulation
+// @Description Simulates a chain of sequential investment scenarios
+// @Tags Scenarios
+// @Accept json
+// @Produce json
+// @Param request body entities.ScenarioChainRequest true "Chain parameters"
+// @Success 200 {object} response.Response{data=entities.ChainResult}
+// @Failure 400 {object} response.Response
+// @Failure 401 {object} response.Response
+// @Failure 500 {object} response.Response
+// @Security BearerAuth
+// @Router /api/v1/ai/simulate/chain [post]
+func (h *ScenarioHandler) SimulateChain(c *gin.Context) {
+	// Get user ID from context
+	userIDValue, ok := c.Get(middleware.UserIDKey)
+	if !ok {
+		response.Unauthorized(c, "User not authenticated")
+		return
+	}
+	userIDStr, ok := userIDValue.(string)
+	if !ok {
+		response.BadRequest(c, "Invalid user ID format")
+		return
+	}
+	uid, parseErr := uuid.Parse(userIDStr)
+	if parseErr != nil {
+		response.BadRequest(c, "Invalid user ID")
+		return
+	}
+
+	// Parse request
+	var req entities.ScenarioChainRequest
+	if bindErr := c.ShouldBindJSON(&req); bindErr != nil {
+		response.BadRequest(c, "Invalid request: "+bindErr.Error())
+		return
+	}
+
+	// Set user ID
+	req.UserID = uid
+
+	// Validate steps
+	if len(req.Steps) == 0 {
+		response.BadRequest(c, "At least one step is required")
+		return
+	}
+	for i, step := range req.Steps {
+		if !step.Type.IsValid() {
+			response.BadRequest(c, "Invalid scenario type in step "+string(rune(i+1))+": "+string(step.Type))
+			return
+		}
+	}
+
+	// Run simulation chain
+	result, err := h.scenarioEngine.SimulateChain(c.Request.Context(), req)
+	if err != nil {
+		response.InternalError(c, "Simulation chain failed: "+err.Error())
+		return
+	}
+
+	response.Success(c, result)
+}
+
 // GetTemplates handles GET /api/v1/ai/scenarios/templates
 // @Summary Get predefined scenario templates
 // @Description Returns a list of predefined scenario templates that users can run

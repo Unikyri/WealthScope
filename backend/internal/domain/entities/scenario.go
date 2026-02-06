@@ -212,3 +212,49 @@ func GetPredefinedTemplates() []ScenarioTemplate {
 		},
 	}
 }
+
+// ScenarioChainRequest defines a sequence of scenario steps
+//
+//nolint:govet // fieldalignment: keep logical field grouping
+type ScenarioChainRequest struct {
+	UserID uuid.UUID      `json:"user_id"`
+	Steps  []ScenarioStep `json:"steps"`
+}
+
+// ScenarioStep represents a single step in a scenario chain
+//
+//nolint:govet // fieldalignment: keep logical field grouping
+type ScenarioStep struct {
+	Order      int            `json:"order"`
+	Type       ScenarioType   `json:"type"`
+	Parameters ScenarioParams `json:"parameters"`
+}
+
+// ChainResult represents the result of a scenario chain simulation
+//
+//nolint:govet // fieldalignment: keep logical field grouping
+type ChainResult struct {
+	Steps       []StepResult    `json:"steps"`
+	FinalState  PortfolioState  `json:"final_state"`
+	TotalImpact float64         `json:"total_impact"` // Initial vs Final total value
+	Risk        *RiskAssessment `json:"risk,omitempty"`
+}
+
+// StepResult represents the result of a single step
+//
+//nolint:govet // fieldalignment: keep logical field grouping
+type StepResult struct {
+	Step   ScenarioStep    `json:"step"`
+	Result *ScenarioResult `json:"result"`
+}
+
+// RiskAssessment represents the calculated risk of the final portfolio state
+//
+//nolint:govet // fieldalignment: keep logical field grouping
+type RiskAssessment struct {
+	Score          int      `json:"score"` // 0-100 high is risky
+	Level          string   `json:"level"` // low, medium, high, critical
+	Factors        []string `json:"factors"`
+	Warnings       []string `json:"warnings"`
+	Recommendation string   `json:"recommendation"`
+}
