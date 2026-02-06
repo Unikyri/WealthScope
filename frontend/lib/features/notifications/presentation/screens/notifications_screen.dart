@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/notification.dart';
 import '../providers/notifications_provider.dart';
 import '../widgets/notification_card.dart';
+import '../widgets/notifications_list_skeleton.dart';
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wealthscope_app/features/news/domain/entities/news_article.dart';
 import 'package:wealthscope_app/features/news/presentation/providers/news_provider.dart';
 import 'package:wealthscope_app/shared/widgets/news_card.dart';
+import 'package:wealthscope_app/features/news/presentation/widgets/news_list_skeleton.dart';
 
 /// News Screen with filtering, search, and pagination
 class NewsScreen extends ConsumerStatefulWidget {
@@ -94,7 +95,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
             child: RefreshIndicator(
               onRefresh: () => ref.read(newsProvider.notifier).refresh(),
               child: newsState.articles.isEmpty && newsState.isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const NewsListSkeleton()
                   : newsState.articles.isEmpty
                       ? _buildEmptyState()
                       : ListView.builder(

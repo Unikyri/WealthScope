@@ -7,6 +7,7 @@ import 'package:wealthscope_app/features/assets/presentation/widgets/asset_detai
 import 'package:wealthscope_app/features/assets/presentation/widgets/asset_info_section.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/asset_metadata_section.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/delete_asset_dialog.dart';
+import 'package:wealthscope_app/features/assets/presentation/widgets/asset_detail_skeleton.dart';
 
 /// Asset Detail Screen
 /// Displays complete information about a specific asset including
@@ -66,9 +67,7 @@ class AssetDetailScreen extends ConsumerWidget {
             ),
           ),
         ),
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
+        loading: () => const AssetDetailSkeleton(),
         error: (error, stackTrace) => Center(
           child: Padding(
             padding: const EdgeInsets.all(24.0),
