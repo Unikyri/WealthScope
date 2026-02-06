@@ -11,6 +11,7 @@ import 'package:wealthscope_app/features/dashboard/presentation/widgets/error_vi
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/last_updated_indicator.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_summary_card.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_history_chart.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/quick_actions_row.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/performance_metrics.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
 import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
@@ -97,6 +98,10 @@ class DashboardScreen extends ConsumerWidget {
                   PortfolioSummaryCard(summary: summary),
                   const SizedBox(height: 8),
                   LastUpdatedIndicator(lastUpdated: summary.lastUpdated),
+                  const SizedBox(height: 24),
+
+                  // Quick Actions
+                  const QuickActionsRow(),
                   const SizedBox(height: 24),
 
                   // Quick Stats Row
