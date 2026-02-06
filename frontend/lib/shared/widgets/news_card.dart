@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/news/domain/entities/news_article.dart';
 
 /// Sentiment types for news articles
@@ -62,7 +62,7 @@ class NewsCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       elevation: 2,
       child: InkWell(
-        onTap: onTap ?? () => _openArticle(article.url),
+        onTap: onTap ?? () => _openArticle(context, article),
         child: isCompact ? _buildCompactLayout(context) : _buildFullLayout(context),
       ),
     );
@@ -136,6 +136,7 @@ class NewsCard extends StatelessWidget {
 
     return SizedBox(
       width: 280,
+      height: 224,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -168,45 +169,47 @@ class NewsCard extends StatelessWidget {
             ],
           ),
           
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Title
-                Text(
-                  article.title,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title
+                  Text(
+                    article.title,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                
-                const SizedBox(height: 8),
-                
-                // Source
-                Row(
-                  children: [
-                    Icon(
-                      Icons.article_outlined,
-                      size: 14,
-                      color: theme.colorScheme.onSurface.withOpacity(0.6),
-                    ),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        article.source,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                  
+                  const Spacer(),
+                  
+                  // Source
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.article_outlined,
+                        size: 14,
+                        color: theme.colorScheme.onSurface.withOpacity(0.6),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          article.source,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -422,11 +425,10 @@ class NewsCard extends StatelessWidget {
     }
   }
 
-  /// Open article in external browser
-  Future<void> _openArticle(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
+  /// Open article in in-app webview
+  static void _openArticle(BuildContext context, NewsArticle article) {
+    context.push(
+      '/news/article?url=${Uri.encodeComponent(article.url)}&title=${Uri.encodeComponent(article.title)}',
+    );
   }
 }
