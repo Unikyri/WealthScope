@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/auth/presentation/providers/logout_provider.dart';
+import 'package:wealthscope_app/features/onboarding/presentation/providers/onboarding_provider.dart';
 import 'package:wealthscope_app/features/profile/presentation/providers/profile_provider.dart';
 import 'package:wealthscope_app/features/profile/presentation/widgets/logout_confirmation_dialog.dart';
 
@@ -74,6 +75,17 @@ class ProfileScreen extends ConsumerWidget {
               // Profile Options
               ListTile(
                 leading: Icon(
+                  Icons.settings_outlined,
+                  color: colorScheme.onSurface,
+                ),
+                title: const Text('Settings'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  context.push('/settings');
+                },
+              ),
+              ListTile(
+                leading: Icon(
                   Icons.person_outline,
                   color: colorScheme.onSurface,
                 ),
@@ -91,7 +103,18 @@ class ProfileScreen extends ConsumerWidget {
                 title: const Text('Notifications'),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
-                  // TODO: Navigate to notifications settings
+                  context.push('/notifications');
+                },
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.article_outlined,
+                  color: colorScheme.onSurface,
+                ),
+                title: const Text('Financial News'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  context.push('/news');
                 },
               ),
               ListTile(
@@ -115,6 +138,20 @@ class ProfileScreen extends ConsumerWidget {
                 onTap: () {
                   // TODO: Navigate to help
                 },
+              ),
+              const Divider(),
+              // Debug Options (Development only)
+              ListTile(
+                leading: Icon(
+                  Icons.replay,
+                  color: colorScheme.secondary,
+                ),
+                title: Text(
+                  'Reset Onboarding',
+                  style: TextStyle(color: colorScheme.secondary),
+                ),
+                subtitle: const Text('View onboarding again'),
+                onTap: () => _resetOnboarding(context, ref),
               ),
               const Divider(),
               // Logout Button
@@ -174,6 +211,33 @@ class ProfileScreen extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  Future<void> _resetOnboarding(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset Onboarding'),
+        content: const Text('This will reset the onboarding state and navigate you to the onboarding screen. Continue?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Reset'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      await ref.read(onboardingProvider.notifier).resetOnboarding();
+      if (context.mounted) {
+        context.go('/onboarding');
+      }
+    }
   }
 
   Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {

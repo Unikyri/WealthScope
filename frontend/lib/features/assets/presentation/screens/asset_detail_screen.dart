@@ -7,13 +7,14 @@ import 'package:wealthscope_app/features/assets/presentation/widgets/asset_detai
 import 'package:wealthscope_app/features/assets/presentation/widgets/asset_info_section.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/asset_metadata_section.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/delete_asset_dialog.dart';
+import 'package:wealthscope_app/features/assets/presentation/widgets/asset_detail_skeleton.dart';
 
 /// Asset Detail Screen
 /// Displays complete information about a specific asset including
 /// header with large icon and price, investment details, and type-specific metadata
 class AssetDetailScreen extends ConsumerWidget {
   final String assetId;
-  
+
   const AssetDetailScreen({
     required this.assetId,
     super.key,
@@ -23,7 +24,7 @@ class AssetDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final assetAsync = ref.watch(assetDetailProvider(assetId));
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -55,20 +56,18 @@ class AssetDetailScreen extends ConsumerWidget {
                 // Header with large icon, name, symbol, current price, daily change
                 AssetDetailHeader(asset: asset),
                 const SizedBox(height: 24),
-                
+
                 // Investment details section
                 AssetInfoSection(asset: asset),
                 const SizedBox(height: 24),
-                
+
                 // Type-specific metadata
                 AssetMetadataSection(asset: asset),
               ],
             ),
           ),
         ),
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
+        loading: () => const AssetDetailSkeleton(),
         error: (error, stackTrace) => Center(
           child: Padding(
             padding: const EdgeInsets.all(24.0),
@@ -109,11 +108,11 @@ class AssetDetailScreen extends ConsumerWidget {
 
   void _handleDeleteAsset(BuildContext context, WidgetRef ref) async {
     final theme = Theme.of(context);
-    
+
     // Get the asset data first
     final assetAsync = ref.read(assetDetailProvider(assetId));
     final asset = assetAsync.valueOrNull;
-    
+
     if (asset == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -123,13 +122,13 @@ class AssetDetailScreen extends ConsumerWidget {
       );
       return;
     }
-    
+
     // Show confirmation dialog with asset name
     final confirmed = await showDeleteAssetDialog(context, asset);
-    
+
     // User cancelled or dismissed dialog
     if (confirmed != true) return;
-    
+
     // Show loading indicator
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -139,19 +138,19 @@ class AssetDetailScreen extends ConsumerWidget {
         ),
       );
     }
-    
+
     try {
       // Delete the asset via repository
       final repository = ref.read(assetRepositoryProvider);
       await repository.deleteAsset(assetId);
-      
+
       // Invalidate the assets list to refresh
       ref.invalidate(allAssetsProvider);
-      
+
       if (context.mounted) {
         // Navigate back to assets list
         context.go('/assets');
-        
+
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

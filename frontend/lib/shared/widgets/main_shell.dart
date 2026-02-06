@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/notifications/presentation/providers/notifications_provider.dart';
 
 /// MainShell wraps the main navigation structure of the app
 /// with a bottom navigation bar for protected routes
@@ -20,10 +22,14 @@ class MainShell extends StatelessWidget {
   }
 }
 
-class _MainBottomNavigationBar extends StatelessWidget {
+class _MainBottomNavigationBar extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final location = GoRouterState.of(context).uri.path;
+    final unreadCount = ref.watch(unreadNotificationsCountProvider);
+    
+    // Format badge label: show "9+" for 10 or more
+    final badgeLabel = unreadCount > 9 ? '9+' : '$unreadCount';
     
     // Determine selected index based on current route
     int selectedIndex = 0;
@@ -57,23 +63,31 @@ class _MainBottomNavigationBar extends StatelessWidget {
             break;
         }
       },
-      destinations: const [
+      destinations: [
         NavigationDestination(
-          icon: Icon(Icons.dashboard_outlined),
-          selectedIcon: Icon(Icons.dashboard),
+          icon: Badge(
+            label: Text(badgeLabel),
+            isLabelVisible: unreadCount > 0,
+            child: const Icon(Icons.dashboard_outlined),
+          ),
+          selectedIcon: Badge(
+            label: Text(badgeLabel),
+            isLabelVisible: unreadCount > 0,
+            child: const Icon(Icons.dashboard),
+          ),
           label: 'Dashboard',
         ),
-        NavigationDestination(
+        const NavigationDestination(
           icon: Icon(Icons.account_balance_wallet_outlined),
           selectedIcon: Icon(Icons.account_balance_wallet),
           label: 'Assets',
         ),
-        NavigationDestination(
+        const NavigationDestination(
           icon: Icon(Icons.psychology_outlined),
           selectedIcon: Icon(Icons.psychology),
           label: 'AI Advisor',
         ),
-        NavigationDestination(
+        const NavigationDestination(
           icon: Icon(Icons.person_outline),
           selectedIcon: Icon(Icons.person),
           label: 'Profile',

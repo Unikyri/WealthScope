@@ -36,24 +36,21 @@ class AssetDetailHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Asset Type Icon with Hero animation
-          Hero(
-            tag: 'asset-icon-${asset.id}',
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface.withOpacity(0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                _getAssetIcon(asset.type),
-                size: 40,
-                color: theme.colorScheme.onPrimary,
-              ),
+          // Asset Type Icon
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              _getAssetIcon(asset.type),
+              size: 40,
+              color: theme.colorScheme.onPrimary,
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Asset Name
           Text(
             asset.name,
@@ -63,7 +60,7 @@ class AssetDetailHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          
+
           // Symbol
           Text(
             asset.symbol,
@@ -72,7 +69,7 @@ class AssetDetailHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          
+
           // Current Price
           Text(
             '${asset.currency.symbol}${_formatPrice(asset.currentPrice ?? asset.purchasePrice)}',
@@ -82,7 +79,7 @@ class AssetDetailHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          
+
           // Daily Change
           if (gainLoss != null && asset.gainLossPercent != null)
             Container(

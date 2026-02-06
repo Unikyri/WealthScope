@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/assets/data/providers/asset_repository_provider.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
@@ -52,10 +53,11 @@ class AssetsListScreen extends ConsumerWidget {
             child: assetsAsync.when(
               data: (assets) {
                 print('🟠 [AssetsList] Received ${assets.length} assets');
-                
+
                 // Empty state with pull-to-refresh support
                 if (assets.isEmpty) {
-                  print('⚠️ [AssetsList] Assets list is empty, showing empty view');
+                  print(
+                      '⚠️ [AssetsList] Assets list is empty, showing empty view');
                   return RefreshIndicator(
                     onRefresh: () async {
                       print('🔄 [AssetsList] Refreshing assets...');
@@ -74,8 +76,9 @@ class AssetsListScreen extends ConsumerWidget {
                   );
                 }
 
-                print('✅ [AssetsList] Building list with ${assets.length} items');
-                // Data state - show list with pull-to-refresh
+                print(
+                    '✅ [AssetsList] Building list with ${assets.length} items');
+                // Data state - show list with pull-to-refresh and staggered animations
                 return RefreshIndicator(
                   onRefresh: () async {
                     print('🔄 [AssetsList] Refreshing assets...');
@@ -84,68 +87,87 @@ class AssetsListScreen extends ConsumerWidget {
                     // Wait for the refresh to complete
                     await ref.read(allAssetsProvider.future);
                   },
-                  child: ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(16),
-                    itemCount: assets.length,
-                    itemBuilder: (context, index) {
-                      final asset = assets[index];
-                      return Dismissible(
-                        key: Key(asset.id ?? 'asset-$index'),
-                        direction: DismissDirection.endToStart,
-                        confirmDismiss: (direction) async {
-                          // Show confirmation dialog
-                          return await showDeleteAssetDialog(context, asset);
-                        },
-                        onDismissed: (direction) async {
-                          // Optimistically update UI immediately
-                          ref.read(allAssetsProvider.notifier).removeAsset(asset.id!);
+                  child: AnimationLimiter(
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(16),
+                      itemCount: assets.length,
+                      itemBuilder: (context, index) {
+                        final asset = assets[index];
+                        return AnimationConfiguration.staggeredList(
+                          position: index,
+                          duration: const Duration(milliseconds: 375),
+                          child: SlideAnimation(
+                            verticalOffset: 50.0,
+                            child: FadeInAnimation(
+                              child: Dismissible(
+                                key: Key(asset.id ?? 'asset-$index'),
+                                direction: DismissDirection.endToStart,
+                                confirmDismiss: (direction) async {
+                                  // Show confirmation dialog
+                                  return await showDeleteAssetDialog(
+                                      context, asset);
+                                },
+                                onDismissed: (direction) async {
+                                  // Optimistically update UI immediately
+                                  ref
+                                      .read(allAssetsProvider.notifier)
+                                      .removeAsset(asset.id!);
 
-                          try {
-                            // Delete asset from backend
-                            await ref
-                                .read(assetRepositoryProvider)
-                                .deleteAsset(asset.id!);
+                                  try {
+                                    // Delete asset from backend
+                                    await ref
+                                        .read(assetRepositoryProvider)
+                                        .deleteAsset(asset.id!);
 
-                            // Show success message
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('${asset.name} deleted'),
+                                    // Show success message
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content:
+                                              Text('${asset.name} deleted'),
+                                        ),
+                                      );
+                                    }
+                                  } catch (e) {
+                                    // Show error message
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text('Failed to delete: $e'),
+                                          backgroundColor:
+                                              theme.colorScheme.error,
+                                        ),
+                                      );
+                                    }
+                                    // Revert optimistic update by refreshing from backend
+                                    await ref
+                                        .read(allAssetsProvider.notifier)
+                                        .refresh();
+                                  }
+                                },
+                                background: Container(
+                                  alignment: Alignment.centerRight,
+                                  padding: const EdgeInsets.only(right: 20),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.error,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: theme.colorScheme.onError,
+                                    size: 28,
+                                  ),
                                 ),
-                              );
-                            }
-                          } catch (e) {
-                            // Show error message
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Failed to delete: $e'),
-                                  backgroundColor:
-                                      theme.colorScheme.error,
-                                ),
-                              );
-                            }
-                            // Revert optimistic update by refreshing from backend
-                            await ref.read(allAssetsProvider.notifier).refresh();
-                          }
-                        },
-                        background: Container(
-                          alignment: Alignment.centerRight,
-                          padding: const EdgeInsets.only(right: 20),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.error,
-                            borderRadius: BorderRadius.circular(12),
+                                child: AssetCard(asset: asset),
+                              ),
+                            ),
                           ),
-                          child: Icon(
-                            Icons.delete,
-                            color: theme.colorScheme.onError,
-                            size: 28,
-                          ),
-                        ),
-                        child: AssetCard(asset: asset),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
                 );
               },

@@ -30,45 +30,73 @@ class AssetCardSkeleton extends StatelessWidget {
     final highlightColor = theme.colorScheme.surfaceContainerLow;
     final shimmerColor = theme.colorScheme.surfaceContainerHighest;
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Shimmer.fromColors(
-        baseColor: baseColor,
-        highlightColor: highlightColor,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              // Asset Type Icon Placeholder
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: shimmerColor,
-                  borderRadius: BorderRadius.circular(12),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Card(
+        child: Shimmer.fromColors(
+          baseColor: baseColor,
+          highlightColor: highlightColor,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                // Asset Type Icon Placeholder
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: shimmerColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              
-              // Asset Information Placeholders
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                const SizedBox(width: 16),
+                
+                // Asset Information Placeholders
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Asset Name Placeholder
+                      Container(
+                        width: 120,
+                        height: 16,
+                        decoration: BoxDecoration(
+                          color: shimmerColor,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      // Quantity Placeholder
+                      Container(
+                        width: 80,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: shimmerColor,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // Value and Performance Placeholders
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    // Asset Name Placeholder
+                    // Percentage Change Placeholder
                     Container(
-                      width: 120,
-                      height: 16,
+                      width: 50,
+                      height: 14,
                       decoration: BoxDecoration(
                         color: shimmerColor,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
                     const SizedBox(height: 8),
-                    // Quantity Placeholder
+                    // Total Value Placeholder
                     Container(
-                      width: 80,
-                      height: 12,
+                      width: 70,
+                      height: 16,
                       decoration: BoxDecoration(
                         color: shimmerColor,
                         borderRadius: BorderRadius.circular(4),
@@ -76,34 +104,8 @@ class AssetCardSkeleton extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
-              
-              // Value and Performance Placeholders
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  // Percentage Change Placeholder
-                  Container(
-                    width: 50,
-                    height: 14,
-                    decoration: BoxDecoration(
-                      color: shimmerColor,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  // Total Value Placeholder
-                  Container(
-                    width: 70,
-                    height: 16,
-                    decoration: BoxDecoration(
-                      color: shimmerColor,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
