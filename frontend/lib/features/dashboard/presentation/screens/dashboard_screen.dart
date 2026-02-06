@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/providers/dashboard_providers.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/providers/portfolio_history_provider.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/enhanced_allocation_section_with_legend.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/dashboard_skeleton.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/empty_dashboard.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/error_view.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/last_updated_indicator.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_summary_card.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_history_chart.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
 import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
 
@@ -97,6 +99,10 @@ class DashboardScreen extends ConsumerWidget {
 
                   // Quick Stats Row
                   _QuickStatsRow(summary: summary),
+                  const SizedBox(height: 24),
+
+                  // Portfolio History Chart
+                  _PortfolioHistorySection(),
                   const SizedBox(height: 24),
 
                   // Asset Allocation Pie Chart
@@ -460,5 +466,60 @@ class _AssetListItem extends StatelessWidget {
       return '\$${(value / 1000).toStringAsFixed(2)}K';
     }
     return '\$${value.toStringAsFixed(2)}';
+  }
+}
+
+/// Portfolio History Section Widget
+class _PortfolioHistorySection extends ConsumerWidget {
+  const _PortfolioHistorySection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final selectedPeriod = ref.watch(selectedPeriodProvider);
+    final historyAsync = ref.watch(portfolioHistoryProvider(selectedPeriod));
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            historyAsync.when(
+              data: (data) => PortfolioHistoryChart(
+                data: data,
+                period: selectedPeriod,
+                onPeriodChanged: (period) {
+                  ref.read(selectedPeriodProvider.notifier).setPeriod(period);
+                },
+              ),
+              loading: () => const SizedBox(
+                height: 300,
+                child: Center(child: CircularProgressIndicator()),
+              ),
+              error: (error, _) => SizedBox(
+                height: 300,
+                child: Center(
+                  child: Text(
+                    'Error loading history',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.error,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
