@@ -73,19 +73,38 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
-            // Skip button
-            Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: TextButton(
-                  onPressed: _skip,
-                  child: const Text('Skip'),
-                ),
+            // Header with Skip button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Logo or app name
+                  Text(
+                    'WealthScope',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                  // Skip button
+                  if (_currentPage < _slides.length - 1)
+                    TextButton(
+                      onPressed: _skip,
+                      child: Text(
+                        'Skip',
+                        style: TextStyle(color: colorScheme.onSurfaceVariant),
+                      ),
+                    ),
+                ],
               ),
             ),
 
@@ -96,14 +115,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 onPageChanged: (index) => setState(() => _currentPage = index),
                 itemCount: _slides.length,
                 itemBuilder: (context, index) {
-                  return _OnboardingPage(slide: _slides[index]);
+                  return _OnboardingPage(
+                    slide: _slides[index],
+                    key: ValueKey(index),
+                  );
                 },
               ),
             ),
 
             // Page indicator
             Padding(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.symmetric(vertical: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
@@ -117,18 +139,27 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
             // Navigation button
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
               child: SizedBox(
                 width: double.infinity,
+                height: 56,
                 child: FilledButton(
                   onPressed: _nextPage,
+                  style: FilledButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
                   child: Text(
                     _currentPage == _slides.length - 1 ? 'Get Started' : 'Next',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 24),
           ],
         ),
       ),
@@ -157,62 +188,123 @@ class OnboardingSlide {
 class _OnboardingPage extends StatelessWidget {
   final OnboardingSlide slide;
 
-  const _OnboardingPage({required this.slide});
+  const _OnboardingPage({super.key, required this.slide});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 360;
 
-    return Padding(
-      padding: const EdgeInsets.all(32),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Animated icon container
-          TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0, end: 1),
-            duration: const Duration(milliseconds: 500),
-            builder: (context, value, child) {
-              return Transform.scale(
-                scale: value,
-                child: child,
-              );
-            },
-            child: Container(
-              width: 160,
-              height: 160,
-              decoration: BoxDecoration(
-                color: slide.color.withOpacity(0.1),
-                shape: BoxShape.circle,
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: isSmallScreen ? 24 : 32,
+          vertical: 16,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(height: size.height * 0.05),
+
+            // Animated icon container
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: 1),
+              duration: const Duration(milliseconds: 600),
+              curve: Curves.easeOutBack,
+              builder: (context, value, child) {
+                return Transform.scale(
+                  scale: value,
+                  child: Opacity(
+                    opacity: value,
+                    child: child,
+                  ),
+                );
+              },
+              child: Hero(
+                tag: 'onboarding_${slide.title}',
+                child: Container(
+                  width: isSmallScreen ? 140 : 180,
+                  height: isSmallScreen ? 140 : 180,
+                  decoration: BoxDecoration(
+                    color: slide.color.withOpacity(0.12),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: slide.color.withOpacity(0.2),
+                        blurRadius: 30,
+                        spreadRadius: 5,
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    slide.icon,
+                    size: isSmallScreen ? 70 : 90,
+                    color: slide.color,
+                  ),
+                ),
               ),
-              child: Icon(
-                slide.icon,
-                size: 80,
-                color: slide.color,
+            ),
+            
+            SizedBox(height: size.height * 0.08),
+
+            // Title with fade-in animation
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: 1),
+              duration: const Duration(milliseconds: 700),
+              curve: Curves.easeOut,
+              builder: (context, value, child) {
+                return Opacity(
+                  opacity: value,
+                  child: Transform.translate(
+                    offset: Offset(0, 20 * (1 - value)),
+                    child: child,
+                  ),
+                );
+              },
+              child: Text(
+                slide.title,
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: isSmallScreen ? 24 : 28,
+                  height: 1.2,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
               ),
             ),
-          ),
-          const SizedBox(height: 48),
+            
+            const SizedBox(height: 20),
 
-          // Title
-          Text(
-            slide.title,
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
+            // Subtitle with fade-in animation
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: 1),
+              duration: const Duration(milliseconds: 800),
+              curve: Curves.easeOut,
+              builder: (context, value, child) {
+                return Opacity(
+                  opacity: value,
+                  child: Transform.translate(
+                    offset: Offset(0, 20 * (1 - value)),
+                    child: child,
+                  ),
+                );
+              },
+              child: Text(
+                slide.subtitle,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontSize: isSmallScreen ? 14 : 16,
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 3,
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-
-          // Subtitle
-          Text(
-            slide.subtitle,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+            
+            SizedBox(height: size.height * 0.05),
+          ],
+        ),
       ),
     );
   }
