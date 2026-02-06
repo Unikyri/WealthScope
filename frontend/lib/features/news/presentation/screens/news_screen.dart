@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wealthscope_app/features/news/domain/entities/news_article.dart';
 import 'package:wealthscope_app/features/news/presentation/providers/news_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:wealthscope_app/shared/widgets/news_card.dart';
 
 /// News Screen with filtering, search, and pagination
 class NewsScreen extends ConsumerStatefulWidget {
@@ -111,8 +111,14 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
                                 ),
                               );
                             }
-                            return _NewsCard(
-                              article: newsState.articles[index],
+                            final article = newsState.articles[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: NewsCard(
+                                article: article,
+                                relatedSymbols: _getRelatedSymbols(article),
+                                sentiment: _getSentiment(article),
+                              ),
                             );
                           },
                         ),
@@ -178,167 +184,36 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
       ),
     );
   }
-}
 
-/// Individual news card widget
-class _NewsCard extends StatelessWidget {
-  final NewsArticle article;
-
-  const _NewsCard({required this.article});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => _openArticle(article.url),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Article image
-            AspectRatio(
-              aspectRatio: 16 / 9,
-              child: Image.network(
-                article.imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: theme.colorScheme.surfaceContainerHighest,
-                    child: Icon(
-                      Icons.image_not_supported,
-                      size: 48,
-                      color: theme.colorScheme.onSurface.withOpacity(0.3),
-                    ),
-                  );
-                },
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Container(
-                    color: theme.colorScheme.surfaceContainerHighest,
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                            : null,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            // Article content
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Category badge
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: _getCategoryColor(article.category, theme)
-                          .withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      article.category.toUpperCase(),
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: _getCategoryColor(article.category, theme),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Title
-                  Text(
-                    article.title,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      height: 1.3,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Description
-                  Text(
-                    article.description,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7),
-                      height: 1.4,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Metadata
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.access_time,
-                        size: 14,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        article.getTimeAgo(),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Icon(
-                        Icons.newspaper,
-                        size: 14,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          article.source,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  /// Get related symbols for an article (mock implementation)
+  List<String>? _getRelatedSymbols(NewsArticle article) {
+    // Mock logic - in real app, this would come from article data
+    final category = article.category;
+    if (category == NewsCategory.stocks) {
+      return ['AAPL', 'TSLA'];
+    } else if (category == NewsCategory.crypto) {
+      return ['BTC', 'ETH'];
+    } else if (category == NewsCategory.forex) {
+      return ['EUR/USD', 'GBP/USD'];
+    }
+    return null;
   }
 
-  Color _getCategoryColor(String category, ThemeData theme) {
-    switch (category.toLowerCase()) {
-      case 'stocks':
-        return Colors.blue;
-      case 'crypto':
-        return Colors.orange;
-      case 'forex':
-        return Colors.green;
-      default:
-        return theme.colorScheme.primary;
+  /// Get sentiment for an article (mock implementation)
+  NewsSentiment? _getSentiment(NewsArticle article) {
+    // Mock logic - in real app, this would be analyzed from content
+    final titleLower = article.title.toLowerCase();
+    if (titleLower.contains('surge') ||
+        titleLower.contains('rally') ||
+        titleLower.contains('gain') ||
+        titleLower.contains('up')) {
+      return NewsSentiment.positive;
+    } else if (titleLower.contains('fall') ||
+        titleLower.contains('drop') ||
+        titleLower.contains('decline') ||
+        titleLower.contains('crash')) {
+      return NewsSentiment.negative;
     }
-  }
-
-  Future<void> _openArticle(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
+    return NewsSentiment.neutral;
   }
 }
