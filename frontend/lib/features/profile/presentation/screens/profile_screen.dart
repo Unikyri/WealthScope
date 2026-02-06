@@ -103,7 +103,18 @@ class ProfileScreen extends ConsumerWidget {
                 title: const Text('Notifications'),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
-                  // TODO: Navigate to notifications settings
+                  context.push('/notifications');
+                },
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.article_outlined,
+                  color: colorScheme.onSurface,
+                ),
+                title: const Text('Financial News'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  context.push('/news');
                 },
               ),
               ListTile(
