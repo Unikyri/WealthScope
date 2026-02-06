@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/providers/dashboard_providers.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/providers/portfolio_history_provider.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/providers/performance_provider.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/enhanced_allocation_section_with_legend.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/dashboard_skeleton.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/empty_dashboard.dart';
@@ -10,6 +11,7 @@ import 'package:wealthscope_app/features/dashboard/presentation/widgets/error_vi
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/last_updated_indicator.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_summary_card.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_history_chart.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/performance_metrics.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
 import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
 
@@ -99,6 +101,10 @@ class DashboardScreen extends ConsumerWidget {
 
                   // Quick Stats Row
                   _QuickStatsRow(summary: summary),
+                  const SizedBox(height: 24),
+
+                  // Performance Metrics
+                  _PerformanceMetricsSection(),
                   const SizedBox(height: 24),
 
                   // Portfolio History Chart
@@ -518,6 +524,58 @@ class _PortfolioHistorySection extends ConsumerWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Performance Metrics Section Widget
+class _PerformanceMetricsSection extends ConsumerWidget {
+  const _PerformanceMetricsSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final performanceAsync = ref.watch(performanceProvider);
+
+    return performanceAsync.when(
+      data: (performance) => PerformanceMetrics(
+        performance: performance,
+      ),
+      loading: () => Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: const SizedBox(
+          height: 200,
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+      error: (error, _) => Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: SizedBox(
+          height: 200,
+          child: Center(
+            child: Text(
+              'Error loading performance',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.error,
+              ),
+            ),
+          ),
         ),
       ),
     );
