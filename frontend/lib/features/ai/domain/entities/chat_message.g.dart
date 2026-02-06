@@ -24,14 +24,18 @@ Map<String, dynamic> _$$ChatMessageImplToJson(_$ChatMessageImpl instance) =>
 
 _$ChatResponseImpl _$$ChatResponseImplFromJson(Map<String, dynamic> json) =>
     _$ChatResponseImpl(
-      message: ChatMessage.fromJson(json['message'] as Map<String, dynamic>),
+      userMessage:
+          ChatMessage.fromJson(json['user_message'] as Map<String, dynamic>),
+      aiMessage:
+          ChatMessage.fromJson(json['ai_message'] as Map<String, dynamic>),
       conversationId: json['conversation_id'] as String,
       tokensUsed: (json['tokens_used'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$$ChatResponseImplToJson(_$ChatResponseImpl instance) =>
     <String, dynamic>{
-      'message': instance.message.toJson(),
+      'user_message': instance.userMessage.toJson(),
+      'ai_message': instance.aiMessage.toJson(),
       'conversation_id': instance.conversationId,
       'tokens_used': instance.tokensUsed,
     };

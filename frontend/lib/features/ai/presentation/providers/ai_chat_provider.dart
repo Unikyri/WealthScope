@@ -58,11 +58,9 @@ class AiChat extends _$AiChat {
         (response) {
           _conversationId = response.conversationId;
           
-          // Add AI response
-          state = AsyncData([
-            ...state.value ?? [],
-            response.message,
-          ]);
+          // Replace optimistic user message with the actual one and add AI response
+          final messages = [...currentMessages, response.userMessage, response.aiMessage];
+          state = AsyncData(messages);
         },
       );
     } catch (e) {

@@ -22,7 +22,7 @@ final aiRepositoryProvider = AutoDisposeProvider<AIRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AiRepositoryRef = AutoDisposeProviderRef<AIRepository>;
-String _$aiChatHash() => r'2d7e3b786b8b59fbad514241edd6f91adf29a3d8';
+String _$aiChatHash() => r'1e24da08245df1e52c84ccc52bb6d19707a93523';
 
 /// See also [AiChat].
 @ProviderFor(AiChat)

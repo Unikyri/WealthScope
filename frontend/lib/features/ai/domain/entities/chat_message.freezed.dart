@@ -24,6 +24,7 @@ mixin _$ChatMessage {
   String get role =>
       throw _privateConstructorUsedError; // 'user' or 'assistant'
   String get content => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this ChatMessage to a JSON map.
@@ -42,7 +43,11 @@ abstract class $ChatMessageCopyWith<$Res> {
           ChatMessage value, $Res Function(ChatMessage) then) =
       _$ChatMessageCopyWithImpl<$Res, ChatMessage>;
   @useResult
-  $Res call({String id, String role, String content, DateTime createdAt});
+  $Res call(
+      {String id,
+      String role,
+      String content,
+      @JsonKey(name: 'created_at') DateTime createdAt});
 }
 
 /// @nodoc
@@ -94,7 +99,11 @@ abstract class _$$ChatMessageImplCopyWith<$Res>
       __$$ChatMessageImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, String role, String content, DateTime createdAt});
+  $Res call(
+      {String id,
+      String role,
+      String content,
+      @JsonKey(name: 'created_at') DateTime createdAt});
 }
 
 /// @nodoc
@@ -143,7 +152,7 @@ class _$ChatMessageImpl implements _ChatMessage {
       {required this.id,
       required this.role,
       required this.content,
-      required this.createdAt});
+      @JsonKey(name: 'created_at') required this.createdAt});
 
   factory _$ChatMessageImpl.fromJson(Map<String, dynamic> json) =>
       _$$ChatMessageImplFromJson(json);
@@ -156,6 +165,7 @@ class _$ChatMessageImpl implements _ChatMessage {
   @override
   final String content;
   @override
+  @JsonKey(name: 'created_at')
   final DateTime createdAt;
 
   @override
@@ -197,10 +207,11 @@ class _$ChatMessageImpl implements _ChatMessage {
 
 abstract class _ChatMessage implements ChatMessage {
   const factory _ChatMessage(
-      {required final String id,
-      required final String role,
-      required final String content,
-      required final DateTime createdAt}) = _$ChatMessageImpl;
+          {required final String id,
+          required final String role,
+          required final String content,
+          @JsonKey(name: 'created_at') required final DateTime createdAt}) =
+      _$ChatMessageImpl;
 
   factory _ChatMessage.fromJson(Map<String, dynamic> json) =
       _$ChatMessageImpl.fromJson;
@@ -212,6 +223,7 @@ abstract class _ChatMessage implements ChatMessage {
   @override
   String get content;
   @override
+  @JsonKey(name: 'created_at')
   DateTime get createdAt;
 
   /// Create a copy of ChatMessage
@@ -228,7 +240,8 @@ ChatResponse _$ChatResponseFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$ChatResponse {
-  ChatMessage get message => throw _privateConstructorUsedError;
+  ChatMessage get userMessage => throw _privateConstructorUsedError;
+  ChatMessage get aiMessage => throw _privateConstructorUsedError;
   String get conversationId => throw _privateConstructorUsedError;
   int? get tokensUsed => throw _privateConstructorUsedError;
 
@@ -248,9 +261,14 @@ abstract class $ChatResponseCopyWith<$Res> {
           ChatResponse value, $Res Function(ChatResponse) then) =
       _$ChatResponseCopyWithImpl<$Res, ChatResponse>;
   @useResult
-  $Res call({ChatMessage message, String conversationId, int? tokensUsed});
+  $Res call(
+      {ChatMessage userMessage,
+      ChatMessage aiMessage,
+      String conversationId,
+      int? tokensUsed});
 
-  $ChatMessageCopyWith<$Res> get message;
+  $ChatMessageCopyWith<$Res> get userMessage;
+  $ChatMessageCopyWith<$Res> get aiMessage;
 }
 
 /// @nodoc
@@ -268,14 +286,19 @@ class _$ChatResponseCopyWithImpl<$Res, $Val extends ChatResponse>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? message = null,
+    Object? userMessage = null,
+    Object? aiMessage = null,
     Object? conversationId = null,
     Object? tokensUsed = freezed,
   }) {
     return _then(_value.copyWith(
-      message: null == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
+      userMessage: null == userMessage
+          ? _value.userMessage
+          : userMessage // ignore: cast_nullable_to_non_nullable
+              as ChatMessage,
+      aiMessage: null == aiMessage
+          ? _value.aiMessage
+          : aiMessage // ignore: cast_nullable_to_non_nullable
               as ChatMessage,
       conversationId: null == conversationId
           ? _value.conversationId
@@ -292,9 +315,19 @@ class _$ChatResponseCopyWithImpl<$Res, $Val extends ChatResponse>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $ChatMessageCopyWith<$Res> get message {
-    return $ChatMessageCopyWith<$Res>(_value.message, (value) {
-      return _then(_value.copyWith(message: value) as $Val);
+  $ChatMessageCopyWith<$Res> get userMessage {
+    return $ChatMessageCopyWith<$Res>(_value.userMessage, (value) {
+      return _then(_value.copyWith(userMessage: value) as $Val);
+    });
+  }
+
+  /// Create a copy of ChatResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ChatMessageCopyWith<$Res> get aiMessage {
+    return $ChatMessageCopyWith<$Res>(_value.aiMessage, (value) {
+      return _then(_value.copyWith(aiMessage: value) as $Val);
     });
   }
 }
@@ -307,10 +340,16 @@ abstract class _$$ChatResponseImplCopyWith<$Res>
       __$$ChatResponseImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({ChatMessage message, String conversationId, int? tokensUsed});
+  $Res call(
+      {ChatMessage userMessage,
+      ChatMessage aiMessage,
+      String conversationId,
+      int? tokensUsed});
 
   @override
-  $ChatMessageCopyWith<$Res> get message;
+  $ChatMessageCopyWith<$Res> get userMessage;
+  @override
+  $ChatMessageCopyWith<$Res> get aiMessage;
 }
 
 /// @nodoc
@@ -326,14 +365,19 @@ class __$$ChatResponseImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? message = null,
+    Object? userMessage = null,
+    Object? aiMessage = null,
     Object? conversationId = null,
     Object? tokensUsed = freezed,
   }) {
     return _then(_$ChatResponseImpl(
-      message: null == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
+      userMessage: null == userMessage
+          ? _value.userMessage
+          : userMessage // ignore: cast_nullable_to_non_nullable
+              as ChatMessage,
+      aiMessage: null == aiMessage
+          ? _value.aiMessage
+          : aiMessage // ignore: cast_nullable_to_non_nullable
               as ChatMessage,
       conversationId: null == conversationId
           ? _value.conversationId
@@ -351,13 +395,18 @@ class __$$ChatResponseImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$ChatResponseImpl implements _ChatResponse {
   const _$ChatResponseImpl(
-      {required this.message, required this.conversationId, this.tokensUsed});
+      {required this.userMessage,
+      required this.aiMessage,
+      required this.conversationId,
+      this.tokensUsed});
 
   factory _$ChatResponseImpl.fromJson(Map<String, dynamic> json) =>
       _$$ChatResponseImplFromJson(json);
 
   @override
-  final ChatMessage message;
+  final ChatMessage userMessage;
+  @override
+  final ChatMessage aiMessage;
   @override
   final String conversationId;
   @override
@@ -365,7 +414,7 @@ class _$ChatResponseImpl implements _ChatResponse {
 
   @override
   String toString() {
-    return 'ChatResponse(message: $message, conversationId: $conversationId, tokensUsed: $tokensUsed)';
+    return 'ChatResponse(userMessage: $userMessage, aiMessage: $aiMessage, conversationId: $conversationId, tokensUsed: $tokensUsed)';
   }
 
   @override
@@ -373,7 +422,10 @@ class _$ChatResponseImpl implements _ChatResponse {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ChatResponseImpl &&
-            (identical(other.message, message) || other.message == message) &&
+            (identical(other.userMessage, userMessage) ||
+                other.userMessage == userMessage) &&
+            (identical(other.aiMessage, aiMessage) ||
+                other.aiMessage == aiMessage) &&
             (identical(other.conversationId, conversationId) ||
                 other.conversationId == conversationId) &&
             (identical(other.tokensUsed, tokensUsed) ||
@@ -382,8 +434,8 @@ class _$ChatResponseImpl implements _ChatResponse {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, message, conversationId, tokensUsed);
+  int get hashCode => Object.hash(
+      runtimeType, userMessage, aiMessage, conversationId, tokensUsed);
 
   /// Create a copy of ChatResponse
   /// with the given fields replaced by the non-null parameter values.
@@ -403,7 +455,8 @@ class _$ChatResponseImpl implements _ChatResponse {
 
 abstract class _ChatResponse implements ChatResponse {
   const factory _ChatResponse(
-      {required final ChatMessage message,
+      {required final ChatMessage userMessage,
+      required final ChatMessage aiMessage,
       required final String conversationId,
       final int? tokensUsed}) = _$ChatResponseImpl;
 
@@ -411,7 +464,9 @@ abstract class _ChatResponse implements ChatResponse {
       _$ChatResponseImpl.fromJson;
 
   @override
-  ChatMessage get message;
+  ChatMessage get userMessage;
+  @override
+  ChatMessage get aiMessage;
   @override
   String get conversationId;
   @override

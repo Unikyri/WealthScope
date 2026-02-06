@@ -12,7 +12,7 @@ class AIRemoteDataSource {
   }) async {
     try {
       final response = await _dio.post(
-        '/api/v1/ai/chat',
+        '/ai/chat',
         data: {
           'message': message,
           if (conversationId != null) 'conversation_id': conversationId,
@@ -21,6 +21,17 @@ class AIRemoteDataSource {
 
       return response.data['data'];
     } on DioException catch (e) {
+      // Extract error message from API response
+      if (e.response?.data != null && e.response!.data is Map) {
+        final errorData = e.response!.data as Map<String, dynamic>;
+        if (errorData.containsKey('error') && errorData['error'] is Map) {
+          final errorInfo = errorData['error'] as Map<String, dynamic>;
+          final errorMessage = errorInfo['message'] as String?;
+          if (errorMessage != null) {
+            throw Exception(errorMessage);
+          }
+        }
+      }
       throw Exception('Failed to send message: ${e.message}');
     }
   }
@@ -28,7 +39,7 @@ class AIRemoteDataSource {
   Future<Map<String, dynamic>> getInsights({bool includeBriefing = true}) async {
     try {
       final response = await _dio.get(
-        '/api/v1/ai/insights',
+        '/ai/insights',
         queryParameters: {
           'include_briefing': includeBriefing,
         },
@@ -42,7 +53,7 @@ class AIRemoteDataSource {
 
   Future<List<ChatMessageDTO>> getChatHistory() async {
     try {
-      final response = await _dio.get('/api/ai/history');
+      final response = await _dio.get('/ai/history');
 
       final List<dynamic> data = response.data;
       return data.map((json) => ChatMessageDTO.fromJson(json)).toList();
@@ -53,7 +64,7 @@ class AIRemoteDataSource {
 
   Future<void> clearHistory() async {
     try {
-      await _dio.delete('/api/ai/history');
+      await _dio.delete('/ai/history');
     } on DioException catch (e) {
       throw Exception('Failed to clear history: ${e.message}');
     }

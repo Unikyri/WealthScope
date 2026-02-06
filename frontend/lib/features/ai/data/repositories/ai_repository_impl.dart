@@ -22,9 +22,10 @@ class AIRepositoryImpl implements AIRepository {
       );
       
       return Right(ChatResponse(
-        message: ChatMessage.fromJson(data['message']),
+        userMessage: ChatMessage.fromJson(data['user_message']),
+        aiMessage: ChatMessage.fromJson(data['ai_message']),
         conversationId: data['conversation_id'],
-        tokensUsed: data['tokens_used'],
+        tokensUsed: null, // API doesn't return tokens_used in this endpoint
       ));
     } on DioException catch (e) {
       return Left(ServerFailure(e.message ?? 'Server error'));
