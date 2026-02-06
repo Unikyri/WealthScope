@@ -23,9 +23,13 @@ class NotificationCard extends ConsumerWidget {
           ? theme.colorScheme.surface
           : theme.colorScheme.primaryContainer.withOpacity(0.1),
       child: InkWell(
-        onTap: () {
+        onTap: () async {
           if (!notification.isRead) {
-            ref.read(notificationsProvider.notifier).markAsRead(notification.id);
+            try {
+              await ref.read(markInsightAsReadProvider.notifier).mark(notification.id);
+            } catch (e) {
+              // Handle error silently or show a snackbar
+            }
           }
           if (notification.assetId != null) {
             // Navigate to asset detail
@@ -91,20 +95,19 @@ class NotificationCard extends ConsumerWidget {
                 children: [
                   if (notification.assetId != null)
                     TextButton.icon(
-                      onPressed: () {
-                        ref.read(notificationsProvider.notifier).markAsRead(notification.id);
+                      onPressed: () async {
+                        if (!notification.isRead) {
+                          try {
+                            await ref.read(markInsightAsReadProvider.notifier).mark(notification.id);
+                          } catch (e) {
+                            // Handle error
+                          }
+                        }
                         // Navigate to asset
                       },
                       icon: const Icon(Icons.visibility, size: 18),
                       label: const Text('View Asset'),
                     ),
-                  TextButton.icon(
-                    onPressed: () {
-                      ref.read(notificationsProvider.notifier).dismiss(notification.id);
-                    },
-                    icon: const Icon(Icons.close, size: 18),
-                    label: const Text('Dismiss'),
-                  ),
                 ],
               ),
             ],

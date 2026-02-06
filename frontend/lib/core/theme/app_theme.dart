@@ -9,24 +9,26 @@ class AppTheme {
   // ============================================================================
   // BRAND COLORS - Modern Financial App Palette
   // ============================================================================
-  static const Color primaryColor = Color(0xFF6366F1);    // Indigo - Main actions
-  static const Color secondaryColor = Color(0xFF10B981);  // Emerald - Success/Gains
-  static const Color accentColor = Color(0xFFF59E0B);     // Amber - Accents/Warnings
-  static const Color errorColor = Color(0xFFEF4444);      // Red - Errors/Losses
-  static const Color successColor = Color(0xFF10B981);    // Emerald - Same as secondary
+  static const Color primaryColor = Color(0xFF5B67F1);    // Vibrant Blue - Main actions
+  static const Color secondaryColor = Color(0xFF00D9A3);  // Vibrant Green - Success/Gains
+  static const Color accentColor = Color(0xFFFFC107);     // Vibrant Yellow - Accents/CTAs
+  static const Color errorColor = Color(0xFFFF5252);      // Vibrant Red - Errors/Losses
+  static const Color successColor = Color(0xFF00D9A3);    // Vibrant Green - Same as secondary
   
   // ============================================================================
   // SEMANTIC COLORS - For financial data display
   // ============================================================================
-  static const Color gainColor = Color(0xFF10B981);       // Green for gains
-  static const Color lossColor = Color(0xFFEF4444);       // Red for losses
-  static const Color neutralColor = Color(0xFF6B7280);    // Gray for neutral
+  static const Color gainColor = Color(0xFF00E5A0);       // Bright green for gains
+  static const Color lossColor = Color(0xFFFF5555);       // Bright red for losses
+  static const Color neutralColor = Color(0xFF8E95A5);    // Blue-gray for neutral
   
   // ============================================================================
-  // SURFACE COLORS
+  // SURFACE COLORS - Dark theme inspired
   // ============================================================================
-  static const Color surfaceLight = Color(0xFFF8FAFC);    // Light mode background
-  static const Color surfaceDark = Color(0xFF0F172A);     // Dark mode background
+  static const Color surfaceLight = Color(0xFFF5F7FA);    // Light mode background
+  static const Color surfaceDark = Color(0xFF0D1117);     // Dark mode background (darker)
+  static const Color cardDark = Color(0xFF161B22);        // Dark mode cards
+  static const Color cardLight = Color(0xFFFFFFFF);       // Light mode cards
   
   // ============================================================================
   // CHART COLORS - For pie charts and graphs

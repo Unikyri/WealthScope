@@ -43,9 +43,29 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
     _messageController.clear();
 
     // Send message via provider
-    await ref.read(aiChatProvider.notifier).sendMessage(message);
-
-    _scrollToBottom();
+    try {
+      await ref.read(aiChatProvider.notifier).sendMessage(message);
+      _scrollToBottom();
+    } catch (e) {
+      // Show user-friendly error message
+      if (mounted) {
+        final errorMessage = e.toString().replaceFirst('Exception: ', '');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              errorMessage.contains('overloaded')
+                  ? 'AI service is temporarily busy. Please try again in a moment.'
+                  : errorMessage,
+            ),
+            duration: const Duration(seconds: 5),
+            action: SnackBarAction(
+              label: 'Retry',
+              onPressed: () => _sendMessage(),
+            ),
+          ),
+        );
+      }
+    }
   }
 
   @override

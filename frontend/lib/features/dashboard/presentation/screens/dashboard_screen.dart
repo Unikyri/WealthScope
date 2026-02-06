@@ -28,7 +28,8 @@ class DashboardScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final summaryAsync = ref.watch(portfolioSummaryProvider);
     final currentUserEmail = ref.watch(currentUserProvider)?.email;
-    final unreadCount = ref.watch(unreadNotificationsCountProvider);
+    final unreadCountAsync = ref.watch(unreadNotificationsCountProvider);
+    final unreadCount = unreadCountAsync.valueOrNull ?? 0;
     
     // Format badge label: show "9+" for 10 or more
     final badgeLabel = unreadCount > 9 ? '9+' : '$unreadCount';
@@ -37,6 +38,7 @@ class DashboardScreen extends ConsumerWidget {
     final userName = currentUserEmail?.split('@').first.capitalize() ?? 'User';
 
     return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
       body: RefreshIndicator(
         onRefresh: () async {
           // Refresh all dashboard data simultaneously
@@ -129,10 +131,6 @@ class DashboardScreen extends ConsumerWidget {
                       const _PortfolioHistorySection(),
                       const SizedBox(height: 24),
 
-                      // Latest Financial News
-                      const DashboardNewsSection(),
-                      const SizedBox(height: 24),
-
                       // Asset Allocation Pie Chart
                       if (summary.breakdownByType.isNotEmpty) ...[
                         EnhancedAllocationSection(
@@ -159,6 +157,11 @@ class DashboardScreen extends ConsumerWidget {
                         loading: () => const SizedBox.shrink(),
                         error: (error, stack) => const SizedBox.shrink(),
                       ),
+
+                      const SizedBox(height: 24),
+
+                      // Latest Financial News (moved to bottom)
+                      const DashboardNewsSection(),
 
                       const SizedBox(height: 80), // Space for FAB
                     ]),

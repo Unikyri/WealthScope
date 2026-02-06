@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
@@ -12,13 +13,16 @@ class DocumentPickerService {
 
   /// Pick image from camera
   Future<File?> pickFromCamera(BuildContext context) async {
-    final status = await Permission.camera.request();
+    // Skip permission check on web - browser handles it
+    if (!kIsWeb) {
+      final status = await Permission.camera.request();
 
-    if (status.isDenied) {
-      if (context.mounted) {
-        _showPermissionDeniedDialog(context, 'Camera');
+      if (status.isDenied) {
+        if (context.mounted) {
+          _showPermissionDeniedDialog(context, 'Camera');
+        }
+        return null;
       }
-      return null;
     }
 
     final image = await _imagePicker.pickImage(
@@ -30,18 +34,29 @@ class DocumentPickerService {
     );
 
     if (image == null) return null;
+    
+    // On web, we can't create File from path
+    if (kIsWeb) {
+      // For web, you might need to handle this differently
+      // For now, return null as camera on web needs special handling
+      return null;
+    }
+    
     return File(image.path);
   }
 
   /// Pick image from gallery
   Future<File?> pickFromGallery(BuildContext context) async {
-    final status = await Permission.photos.request();
+    // Skip permission check on web - browser handles it automatically
+    if (!kIsWeb) {
+      final status = await Permission.photos.request();
 
-    if (status.isDenied) {
-      if (context.mounted) {
-        _showPermissionDeniedDialog(context, 'Photos');
+      if (status.isDenied) {
+        if (context.mounted) {
+          _showPermissionDeniedDialog(context, 'Photos');
+        }
+        return null;
       }
-      return null;
     }
 
     final image = await _imagePicker.pickImage(
@@ -52,6 +67,14 @@ class DocumentPickerService {
     );
 
     if (image == null) return null;
+    
+    // On web, we can't create File from path
+    if (kIsWeb) {
+      // For web, you might need to handle this differently
+      // For now, return null and use FilePicker instead
+      return null;
+    }
+    
     return File(image.path);
   }
 

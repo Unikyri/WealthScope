@@ -15,7 +15,7 @@ class ChatMessage with _$ChatMessage {
     required String id,
     required String role, // 'user' or 'assistant'
     required String content,
-    required DateTime createdAt,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
   }) = _ChatMessage;
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) =>
@@ -25,7 +25,8 @@ class ChatMessage with _$ChatMessage {
 @freezed
 class ChatResponse with _$ChatResponse {
   const factory ChatResponse({
-    required ChatMessage message,
+    required ChatMessage userMessage,
+    required ChatMessage aiMessage,
     required String conversationId,
     int? tokensUsed,
   }) = _ChatResponse;
