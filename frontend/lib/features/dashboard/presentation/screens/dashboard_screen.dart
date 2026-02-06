@@ -12,6 +12,7 @@ import 'package:wealthscope_app/features/dashboard/presentation/widgets/last_upd
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_summary_card.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_history_chart.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/performance_metrics.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/dashboard_news_section.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
 import 'package:wealthscope_app/features/notifications/presentation/providers/notifications_provider.dart';
 import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
@@ -126,6 +127,10 @@ class DashboardScreen extends ConsumerWidget {
 
                       // Portfolio History Chart
                       const _PortfolioHistorySection(),
+                      const SizedBox(height: 24),
+
+                      // Latest Financial News
+                      const DashboardNewsSection(),
                       const SizedBox(height: 24),
 
                       // Asset Allocation Pie Chart
