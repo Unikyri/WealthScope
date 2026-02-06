@@ -11,7 +11,6 @@ import 'package:wealthscope_app/features/dashboard/presentation/widgets/error_vi
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/last_updated_indicator.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_summary_card.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_history_chart.dart';
-import 'package:wealthscope_app/features/dashboard/presentation/widgets/quick_actions_row.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/performance_metrics.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
 import 'package:wealthscope_app/features/notifications/presentation/providers/notifications_provider.dart';
