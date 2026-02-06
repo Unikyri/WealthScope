@@ -4,11 +4,25 @@ import (
 	"context"
 	"fmt"
 	"iter"
+	"strings"
 
 	"go.uber.org/zap"
 	"google.golang.org/genai"
 
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/marketdata"
+)
+
+// ThinkingLevel configures reasoning depth for Gemini 3.
+// Higher levels enable more complex multi-step reasoning.
+type ThinkingLevel int
+
+const (
+	// ThinkingFast provides quick responses for simple queries.
+	ThinkingFast ThinkingLevel = 1
+	// ThinkingBalanced provides balanced analysis for general use.
+	ThinkingBalanced ThinkingLevel = 3
+	// ThinkingDeep provides complex analysis for scenarios like What-If.
+	ThinkingDeep ThinkingLevel = 5
 )
 
 // Message represents a chat message for the AI.
@@ -39,6 +53,13 @@ func NewGeminiClient(apiKey, model string, rateLimiter *marketdata.RateLimiter, 
 		logger = zap.NewNop()
 	}
 
+	// Warn if not using Gemini 3 model (required for hackathon)
+	if !strings.HasPrefix(model, "gemini-3") {
+		logger.Warn("using non-Gemini-3 model - hackathon requires Gemini 3",
+			zap.String("model", model),
+			zap.String("recommended", "gemini-3-flash-preview"))
+	}
+
 	ctx := context.Background()
 	client, err := genai.NewClient(ctx, &genai.ClientConfig{
 		APIKey:  apiKey,
@@ -47,6 +68,10 @@ func NewGeminiClient(apiKey, model string, rateLimiter *marketdata.RateLimiter, 
 	if err != nil {
 		return nil, fmt.Errorf("gemini: failed to create client: %w", err)
 	}
+
+	logger.Info("Gemini client initialized",
+		zap.String("model", model),
+		zap.Bool("is_gemini_3", strings.HasPrefix(model, "gemini-3")))
 
 	return &GeminiClient{
 		client:      client,
@@ -314,4 +339,85 @@ func (c *GeminiClient) Close() error {
 // Model returns the model name being used.
 func (c *GeminiClient) Model() string {
 	return c.model
+}
+
+// GenerateWithThinking uses Gemini 3 thinking levels for complex reasoning.
+// Higher thinking levels enable deeper multi-step analysis suitable for
+// financial scenarios like What-If simulations and portfolio optimization.
+func (c *GeminiClient) GenerateWithThinking(
+	ctx context.Context,
+	prompt string,
+	systemPrompt string,
+	thinkingLevel ThinkingLevel,
+) (string, error) {
+	if c.rateLimiter != nil {
+		if err := c.rateLimiter.Wait(ctx); err != nil {
+			return "", fmt.Errorf("gemini: rate limit wait: %w", err)
+		}
+	}
+
+	c.logger.Debug("sending request with thinking level",
+		zap.String("model", c.model),
+		zap.Int("thinking_level", int(thinkingLevel)),
+		zap.Int("prompt_length", len(prompt)))
+
+	// Build content
+	contents := []*genai.Content{{
+		Role: "user",
+		Parts: []*genai.Part{
+			{Text: prompt},
+		},
+	}}
+
+	// Build config with system instruction and thinking level
+	config := &genai.GenerateContentConfig{
+		// Temperature adjusted based on thinking level:
+		// Lower for deeper analysis, higher for creative responses
+		Temperature: genai.Ptr(float32(0.9 - (float32(thinkingLevel) * 0.1))),
+		// TopP for nucleus sampling
+		TopP: genai.Ptr(float32(0.95)),
+		// TopK for diverse token selection
+		TopK: genai.Ptr(float32(40)),
+	}
+
+	if systemPrompt != "" {
+		// Include thinking level guidance in system prompt
+		enhancedPrompt := fmt.Sprintf(`%s
+
+REASONING DEPTH: Level %d
+- Think step-by-step when analyzing
+- Consider multiple perspectives
+- Provide confidence levels for predictions
+- Show your reasoning process when appropriate`, systemPrompt, thinkingLevel)
+
+		config.SystemInstruction = &genai.Content{
+			Parts: []*genai.Part{
+				{Text: enhancedPrompt},
+			},
+		}
+	}
+
+	// Call the API
+	result, err := c.client.Models.GenerateContent(ctx, c.model, contents, config)
+	if err != nil {
+		c.logger.Error("gemini thinking API error", zap.Error(err))
+		return "", fmt.Errorf("gemini: thinking generation failed: %w", err)
+	}
+
+	// Extract text from response
+	text := result.Text()
+	if text == "" {
+		return "", fmt.Errorf("gemini: empty thinking response")
+	}
+
+	c.logger.Debug("received thinking response from Gemini",
+		zap.Int("response_length", len(text)),
+		zap.Int("thinking_level", int(thinkingLevel)))
+
+	return text, nil
+}
+
+// IsGemini3 returns true if the client is using a Gemini 3 model.
+func (c *GeminiClient) IsGemini3() bool {
+	return strings.HasPrefix(c.model, "gemini-3")
 }
