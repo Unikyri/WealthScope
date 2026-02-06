@@ -15,8 +15,8 @@ AIRepository aiRepository(AiRepositoryRef ref) {
   return AIRepositoryImpl(dataSource);
 }
 
-// Chat State Provider
-@riverpod
+// Chat State Provider with keepAlive to persist history
+@Riverpod(keepAlive: true)
 class AiChat extends _$AiChat {
   String? _conversationId;
 

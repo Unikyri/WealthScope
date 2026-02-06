@@ -1,88 +1,119 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../../../core/network/dio_client_provider.dart';
+import '../../data/datasources/insights_remote_datasource.dart';
+import '../../data/repositories/insights_repository_impl.dart';
+import '../../domain/entities/insight_entity.dart';
+import '../../domain/repositories/insights_repository.dart';
 import '../../domain/entities/notification.dart';
 
 part 'notifications_provider.g.dart';
 
+/// Provider for InsightsRepository
 @riverpod
-class Notifications extends _$Notifications {
+InsightsRepository insightsRepository(InsightsRepositoryRef ref) {
+  final dio = ref.watch(dioClientProvider);
+  final dataSource = InsightsRemoteDataSource(dio);
+  return InsightsRepositoryImpl(dataSource);
+}
+
+/// Provider to fetch insights list with optional filters
+@riverpod
+Future<InsightListEntity> insightsList(
+  InsightsListRef ref, {
+  String? type,
+  String? category,
+  String? priority,
+  bool? unread,
+  int limit = 20,
+  int offset = 0,
+}) async {
+  final repository = ref.watch(insightsRepositoryProvider);
+  return await repository.listInsights(
+    type: type,
+    category: category,
+    priority: priority,
+    unread: unread,
+    limit: limit,
+    offset: offset,
+  );
+}
+
+/// Provider to get daily briefing
+@riverpod
+Future<InsightEntity> dailyBriefing(DailyBriefingRef ref) async {
+  final repository = ref.watch(insightsRepositoryProvider);
+  return await repository.getDailyBriefing();
+}
+
+/// Provider for unread count
+@riverpod
+Future<int> unreadInsightsCount(UnreadInsightsCountRef ref) async {
+  final repository = ref.watch(insightsRepositoryProvider);
+  final result = await repository.getUnreadCount();
+  return result.count;
+}
+
+/// Provider to mark insight as read
+@riverpod
+class MarkInsightAsRead extends _$MarkInsightAsRead {
   @override
-  List<AppNotification> build() {
-    return _generateMockNotifications();
-  }
+  FutureOr<void> build() {}
 
-  void markAsRead(String notificationId) {
-    state = state.map((notification) {
-      if (notification.id == notificationId) {
-        return notification.copyWith(isRead: true);
-      }
-      return notification;
-    }).toList();
-  }
-
-  void dismiss(String notificationId) {
-    state = state.where((n) => n.id != notificationId).toList();
-  }
-
-  void markAllAsRead() {
-    state = state.map((n) => n.copyWith(isRead: true)).toList();
-  }
-
-  Future<void> refresh() async {
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 1));
-    state = _generateMockNotifications();
-  }
-
-  List<AppNotification> _generateMockNotifications() {
-    final now = DateTime.now();
-    return [
-      AppNotification(
-        id: '1',
-        title: 'Price Alert: Bitcoin',
-        message: 'BTC reached your target price of \$45,000',
-        type: NotificationType.priceAlert,
-        timestamp: now.subtract(const Duration(hours: 2)),
-        isRead: false,
-        assetId: 'btc-001',
-      ),
-      AppNotification(
-        id: '2',
-        title: 'Portfolio Update',
-        message: 'Your portfolio gained +3.2% today',
-        type: NotificationType.portfolioUpdate,
-        timestamp: now.subtract(const Duration(hours: 5)),
-        isRead: false,
-      ),
-      AppNotification(
-        id: '3',
-        title: 'AI Insight',
-        message: 'Consider rebalancing your tech stock allocation',
-        type: NotificationType.aiInsight,
-        timestamp: now.subtract(const Duration(days: 1)),
-        isRead: true,
-      ),
-      AppNotification(
-        id: '4',
-        title: 'Document Processed',
-        message: 'Successfully imported 3 assets from bank statement',
-        type: NotificationType.documentProcessed,
-        timestamp: now.subtract(const Duration(days: 2)),
-        isRead: true,
-      ),
-      AppNotification(
-        id: '5',
-        title: 'System Update',
-        message: 'New features available: What-If Scenarios',
-        type: NotificationType.system,
-        timestamp: now.subtract(const Duration(days: 3)),
-        isRead: true,
-      ),
-    ];
+  Future<void> mark(String id) async {
+    state = const AsyncLoading();
+    try {
+      final repository = ref.read(insightsRepositoryProvider);
+      await repository.markAsRead(id);
+      state = const AsyncData(null);
+      
+      // Refresh insights list
+      ref.invalidate(insightsListProvider);
+      ref.invalidate(unreadInsightsCountProvider);
+    } catch (e, st) {
+      state = AsyncError(e, st);
+      rethrow;
+    }
   }
 }
 
+/// Backwards compatibility: Convert insights to notifications format
 @riverpod
-int unreadNotificationsCount(UnreadNotificationsCountRef ref) {
-  final notifications = ref.watch(notificationsProvider);
-  return notifications.where((n) => !n.isRead).length;
+Future<List<AppNotification>> notifications(NotificationsRef ref) async {
+  final insightsAsync = await ref.watch(insightsListProvider(
+    limit: 20,
+    offset: 0,
+  ).future);
+  
+  return insightsAsync.insights.map((insight) {
+    return AppNotification(
+      id: insight.id,
+      title: insight.title,
+      message: insight.content,
+      type: _mapInsightTypeToNotificationType(insight.type),
+      timestamp: insight.createdAt,
+      isRead: insight.isRead,
+      assetId: insight.relatedSymbols.isNotEmpty ? insight.relatedSymbols.first : null,
+      actionUrl: null,
+    );
+  }).toList();
+}
+
+/// Provider for unread notifications count (backwards compatibility)
+@riverpod
+Future<int> unreadNotificationsCount(UnreadNotificationsCountRef ref) async {
+  return await ref.watch(unreadInsightsCountProvider.future);
+}
+
+/// Helper to map insight type to notification type
+NotificationType _mapInsightTypeToNotificationType(String insightType) {
+  switch (insightType) {
+    case 'alert':
+      return NotificationType.priceAlert;
+    case 'recommendation':
+      return NotificationType.aiInsight;
+    case 'daily_briefing':
+      return NotificationType.portfolioUpdate;
+    default:
+      return NotificationType.system;
+  }
 }

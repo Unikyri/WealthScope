@@ -26,7 +26,8 @@ class _MainBottomNavigationBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final location = GoRouterState.of(context).uri.path;
-    final unreadCount = ref.watch(unreadNotificationsCountProvider);
+    final unreadCountAsync = ref.watch(unreadNotificationsCountProvider);
+    final unreadCount = unreadCountAsync.valueOrNull ?? 0;
     
     // Format badge label: show "9+" for 10 or more
     final badgeLabel = unreadCount > 9 ? '9+' : '$unreadCount';

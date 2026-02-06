@@ -22,12 +22,12 @@ final aiRepositoryProvider = AutoDisposeProvider<AIRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AiRepositoryRef = AutoDisposeProviderRef<AIRepository>;
-String _$aiChatHash() => r'1e24da08245df1e52c84ccc52bb6d19707a93523';
+String _$aiChatHash() => r'0f0dc7bb8d50ec23941fc7ecba739943dc99ebab';
 
 /// See also [AiChat].
 @ProviderFor(AiChat)
 final aiChatProvider =
-    AutoDisposeAsyncNotifierProvider<AiChat, List<ChatMessage>>.internal(
+    AsyncNotifierProvider<AiChat, List<ChatMessage>>.internal(
   AiChat.new,
   name: r'aiChatProvider',
   debugGetCreateSourceHash:
@@ -36,7 +36,7 @@ final aiChatProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$AiChat = AutoDisposeAsyncNotifier<List<ChatMessage>>;
+typedef _$AiChat = AsyncNotifier<List<ChatMessage>>;
 String _$aiIsTypingHash() => r'944da31eff73414aed4240628422fecf7ae0bdd2';
 
 /// See also [AiIsTyping].

@@ -12,6 +12,8 @@ import 'package:wealthscope_app/features/ai/presentation/screens/ai_advisor_scre
 import 'package:wealthscope_app/features/ai/presentation/screens/ai_chat_screen.dart';
 import 'package:wealthscope_app/features/ai/presentation/screens/document_upload_screen.dart';
 import 'package:wealthscope_app/features/ai/presentation/screens/what_if_screen.dart';
+import 'package:wealthscope_app/features/conversations/presentation/screens/conversation_chat_screen.dart';
+import 'package:wealthscope_app/features/conversations/presentation/screens/conversations_list_screen.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:wealthscope_app/features/news/presentation/screens/article_webview_screen.dart';
 import 'package:wealthscope_app/features/news/presentation/screens/news_screen.dart';
@@ -132,6 +134,21 @@ class AppRouter {
             path: '/ai-chat',
             name: 'ai-chat',
             builder: (context, state) => const AIChatScreen(),
+            routes: [
+              GoRoute(
+                path: ':conversationId',
+                name: 'ai-chat-conversation',
+                builder: (context, state) {
+                  final conversationId = state.pathParameters['conversationId']!;
+                  return ConversationChatScreen(conversationId: conversationId);
+                },
+              ),
+            ],
+          ),
+          GoRoute(
+            path: '/conversations',
+            name: 'conversations',
+            builder: (context, state) => const ConversationsListScreen(),
           ),
           GoRoute(
             path: '/document-upload',

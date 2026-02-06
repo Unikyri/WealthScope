@@ -12,35 +12,72 @@ class NotificationsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final notifications = ref.watch(notificationsProvider);
-    final groupedNotifications = _groupNotificationsByDate(notifications);
+    final notificationsAsync = ref.watch(notificationsProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notifications'),
         actions: [
-          if (notifications.any((n) => !n.isRead))
-            TextButton(
-              onPressed: () {
-                ref.read(notificationsProvider.notifier).markAllAsRead();
-              },
-              child: const Text('Mark all read'),
-            ),
+          // Show unread count badge
+          Consumer(
+            builder: (context, ref, _) {
+              final unreadAsync = ref.watch(unreadNotificationsCountProvider);
+              return unreadAsync.when(
+                data: (count) => count > 0
+                    ? Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: Chip(
+                          label: Text('$count unread'),
+                          backgroundColor: theme.colorScheme.primary,
+                          labelStyle: TextStyle(color: theme.colorScheme.onPrimary),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+                loading: () => const SizedBox.shrink(),
+                error: (_, __) => const SizedBox.shrink(),
+              );
+            },
+          ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await ref.read(notificationsProvider.notifier).refresh();
+      body: notificationsAsync.when(
+        data: (notifications) {
+          if (notifications.isEmpty) {
+            return _buildEmptyState(context);
+          }
+          
+          final groupedNotifications = _groupNotificationsByDate(notifications);
+          
+          return RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(notificationsProvider);
+              ref.invalidate(unreadNotificationsCountProvider);
+            },
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              itemCount: _calculateTotalItems(groupedNotifications),
+              itemBuilder: (context, index) {
+                return _buildGroupedItem(context, ref, groupedNotifications, index);
+              },
+            ),
+          );
         },
-        child: notifications.isEmpty
-            ? _buildEmptyState(context)
-            : ListView.builder(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                itemCount: _calculateTotalItems(groupedNotifications),
-                itemBuilder: (context, index) {
-                  return _buildGroupedItem(context, groupedNotifications, index);
-                },
+        loading: () => const NotificationsListSkeleton(),
+        error: (error, stack) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 64, color: theme.colorScheme.error),
+              const SizedBox(height: 16),
+              Text('Failed to load notifications'),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: () => ref.invalidate(notificationsProvider),
+                child: const Text('Retry'),
               ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -93,6 +130,7 @@ class NotificationsScreen extends ConsumerWidget {
 
   Widget _buildGroupedItem(
     BuildContext context,
+    WidgetRef ref,
     Map<String, List<AppNotification>> grouped,
     int index,
   ) {

@@ -328,9 +328,65 @@ class PortfolioRiskAnalysis {
 - [x] Portfolio domain layer
 - [x] Portfolio data layer
 - [x] Portfolio providers
+- [x] Conversations domain layer
+- [x] Conversations data layer
+- [x] Conversations providers
 - [x] Code generation successful
 - [ ] UI Screens (pending)
 - [ ] Integration tests (pending)
+
+---
+
+### 5. Conversations (`/features/conversations`)
+
+**Endpoints:**
+- `GET /api/v1/ai/conversations` - List conversations
+- `POST /api/v1/ai/conversations` - Create conversation
+- `GET /api/v1/ai/conversations/{id}` - Get conversation with messages
+- `PUT /api/v1/ai/conversations/{id}` - Update conversation title
+- `DELETE /api/v1/ai/conversations/{id}` - Delete conversation
+- `GET /api/v1/ai/welcome` - Get welcome message and starters
+
+**Structure:**
+```
+lib/features/conversations/
+├── domain/
+│   ├── entities/conversation_entity.dart
+│   └── repositories/conversations_repository.dart
+├── data/
+│   ├── models/conversation_dto.dart (freezed)
+│   ├── datasources/conversations_remote_datasource.dart
+│   └── repositories/conversations_repository_impl.dart
+└── presentation/
+    └── providers/conversations_providers.dart (@riverpod)
+```
+
+**Usage Example:**
+```dart
+// List conversations
+final conversations = ref.watch(conversationsListProvider(
+  limit: 20,
+  offset: 0,
+));
+
+// Get conversation with messages
+final conversation = ref.watch(conversationProvider(conversationId));
+
+// Get welcome message
+final welcome = ref.watch(welcomeMessageProvider);
+
+// Create conversation
+await ref.read(createConversationProvider.notifier).create('My Portfolio Discussion');
+
+// Update conversation
+await ref.read(updateConversationProvider.notifier).update(
+  id: conversationId,
+  title: 'Updated Title',
+);
+
+// Delete conversation
+await ref.read(deleteConversationProvider.notifier).delete(conversationId);
+```
 
 ---
 
