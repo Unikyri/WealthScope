@@ -15,8 +15,6 @@ class Logout extends _$Logout {
   /// Sign out the current user
   /// Clears Supabase session, tokens, and local cache
   Future<void> signOut() async {
-    state = const AsyncLoading();
-    
     state = await AsyncValue.guard(() async {
       final authService = ref.read(authServiceProvider);
       await authService.signOut();
