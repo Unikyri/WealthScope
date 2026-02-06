@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:wealthscope_app/core/currency/currency_extensions.dart';
 
 /// Data model for portfolio history points
 class PortfolioHistoryPoint {
@@ -14,7 +16,7 @@ class PortfolioHistoryPoint {
 }
 
 /// Chart widget displaying portfolio value over time
-class PortfolioHistoryChart extends StatelessWidget {
+class PortfolioHistoryChart extends ConsumerWidget {
   final List<PortfolioHistoryPoint> data;
   final String period;
   final ValueChanged<String>? onPeriodChanged;
@@ -27,7 +29,7 @@ class PortfolioHistoryChart extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -70,7 +72,7 @@ class PortfolioHistoryChart extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '\$${data.last.value.toStringAsFixed(2)}',
+                  ref.formatCurrency(data.last.value),
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -205,7 +207,7 @@ class PortfolioHistoryChart extends StatelessWidget {
                       if (spot.spotIndex >= data.length) return null;
                       final point = data[spot.spotIndex];
                       return LineTooltipItem(
-                        '\$${point.value.toStringAsFixed(2)}\n',
+                        '${ref.formatCurrency(point.value)}\n',
                         theme.textTheme.titleMedium!.copyWith(
                           color: colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
@@ -336,13 +338,16 @@ class PortfolioHistoryChart extends StatelessWidget {
   }
 
   /// Format value with K/M suffix
-  String _formatValue(double value) {
-    if (value >= 1000000) {
-      return '\$${(value / 1000000).toStringAsFixed(1)}M';
-    } else if (value >= 1000) {
-      return '\$${(value / 1000).toStringAsFixed(0)}K';
+  String _formatValue(double value, WidgetRef ref) {
+    final converted = ref.convertFromUsd(value);
+    final currency = ref.getCurrentCurrency();
+    
+    if (converted >= 1000000) {
+      return '${currency.symbol}${(converted / 1000000).toStringAsFixed(1)}M';
+    } else if (converted >= 1000) {
+      return '${currency.symbol}${(converted / 1000).toStringAsFixed(0)}K';
     } else {
-      return '\$${value.toStringAsFixed(0)}';
+      return '${currency.symbol}${converted.toStringAsFixed(0)}';
     }
   }
 }

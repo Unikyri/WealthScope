@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wealthscope_app/features/dashboard/domain/entities/portfolio_performance.dart';
+import 'package:wealthscope_app/core/currency/currency_extensions.dart';
 
 /// Performance metrics widget displaying Today, Week, Month, and YTD changes
-class PerformanceMetrics extends StatelessWidget {
+class PerformanceMetrics extends ConsumerWidget {
   final PortfolioPerformance performance;
 
   const PerformanceMetrics({
@@ -11,7 +13,7 @@ class PerformanceMetrics extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
     return Card(
@@ -93,7 +95,7 @@ class PerformanceMetrics extends StatelessWidget {
 }
 
 /// Individual metric tile
-class _MetricTile extends StatelessWidget {
+class _MetricTile extends ConsumerWidget {
   final String label;
   final double value;
   final double percent;
@@ -105,7 +107,7 @@ class _MetricTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isPositive = value >= 0;
     final color = isPositive
@@ -171,7 +173,7 @@ class _MetricTile extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '${isPositive ? '+' : ''}\$${value.abs().toStringAsFixed(2)}',
+            '${isPositive ? '+' : ''}${ref.formatCurrency(value.abs())}',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurface,
               fontWeight: FontWeight.w500,
