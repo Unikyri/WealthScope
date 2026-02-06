@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -6,7 +7,8 @@ import 'package:share_plus/share_plus.dart';
 /// In-app browser screen for viewing news articles
 /// 
 /// Features:
-/// - WebView with article content
+/// - WebView with article content (mobile/desktop)
+/// - Direct browser launch on web platform
 /// - Loading progress indicator
 /// - Share functionality
 /// - Open in external browser option
@@ -26,14 +28,24 @@ class ArticleWebViewScreen extends StatefulWidget {
 }
 
 class _ArticleWebViewScreenState extends State<ArticleWebViewScreen> {
-  late final WebViewController _controller;
+  late final WebViewController? _controller;
   int _loadingProgress = 0;
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _initializeWebView();
+    
+    // WebView not supported on web platform - open directly in browser
+    if (kIsWeb) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _openInExternalBrowser();
+        Navigator.of(context).pop();
+      });
+      _controller = null;
+    } else {
+      _initializeWebView();
+    }
   }
 
   void _initializeWebView() {
@@ -71,6 +83,18 @@ class _ArticleWebViewScreenState extends State<ArticleWebViewScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // Show loading screen on web while redirecting to external browser
+    if (kIsWeb) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Opening article...'),
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -97,7 +121,7 @@ class _ArticleWebViewScreenState extends State<ArticleWebViewScreen> {
       body: Stack(
         children: [
           // WebView
-          WebViewWidget(controller: _controller),
+          if (_controller != null) WebViewWidget(controller: _controller!),
           
           // Loading progress indicator
           if (_isLoading)
@@ -147,8 +171,8 @@ class _ArticleWebViewScreenState extends State<ArticleWebViewScreen> {
               icon: Icons.arrow_back,
               label: 'Back',
               onPressed: () async {
-                if (await _controller.canGoBack()) {
-                  await _controller.goBack();
+                if (_controller != null && await _controller!.canGoBack()) {
+                  await _controller!.goBack();
                 } else {
                   if (context.mounted) {
                     Navigator.of(context).pop();
@@ -162,8 +186,8 @@ class _ArticleWebViewScreenState extends State<ArticleWebViewScreen> {
               icon: Icons.arrow_forward,
               label: 'Forward',
               onPressed: () async {
-                if (await _controller.canGoForward()) {
-                  await _controller.goForward();
+                if (_controller != null && await _controller!.canGoForward()) {
+                  await _controller!.goForward();
                 }
               },
             ),
@@ -172,7 +196,7 @@ class _ArticleWebViewScreenState extends State<ArticleWebViewScreen> {
             _BottomBarButton(
               icon: Icons.refresh,
               label: 'Reload',
-              onPressed: () => _controller.reload(),
+              onPressed: () => _controller?.reload(),
             ),
           ],
         ),
