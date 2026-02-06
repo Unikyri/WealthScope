@@ -239,6 +239,7 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 				// Scenario simulation routes
 				if scenarioHandler != nil {
 					ai.POST("/simulate", scenarioHandler.Simulate)
+					ai.POST("/simulate/chain", scenarioHandler.SimulateChain)
 					ai.GET("/scenarios/templates", scenarioHandler.GetTemplates)
 					ai.GET("/scenarios/historical", scenarioHandler.GetHistoricalStats)
 				}

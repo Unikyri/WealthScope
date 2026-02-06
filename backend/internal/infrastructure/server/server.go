@@ -54,7 +54,7 @@ func (s *Server) Run() {
 	documentProcessor := s.setupDocumentProcessor(geminiClient)
 
 	// Setup scenario services for what-if simulations
-	scenarioEngine, historicalAnalyzer := s.setupScenarioServices()
+	scenarioEngine, historicalAnalyzer := s.setupScenarioServices(geminiClient)
 
 	// Create router with dependencies
 	r := router.NewRouter(router.RouterDeps{
@@ -479,7 +479,7 @@ func (s *Server) setupInsightService(newsService *appsvc.NewsService, geminiClie
 }
 
 // setupScenarioServices configures the scenario simulation services.
-func (s *Server) setupScenarioServices() (*appsvc.ScenarioEngine, *appsvc.HistoricalAnalyzer) {
+func (s *Server) setupScenarioServices(geminiClient *ai.GeminiClient) (*appsvc.ScenarioEngine, *appsvc.HistoricalAnalyzer) {
 	if s.db == nil {
 		s.logger.Warn("Scenario services require database connection")
 		return nil, nil
@@ -490,7 +490,7 @@ func (s *Server) setupScenarioServices() (*appsvc.ScenarioEngine, *appsvc.Histor
 	priceHistoryRepo := infraRepo.NewPostgresPriceHistoryRepository(s.db.DB)
 
 	// Create scenario engine
-	scenarioEngine := appsvc.NewScenarioEngine(assetRepo, s.logger)
+	scenarioEngine := appsvc.NewScenarioEngine(assetRepo, s.logger, geminiClient)
 
 	// Create historical analyzer
 	historicalAnalyzer := appsvc.NewHistoricalAnalyzer(priceHistoryRepo, s.logger)

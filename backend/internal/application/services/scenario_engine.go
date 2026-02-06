@@ -9,22 +9,31 @@ import (
 
 	"github.com/Unikyri/WealthScope/backend/internal/domain/entities"
 	"github.com/Unikyri/WealthScope/backend/internal/domain/repositories"
+	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/ai"
 )
 
 // ScenarioEngine runs portfolio simulations for what-if scenarios
 type ScenarioEngine struct {
 	assetRepo repositories.AssetRepository
 	logger    *zap.Logger
+	aiClient  AIClient
+}
+
+// AIClient defines the interface for AI generation
+type AIClient interface {
+	GenerateWithThinking(ctx context.Context, prompt, systemPrompt string, thinkingLevel ai.ThinkingLevel) (string, error)
 }
 
 // NewScenarioEngine creates a new ScenarioEngine
 func NewScenarioEngine(
 	assetRepo repositories.AssetRepository,
 	logger *zap.Logger,
+	aiClient AIClient,
 ) *ScenarioEngine {
 	return &ScenarioEngine{
 		assetRepo: assetRepo,
 		logger:    logger,
+		aiClient:  aiClient,
 	}
 }
 
@@ -471,6 +480,211 @@ func absFloat(x float64) float64 {
 }
 
 // GetTemplates returns the list of predefined scenario templates
+
+// SimulateChain runs a multi-step scenario simulation
+func (e *ScenarioEngine) SimulateChain(ctx context.Context, req entities.ScenarioChainRequest) (*entities.ChainResult, error) {
+	e.logger.Info("running scenario chain",
+		zap.String("user_id", req.UserID.String()),
+		zap.Int("steps", len(req.Steps)),
+	)
+
+	// Get initial state
+	initialState, err := e.getCurrentState(ctx, req.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get current state: %w", err)
+	}
+
+	currentState := initialState
+	stepResults := make([]entities.StepResult, 0, len(req.Steps))
+
+	for _, step := range req.Steps {
+		// Run simulation for this step
+		var projected entities.PortfolioState
+		var changes []entities.ChangeDetail
+		var warnings []string
+		var simErr error
+
+		// Re-use existing simulation logic
+		// We process params locally to fit the interface if needed,
+		// but simulate* methods take params directly.
+
+		switch step.Type {
+		case entities.ScenarioBuyAsset:
+			projected, changes, warnings, simErr = e.simulateBuy(ctx, req.UserID, currentState, step.Parameters)
+		case entities.ScenarioSellAsset:
+			projected, changes, warnings, simErr = e.simulateSell(ctx, req.UserID, currentState, step.Parameters)
+		case entities.ScenarioMarketMove:
+			projected, changes, warnings, simErr = e.simulateMarketMove(currentState, step.Parameters)
+		case entities.ScenarioNewAsset:
+			projected, changes, warnings, simErr = e.simulateNewAsset(currentState, step.Parameters)
+		case entities.ScenarioRebalance:
+			projected, changes, warnings, simErr = e.simulateRebalance(currentState, step.Parameters)
+		default:
+			return nil, fmt.Errorf("unhandled scenario type in step %d: %s", step.Order, step.Type)
+		}
+
+		if simErr != nil {
+			return nil, fmt.Errorf("simulation failed at step %d (%s): %w", step.Order, step.Type, simErr)
+		}
+
+		// Store result for this step
+		stepRes := entities.StepResult{
+			Step: step,
+			Result: &entities.ScenarioResult{
+				CurrentState:   currentState, // State before this step
+				ProjectedState: projected,    // State after this step
+				Changes:        changes,
+				Warnings:       warnings,
+			},
+		}
+
+		// TODO: T-10.3.2 Add AI explanation here
+		if e.aiClient != nil {
+			explanation, aiErr := e.explainStep(ctx, step, currentState, projected, changes, warnings)
+			if aiErr != nil {
+				e.logger.Warn("failed to generate AI explanation", zap.Error(aiErr))
+			} else {
+				// We need to inject the analysis into the StepResult's Result
+				// Note: Result.AIAnalysis is a string field
+				stepRes.Result.AIAnalysis = explanation
+			}
+		}
+
+		stepResults = append(stepResults, stepRes)
+
+		// Update current state for next step
+		currentState = projected
+	}
+
+	// Calculate total impact
+	totalImpact := currentState.TotalValue - initialState.TotalValue
+
+	// T-10.3.3 Assess Risk
+	risk := e.assessRisk(initialState, currentState)
+
+	return &entities.ChainResult{
+		Steps:       stepResults,
+		FinalState:  currentState,
+		TotalImpact: totalImpact,
+		Risk:        risk,
+	}, nil
+}
+
+// assessRisk calculates risk factors based on portfolio changes
+func (e *ScenarioEngine) assessRisk(initial, final entities.PortfolioState) *entities.RiskAssessment {
+	risk := &entities.RiskAssessment{
+		Score:   10, // Base score
+		Level:   "low",
+		Factors: []string{},
+	}
+
+	// 1. Concentration Risk
+	// Check if any single asset type > 50% or significantly increased
+	for _, alloc := range final.Allocation {
+		// Example: High crypto concentration
+		if alloc.Type == "crypto" && alloc.Percent > 30 {
+			risk.Score += 20
+			risk.Factors = append(risk.Factors, fmt.Sprintf("High crypto concentration (%.1f%%)", alloc.Percent))
+		}
+		// Example: Single stock dominance (approximated by type if individual assets not tracked in aggregate)
+		// Since we only have type aggregation in PortfolioState, we check type concentration.
+		if alloc.Percent > 60 {
+			risk.Score += 15
+			risk.Factors = append(risk.Factors, fmt.Sprintf("Heavy concentration in %s (%.1f%%)", alloc.Type, alloc.Percent))
+		}
+	}
+
+	// 2. Cash Drag / Liquidity
+	// Check if cash is too low (< 2%) or too high (> 50%)
+	var cashPercent float64
+	for _, alloc := range final.Allocation {
+		if alloc.Type == "cash" {
+			cashPercent = alloc.Percent
+			break
+		}
+	}
+	if cashPercent < 2 {
+		risk.Score += 10
+		risk.Factors = append(risk.Factors, fmt.Sprintf("Low liquidity (Cash: %.1f%%)", cashPercent))
+	} else if cashPercent > 50 {
+		risk.Score += 5
+		risk.Factors = append(risk.Factors, fmt.Sprintf("High cash drag (Cash: %.1f%%)", cashPercent))
+	}
+
+	// 3. Volatility Impact (Approximated)
+	// If total value drops significantly > 10%, flag as high impact scenario
+	valueChange := (final.TotalValue - initial.TotalValue) / initial.TotalValue * 100
+	if valueChange < -15 {
+		risk.Score += 25
+		risk.Factors = append(risk.Factors, fmt.Sprintf("Significant portfolio drawdown (%.1f%%)", valueChange))
+	} else if valueChange < -5 {
+		risk.Score += 10
+		risk.Factors = append(risk.Factors, fmt.Sprintf("Moderate portfolio drawdown (%.1f%%)", valueChange))
+	}
+
+	// Determine Level
+	if risk.Score >= 75 {
+		risk.Level = "critical"
+		risk.Recommendation = "Immediate portfolio review recommended. Consider diversification to reduce exposure."
+	} else if risk.Score >= 50 {
+		risk.Level = "high"
+		risk.Recommendation = "High risk detected. Consider rebalancing to lower concentration or volatility."
+	} else if risk.Score >= 25 {
+		risk.Level = "medium"
+		risk.Recommendation = "Moderate risk. Monitor concentration levels."
+	} else {
+		risk.Level = "low"
+		risk.Recommendation = "Portfolio risk is within healthy limits."
+	}
+
+	return risk
+}
+
+// GetTemplates returns the list of predefined scenario templates
 func (e *ScenarioEngine) GetTemplates() []entities.ScenarioTemplate {
 	return entities.GetPredefinedTemplates()
+}
+
+// explainStep generates an AI explanation for a simulation step
+func (e *ScenarioEngine) explainStep(
+	ctx context.Context,
+	step entities.ScenarioStep,
+	initial, final entities.PortfolioState,
+	changes []entities.ChangeDetail,
+	warnings []string,
+) (string, error) {
+	prompt := fmt.Sprintf(`Explain this portfolio simulation step as if you are a financial educator.
+
+Scenario Step: Order %d, Type %s
+Parameters: %+v
+
+Initial State: Value $%.2f, Invested $%.2f
+Final State: Value $%.2f, Invested $%.2f
+
+Changes:
+`, step.Order, step.Type, step.Parameters, initial.TotalValue, initial.TotalInvested, final.TotalValue, final.TotalInvested)
+
+	for _, change := range changes {
+		prompt += fmt.Sprintf("- %s (Diff: $%.2f)\n", change.Description, change.Difference)
+	}
+
+	if len(warnings) > 0 {
+		prompt += "\nWarnings Triggered:\n"
+		for _, w := range warnings {
+			prompt += fmt.Sprintf("- %s\n", w)
+		}
+	}
+
+	prompt += `
+Provide a concise explanation (2-3 sentences) covering:
+1. What happened in this step.
+2. How it impacted the portfolio (value, allocation, or risk).
+3. A brief educational takeaway or consideration.
+
+Do NOT use markdown headers or bullet points. Just a paragraph.`
+
+	systemPrompt := "You are WealthScope AI, a financial assistant explaining simulation results."
+
+	// Use ThinkingBalanced (2) for reasonable reasoning depth without excessive latency
+	return e.aiClient.GenerateWithThinking(ctx, prompt, systemPrompt, ai.ThinkingBalanced)
 }
