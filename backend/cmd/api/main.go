@@ -1,5 +1,7 @@
 package main
 
+// Trigger CI run
+
 import (
 	"log"
 
