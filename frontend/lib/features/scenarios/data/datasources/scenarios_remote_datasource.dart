@@ -55,4 +55,21 @@ class ScenariosRemoteDataSource {
 
     return templates;
   }
+
+  /// POST /api/v1/ai/simulate/chain
+  Future<Map<String, dynamic>> simulateChain({
+    required List<Map<String, dynamic>> scenarios,
+    String? query,
+  }) async {
+    final response = await _dio.post(
+      '/ai/simulate/chain',
+      data: {
+        'scenarios': scenarios,
+        if (query != null) 'query': query,
+      },
+    );
+
+    return response.data['data'] as Map<String, dynamic>;
+  }
 }
+

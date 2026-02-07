@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/error/failures.dart';
+import '../../../ai/domain/entities/chain_result.dart';
 import '../../domain/entities/scenario_entity.dart';
 import '../../domain/repositories/scenarios_repository.dart';
 import '../datasources/scenarios_remote_datasource.dart';
@@ -22,6 +23,22 @@ class ScenariosRepositoryImpl implements ScenariosRepository {
         parameters: parameters,
       );
       return Right(dto.toDomain());
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, ChainResult>> simulateChain({
+    required List<Map<String, dynamic>> scenarios,
+    String? query,
+  }) async {
+    try {
+      final data = await _remoteDataSource.simulateChain(
+        scenarios: scenarios,
+        query: query,
+      );
+      return Right(ChainResult.fromJson(data));
     } catch (e) {
       return Left(ServerFailure(message: e.toString()));
     }
@@ -53,3 +70,4 @@ class ScenariosRepositoryImpl implements ScenariosRepository {
     }
   }
 }
+

@@ -69,4 +69,14 @@ class AIRemoteDataSource {
       throw Exception('Failed to clear history: ${e.message}');
     }
   }
+
+  Future<Map<String, dynamic>> getBriefing() async {
+    try {
+      final response = await _dio.get('/ai/briefing');
+      return response.data['data'] as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw Exception('Failed to get briefing: ${e.message}');
+    }
+  }
 }
+

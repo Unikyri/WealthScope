@@ -2,6 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:dio/dio.dart';
 import 'package:wealthscope_app/core/errors/failures.dart';
 import 'package:wealthscope_app/features/ai/data/datasources/ai_remote_data_source.dart';
+import 'package:wealthscope_app/features/ai/domain/entities/briefing.dart';
 import 'package:wealthscope_app/features/ai/domain/entities/chat_message.dart';
 import 'package:wealthscope_app/features/ai/domain/repositories/ai_repository.dart';
 
@@ -52,6 +53,18 @@ class AIRepositoryImpl implements AIRepository {
   }
 
   @override
+  Future<Either<Failure, Briefing>> getBriefing() async {
+    try {
+      final data = await _remoteDataSource.getBriefing();
+      return Right(Briefing.fromJson(data));
+    } on DioException catch (e) {
+      return Left(ServerFailure(e.message ?? 'Server error'));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, List<ChatMessage>>> getChatHistory() async {
     try {
       final dtos = await _remoteDataSource.getChatHistory();
@@ -75,3 +88,4 @@ class AIRepositoryImpl implements AIRepository {
     }
   }
 }
+
