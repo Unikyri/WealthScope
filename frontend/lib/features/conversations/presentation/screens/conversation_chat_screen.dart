@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import '../providers/conversations_providers.dart';
 
 class ConversationChatScreen extends ConsumerStatefulWidget {
@@ -151,14 +152,46 @@ class _ConversationChatScreenState
                                           .surfaceContainerHighest,
                                   borderRadius: BorderRadius.circular(16),
                                 ),
-                                child: Text(
-                                  message.content,
-                                  style: TextStyle(
-                                    color: isUser
-                                        ? theme.colorScheme.onPrimary
-                                        : theme.colorScheme.onSurface,
-                                  ),
-                                ),
+                                child: isUser
+                                    ? Text(
+                                        message.content,
+                                        style: TextStyle(
+                                          color: theme.colorScheme.onPrimary,
+                                        ),
+                                      )
+                                    : MarkdownBody(
+                                        data: message.content,
+                                        selectable: true,
+                                        styleSheet: MarkdownStyleSheet(
+                                          p: TextStyle(
+                                            color: theme.colorScheme.onSurface,
+                                            fontSize: 14,
+                                            height: 1.5,
+                                          ),
+                                          strong: TextStyle(
+                                            color: theme.colorScheme.onSurface,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          code: TextStyle(
+                                            color: theme.colorScheme.primary,
+                                            backgroundColor: theme.colorScheme.primaryContainer.withOpacity(0.3),
+                                            fontFamily: 'monospace',
+                                            fontSize: 13,
+                                          ),
+                                          codeblockDecoration: BoxDecoration(
+                                            color: theme.colorScheme.surfaceContainerHigh,
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          listBullet: TextStyle(
+                                            color: theme.colorScheme.primary,
+                                          ),
+                                          h2: TextStyle(
+                                            color: theme.colorScheme.onSurface,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
                               ),
                             ),
                           );
