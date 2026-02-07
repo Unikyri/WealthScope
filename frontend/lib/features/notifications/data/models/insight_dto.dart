@@ -13,8 +13,8 @@ class InsightDto with _$InsightDto {
     required String priority,
     required String title,
     required String content,
-    @JsonKey(name: 'action_items') required List<String> actionItems,
-    @JsonKey(name: 'related_symbols') required List<String> relatedSymbols,
+    @JsonKey(name: 'action_items') @Default([]) List<String> actionItems,
+    @JsonKey(name: 'related_symbols') @Default([]) List<String> relatedSymbols,
     @JsonKey(name: 'is_read') required bool isRead,
     @JsonKey(name: 'created_at') required String createdAt,
   }) = _InsightDto;

@@ -67,6 +67,7 @@ dependencies:
   # UI Effects
   shimmer: ^3.0.0
   flutter_staggered_animations: ^1.1.1
+  flutter_markdown: ^0.7.4+1
 
   # Image Picker & File Selection
   image_picker: ^1.0.7

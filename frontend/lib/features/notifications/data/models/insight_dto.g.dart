@@ -14,12 +14,14 @@ _$InsightDtoImpl _$$InsightDtoImplFromJson(Map<String, dynamic> json) =>
       priority: json['priority'] as String,
       title: json['title'] as String,
       content: json['content'] as String,
-      actionItems: (json['action_items'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
-      relatedSymbols: (json['related_symbols'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
+      actionItems: (json['action_items'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      relatedSymbols: (json['related_symbols'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
       isRead: json['is_read'] as bool,
       createdAt: json['created_at'] as String,
     );

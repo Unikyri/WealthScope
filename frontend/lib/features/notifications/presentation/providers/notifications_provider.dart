@@ -66,9 +66,11 @@ class MarkInsightAsRead extends _$MarkInsightAsRead {
       await repository.markAsRead(id);
       state = const AsyncData(null);
       
-      // Refresh insights list
-      ref.invalidate(insightsListProvider);
-      ref.invalidate(unreadInsightsCountProvider);
+      // Use refresh instead of invalidate for immediate update
+      ref.refresh(unreadInsightsCountProvider);
+      ref.refresh(unreadNotificationsCountProvider);
+      ref.refresh(notificationsProvider);
+      ref.refresh(insightsListProvider(limit: 20, offset: 0));
     } catch (e, st) {
       state = AsyncError(e, st);
       rethrow;
@@ -88,7 +90,7 @@ Future<List<AppNotification>> notifications(NotificationsRef ref) async {
     return AppNotification(
       id: insight.id,
       title: insight.title,
-      message: insight.content,
+      message: _truncateContent(insight.content),
       type: _mapInsightTypeToNotificationType(insight.type),
       timestamp: insight.createdAt,
       isRead: insight.isRead,
@@ -98,10 +100,33 @@ Future<List<AppNotification>> notifications(NotificationsRef ref) async {
   }).toList();
 }
 
+/// Truncate long content for notification preview
+String _truncateContent(String content) {
+  // Remove markdown headers and excessive whitespace
+  final cleaned = content
+      .replaceAll(RegExp(r'#+\s*'), '') // Remove markdown headers
+      .replaceAll(RegExp(r'\*\*'), '') // Remove bold markers
+      .replaceAll(RegExp(r'\n+'), ' ') // Replace newlines with space
+      .trim();
+  
+  // Limit to 200 characters
+  if (cleaned.length <= 200) return cleaned;
+  
+  // Find last complete word before 200 chars
+  final truncated = cleaned.substring(0, 200);
+  final lastSpace = truncated.lastIndexOf(' ');
+  
+  return lastSpace > 0 
+      ? '${truncated.substring(0, lastSpace)}...'
+      : '${truncated}...';
+}
+
 /// Provider for unread notifications count (backwards compatibility)
 @riverpod
 Future<int> unreadNotificationsCount(UnreadNotificationsCountRef ref) async {
-  return await ref.watch(unreadInsightsCountProvider.future);
+  // Watch the insights count directly to ensure reactivity
+  final count = await ref.watch(unreadInsightsCountProvider.future);
+  return count;
 }
 
 /// Helper to map insight type to notification type

@@ -235,9 +235,9 @@ class _$InsightDtoImpl implements _InsightDto {
       required this.priority,
       required this.title,
       required this.content,
-      @JsonKey(name: 'action_items') required final List<String> actionItems,
+      @JsonKey(name: 'action_items') final List<String> actionItems = const [],
       @JsonKey(name: 'related_symbols')
-      required final List<String> relatedSymbols,
+      final List<String> relatedSymbols = const [],
       @JsonKey(name: 'is_read') required this.isRead,
       @JsonKey(name: 'created_at') required this.createdAt})
       : _actionItems = actionItems,
@@ -343,18 +343,17 @@ class _$InsightDtoImpl implements _InsightDto {
 
 abstract class _InsightDto implements InsightDto {
   const factory _InsightDto(
-      {required final String id,
-      required final String type,
-      required final String category,
-      required final String priority,
-      required final String title,
-      required final String content,
-      @JsonKey(name: 'action_items') required final List<String> actionItems,
-      @JsonKey(name: 'related_symbols')
-      required final List<String> relatedSymbols,
-      @JsonKey(name: 'is_read') required final bool isRead,
-      @JsonKey(name: 'created_at')
-      required final String createdAt}) = _$InsightDtoImpl;
+          {required final String id,
+          required final String type,
+          required final String category,
+          required final String priority,
+          required final String title,
+          required final String content,
+          @JsonKey(name: 'action_items') final List<String> actionItems,
+          @JsonKey(name: 'related_symbols') final List<String> relatedSymbols,
+          @JsonKey(name: 'is_read') required final bool isRead,
+          @JsonKey(name: 'created_at') required final String createdAt}) =
+      _$InsightDtoImpl;
 
   factory _InsightDto.fromJson(Map<String, dynamic> json) =
       _$InsightDtoImpl.fromJson;

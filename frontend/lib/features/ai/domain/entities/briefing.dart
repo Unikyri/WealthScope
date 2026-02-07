@@ -1,112 +1,43 @@
-/// Domain entity representing the AI Morning Briefing.
+/// Domain entity representing the AI Daily Briefing (Insight).
+/// Matches the API response format from /api/v1/ai/insights/daily
 class Briefing {
-  final String summary;
-  final List<BriefingInsight> insights;
-  final List<BriefingAlert> alerts;
-  final PortfolioSnapshot portfolioSnapshot;
-  final DateTime generatedAt;
+  final String id;
+  final String type;
+  final String title;
+  final String content; // Markdown content
+  final String priority;
+  final String category;
+  final List<String> actionItems;
+  final bool isRead;
+  final DateTime createdAt;
 
   const Briefing({
-    required this.summary,
-    required this.insights,
-    required this.alerts,
-    required this.portfolioSnapshot,
-    required this.generatedAt,
+    required this.id,
+    required this.type,
+    required this.title,
+    required this.content,
+    required this.priority,
+    required this.category,
+    required this.actionItems,
+    required this.isRead,
+    required this.createdAt,
   });
 
   factory Briefing.fromJson(Map<String, dynamic> json) {
     return Briefing(
-      summary: json['summary'] as String? ?? '',
-      insights: (json['insights'] as List<dynamic>?)
-              ?.map((e) => BriefingInsight.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-      alerts: (json['alerts'] as List<dynamic>?)
-              ?.map((e) => BriefingAlert.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-      portfolioSnapshot: PortfolioSnapshot.fromJson(
-          json['portfolio_snapshot'] as Map<String, dynamic>? ?? {}),
-      generatedAt: DateTime.tryParse(json['generated_at'] as String? ?? '') ??
-          DateTime.now(),
-    );
-  }
-}
-
-/// Individual insight for the briefing.
-class BriefingInsight {
-  final String type;
-  final String title;
-  final String description;
-  final String? symbol;
-  final double? changePercent;
-  final String priority;
-
-  const BriefingInsight({
-    required this.type,
-    required this.title,
-    required this.description,
-    this.symbol,
-    this.changePercent,
-    this.priority = 'medium',
-  });
-
-  factory BriefingInsight.fromJson(Map<String, dynamic> json) {
-    return BriefingInsight(
-      type: json['type'] as String? ?? 'general',
-      title: json['title'] as String? ?? '',
-      description: json['description'] as String? ?? '',
-      symbol: json['symbol'] as String?,
-      changePercent: (json['change_percent'] as num?)?.toDouble(),
+      id: json['id'] as String? ?? '',
+      type: json['type'] as String? ?? 'daily_briefing',
+      title: json['title'] as String? ?? 'Daily Briefing',
+      content: json['content'] as String? ?? '',
       priority: json['priority'] as String? ?? 'medium',
-    );
-  }
-}
-
-/// Alert within a briefing.
-class BriefingAlert {
-  final String type;
-  final String message;
-  final String severity;
-  final String? actionUrl;
-
-  const BriefingAlert({
-    required this.type,
-    required this.message,
-    required this.severity,
-    this.actionUrl,
-  });
-
-  factory BriefingAlert.fromJson(Map<String, dynamic> json) {
-    return BriefingAlert(
-      type: json['type'] as String? ?? 'info',
-      message: json['message'] as String? ?? '',
-      severity: json['severity'] as String? ?? 'low',
-      actionUrl: json['action_url'] as String?,
-    );
-  }
-}
-
-/// Portfolio snapshot for the briefing.
-class PortfolioSnapshot {
-  final double totalValue;
-  final double dayChange;
-  final double dayChangePercent;
-  final int assetCount;
-
-  const PortfolioSnapshot({
-    required this.totalValue,
-    required this.dayChange,
-    required this.dayChangePercent,
-    required this.assetCount,
-  });
-
-  factory PortfolioSnapshot.fromJson(Map<String, dynamic> json) {
-    return PortfolioSnapshot(
-      totalValue: (json['total_value'] as num?)?.toDouble() ?? 0.0,
-      dayChange: (json['day_change'] as num?)?.toDouble() ?? 0.0,
-      dayChangePercent: (json['day_change_percent'] as num?)?.toDouble() ?? 0.0,
-      assetCount: json['asset_count'] as int? ?? 0,
+      category: json['category'] as String? ?? 'general',
+      actionItems: (json['action_items'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      isRead: json['is_read'] as bool? ?? false,
+      createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ??
+          DateTime.now(),
     );
   }
 }

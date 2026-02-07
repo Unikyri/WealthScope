@@ -72,7 +72,7 @@ class AIRemoteDataSource {
 
   Future<Map<String, dynamic>> getBriefing() async {
     try {
-      final response = await _dio.get('/ai/briefing');
+      final response = await _dio.get('/ai/insights/daily');
       return response.data['data'] as Map<String, dynamic>;
     } on DioException catch (e) {
       throw Exception('Failed to get briefing: ${e.message}');
