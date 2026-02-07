@@ -1,15 +1,18 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/network/dio_client.dart';
+import '../../../../core/network/dio_client_provider.dart';
 import '../../data/datasources/scenarios_remote_datasource.dart';
 import '../../data/repositories/scenarios_repository_impl.dart';
 import '../../domain/entities/scenario_entity.dart';
 import '../../domain/repositories/scenarios_repository.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 part 'scenarios_providers.g.dart';
 
 /// Provider for ScenariosRepository
 @riverpod
-ScenariosRepository scenariosRepository(ScenariosRepositoryRef ref) {
+ScenariosRepository scenariosRepository(Ref ref) {
   final dio = ref.watch(dioClientProvider);
   final dataSource = ScenariosRemoteDataSource(dio);
   return ScenariosRepositoryImpl(dataSource);
@@ -18,7 +21,7 @@ ScenariosRepository scenariosRepository(ScenariosRepositoryRef ref) {
 /// Provider to get scenario templates
 @riverpod
 Future<List<ScenarioTemplateEntity>> scenarioTemplates(
-  ScenarioTemplatesRef ref,
+  Ref ref,
 ) async {
   final repository = ref.watch(scenariosRepositoryProvider);
   final result = await repository.getTemplates();
@@ -31,7 +34,7 @@ Future<List<ScenarioTemplateEntity>> scenarioTemplates(
 /// Provider to get historical stats for a symbol
 @riverpod
 Future<HistoricalStatsEntity> historicalStats(
-  HistoricalStatsRef ref, {
+  Ref ref, {
   required String symbol,
   String period = '1Y',
 }) async {

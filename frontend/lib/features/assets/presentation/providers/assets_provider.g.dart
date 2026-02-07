@@ -6,272 +6,346 @@ part of 'assets_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$filteredAssetsHash() => r'5a5d9893b7d6efa75efcff1a4d0c4c9f90e3e957';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Provider for selected asset type filter
+/// This provider manages the current filter state for the asset list
 
-/// Provider for filtered assets based on selected type
-/// This provider automatically updates when the filter changes
-///
-/// Copied from [filteredAssets].
-@ProviderFor(filteredAssets)
-final filteredAssetsProvider =
-    AutoDisposeFutureProvider<List<StockAsset>>.internal(
-  filteredAssets,
-  name: r'filteredAssetsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$filteredAssetsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+@ProviderFor(SelectedAssetType)
+final selectedAssetTypeProvider = SelectedAssetTypeProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef FilteredAssetsRef = AutoDisposeFutureProviderRef<List<StockAsset>>;
-String _$searchedAssetsHash() => r'f18f12f21513e77fb4b2ad4f1fe0e70386ebc585';
-
-/// Provider for searched assets
-/// Returns filtered assets based on search query
-///
-/// Copied from [searchedAssets].
-@ProviderFor(searchedAssets)
-final searchedAssetsProvider =
-    AutoDisposeFutureProvider<List<StockAsset>>.internal(
-  searchedAssets,
-  name: r'searchedAssetsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$searchedAssetsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef SearchedAssetsRef = AutoDisposeFutureProviderRef<List<StockAsset>>;
-String _$assetDetailHash() => r'f0f2295fe97a81c0f2d389a370887bb21c6b541a';
-
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// Provider for fetching a single asset by ID
-/// This provider fetches detailed information for a specific asset
-///
-/// Copied from [assetDetail].
-@ProviderFor(assetDetail)
-const assetDetailProvider = AssetDetailFamily();
-
-/// Provider for fetching a single asset by ID
-/// This provider fetches detailed information for a specific asset
-///
-/// Copied from [assetDetail].
-class AssetDetailFamily extends Family<AsyncValue<StockAsset>> {
-  /// Provider for fetching a single asset by ID
-  /// This provider fetches detailed information for a specific asset
-  ///
-  /// Copied from [assetDetail].
-  const AssetDetailFamily();
-
-  /// Provider for fetching a single asset by ID
-  /// This provider fetches detailed information for a specific asset
-  ///
-  /// Copied from [assetDetail].
-  AssetDetailProvider call(
-    String assetId,
-  ) {
-    return AssetDetailProvider(
-      assetId,
-    );
-  }
-
-  @override
-  AssetDetailProvider getProviderOverride(
-    covariant AssetDetailProvider provider,
-  ) {
-    return call(
-      provider.assetId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'assetDetailProvider';
-}
-
-/// Provider for fetching a single asset by ID
-/// This provider fetches detailed information for a specific asset
-///
-/// Copied from [assetDetail].
-class AssetDetailProvider extends AutoDisposeFutureProvider<StockAsset> {
-  /// Provider for fetching a single asset by ID
-  /// This provider fetches detailed information for a specific asset
-  ///
-  /// Copied from [assetDetail].
-  AssetDetailProvider(
-    String assetId,
-  ) : this._internal(
-          (ref) => assetDetail(
-            ref as AssetDetailRef,
-            assetId,
-          ),
-          from: assetDetailProvider,
-          name: r'assetDetailProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$assetDetailHash,
-          dependencies: AssetDetailFamily._dependencies,
-          allTransitiveDependencies:
-              AssetDetailFamily._allTransitiveDependencies,
-          assetId: assetId,
+/// Provider for selected asset type filter
+/// This provider manages the current filter state for the asset list
+final class SelectedAssetTypeProvider
+    extends $NotifierProvider<SelectedAssetType, AssetType?> {
+  /// Provider for selected asset type filter
+  /// This provider manages the current filter state for the asset list
+  SelectedAssetTypeProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'selectedAssetTypeProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
         );
 
-  AssetDetailProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.assetId,
-  }) : super.internal();
-
-  final String assetId;
-
   @override
-  Override overrideWith(
-    FutureOr<StockAsset> Function(AssetDetailRef provider) create,
-  ) {
-    return ProviderOverride(
+  String debugGetCreateSourceHash() => _$selectedAssetTypeHash();
+
+  @$internal
+  @override
+  SelectedAssetType create() => SelectedAssetType();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AssetType? value) {
+    return $ProviderOverride(
       origin: this,
-      override: AssetDetailProvider._internal(
-        (ref) => create(ref as AssetDetailRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        assetId: assetId,
-      ),
+      providerOverride: $SyncValueProvider<AssetType?>(value),
     );
   }
-
-  @override
-  AutoDisposeFutureProviderElement<StockAsset> createElement() {
-    return _AssetDetailProviderElement(this);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is AssetDetailProvider && other.assetId == assetId;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, assetId.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-}
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin AssetDetailRef on AutoDisposeFutureProviderRef<StockAsset> {
-  /// The parameter `assetId` of this provider.
-  String get assetId;
-}
-
-class _AssetDetailProviderElement
-    extends AutoDisposeFutureProviderElement<StockAsset> with AssetDetailRef {
-  _AssetDetailProviderElement(super.provider);
-
-  @override
-  String get assetId => (origin as AssetDetailProvider).assetId;
 }
 
 String _$selectedAssetTypeHash() => r'0c728901cd16e576e2636227e3c7633934ab9d3e';
 
 /// Provider for selected asset type filter
 /// This provider manages the current filter state for the asset list
-///
-/// Copied from [SelectedAssetType].
-@ProviderFor(SelectedAssetType)
-final selectedAssetTypeProvider =
-    AutoDisposeNotifierProvider<SelectedAssetType, AssetType?>.internal(
-  SelectedAssetType.new,
-  name: r'selectedAssetTypeProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$selectedAssetTypeHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-typedef _$SelectedAssetType = AutoDisposeNotifier<AssetType?>;
+abstract class _$SelectedAssetType extends $Notifier<AssetType?> {
+  AssetType? build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AssetType?, AssetType?>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AssetType?, AssetType?>, AssetType?, Object?, Object?>;
+    element.handleCreate(ref, build);
+  }
+}
+
+/// Provider for fetching all assets
+/// This provider fetches the complete list of user assets from the backend
+/// Supports optimistic updates for delete operations
+
+@ProviderFor(AllAssets)
+final allAssetsProvider = AllAssetsProvider._();
+
+/// Provider for fetching all assets
+/// This provider fetches the complete list of user assets from the backend
+/// Supports optimistic updates for delete operations
+final class AllAssetsProvider
+    extends $AsyncNotifierProvider<AllAssets, List<StockAsset>> {
+  /// Provider for fetching all assets
+  /// This provider fetches the complete list of user assets from the backend
+  /// Supports optimistic updates for delete operations
+  AllAssetsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'allAssetsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$allAssetsHash();
+
+  @$internal
+  @override
+  AllAssets create() => AllAssets();
+}
+
 String _$allAssetsHash() => r'e4b6a858ddd5891418047419e1f1f35b3d2243d5';
 
 /// Provider for fetching all assets
 /// This provider fetches the complete list of user assets from the backend
 /// Supports optimistic updates for delete operations
-///
-/// Copied from [AllAssets].
-@ProviderFor(AllAssets)
-final allAssetsProvider =
-    AutoDisposeAsyncNotifierProvider<AllAssets, List<StockAsset>>.internal(
-  AllAssets.new,
-  name: r'allAssetsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$allAssetsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-typedef _$AllAssets = AutoDisposeAsyncNotifier<List<StockAsset>>;
+abstract class _$AllAssets extends $AsyncNotifier<List<StockAsset>> {
+  FutureOr<List<StockAsset>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref as $Ref<AsyncValue<List<StockAsset>>, List<StockAsset>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<StockAsset>>, List<StockAsset>>,
+        AsyncValue<List<StockAsset>>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}
+
+/// Provider for filtered assets based on selected type
+/// This provider automatically updates when the filter changes
+
+@ProviderFor(filteredAssets)
+final filteredAssetsProvider = FilteredAssetsProvider._();
+
+/// Provider for filtered assets based on selected type
+/// This provider automatically updates when the filter changes
+
+final class FilteredAssetsProvider extends $FunctionalProvider<
+        AsyncValue<List<StockAsset>>,
+        List<StockAsset>,
+        FutureOr<List<StockAsset>>>
+    with $FutureModifier<List<StockAsset>>, $FutureProvider<List<StockAsset>> {
+  /// Provider for filtered assets based on selected type
+  /// This provider automatically updates when the filter changes
+  FilteredAssetsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'filteredAssetsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$filteredAssetsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<StockAsset>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<StockAsset>> create(Ref ref) {
+    return filteredAssets(ref);
+  }
+}
+
+String _$filteredAssetsHash() => r'8205438f9efa3af2b2dc03f5e31d3cc53ca80f56';
+
+/// Provider for asset search functionality
+/// This provider handles searching assets by symbol or name
+
+@ProviderFor(AssetSearch)
+final assetSearchProvider = AssetSearchProvider._();
+
+/// Provider for asset search functionality
+/// This provider handles searching assets by symbol or name
+final class AssetSearchProvider extends $NotifierProvider<AssetSearch, String> {
+  /// Provider for asset search functionality
+  /// This provider handles searching assets by symbol or name
+  AssetSearchProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'assetSearchProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$assetSearchHash();
+
+  @$internal
+  @override
+  AssetSearch create() => AssetSearch();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String>(value),
+    );
+  }
+}
+
 String _$assetSearchHash() => r'a05e4bad77e105e770b074481b8781880d16bc4e';
 
 /// Provider for asset search functionality
 /// This provider handles searching assets by symbol or name
-///
-/// Copied from [AssetSearch].
-@ProviderFor(AssetSearch)
-final assetSearchProvider =
-    AutoDisposeNotifierProvider<AssetSearch, String>.internal(
-  AssetSearch.new,
-  name: r'assetSearchProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$assetSearchHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-typedef _$AssetSearch = AutoDisposeNotifier<String>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$AssetSearch extends $Notifier<String> {
+  String build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<String, String>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<String, String>, String, Object?, Object?>;
+    element.handleCreate(ref, build);
+  }
+}
+
+/// Provider for searched assets
+/// Returns filtered assets based on search query
+
+@ProviderFor(searchedAssets)
+final searchedAssetsProvider = SearchedAssetsProvider._();
+
+/// Provider for searched assets
+/// Returns filtered assets based on search query
+
+final class SearchedAssetsProvider extends $FunctionalProvider<
+        AsyncValue<List<StockAsset>>,
+        List<StockAsset>,
+        FutureOr<List<StockAsset>>>
+    with $FutureModifier<List<StockAsset>>, $FutureProvider<List<StockAsset>> {
+  /// Provider for searched assets
+  /// Returns filtered assets based on search query
+  SearchedAssetsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'searchedAssetsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$searchedAssetsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<StockAsset>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<StockAsset>> create(Ref ref) {
+    return searchedAssets(ref);
+  }
+}
+
+String _$searchedAssetsHash() => r'383a8034c470ae302add42f045f0f9bd04eff641';
+
+/// Provider for fetching a single asset by ID
+/// This provider fetches detailed information for a specific asset
+
+@ProviderFor(assetDetail)
+final assetDetailProvider = AssetDetailFamily._();
+
+/// Provider for fetching a single asset by ID
+/// This provider fetches detailed information for a specific asset
+
+final class AssetDetailProvider extends $FunctionalProvider<
+        AsyncValue<StockAsset>, StockAsset, FutureOr<StockAsset>>
+    with $FutureModifier<StockAsset>, $FutureProvider<StockAsset> {
+  /// Provider for fetching a single asset by ID
+  /// This provider fetches detailed information for a specific asset
+  AssetDetailProvider._(
+      {required AssetDetailFamily super.from, required String super.argument})
+      : super(
+          retry: null,
+          name: r'assetDetailProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$assetDetailHash();
+
+  @override
+  String toString() {
+    return r'assetDetailProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<StockAsset> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<StockAsset> create(Ref ref) {
+    final argument = this.argument as String;
+    return assetDetail(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is AssetDetailProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$assetDetailHash() => r'17ad7e9b12d0a2ccc379f3b1aab61339072b1969';
+
+/// Provider for fetching a single asset by ID
+/// This provider fetches detailed information for a specific asset
+
+final class AssetDetailFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<StockAsset>, String> {
+  AssetDetailFamily._()
+      : super(
+          retry: null,
+          name: r'assetDetailProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  /// Provider for fetching a single asset by ID
+  /// This provider fetches detailed information for a specific asset
+
+  AssetDetailProvider call(
+    String assetId,
+  ) =>
+      AssetDetailProvider._(argument: assetId, from: this);
+
+  @override
+  String toString() => r'assetDetailProvider';
+}

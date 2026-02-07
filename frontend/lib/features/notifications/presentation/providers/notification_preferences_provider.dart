@@ -46,7 +46,7 @@ class NotificationPreferencesNotifier extends _$NotificationPreferencesNotifier 
 
   /// Toggle price alerts
   Future<void> togglePriceAlerts(bool value) async {
-    final currentPrefs = state.valueOrNull ?? NotificationPreferences.defaults();
+    final currentPrefs = state.asData?.value ?? NotificationPreferences.defaults();
     final newPrefs = currentPrefs.copyWith(priceAlerts: value);
     
     state = AsyncValue.data(newPrefs);
@@ -58,7 +58,7 @@ class NotificationPreferencesNotifier extends _$NotificationPreferencesNotifier 
 
   /// Toggle daily briefing
   Future<void> toggleDailyBriefing(bool value) async {
-    final currentPrefs = state.valueOrNull ?? NotificationPreferences.defaults();
+    final currentPrefs = state.asData?.value ?? NotificationPreferences.defaults();
     final newPrefs = currentPrefs.copyWith(dailyBriefing: value);
     
     state = AsyncValue.data(newPrefs);
@@ -69,7 +69,7 @@ class NotificationPreferencesNotifier extends _$NotificationPreferencesNotifier 
 
   /// Toggle portfolio alerts
   Future<void> togglePortfolioAlerts(bool value) async {
-    final currentPrefs = state.valueOrNull ?? NotificationPreferences.defaults();
+    final currentPrefs = state.asData?.value ?? NotificationPreferences.defaults();
     final newPrefs = currentPrefs.copyWith(portfolioAlerts: value);
     
     state = AsyncValue.data(newPrefs);
@@ -80,7 +80,7 @@ class NotificationPreferencesNotifier extends _$NotificationPreferencesNotifier 
 
   /// Toggle AI insights
   Future<void> toggleAiInsights(bool value) async {
-    final currentPrefs = state.valueOrNull ?? NotificationPreferences.defaults();
+    final currentPrefs = state.asData?.value ?? NotificationPreferences.defaults();
     final newPrefs = currentPrefs.copyWith(aiInsights: value);
     
     state = AsyncValue.data(newPrefs);

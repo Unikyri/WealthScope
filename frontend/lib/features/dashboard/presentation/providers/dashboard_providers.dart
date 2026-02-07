@@ -5,12 +5,14 @@ import 'package:wealthscope_app/features/dashboard/data/repositories/dashboard_r
 import 'package:wealthscope_app/features/dashboard/domain/entities/portfolio_summary.dart';
 import 'package:wealthscope_app/features/dashboard/domain/repositories/dashboard_repository.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 part 'dashboard_providers.g.dart';
 
 /// Dashboard Remote Data Source Provider
 @riverpod
 DashboardRemoteDataSource dashboardRemoteDataSource(
-  DashboardRemoteDataSourceRef ref,
+  Ref ref,
 ) {
   final dio = ref.watch(dioClientProvider);
   return DashboardRemoteDataSource(dio);
@@ -18,7 +20,7 @@ DashboardRemoteDataSource dashboardRemoteDataSource(
 
 /// Dashboard Repository Provider
 @riverpod
-DashboardRepository dashboardRepository(DashboardRepositoryRef ref) {
+DashboardRepository dashboardRepository(Ref ref) {
   final remoteSource = ref.watch(dashboardRemoteDataSourceProvider);
   return DashboardRepositoryImpl(remoteSource);
 }
@@ -26,7 +28,7 @@ DashboardRepository dashboardRepository(DashboardRepositoryRef ref) {
 /// Portfolio Summary Provider
 /// Fetches and caches the portfolio summary data
 @riverpod
-Future<PortfolioSummary> portfolioSummary(PortfolioSummaryRef ref) async {
+Future<PortfolioSummary> dashboardPortfolioSummary(Ref ref) async {
   final repository = ref.watch(dashboardRepositoryProvider);
   
   final result = await repository.getPortfolioSummary();

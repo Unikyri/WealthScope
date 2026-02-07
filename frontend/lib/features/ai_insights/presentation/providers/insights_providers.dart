@@ -1,5 +1,6 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../../../core/network/dio_client.dart';
+import '../../../../core/network/dio_client_provider.dart';
 import '../../data/datasources/insights_remote_datasource.dart';
 import '../../data/repositories/insights_repository_impl.dart';
 import '../../domain/entities/insight_entity.dart';
@@ -9,7 +10,7 @@ part 'insights_providers.g.dart';
 
 /// Provider for InsightsRepository
 @riverpod
-InsightsRepository insightsRepository(InsightsRepositoryRef ref) {
+InsightsRepository insightsRepository(Ref ref) {
   final dio = ref.watch(dioClientProvider);
   final dataSource = InsightsRemoteDataSource(dio);
   return InsightsRepositoryImpl(dataSource);
@@ -18,7 +19,7 @@ InsightsRepository insightsRepository(InsightsRepositoryRef ref) {
 /// Provider to fetch insights list
 @riverpod
 Future<List<InsightEntity>> insightsList(
-  InsightsListRef ref, {
+  Ref ref, {
   String? type,
   String? category,
   String? priority,
@@ -43,7 +44,7 @@ Future<List<InsightEntity>> insightsList(
 
 /// Provider to fetch daily briefing
 @riverpod
-Future<InsightEntity> dailyBriefing(DailyBriefingRef ref) async {
+Future<InsightEntity> dailyBriefing(Ref ref) async {
   final repository = ref.watch(insightsRepositoryProvider);
   final result = await repository.getDailyBriefing();
   return result.fold(
@@ -54,7 +55,7 @@ Future<InsightEntity> dailyBriefing(DailyBriefingRef ref) async {
 
 /// Provider to fetch unread count
 @riverpod
-Future<int> unreadInsightsCount(UnreadInsightsCountRef ref) async {
+Future<int> unreadInsightsCount(Ref ref) async {
   final repository = ref.watch(insightsRepositoryProvider);
   final result = await repository.getUnreadCount();
   return result.fold(

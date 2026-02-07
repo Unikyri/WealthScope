@@ -6,68 +6,166 @@ part of 'insights_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$insightsRepositoryHash() =>
-    r'a049b3541c0c446f4c70a75bf623a27a98ab09d4';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Provider for InsightsRepository
+
+@ProviderFor(insightsRepository)
+final insightsRepositoryProvider = InsightsRepositoryProvider._();
 
 /// Provider for InsightsRepository
-///
-/// Copied from [insightsRepository].
-@ProviderFor(insightsRepository)
-final insightsRepositoryProvider =
-    AutoDisposeProvider<InsightsRepository>.internal(
-  insightsRepository,
-  name: r'insightsRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$insightsRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef InsightsRepositoryRef = AutoDisposeProviderRef<InsightsRepository>;
-String _$insightsListHash() => r'4eb6772ae5b176fcadb8080010e82e8c6dfac582';
+final class InsightsRepositoryProvider extends $FunctionalProvider<
+    InsightsRepository,
+    InsightsRepository,
+    InsightsRepository> with $Provider<InsightsRepository> {
+  /// Provider for InsightsRepository
+  InsightsRepositoryProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'insightsRepositoryProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
+  @override
+  String debugGetCreateSourceHash() => _$insightsRepositoryHash();
 
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
+  @$internal
+  @override
+  $ProviderElement<InsightsRepository> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  InsightsRepository create(Ref ref) {
+    return insightsRepository(ref);
   }
 
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(InsightsRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<InsightsRepository>(value),
+    );
   }
 }
 
+String _$insightsRepositoryHash() =>
+    r'92764bfa84a034059c88d024f85d74eb87e03458';
+
 /// Provider to fetch insights list
-///
-/// Copied from [insightsList].
+
 @ProviderFor(insightsList)
-const insightsListProvider = InsightsListFamily();
+final insightsListProvider = InsightsListFamily._();
 
 /// Provider to fetch insights list
-///
-/// Copied from [insightsList].
-class InsightsListFamily extends Family<AsyncValue<List<InsightEntity>>> {
+
+final class InsightsListProvider extends $FunctionalProvider<
+        AsyncValue<List<InsightEntity>>,
+        List<InsightEntity>,
+        FutureOr<List<InsightEntity>>>
+    with
+        $FutureModifier<List<InsightEntity>>,
+        $FutureProvider<List<InsightEntity>> {
   /// Provider to fetch insights list
-  ///
-  /// Copied from [insightsList].
-  const InsightsListFamily();
+  InsightsListProvider._(
+      {required InsightsListFamily super.from,
+      required ({
+        String? type,
+        String? category,
+        String? priority,
+        bool? unread,
+        int? limit,
+        int? offset,
+      })
+          super.argument})
+      : super(
+          retry: null,
+          name: r'insightsListProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$insightsListHash();
+
+  @override
+  String toString() {
+    return r'insightsListProvider'
+        ''
+        '$argument';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<InsightEntity>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<InsightEntity>> create(Ref ref) {
+    final argument = this.argument as ({
+      String? type,
+      String? category,
+      String? priority,
+      bool? unread,
+      int? limit,
+      int? offset,
+    });
+    return insightsList(
+      ref,
+      type: argument.type,
+      category: argument.category,
+      priority: argument.priority,
+      unread: argument.unread,
+      limit: argument.limit,
+      offset: argument.offset,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is InsightsListProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$insightsListHash() => r'c5544631c4bb303e696f9efe2dc91c1f3809cdd9';
+
+/// Provider to fetch insights list
+
+final class InsightsListFamily extends $Family
+    with
+        $FunctionalFamilyOverride<
+            FutureOr<List<InsightEntity>>,
+            ({
+              String? type,
+              String? category,
+              String? priority,
+              bool? unread,
+              int? limit,
+              int? offset,
+            })> {
+  InsightsListFamily._()
+      : super(
+          retry: null,
+          name: r'insightsListProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
 
   /// Provider to fetch insights list
-  ///
-  /// Copied from [insightsList].
+
   InsightsListProvider call({
     String? type,
     String? category,
@@ -75,278 +173,189 @@ class InsightsListFamily extends Family<AsyncValue<List<InsightEntity>>> {
     bool? unread,
     int? limit,
     int? offset,
-  }) {
-    return InsightsListProvider(
-      type: type,
-      category: category,
-      priority: priority,
-      unread: unread,
-      limit: limit,
-      offset: offset,
-    );
-  }
-
-  @override
-  InsightsListProvider getProviderOverride(
-    covariant InsightsListProvider provider,
-  ) {
-    return call(
-      type: provider.type,
-      category: provider.category,
-      priority: provider.priority,
-      unread: provider.unread,
-      limit: provider.limit,
-      offset: provider.offset,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'insightsListProvider';
-}
-
-/// Provider to fetch insights list
-///
-/// Copied from [insightsList].
-class InsightsListProvider
-    extends AutoDisposeFutureProvider<List<InsightEntity>> {
-  /// Provider to fetch insights list
-  ///
-  /// Copied from [insightsList].
-  InsightsListProvider({
-    String? type,
-    String? category,
-    String? priority,
-    bool? unread,
-    int? limit,
-    int? offset,
-  }) : this._internal(
-          (ref) => insightsList(
-            ref as InsightsListRef,
-            type: type,
-            category: category,
-            priority: priority,
-            unread: unread,
-            limit: limit,
-            offset: offset,
-          ),
-          from: insightsListProvider,
-          name: r'insightsListProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$insightsListHash,
-          dependencies: InsightsListFamily._dependencies,
-          allTransitiveDependencies:
-              InsightsListFamily._allTransitiveDependencies,
-          type: type,
-          category: category,
-          priority: priority,
-          unread: unread,
-          limit: limit,
-          offset: offset,
-        );
-
-  InsightsListProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.type,
-    required this.category,
-    required this.priority,
-    required this.unread,
-    required this.limit,
-    required this.offset,
-  }) : super.internal();
-
-  final String? type;
-  final String? category;
-  final String? priority;
-  final bool? unread;
-  final int? limit;
-  final int? offset;
-
-  @override
-  Override overrideWith(
-    FutureOr<List<InsightEntity>> Function(InsightsListRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: InsightsListProvider._internal(
-        (ref) => create(ref as InsightsListRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
+  }) =>
+      InsightsListProvider._(argument: (
         type: type,
         category: category,
         priority: priority,
         unread: unread,
         limit: limit,
         offset: offset,
-      ),
-    );
-  }
+      ), from: this);
 
   @override
-  AutoDisposeFutureProviderElement<List<InsightEntity>> createElement() {
-    return _InsightsListProviderElement(this);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is InsightsListProvider &&
-        other.type == type &&
-        other.category == category &&
-        other.priority == priority &&
-        other.unread == unread &&
-        other.limit == limit &&
-        other.offset == offset;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, type.hashCode);
-    hash = _SystemHash.combine(hash, category.hashCode);
-    hash = _SystemHash.combine(hash, priority.hashCode);
-    hash = _SystemHash.combine(hash, unread.hashCode);
-    hash = _SystemHash.combine(hash, limit.hashCode);
-    hash = _SystemHash.combine(hash, offset.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
+  String toString() => r'insightsListProvider';
 }
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin InsightsListRef on AutoDisposeFutureProviderRef<List<InsightEntity>> {
-  /// The parameter `type` of this provider.
-  String? get type;
-
-  /// The parameter `category` of this provider.
-  String? get category;
-
-  /// The parameter `priority` of this provider.
-  String? get priority;
-
-  /// The parameter `unread` of this provider.
-  bool? get unread;
-
-  /// The parameter `limit` of this provider.
-  int? get limit;
-
-  /// The parameter `offset` of this provider.
-  int? get offset;
-}
-
-class _InsightsListProviderElement
-    extends AutoDisposeFutureProviderElement<List<InsightEntity>>
-    with InsightsListRef {
-  _InsightsListProviderElement(super.provider);
-
-  @override
-  String? get type => (origin as InsightsListProvider).type;
-  @override
-  String? get category => (origin as InsightsListProvider).category;
-  @override
-  String? get priority => (origin as InsightsListProvider).priority;
-  @override
-  bool? get unread => (origin as InsightsListProvider).unread;
-  @override
-  int? get limit => (origin as InsightsListProvider).limit;
-  @override
-  int? get offset => (origin as InsightsListProvider).offset;
-}
-
-String _$dailyBriefingHash() => r'5084a7646b110078fc886e4014dee6658a714a8a';
 
 /// Provider to fetch daily briefing
-///
-/// Copied from [dailyBriefing].
-@ProviderFor(dailyBriefing)
-final dailyBriefingProvider = AutoDisposeFutureProvider<InsightEntity>.internal(
-  dailyBriefing,
-  name: r'dailyBriefingProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$dailyBriefingHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef DailyBriefingRef = AutoDisposeFutureProviderRef<InsightEntity>;
-String _$unreadInsightsCountHash() =>
-    r'24d04e5eabbe4cd78a57309d258b7f04398a3976';
+@ProviderFor(dailyBriefing)
+final dailyBriefingProvider = DailyBriefingProvider._();
+
+/// Provider to fetch daily briefing
+
+final class DailyBriefingProvider extends $FunctionalProvider<
+        AsyncValue<InsightEntity>, InsightEntity, FutureOr<InsightEntity>>
+    with $FutureModifier<InsightEntity>, $FutureProvider<InsightEntity> {
+  /// Provider to fetch daily briefing
+  DailyBriefingProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'dailyBriefingProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$dailyBriefingHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<InsightEntity> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<InsightEntity> create(Ref ref) {
+    return dailyBriefing(ref);
+  }
+}
+
+String _$dailyBriefingHash() => r'd94c086af3c063a1c72828c45f4ea9a6d7c22857';
 
 /// Provider to fetch unread count
-///
-/// Copied from [unreadInsightsCount].
-@ProviderFor(unreadInsightsCount)
-final unreadInsightsCountProvider = AutoDisposeFutureProvider<int>.internal(
-  unreadInsightsCount,
-  name: r'unreadInsightsCountProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$unreadInsightsCountHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef UnreadInsightsCountRef = AutoDisposeFutureProviderRef<int>;
+@ProviderFor(unreadInsightsCount)
+final unreadInsightsCountProvider = UnreadInsightsCountProvider._();
+
+/// Provider to fetch unread count
+
+final class UnreadInsightsCountProvider
+    extends $FunctionalProvider<AsyncValue<int>, int, FutureOr<int>>
+    with $FutureModifier<int>, $FutureProvider<int> {
+  /// Provider to fetch unread count
+  UnreadInsightsCountProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'unreadInsightsCountProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$unreadInsightsCountHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<int> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<int> create(Ref ref) {
+    return unreadInsightsCount(ref);
+  }
+}
+
+String _$unreadInsightsCountHash() =>
+    r'cca57c78e40f10775f5362c7d4a61b60553f4035';
+
+/// Provider to mark insight as read
+
+@ProviderFor(MarkInsightAsRead)
+final markInsightAsReadProvider = MarkInsightAsReadProvider._();
+
+/// Provider to mark insight as read
+final class MarkInsightAsReadProvider
+    extends $AsyncNotifierProvider<MarkInsightAsRead, void> {
+  /// Provider to mark insight as read
+  MarkInsightAsReadProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'markInsightAsReadProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$markInsightAsReadHash();
+
+  @$internal
+  @override
+  MarkInsightAsRead create() => MarkInsightAsRead();
+}
+
 String _$markInsightAsReadHash() => r'e784a5727a6ceefadd352a807e02c09251022c56';
 
 /// Provider to mark insight as read
-///
-/// Copied from [MarkInsightAsRead].
-@ProviderFor(MarkInsightAsRead)
-final markInsightAsReadProvider =
-    AutoDisposeAsyncNotifierProvider<MarkInsightAsRead, void>.internal(
-  MarkInsightAsRead.new,
-  name: r'markInsightAsReadProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$markInsightAsReadHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-typedef _$MarkInsightAsRead = AutoDisposeAsyncNotifier<void>;
+abstract class _$MarkInsightAsRead extends $AsyncNotifier<void> {
+  FutureOr<void> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<void>, void>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<void>, void>,
+        AsyncValue<void>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}
+
+/// Provider to generate new insights
+
+@ProviderFor(GenerateInsights)
+final generateInsightsProvider = GenerateInsightsProvider._();
+
+/// Provider to generate new insights
+final class GenerateInsightsProvider
+    extends $AsyncNotifierProvider<GenerateInsights, List<InsightEntity>> {
+  /// Provider to generate new insights
+  GenerateInsightsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'generateInsightsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$generateInsightsHash();
+
+  @$internal
+  @override
+  GenerateInsights create() => GenerateInsights();
+}
+
 String _$generateInsightsHash() => r'acdead84b68be09530fa8cf3068175eaf14a3459';
 
 /// Provider to generate new insights
-///
-/// Copied from [GenerateInsights].
-@ProviderFor(GenerateInsights)
-final generateInsightsProvider = AutoDisposeAsyncNotifierProvider<
-    GenerateInsights, List<InsightEntity>>.internal(
-  GenerateInsights.new,
-  name: r'generateInsightsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$generateInsightsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-typedef _$GenerateInsights = AutoDisposeAsyncNotifier<List<InsightEntity>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$GenerateInsights extends $AsyncNotifier<List<InsightEntity>> {
+  FutureOr<List<InsightEntity>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref as $Ref<AsyncValue<List<InsightEntity>>, List<InsightEntity>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<InsightEntity>>, List<InsightEntity>>,
+        AsyncValue<List<InsightEntity>>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}

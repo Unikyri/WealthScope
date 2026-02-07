@@ -6,27 +6,61 @@ part of 'notification_preferences_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$notificationPreferencesNotifierHash() =>
-    r'206c6c143eb2d3f0d039380dbd406013b1b4630a';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Provider for managing notification preferences
+/// Persists user's notification settings to SharedPreferences
+
+@ProviderFor(NotificationPreferencesNotifier)
+final notificationPreferencesProvider =
+    NotificationPreferencesNotifierProvider._();
 
 /// Provider for managing notification preferences
 /// Persists user's notification settings to SharedPreferences
-///
-/// Copied from [NotificationPreferencesNotifier].
-@ProviderFor(NotificationPreferencesNotifier)
-final notificationPreferencesNotifierProvider =
-    AutoDisposeAsyncNotifierProvider<NotificationPreferencesNotifier,
-        NotificationPreferences>.internal(
-  NotificationPreferencesNotifier.new,
-  name: r'notificationPreferencesNotifierProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$notificationPreferencesNotifierHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final class NotificationPreferencesNotifierProvider
+    extends $AsyncNotifierProvider<NotificationPreferencesNotifier,
+        NotificationPreferences> {
+  /// Provider for managing notification preferences
+  /// Persists user's notification settings to SharedPreferences
+  NotificationPreferencesNotifierProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'notificationPreferencesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
 
-typedef _$NotificationPreferencesNotifier
-    = AutoDisposeAsyncNotifier<NotificationPreferences>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+  @override
+  String debugGetCreateSourceHash() => _$notificationPreferencesNotifierHash();
+
+  @$internal
+  @override
+  NotificationPreferencesNotifier create() => NotificationPreferencesNotifier();
+}
+
+String _$notificationPreferencesNotifierHash() =>
+    r'9055bf7c174acd4d889e5c97f0b502c98497e744';
+
+/// Provider for managing notification preferences
+/// Persists user's notification settings to SharedPreferences
+
+abstract class _$NotificationPreferencesNotifier
+    extends $AsyncNotifier<NotificationPreferences> {
+  FutureOr<NotificationPreferences> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref
+        as $Ref<AsyncValue<NotificationPreferences>, NotificationPreferences>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<NotificationPreferences>,
+            NotificationPreferences>,
+        AsyncValue<NotificationPreferences>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}

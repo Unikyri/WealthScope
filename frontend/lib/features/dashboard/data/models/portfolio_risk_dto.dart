@@ -8,7 +8,7 @@ part 'portfolio_risk_dto.g.dart';
 /// Portfolio Risk DTO
 /// Matches GET /api/v1/portfolio/risk response
 @freezed
-class PortfolioRiskDto with _$PortfolioRiskDto {
+abstract class PortfolioRiskDto with _$PortfolioRiskDto {
   const factory PortfolioRiskDto({
     @JsonKey(name: 'risk_score') required int riskScore,
     @JsonKey(name: 'diversification_level') required String diversificationLevel,
@@ -23,7 +23,7 @@ class PortfolioRiskDto with _$PortfolioRiskDto {
 
 /// Risk Alert DTO
 @freezed
-class RiskAlertDto with _$RiskAlertDto {
+abstract class RiskAlertDto with _$RiskAlertDto {
   const factory RiskAlertDto({
     required String type,
     required String title,

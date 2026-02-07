@@ -111,7 +111,7 @@ class AssetDetailScreen extends ConsumerWidget {
 
     // Get the asset data first
     final assetAsync = ref.read(assetDetailProvider(assetId));
-    final asset = assetAsync.valueOrNull;
+    final asset = assetAsync.asData?.value;
 
     if (asset == null) {
       ScaffoldMessenger.of(context).showSnackBar(

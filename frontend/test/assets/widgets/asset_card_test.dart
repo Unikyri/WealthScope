@@ -46,7 +46,7 @@ void main() {
         purchasePrice: 150.0,
         currency: Currency.usd,
         currentPrice: 175.0,
-        currentValue: 1750.0, // 10 * 175
+        totalValue: 1750.0, // 10 * 175
       );
 
       await tester.pumpWidget(
@@ -123,7 +123,7 @@ void main() {
         purchasePrice: 300.0,
         currency: Currency.usd,
         currentPrice: 350.0,
-        currentValue: 3500.0,
+        totalValue: 3500.0,
       );
 
       await tester.pumpWidget(
@@ -343,7 +343,7 @@ void main() {
         purchasePrice: 100.0,
         currency: Currency.usd,
         currentPrice: 120.0,
-        currentValue: 1200.0, // +20% gain
+        totalValue: 1200.0, // +20% gain
       );
 
       await tester.pumpWidget(
@@ -378,7 +378,7 @@ void main() {
         purchasePrice: 150.0,
         currency: Currency.usd,
         currentPrice: 120.0,
-        currentValue: 1200.0, // -20% loss
+        totalValue: 1200.0, // -20% loss
       );
 
       await tester.pumpWidget(
@@ -413,7 +413,7 @@ void main() {
         purchasePrice: 100.0,
         currency: Currency.usd,
         currentPrice: 100.0,
-        currentValue: 1000.0, // 0% change
+        totalValue: 1000.0, // 0% change
       );
 
       await tester.pumpWidget(
@@ -442,7 +442,7 @@ void main() {
         purchasePrice: 100.0,
         currency: Currency.usd,
         currentPrice: null,
-        currentValue: null,
+        totalValue: null,
       );
 
       await tester.pumpWidget(
@@ -474,7 +474,7 @@ void main() {
         purchasePrice: 50.0,
         currency: Currency.usd,
         currentPrice: 55.0,
-        currentValue: 5500.0, // Should show as 5.5K
+        totalValue: 5500.0, // Should show as 5.5K
       );
 
       await tester.pumpWidget(
@@ -500,7 +500,7 @@ void main() {
         purchasePrice: 100.0,
         currency: Currency.usd,
         currentPrice: 150.0,
-        currentValue: 1500000.0, // Should show as 1.5M
+        totalValue: 1500000.0, // Should show as 1.5M
       );
 
       await tester.pumpWidget(
@@ -526,7 +526,7 @@ void main() {
         purchasePrice: 50.0,
         currency: Currency.usd,
         currentPrice: 60.0,
-        currentValue: 300.0, // Should show as 300
+        totalValue: 300.0, // Should show as 300
       );
 
       await tester.pumpWidget(
@@ -554,7 +554,7 @@ void main() {
         purchasePrice: 100.0,
         currency: Currency.eur,
         currentPrice: 120.0,
-        currentValue: 1200.0,
+        totalValue: 1200.0,
       );
 
       await tester.pumpWidget(
@@ -581,7 +581,7 @@ void main() {
         purchasePrice: 100.0,
         currency: Currency.gbp,
         currentPrice: 150.0,
-        currentValue: 1500.0,
+        totalValue: 1500.0,
       );
 
       await tester.pumpWidget(
@@ -715,7 +715,7 @@ void main() {
         purchasePrice: 100.0,
         currency: Currency.usd,
         currentPrice: null,
-        currentValue: null,
+        totalValue: null,
       );
 
       await tester.pumpWidget(

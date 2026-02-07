@@ -1,5 +1,6 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../../../core/network/dio_client.dart';
+import '../../../../core/network/dio_client_provider.dart';
 import '../../data/datasources/ocr_remote_datasource.dart';
 import '../../data/repositories/ocr_repository_impl.dart';
 import '../../domain/entities/ocr_entity.dart';
@@ -9,7 +10,7 @@ part 'ocr_providers.g.dart';
 
 /// Provider for OCRRepository
 @riverpod
-OCRRepository ocrRepository(OcrRepositoryRef ref) {
+OCRRepository ocrRepository(Ref ref) {
   final dio = ref.watch(dioClientProvider);
   final dataSource = OCRRemoteDataSource(dio);
   return OCRRepositoryImpl(dataSource);

@@ -29,7 +29,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Future<void> _handleRegister() async {
     if (_formKey.currentState?.validate() ?? false) {
-      final success = await ref.read(registerNotifierProvider.notifier).register(
+      final success = await ref.read(registerProvider.notifier).register(
             email: _emailController.text.trim(),
             password: _passwordController.text,
             confirmPassword: _confirmPasswordController.text,
@@ -48,12 +48,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final registerState = ref.watch(registerNotifierProvider);
+    final registerState = ref.watch(registerProvider);
     final theme = Theme.of(context);
 
     // Show error snackbar when there's an error
     ref.listen<RegisterState>(
-      registerNotifierProvider,
+      registerProvider,
       (previous, next) {
         if (next.errorMessage != null && next.errorMessage!.isNotEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -63,7 +63,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               behavior: SnackBarBehavior.floating,
             ),
           );
-          ref.read(registerNotifierProvider.notifier).clearError();
+          ref.read(registerProvider.notifier).clearError();
         }
       },
     );
@@ -157,7 +157,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         ),
                         onPressed: () {
                           ref
-                              .read(registerNotifierProvider.notifier)
+                              .read(registerProvider.notifier)
                               .togglePasswordVisibility();
                         },
                       ),
@@ -191,7 +191,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         ),
                         onPressed: () {
                           ref
-                              .read(registerNotifierProvider.notifier)
+                              .read(registerProvider.notifier)
                               .toggleConfirmPasswordVisibility();
                         },
                       ),
@@ -214,7 +214,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         ? null
                         : (value) {
                             ref
-                                .read(registerNotifierProvider.notifier)
+                                .read(registerProvider.notifier)
                                 .toggleTerms();
                           },
                     controlAffinity: ListTileControlAffinity.leading,

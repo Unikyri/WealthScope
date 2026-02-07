@@ -7,7 +7,7 @@ part 'portfolio_dto.g.dart';
 
 /// DTO for Portfolio Summary Response
 @freezed
-class PortfolioSummaryDto with _$PortfolioSummaryDto {
+abstract class PortfolioSummaryDto with _$PortfolioSummaryDto {
   const factory PortfolioSummaryDto({
     @JsonKey(name: 'total_value') required double totalValue,
     @JsonKey(name: 'total_invested') required double totalInvested,
@@ -23,7 +23,7 @@ class PortfolioSummaryDto with _$PortfolioSummaryDto {
 }
 
 @freezed
-class AssetTypeBreakdownDto with _$AssetTypeBreakdownDto {
+abstract class AssetTypeBreakdownDto with _$AssetTypeBreakdownDto {
   const factory AssetTypeBreakdownDto({
     required String type,
     required double value,
@@ -37,7 +37,7 @@ class AssetTypeBreakdownDto with _$AssetTypeBreakdownDto {
 
 /// DTO for Risk Analysis Response
 @freezed
-class PortfolioRiskAnalysisDto with _$PortfolioRiskAnalysisDto {
+abstract class PortfolioRiskAnalysisDto with _$PortfolioRiskAnalysisDto {
   const factory PortfolioRiskAnalysisDto({
     @JsonKey(name: 'risk_score') required int riskScore,
     @JsonKey(name: 'diversification_level') required String diversificationLevel,
@@ -49,7 +49,7 @@ class PortfolioRiskAnalysisDto with _$PortfolioRiskAnalysisDto {
 }
 
 @freezed
-class RiskAlertDto with _$RiskAlertDto {
+abstract class RiskAlertDto with _$RiskAlertDto {
   const factory RiskAlertDto({
     required String type,
     required String title,

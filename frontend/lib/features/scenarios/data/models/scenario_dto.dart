@@ -5,7 +5,7 @@ part 'scenario_dto.freezed.dart';
 part 'scenario_dto.g.dart';
 
 @freezed
-class AllocationItemDto with _$AllocationItemDto {
+abstract class AllocationItemDto with _$AllocationItemDto {
   const factory AllocationItemDto({
     required String type,
     required double value,
@@ -17,7 +17,7 @@ class AllocationItemDto with _$AllocationItemDto {
 }
 
 @freezed
-class PortfolioStateDto with _$PortfolioStateDto {
+abstract class PortfolioStateDto with _$PortfolioStateDto {
   const factory PortfolioStateDto({
     @JsonKey(name: 'total_value') required double totalValue,
     @JsonKey(name: 'total_invested') required double totalInvested,
@@ -32,7 +32,7 @@ class PortfolioStateDto with _$PortfolioStateDto {
 }
 
 @freezed
-class ChangeDetailDto with _$ChangeDetailDto {
+abstract class ChangeDetailDto with _$ChangeDetailDto {
   const factory ChangeDetailDto({
     required String type,
     required String description,
@@ -46,7 +46,7 @@ class ChangeDetailDto with _$ChangeDetailDto {
 }
 
 @freezed
-class SimulationResultDto with _$SimulationResultDto {
+abstract class SimulationResultDto with _$SimulationResultDto {
   const factory SimulationResultDto({
     @JsonKey(name: 'current_state') required PortfolioStateDto currentState,
     @JsonKey(name: 'projected_state') required PortfolioStateDto projectedState,
@@ -60,7 +60,7 @@ class SimulationResultDto with _$SimulationResultDto {
 }
 
 @freezed
-class HistoricalStatsDto with _$HistoricalStatsDto {
+abstract class HistoricalStatsDto with _$HistoricalStatsDto {
   const factory HistoricalStatsDto({
     required String symbol,
     required String period,
@@ -79,7 +79,7 @@ class HistoricalStatsDto with _$HistoricalStatsDto {
 }
 
 @freezed
-class ScenarioTemplateDto with _$ScenarioTemplateDto {
+abstract class ScenarioTemplateDto with _$ScenarioTemplateDto {
   const factory ScenarioTemplateDto({
     required String id,
     required String name,
@@ -94,7 +94,7 @@ class ScenarioTemplateDto with _$ScenarioTemplateDto {
 
 /// Request DTO for simulation
 @freezed
-class SimulateRequestDto with _$SimulateRequestDto {
+abstract class SimulateRequestDto with _$SimulateRequestDto {
   const factory SimulateRequestDto({
     required String type,
     required Map<String, dynamic> parameters,

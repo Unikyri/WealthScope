@@ -6,17 +6,15 @@ part of 'conversation_dto.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ConversationDtoImpl _$$ConversationDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$ConversationDtoImpl(
+_ConversationDto _$ConversationDtoFromJson(Map<String, dynamic> json) =>
+    _ConversationDto(
       id: json['id'] as String,
       title: json['title'] as String,
       createdAt: json['created_at'] as String,
       updatedAt: json['updated_at'] as String,
     );
 
-Map<String, dynamic> _$$ConversationDtoImplToJson(
-        _$ConversationDtoImpl instance) =>
+Map<String, dynamic> _$ConversationDtoToJson(_ConversationDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
@@ -24,8 +22,7 @@ Map<String, dynamic> _$$ConversationDtoImplToJson(
       'updated_at': instance.updatedAt,
     };
 
-_$MessageDtoImpl _$$MessageDtoImplFromJson(Map<String, dynamic> json) =>
-    _$MessageDtoImpl(
+_MessageDto _$MessageDtoFromJson(Map<String, dynamic> json) => _MessageDto(
       id: json['id'] as String,
       conversationId: json['conversation_id'] as String,
       role: json['role'] as String,
@@ -33,7 +30,7 @@ _$MessageDtoImpl _$$MessageDtoImplFromJson(Map<String, dynamic> json) =>
       createdAt: json['created_at'] as String,
     );
 
-Map<String, dynamic> _$$MessageDtoImplToJson(_$MessageDtoImpl instance) =>
+Map<String, dynamic> _$MessageDtoToJson(_MessageDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'conversation_id': instance.conversationId,
@@ -42,9 +39,9 @@ Map<String, dynamic> _$$MessageDtoImplToJson(_$MessageDtoImpl instance) =>
       'created_at': instance.createdAt,
     };
 
-_$ConversationWithMessagesDtoImpl _$$ConversationWithMessagesDtoImplFromJson(
+_ConversationWithMessagesDto _$ConversationWithMessagesDtoFromJson(
         Map<String, dynamic> json) =>
-    _$ConversationWithMessagesDtoImpl(
+    _ConversationWithMessagesDto(
       conversation: ConversationDto.fromJson(
           json['conversation'] as Map<String, dynamic>),
       messages: (json['messages'] as List<dynamic>)
@@ -52,16 +49,15 @@ _$ConversationWithMessagesDtoImpl _$$ConversationWithMessagesDtoImplFromJson(
           .toList(),
     );
 
-Map<String, dynamic> _$$ConversationWithMessagesDtoImplToJson(
-        _$ConversationWithMessagesDtoImpl instance) =>
+Map<String, dynamic> _$ConversationWithMessagesDtoToJson(
+        _ConversationWithMessagesDto instance) =>
     <String, dynamic>{
       'conversation': instance.conversation.toJson(),
       'messages': instance.messages.map((e) => e.toJson()).toList(),
     };
 
-_$ConversationListDtoImpl _$$ConversationListDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$ConversationListDtoImpl(
+_ConversationListDto _$ConversationListDtoFromJson(Map<String, dynamic> json) =>
+    _ConversationListDto(
       conversations: (json['conversations'] as List<dynamic>)
           .map((e) => ConversationDto.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -70,8 +66,8 @@ _$ConversationListDtoImpl _$$ConversationListDtoImplFromJson(
       offset: (json['offset'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$ConversationListDtoImplToJson(
-        _$ConversationListDtoImpl instance) =>
+Map<String, dynamic> _$ConversationListDtoToJson(
+        _ConversationListDto instance) =>
     <String, dynamic>{
       'conversations': instance.conversations.map((e) => e.toJson()).toList(),
       'total': instance.total,
@@ -79,42 +75,40 @@ Map<String, dynamic> _$$ConversationListDtoImplToJson(
       'offset': instance.offset,
     };
 
-_$WelcomeMessageDtoImpl _$$WelcomeMessageDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$WelcomeMessageDtoImpl(
+_WelcomeMessageDto _$WelcomeMessageDtoFromJson(Map<String, dynamic> json) =>
+    _WelcomeMessageDto(
       message: json['message'] as String,
       conversationStarters: (json['conversation_starters'] as List<dynamic>)
           .map((e) => e as String)
           .toList(),
     );
 
-Map<String, dynamic> _$$WelcomeMessageDtoImplToJson(
-        _$WelcomeMessageDtoImpl instance) =>
+Map<String, dynamic> _$WelcomeMessageDtoToJson(_WelcomeMessageDto instance) =>
     <String, dynamic>{
       'message': instance.message,
       'conversation_starters': instance.conversationStarters,
     };
 
-_$CreateConversationRequestDtoImpl _$$CreateConversationRequestDtoImplFromJson(
+_CreateConversationRequestDto _$CreateConversationRequestDtoFromJson(
         Map<String, dynamic> json) =>
-    _$CreateConversationRequestDtoImpl(
+    _CreateConversationRequestDto(
       title: json['title'] as String,
     );
 
-Map<String, dynamic> _$$CreateConversationRequestDtoImplToJson(
-        _$CreateConversationRequestDtoImpl instance) =>
+Map<String, dynamic> _$CreateConversationRequestDtoToJson(
+        _CreateConversationRequestDto instance) =>
     <String, dynamic>{
       'title': instance.title,
     };
 
-_$UpdateConversationRequestDtoImpl _$$UpdateConversationRequestDtoImplFromJson(
+_UpdateConversationRequestDto _$UpdateConversationRequestDtoFromJson(
         Map<String, dynamic> json) =>
-    _$UpdateConversationRequestDtoImpl(
+    _UpdateConversationRequestDto(
       title: json['title'] as String,
     );
 
-Map<String, dynamic> _$$UpdateConversationRequestDtoImplToJson(
-        _$UpdateConversationRequestDtoImpl instance) =>
+Map<String, dynamic> _$UpdateConversationRequestDtoToJson(
+        _UpdateConversationRequestDto instance) =>
     <String, dynamic>{
       'title': instance.title,
     };

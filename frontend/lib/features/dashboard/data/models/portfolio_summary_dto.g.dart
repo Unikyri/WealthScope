@@ -6,9 +6,8 @@ part of 'portfolio_summary_dto.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$PortfolioSummaryDtoImpl _$$PortfolioSummaryDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$PortfolioSummaryDtoImpl(
+_PortfolioSummaryDto _$PortfolioSummaryDtoFromJson(Map<String, dynamic> json) =>
+    _PortfolioSummaryDto(
       totalValue: (json['total_value'] as num).toDouble(),
       totalInvested: (json['total_invested'] as num).toDouble(),
       gainLoss: (json['gain_loss'] as num).toDouble(),
@@ -22,8 +21,8 @@ _$PortfolioSummaryDtoImpl _$$PortfolioSummaryDtoImplFromJson(
       lastUpdated: json['last_updated'] as String?,
     );
 
-Map<String, dynamic> _$$PortfolioSummaryDtoImplToJson(
-        _$PortfolioSummaryDtoImpl instance) =>
+Map<String, dynamic> _$PortfolioSummaryDtoToJson(
+        _PortfolioSummaryDto instance) =>
     <String, dynamic>{
       'total_value': instance.totalValue,
       'total_invested': instance.totalInvested,
@@ -35,17 +34,17 @@ Map<String, dynamic> _$$PortfolioSummaryDtoImplToJson(
       'last_updated': instance.lastUpdated,
     };
 
-_$AssetTypeBreakdownDtoImpl _$$AssetTypeBreakdownDtoImplFromJson(
+_AssetTypeBreakdownDto _$AssetTypeBreakdownDtoFromJson(
         Map<String, dynamic> json) =>
-    _$AssetTypeBreakdownDtoImpl(
+    _AssetTypeBreakdownDto(
       type: json['type'] as String,
       value: (json['value'] as num).toDouble(),
       percent: (json['percent'] as num).toDouble(),
       count: (json['count'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$AssetTypeBreakdownDtoImplToJson(
-        _$AssetTypeBreakdownDtoImpl instance) =>
+Map<String, dynamic> _$AssetTypeBreakdownDtoToJson(
+        _AssetTypeBreakdownDto instance) =>
     <String, dynamic>{
       'type': instance.type,
       'value': instance.value,

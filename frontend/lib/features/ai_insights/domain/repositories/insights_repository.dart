@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/error/failures.dart';
+import '../../../../core/errors/failures.dart';
 import '../entities/insight_entity.dart';
 
 /// Abstract Repository for AI Insights

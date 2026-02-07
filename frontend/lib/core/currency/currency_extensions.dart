@@ -19,7 +19,7 @@ extension CurrencyFormatting on WidgetRef {
     bool convertFromUsd = true,
   }) {
     final selectedCurrencyAsync = watch(selectedCurrencyProvider);
-    final currency = selectedCurrencyAsync.valueOrNull ?? Currency.usd;
+    final currency = selectedCurrencyAsync.asData?.value ?? Currency.usd;
 
     // Convert amount if needed
     final convertedAmount = convertFromUsd
@@ -41,7 +41,7 @@ extension CurrencyFormatting on WidgetRef {
   /// Get the current selected currency
   Currency getCurrentCurrency() {
     final selectedCurrencyAsync = watch(selectedCurrencyProvider);
-    return selectedCurrencyAsync.valueOrNull ?? Currency.usd;
+    return selectedCurrencyAsync.asData?.value ?? Currency.usd;
   }
 
   /// Convert amount from USD to user's preferred currency

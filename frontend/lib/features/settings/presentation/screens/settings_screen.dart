@@ -278,7 +278,7 @@ class SettingsScreen extends ConsumerWidget {
 
   Widget _buildNotificationToggles(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final notificationPrefsAsync = ref.watch(notificationPreferencesNotifierProvider);
+    final notificationPrefsAsync = ref.watch(notificationPreferencesProvider);
 
     return notificationPrefsAsync.when(
       data: (prefs) => Column(
@@ -296,7 +296,7 @@ class SettingsScreen extends ConsumerWidget {
             value: prefs.priceAlerts,
             onChanged: (value) {
               ref
-                  .read(notificationPreferencesNotifierProvider.notifier)
+                  .read(notificationPreferencesProvider.notifier)
                   .togglePriceAlerts(value);
             },
           ),
@@ -313,7 +313,7 @@ class SettingsScreen extends ConsumerWidget {
             value: prefs.dailyBriefing,
             onChanged: (value) {
               ref
-                  .read(notificationPreferencesNotifierProvider.notifier)
+                  .read(notificationPreferencesProvider.notifier)
                   .toggleDailyBriefing(value);
             },
           ),
@@ -330,7 +330,7 @@ class SettingsScreen extends ConsumerWidget {
             value: prefs.portfolioAlerts,
             onChanged: (value) {
               ref
-                  .read(notificationPreferencesNotifierProvider.notifier)
+                  .read(notificationPreferencesProvider.notifier)
                   .togglePortfolioAlerts(value);
             },
           ),
@@ -347,7 +347,7 @@ class SettingsScreen extends ConsumerWidget {
             value: prefs.aiInsights,
             onChanged: (value) {
               ref
-                  .read(notificationPreferencesNotifierProvider.notifier)
+                  .read(notificationPreferencesProvider.notifier)
                   .toggleAiInsights(value);
             },
           ),

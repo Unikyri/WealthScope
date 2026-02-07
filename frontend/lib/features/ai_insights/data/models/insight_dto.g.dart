@@ -6,8 +6,7 @@ part of 'insight_dto.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$InsightDtoImpl _$$InsightDtoImplFromJson(Map<String, dynamic> json) =>
-    _$InsightDtoImpl(
+_InsightDto _$InsightDtoFromJson(Map<String, dynamic> json) => _InsightDto(
       id: json['id'] as String,
       type: json['type'] as String,
       category: json['category'] as String,
@@ -24,7 +23,7 @@ _$InsightDtoImpl _$$InsightDtoImplFromJson(Map<String, dynamic> json) =>
       createdAt: json['created_at'] as String,
     );
 
-Map<String, dynamic> _$$InsightDtoImplToJson(_$InsightDtoImpl instance) =>
+Map<String, dynamic> _$InsightDtoToJson(_InsightDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'type': instance.type,

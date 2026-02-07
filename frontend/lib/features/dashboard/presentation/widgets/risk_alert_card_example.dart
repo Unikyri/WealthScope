@@ -23,12 +23,12 @@ class RiskAlertCardExample extends StatelessWidget {
             // Critical Alert Example
             RiskAlertCard(
               alert: RiskAlert(
-                id: '1',
+                type: 'concentration',
                 severity: AlertSeverity.critical,
                 title: 'Critical Risk Detected',
-                message: 'Your portfolio has significant concentration risk. '
-                    'Over 80% is invested in a single asset.',
-                timestamp: DateTime.now(),
+                message: 'Your portfolio has significant concentration risk. Over 80% is invested in a single asset.',
+                value: 85.0,
+                threshold: 80.0,
               ),
             ),
             const SizedBox(height: 16),
@@ -36,12 +36,12 @@ class RiskAlertCardExample extends StatelessWidget {
             // Warning Alert Example
             RiskAlertCard(
               alert: RiskAlert(
-                id: '2',
+                type: 'sector_concentration',
                 severity: AlertSeverity.warning,
                 title: 'High Concentration in Technology',
-                message: '65% of your portfolio is in Technology sector. '
-                    'Consider diversifying to reduce risk.',
-                timestamp: DateTime.now(),
+                message: '65% of your portfolio is in Technology sector. Consider diversifying to reduce risk.',
+                value: 65.0,
+                threshold: 50.0,
               ),
             ),
             const SizedBox(height: 16),
@@ -49,12 +49,12 @@ class RiskAlertCardExample extends StatelessWidget {
             // Info Alert Example
             RiskAlertCard(
               alert: RiskAlert(
-                id: '3',
+                type: 'rebalancing',
                 severity: AlertSeverity.info,
                 title: 'Portfolio Rebalancing Suggestion',
-                message: 'Based on your investment goals, consider rebalancing '
-                    'your portfolio to maintain your target allocation.',
-                timestamp: DateTime.now(),
+                message: 'Based on your investment goals, consider rebalancing your portfolio to maintain your target allocation.',
+                value: 15.0,
+                threshold: 10.0,
               ),
             ),
           ],

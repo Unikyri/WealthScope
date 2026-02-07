@@ -6,9 +6,8 @@ part of 'portfolio_risk_dto.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$PortfolioRiskDtoImpl _$$PortfolioRiskDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$PortfolioRiskDtoImpl(
+_PortfolioRiskDto _$PortfolioRiskDtoFromJson(Map<String, dynamic> json) =>
+    _PortfolioRiskDto(
       riskScore: (json['risk_score'] as num).toInt(),
       diversificationLevel: json['diversification_level'] as String,
       alerts: (json['alerts'] as List<dynamic>?)
@@ -17,16 +16,15 @@ _$PortfolioRiskDtoImpl _$$PortfolioRiskDtoImplFromJson(
           const [],
     );
 
-Map<String, dynamic> _$$PortfolioRiskDtoImplToJson(
-        _$PortfolioRiskDtoImpl instance) =>
+Map<String, dynamic> _$PortfolioRiskDtoToJson(_PortfolioRiskDto instance) =>
     <String, dynamic>{
       'risk_score': instance.riskScore,
       'diversification_level': instance.diversificationLevel,
       'alerts': instance.alerts.map((e) => e.toJson()).toList(),
     };
 
-_$RiskAlertDtoImpl _$$RiskAlertDtoImplFromJson(Map<String, dynamic> json) =>
-    _$RiskAlertDtoImpl(
+_RiskAlertDto _$RiskAlertDtoFromJson(Map<String, dynamic> json) =>
+    _RiskAlertDto(
       type: json['type'] as String,
       title: json['title'] as String,
       message: json['message'] as String,
@@ -35,7 +33,7 @@ _$RiskAlertDtoImpl _$$RiskAlertDtoImplFromJson(Map<String, dynamic> json) =>
       threshold: (json['threshold'] as num).toDouble(),
     );
 
-Map<String, dynamic> _$$RiskAlertDtoImplToJson(_$RiskAlertDtoImpl instance) =>
+Map<String, dynamic> _$RiskAlertDtoToJson(_RiskAlertDto instance) =>
     <String, dynamic>{
       'type': instance.type,
       'title': instance.title,

@@ -44,6 +44,6 @@ class SelectedCurrency extends _$SelectedCurrency {
 
   /// Get current currency synchronously (returns USD if not loaded)
   Currency getCurrent() {
-    return state.valueOrNull ?? Currency.usd;
+    return state.asData?.value ?? Currency.usd;
   }
 }

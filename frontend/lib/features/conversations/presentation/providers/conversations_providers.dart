@@ -5,12 +5,14 @@ import '../../data/repositories/conversations_repository_impl.dart';
 import '../../domain/entities/conversation_entity.dart';
 import '../../domain/repositories/conversations_repository.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 part 'conversations_providers.g.dart';
 
 /// Provider for ConversationsRepository
 @riverpod
 ConversationsRepository conversationsRepository(
-  ConversationsRepositoryRef ref,
+  Ref ref,
 ) {
   final dio = ref.watch(dioClientProvider);
   final dataSource = ConversationsRemoteDataSource(dio);
@@ -20,7 +22,7 @@ ConversationsRepository conversationsRepository(
 /// Provider to list conversations
 @riverpod
 Future<List<ConversationEntity>> conversationsList(
-  ConversationsListRef ref, {
+  Ref ref, {
   int? limit,
   int? offset,
 }) async {
@@ -34,7 +36,7 @@ Future<List<ConversationEntity>> conversationsList(
 /// Provider to get conversation with messages
 @riverpod
 Future<ConversationWithMessagesEntity> conversation(
-  ConversationRef ref,
+  Ref ref,
   String id,
 ) async {
   final repository = ref.watch(conversationsRepositoryProvider);
@@ -43,7 +45,7 @@ Future<ConversationWithMessagesEntity> conversation(
 
 /// Provider to get welcome message
 @riverpod
-Future<WelcomeMessageEntity> welcomeMessage(WelcomeMessageRef ref) async {
+Future<WelcomeMessageEntity> welcomeMessage(Ref ref) async {
   final repository = ref.watch(conversationsRepositoryProvider);
   return await repository.getWelcomeMessage();
 }

@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/error/failures.dart';
+import '../../../../core/errors/failures.dart';
 import '../../../dashboard/domain/entities/portfolio_summary.dart';
 import '../../domain/repositories/portfolio_repository.dart';
 import '../datasources/portfolio_remote_datasource.dart';
@@ -17,7 +17,7 @@ class PortfolioRepositoryImpl implements PortfolioRepository {
       final dto = await _remoteDataSource.getSummary();
       return Right(dto.toDomain());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -27,7 +27,7 @@ class PortfolioRepositoryImpl implements PortfolioRepository {
       final dto = await _remoteDataSource.getRiskAnalysis();
       return Right(dto.toDomain());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 }

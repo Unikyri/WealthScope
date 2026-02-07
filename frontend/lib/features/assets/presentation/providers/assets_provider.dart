@@ -3,6 +3,9 @@ import 'package:wealthscope_app/features/assets/data/providers/asset_repository_
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
 
+import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 part 'assets_provider.g.dart';
 
 /// Provider for selected asset type filter
@@ -68,7 +71,7 @@ class AllAssets extends _$AllAssets {
 /// Provider for filtered assets based on selected type
 /// This provider automatically updates when the filter changes
 @riverpod
-Future<List<StockAsset>> filteredAssets(FilteredAssetsRef ref) async {
+Future<List<StockAsset>> filteredAssets(Ref ref) async {
   print('🟡 [FilteredAssetsProvider] Building...');
   final selectedType = ref.watch(selectedAssetTypeProvider);
   print('🟡 [FilteredAssetsProvider] Selected type: ${selectedType?.name ?? "ALL"}');
@@ -109,7 +112,7 @@ class AssetSearch extends _$AssetSearch {
 /// Provider for searched assets
 /// Returns filtered assets based on search query
 @riverpod
-Future<List<StockAsset>> searchedAssets(SearchedAssetsRef ref) async {
+Future<List<StockAsset>> searchedAssets(Ref ref) async {
   final query = ref.watch(assetSearchProvider);
   final allAssetsList = await ref.watch(filteredAssetsProvider.future);
 
@@ -127,7 +130,7 @@ Future<List<StockAsset>> searchedAssets(SearchedAssetsRef ref) async {
 /// Provider for fetching a single asset by ID
 /// This provider fetches detailed information for a specific asset
 @riverpod
-Future<StockAsset> assetDetail(AssetDetailRef ref, String assetId) async {
+Future<StockAsset> assetDetail(Ref ref, String assetId) async {
   final repository = ref.watch(assetRepositoryProvider);
   final asset = await repository.getAssetById(assetId);
   

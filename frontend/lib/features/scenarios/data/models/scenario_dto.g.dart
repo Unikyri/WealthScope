@@ -6,25 +6,22 @@ part of 'scenario_dto.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$AllocationItemDtoImpl _$$AllocationItemDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$AllocationItemDtoImpl(
+_AllocationItemDto _$AllocationItemDtoFromJson(Map<String, dynamic> json) =>
+    _AllocationItemDto(
       type: json['type'] as String,
       value: (json['value'] as num).toDouble(),
       percent: (json['percent'] as num).toDouble(),
     );
 
-Map<String, dynamic> _$$AllocationItemDtoImplToJson(
-        _$AllocationItemDtoImpl instance) =>
+Map<String, dynamic> _$AllocationItemDtoToJson(_AllocationItemDto instance) =>
     <String, dynamic>{
       'type': instance.type,
       'value': instance.value,
       'percent': instance.percent,
     };
 
-_$PortfolioStateDtoImpl _$$PortfolioStateDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$PortfolioStateDtoImpl(
+_PortfolioStateDto _$PortfolioStateDtoFromJson(Map<String, dynamic> json) =>
+    _PortfolioStateDto(
       totalValue: (json['total_value'] as num).toDouble(),
       totalInvested: (json['total_invested'] as num).toDouble(),
       gainLoss: (json['gain_loss'] as num).toDouble(),
@@ -35,8 +32,7 @@ _$PortfolioStateDtoImpl _$$PortfolioStateDtoImplFromJson(
           .toList(),
     );
 
-Map<String, dynamic> _$$PortfolioStateDtoImplToJson(
-        _$PortfolioStateDtoImpl instance) =>
+Map<String, dynamic> _$PortfolioStateDtoToJson(_PortfolioStateDto instance) =>
     <String, dynamic>{
       'total_value': instance.totalValue,
       'total_invested': instance.totalInvested,
@@ -46,9 +42,8 @@ Map<String, dynamic> _$$PortfolioStateDtoImplToJson(
       'allocation': instance.allocation.map((e) => e.toJson()).toList(),
     };
 
-_$ChangeDetailDtoImpl _$$ChangeDetailDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$ChangeDetailDtoImpl(
+_ChangeDetailDto _$ChangeDetailDtoFromJson(Map<String, dynamic> json) =>
+    _ChangeDetailDto(
       type: json['type'] as String,
       description: json['description'] as String,
       oldValue: (json['old_value'] as num).toDouble(),
@@ -56,8 +51,7 @@ _$ChangeDetailDtoImpl _$$ChangeDetailDtoImplFromJson(
       difference: (json['difference'] as num).toDouble(),
     );
 
-Map<String, dynamic> _$$ChangeDetailDtoImplToJson(
-        _$ChangeDetailDtoImpl instance) =>
+Map<String, dynamic> _$ChangeDetailDtoToJson(_ChangeDetailDto instance) =>
     <String, dynamic>{
       'type': instance.type,
       'description': instance.description,
@@ -66,9 +60,8 @@ Map<String, dynamic> _$$ChangeDetailDtoImplToJson(
       'difference': instance.difference,
     };
 
-_$SimulationResultDtoImpl _$$SimulationResultDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$SimulationResultDtoImpl(
+_SimulationResultDto _$SimulationResultDtoFromJson(Map<String, dynamic> json) =>
+    _SimulationResultDto(
       currentState: PortfolioStateDto.fromJson(
           json['current_state'] as Map<String, dynamic>),
       projectedState: PortfolioStateDto.fromJson(
@@ -81,8 +74,8 @@ _$SimulationResultDtoImpl _$$SimulationResultDtoImplFromJson(
           (json['warnings'] as List<dynamic>).map((e) => e as String).toList(),
     );
 
-Map<String, dynamic> _$$SimulationResultDtoImplToJson(
-        _$SimulationResultDtoImpl instance) =>
+Map<String, dynamic> _$SimulationResultDtoToJson(
+        _SimulationResultDto instance) =>
     <String, dynamic>{
       'current_state': instance.currentState.toJson(),
       'projected_state': instance.projectedState.toJson(),
@@ -91,9 +84,8 @@ Map<String, dynamic> _$$SimulationResultDtoImplToJson(
       'warnings': instance.warnings,
     };
 
-_$HistoricalStatsDtoImpl _$$HistoricalStatsDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$HistoricalStatsDtoImpl(
+_HistoricalStatsDto _$HistoricalStatsDtoFromJson(Map<String, dynamic> json) =>
+    _HistoricalStatsDto(
       symbol: json['symbol'] as String,
       period: json['period'] as String,
       volatility: (json['volatility'] as num).toDouble(),
@@ -106,8 +98,7 @@ _$HistoricalStatsDtoImpl _$$HistoricalStatsDtoImplFromJson(
       dataPoints: (json['data_points'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$HistoricalStatsDtoImplToJson(
-        _$HistoricalStatsDtoImpl instance) =>
+Map<String, dynamic> _$HistoricalStatsDtoToJson(_HistoricalStatsDto instance) =>
     <String, dynamic>{
       'symbol': instance.symbol,
       'period': instance.period,
@@ -121,9 +112,8 @@ Map<String, dynamic> _$$HistoricalStatsDtoImplToJson(
       'data_points': instance.dataPoints,
     };
 
-_$ScenarioTemplateDtoImpl _$$ScenarioTemplateDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$ScenarioTemplateDtoImpl(
+_ScenarioTemplateDto _$ScenarioTemplateDtoFromJson(Map<String, dynamic> json) =>
+    _ScenarioTemplateDto(
       id: json['id'] as String,
       name: json['name'] as String,
       description: json['description'] as String,
@@ -131,8 +121,8 @@ _$ScenarioTemplateDtoImpl _$$ScenarioTemplateDtoImplFromJson(
       parameters: json['parameters'] as Map<String, dynamic>,
     );
 
-Map<String, dynamic> _$$ScenarioTemplateDtoImplToJson(
-        _$ScenarioTemplateDtoImpl instance) =>
+Map<String, dynamic> _$ScenarioTemplateDtoToJson(
+        _ScenarioTemplateDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
@@ -141,15 +131,13 @@ Map<String, dynamic> _$$ScenarioTemplateDtoImplToJson(
       'parameters': instance.parameters,
     };
 
-_$SimulateRequestDtoImpl _$$SimulateRequestDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$SimulateRequestDtoImpl(
+_SimulateRequestDto _$SimulateRequestDtoFromJson(Map<String, dynamic> json) =>
+    _SimulateRequestDto(
       type: json['type'] as String,
       parameters: json['parameters'] as Map<String, dynamic>,
     );
 
-Map<String, dynamic> _$$SimulateRequestDtoImplToJson(
-        _$SimulateRequestDtoImpl instance) =>
+Map<String, dynamic> _$SimulateRequestDtoToJson(_SimulateRequestDto instance) =>
     <String, dynamic>{
       'type': instance.type,
       'parameters': instance.parameters,

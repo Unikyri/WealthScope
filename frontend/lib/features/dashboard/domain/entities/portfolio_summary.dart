@@ -5,7 +5,7 @@ part 'portfolio_summary.freezed.dart';
 /// Portfolio Summary Entity
 /// Represents the aggregated financial summary of a user's portfolio
 @freezed
-class PortfolioSummary with _$PortfolioSummary {
+abstract class PortfolioSummary with _$PortfolioSummary {
   const factory PortfolioSummary({
     required double totalValue,
     required double totalInvested,
@@ -19,7 +19,7 @@ class PortfolioSummary with _$PortfolioSummary {
 
 /// Asset Type Breakdown
 @freezed
-class AssetTypeBreakdown with _$AssetTypeBreakdown {
+abstract class AssetTypeBreakdown with _$AssetTypeBreakdown {
   const factory AssetTypeBreakdown({
     required String type,
     required double value,
@@ -30,7 +30,7 @@ class AssetTypeBreakdown with _$AssetTypeBreakdown {
 
 /// Risk Alert Entity (from separate /api/v1/portfolio/risk endpoint)
 @freezed
-class RiskAlert with _$RiskAlert {
+abstract class RiskAlert with _$RiskAlert {
   const factory RiskAlert({
     required String type,
     required String title,

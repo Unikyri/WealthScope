@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/error/failures.dart';
+import '../../../../core/errors/failures.dart';
 import '../entities/ocr_entity.dart';
 
 /// Abstract Repository for AI OCR

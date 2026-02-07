@@ -5,11 +5,13 @@ import 'package:wealthscope_app/features/ai/data/repositories/ai_repository_impl
 import 'package:wealthscope_app/features/ai/domain/entities/chat_message.dart';
 import 'package:wealthscope_app/features/ai/domain/repositories/ai_repository.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 part 'ai_chat_provider.g.dart';
 
 // Repository Provider
 @riverpod
-AIRepository aiRepository(AiRepositoryRef ref) {
+AIRepository aiRepository(Ref ref) {
   final dio = ref.watch(dioClientProvider);
   final dataSource = AIRemoteDataSource(dio);
   return AIRepositoryImpl(dataSource);

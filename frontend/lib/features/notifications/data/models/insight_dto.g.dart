@@ -6,8 +6,7 @@ part of 'insight_dto.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$InsightDtoImpl _$$InsightDtoImplFromJson(Map<String, dynamic> json) =>
-    _$InsightDtoImpl(
+_InsightDto _$InsightDtoFromJson(Map<String, dynamic> json) => _InsightDto(
       id: json['id'] as String,
       type: json['type'] as String,
       category: json['category'] as String,
@@ -26,7 +25,7 @@ _$InsightDtoImpl _$$InsightDtoImplFromJson(Map<String, dynamic> json) =>
       createdAt: json['created_at'] as String,
     );
 
-Map<String, dynamic> _$$InsightDtoImplToJson(_$InsightDtoImpl instance) =>
+Map<String, dynamic> _$InsightDtoToJson(_InsightDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'type': instance.type,
@@ -40,8 +39,8 @@ Map<String, dynamic> _$$InsightDtoImplToJson(_$InsightDtoImpl instance) =>
       'created_at': instance.createdAt,
     };
 
-_$InsightListDtoImpl _$$InsightListDtoImplFromJson(Map<String, dynamic> json) =>
-    _$InsightListDtoImpl(
+_InsightListDto _$InsightListDtoFromJson(Map<String, dynamic> json) =>
+    _InsightListDto(
       insights: (json['insights'] as List<dynamic>)
           .map((e) => InsightDto.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -51,8 +50,7 @@ _$InsightListDtoImpl _$$InsightListDtoImplFromJson(Map<String, dynamic> json) =>
       unreadCount: (json['unread_count'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$InsightListDtoImplToJson(
-        _$InsightListDtoImpl instance) =>
+Map<String, dynamic> _$InsightListDtoToJson(_InsightListDto instance) =>
     <String, dynamic>{
       'insights': instance.insights.map((e) => e.toJson()).toList(),
       'total': instance.total,
@@ -61,13 +59,12 @@ Map<String, dynamic> _$$InsightListDtoImplToJson(
       'unread_count': instance.unreadCount,
     };
 
-_$UnreadCountDtoImpl _$$UnreadCountDtoImplFromJson(Map<String, dynamic> json) =>
-    _$UnreadCountDtoImpl(
+_UnreadCountDto _$UnreadCountDtoFromJson(Map<String, dynamic> json) =>
+    _UnreadCountDto(
       count: (json['count'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$UnreadCountDtoImplToJson(
-        _$UnreadCountDtoImpl instance) =>
+Map<String, dynamic> _$UnreadCountDtoToJson(_UnreadCountDto instance) =>
     <String, dynamic>{
       'count': instance.count,
     };

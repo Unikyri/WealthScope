@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/error/failures.dart';
+import '../../../../core/errors/failures.dart';
 import '../../../dashboard/domain/entities/portfolio_summary.dart';
 
 /// Abstract Repository for Portfolio
