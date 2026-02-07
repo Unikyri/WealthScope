@@ -18,21 +18,22 @@ import (
 )
 
 // AssetModel represents the database model for assets
+// Fields ordered for optimal memory alignment
 type AssetModel struct {
+	Metadata      json.RawMessage `gorm:"type:jsonb;default:'{}'"`
+	Symbol        *string         `gorm:"type:varchar(20)"`
+	CurrentPrice  *float64        `gorm:"type:decimal(20,8)"`
+	PurchaseDate  *time.Time      `gorm:"type:timestamptz"`
+	Notes         *string         `gorm:"type:text"`
+	CreatedAt     time.Time       `gorm:"type:timestamptz;not null;default:now()"`
+	UpdatedAt     time.Time       `gorm:"type:timestamptz;not null;default:now()"`
 	ID            uuid.UUID       `gorm:"type:uuid;primaryKey"`
 	UserID        uuid.UUID       `gorm:"type:uuid;not null;index"`
 	Type          string          `gorm:"type:varchar(50);not null"`
 	Name          string          `gorm:"type:varchar(255);not null"`
-	Symbol        *string         `gorm:"type:varchar(20)"`
+	Currency      string          `gorm:"type:varchar(10);not null;default:'USD'"`
 	Quantity      float64         `gorm:"type:decimal(20,8);not null"`
 	PurchasePrice float64         `gorm:"type:decimal(20,8);not null"`
-	CurrentPrice  *float64        `gorm:"type:decimal(20,8)"`
-	Currency      string          `gorm:"type:varchar(10);not null;default:'USD'"`
-	PurchaseDate  *time.Time      `gorm:"type:timestamptz"`
-	Metadata      json.RawMessage `gorm:"type:jsonb;default:'{}'"`
-	Notes         *string         `gorm:"type:text"`
-	CreatedAt     time.Time       `gorm:"type:timestamptz;not null;default:now()"`
-	UpdatedAt     time.Time       `gorm:"type:timestamptz;not null;default:now()"`
 }
 
 func (AssetModel) TableName() string {
@@ -40,14 +41,15 @@ func (AssetModel) TableName() string {
 }
 
 // DemoAsset defines a demo asset to be created
+// Fields ordered for optimal memory alignment
 type DemoAsset struct {
 	Type          string
 	Name          string
 	Symbol        string
+	Notes         string
 	Quantity      float64
 	PurchasePrice float64
 	CurrentPrice  float64
-	Notes         string
 	DaysAgo       int // Purchase date relative to now
 }
 
@@ -193,9 +195,9 @@ func main() {
 	fmt.Println("\n" + "═══════════════════════════════════════════════════════════════════")
 	fmt.Printf("📊 PORTFOLIO SUMMARY\n")
 	fmt.Println("───────────────────────────────────────────────────────────────────")
-	fmt.Printf("  💼 Total Invested:  $%,.2f\n", totalInvested)
-	fmt.Printf("  💰 Current Value:   $%,.2f\n", totalValue)
-	fmt.Printf("  📈 Gain/Loss:       %s$%,.2f (%s%.2f%%)\n", changeSign, gainLoss, changeSign, percent)
+	fmt.Printf("  💼 Total Invested:  $%.2f\n", totalInvested)
+	fmt.Printf("  💰 Current Value:   $%.2f\n", totalValue)
+	fmt.Printf("  📈 Gain/Loss:       %s$%.2f (%s%.2f%%)\n", changeSign, gainLoss, changeSign, percent)
 	fmt.Printf("  🪙 Asset Count:     %d assets\n", len(demoAssets))
 	fmt.Println("═══════════════════════════════════════════════════════════════════")
 
