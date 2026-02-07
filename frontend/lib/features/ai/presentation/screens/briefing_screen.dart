@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/briefing.dart';
-import '../widgets/briefing_bottom_sheet.dart';
+import '../providers/briefing_provider.dart';
 
 /// Screen that displays the AI Morning Briefing.
-/// Fetches data and displays it via the MorningBriefingBottomSheet widget.
+/// Fetches data from the real API and displays it.
 class BriefingScreen extends ConsumerStatefulWidget {
   const BriefingScreen({super.key});
 
@@ -13,83 +13,20 @@ class BriefingScreen extends ConsumerStatefulWidget {
 }
 
 class _BriefingScreenState extends ConsumerState<BriefingScreen> {
-  bool _isLoading = true;
-  Briefing? _briefing;
-  String? _error;
-
   @override
   void initState() {
     super.initState();
-    _loadBriefing();
-  }
-
-  Future<void> _loadBriefing() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
+    // Load briefing when screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(briefingNotifierProvider.notifier).loadBriefing();
     });
-
-    // TODO: Replace with actual API call when backend endpoint is ready
-    // For now, use demo data
-    await Future.delayed(const Duration(seconds: 1));
-
-    setState(() {
-      _isLoading = false;
-      _briefing = _createDemoBriefing();
-    });
-  }
-
-  Briefing _createDemoBriefing() {
-    return Briefing(
-      summary: 'Your portfolio is performing well today! Tech stocks are driving most of your gains. '
-          'Consider taking some profits on your overweight positions.',
-      insights: [
-        BriefingInsight(
-          type: 'market',
-          title: 'Tech Rally Continues',
-          description: 'Technology sector is up 2.3% driven by strong earnings reports.',
-          changePercent: 2.3,
-        ),
-        BriefingInsight(
-          type: 'opportunity',
-          title: 'Rebalancing Opportunity',
-          description: 'Your crypto allocation is 5% above target. Consider taking profits.',
-          changePercent: null,
-        ),
-        BriefingInsight(
-          type: 'risk',
-          title: 'Bond Volatility Alert',
-          description: 'Interest rate sensitivity of your bond holdings has increased.',
-          changePercent: -0.8,
-        ),
-      ],
-      alerts: [
-        BriefingAlert(
-          severity: 'medium',
-          message: 'AAPL is up 15% this month - consider profit-taking.',
-          assetId: 'aapl',
-        ),
-        BriefingAlert(
-          severity: 'low',
-          message: 'Your emergency fund contribution is due in 3 days.',
-          assetId: null,
-        ),
-      ],
-      portfolioSnapshot: PortfolioSnapshot(
-        totalValue: 127543.67,
-        dayChange: 1283.45,
-        dayChangePercent: 1.02,
-        assetCount: 12,
-        topAssets: ['AAPL', 'MSFT', 'BTC'],
-      ),
-      generatedAt: DateTime.now(),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final state = ref.watch(briefingNotifierProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -97,23 +34,23 @@ class _BriefingScreenState extends ConsumerState<BriefingScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _loadBriefing,
+            onPressed: () => ref.read(briefingNotifierProvider.notifier).refresh(),
             tooltip: 'Refresh',
           ),
         ],
       ),
-      body: _isLoading
+      body: state.isLoading
           ? _buildLoadingState(colorScheme, textTheme)
-          : _error != null
-              ? _buildErrorState(colorScheme, textTheme)
-              : _briefing != null
+          : state.error != null
+              ? _buildErrorState(colorScheme, textTheme, state.error!)
+              : state.briefing != null
                   ? SingleChildScrollView(
                       child: Padding(
                         padding: const EdgeInsets.all(16),
-                        child: _BriefingContent(briefing: _briefing!),
+                        child: _BriefingContent(briefing: state.briefing!),
                       ),
                     )
-                  : const SizedBox.shrink(),
+                  : _buildEmptyState(colorScheme, textTheme),
     );
   }
 
@@ -163,35 +100,69 @@ class _BriefingScreenState extends ConsumerState<BriefingScreen> {
     );
   }
 
-  Widget _buildErrorState(ColorScheme colorScheme, TextTheme textTheme) {
+  Widget _buildErrorState(ColorScheme colorScheme, TextTheme textTheme, String error) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: colorScheme.error,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Failed to load briefing',
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error,
+              textAlign: TextAlign.center,
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: () => ref.read(briefingNotifierProvider.notifier).refresh(),
+              icon: const Icon(Icons.refresh),
+              label: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(ColorScheme colorScheme, TextTheme textTheme) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.error_outline,
+            Icons.wb_sunny_outlined,
             size: 64,
-            color: colorScheme.error,
+            color: colorScheme.primary,
           ),
           const SizedBox(height: 16),
           Text(
-            'Failed to load briefing',
+            'No briefing available',
             style: textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            _error ?? 'Unknown error',
+            'Add some assets to your portfolio to get personalized insights',
+            textAlign: TextAlign.center,
             style: textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
-          ),
-          const SizedBox(height: 24),
-          FilledButton.icon(
-            onPressed: _loadBriefing,
-            icon: const Icon(Icons.refresh),
-            label: const Text('Retry'),
           ),
         ],
       ),
