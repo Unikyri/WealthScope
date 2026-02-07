@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"strconv"
 	"strings"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/Unikyri/WealthScope/backend/internal/application/services"
+	"github.com/Unikyri/WealthScope/backend/internal/domain/repositories"
 	"github.com/Unikyri/WealthScope/backend/internal/infrastructure/ai"
 	"github.com/Unikyri/WealthScope/backend/internal/interfaces/http/middleware"
 	"github.com/Unikyri/WealthScope/backend/pkg/response"
@@ -17,12 +19,14 @@ import (
 // ChatHandler handles AI chat-related HTTP requests.
 type ChatHandler struct {
 	aiService *services.AIService
+	assetRepo repositories.AssetRepository
 }
 
 // NewChatHandler creates a new ChatHandler.
-func NewChatHandler(aiService *services.AIService) *ChatHandler {
+func NewChatHandler(aiService *services.AIService, assetRepo repositories.AssetRepository) *ChatHandler {
 	return &ChatHandler{
 		aiService: aiService,
+		assetRepo: assetRepo,
 	}
 }
 
@@ -122,16 +126,14 @@ func (h *ChatHandler) Chat(c *gin.Context) {
 		return
 	}
 
-	// Build user context (can be enhanced with portfolio data)
-	userCtx := ai.UserContext{
-		HasPortfolio:  false, // TODO: Get from portfolio service
-		PreferredLang: c.GetHeader("Accept-Language"),
-	}
-	if strings.HasPrefix(userCtx.PreferredLang, "es") {
-		userCtx.PreferredLang = "es"
+	// Build user context with real portfolio data
+	lang := c.GetHeader("Accept-Language")
+	if strings.HasPrefix(lang, "es") {
+		lang = "es"
 	} else {
-		userCtx.PreferredLang = "en"
+		lang = "en"
 	}
+	userCtx := h.buildUserContext(c.Request.Context(), userID, lang)
 
 	chatReq := services.ChatRequest{
 		UserID:         userID,
@@ -439,7 +441,7 @@ func (h *ChatHandler) Welcome(c *gin.Context) {
 		return
 	}
 
-	_, ok := middleware.GetUserID(c)
+	userID, ok := middleware.GetUserID(c)
 	if !ok {
 		response.Unauthorized(c, "User not authenticated")
 		return
@@ -453,16 +455,43 @@ func (h *ChatHandler) Welcome(c *gin.Context) {
 		lang = "en"
 	}
 
-	// TODO: Get portfolio status from portfolio service
-	hasPortfolio := false
-
-	userCtx := ai.UserContext{
-		HasPortfolio:  hasPortfolio,
-		PreferredLang: lang,
-	}
+	userCtx := h.buildUserContext(c.Request.Context(), userID, lang)
 
 	response.Success(c, WelcomeResponse{
 		Message:              h.aiService.GetWelcomeMessage(userCtx),
-		ConversationStarters: h.aiService.GetConversationStarters(hasPortfolio, lang),
+		ConversationStarters: h.aiService.GetConversationStarters(userCtx.HasPortfolio, lang),
 	})
+}
+
+// buildUserContext creates a UserContext populated with real portfolio data.
+func (h *ChatHandler) buildUserContext(ctx context.Context, userID uuid.UUID, lang string) ai.UserContext {
+	userCtx := ai.UserContext{
+		HasPortfolio:  false,
+		PreferredLang: lang,
+	}
+
+	// If no asset repo is configured, return minimal context
+	if h.assetRepo == nil {
+		return userCtx
+	}
+
+	// Fetch real portfolio summary
+	summary, err := h.assetRepo.GetPortfolioSummary(ctx, userID)
+	if err != nil || summary == nil {
+		return userCtx
+	}
+
+	// Populate context with real data
+	userCtx.HasPortfolio = summary.AssetCount > 0
+	userCtx.TotalValue = summary.TotalValue
+	userCtx.AssetCount = summary.AssetCount
+
+	// Extract top asset types from breakdown
+	for _, breakdown := range summary.BreakdownByType {
+		if breakdown.Percent >= 10.0 { // Only include types with >= 10% allocation
+			userCtx.TopAssetTypes = append(userCtx.TopAssetTypes, string(breakdown.Type))
+		}
+	}
+
+	return userCtx
 }

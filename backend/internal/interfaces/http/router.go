@@ -119,7 +119,7 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 	// Initialize chat handler
 	var chatHandler *handlers.ChatHandler
 	if deps.AIService != nil {
-		chatHandler = handlers.NewChatHandler(deps.AIService)
+		chatHandler = handlers.NewChatHandler(deps.AIService, assetRepo)
 	}
 
 	// Initialize insights handler
