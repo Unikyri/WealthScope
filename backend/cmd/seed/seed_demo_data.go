@@ -18,25 +18,25 @@ import (
 )
 
 // AssetModel represents the database model for assets
-// Fields ordered for optimal memory alignment (largest to smallest)
+// Fields ordered for optimal memory alignment (pointers first for GC efficiency)
 type AssetModel struct {
-	// 24-byte types
-	Metadata  json.RawMessage `gorm:"type:jsonb;default:'{}'"`
-	CreatedAt time.Time       `gorm:"type:timestamptz;not null;default:now()"`
-	UpdatedAt time.Time       `gorm:"type:timestamptz;not null;default:now()"`
-	// 16-byte types
-	ID       uuid.UUID `gorm:"type:uuid;primaryKey"`
-	UserID   uuid.UUID `gorm:"type:uuid;not null;index"`
-	Type     string    `gorm:"type:varchar(50);not null"`
-	Name     string    `gorm:"type:varchar(255);not null"`
-	Currency string    `gorm:"type:varchar(10);not null;default:'USD'"`
-	// 8-byte types (pointers and float64)
-	Symbol        *string    `gorm:"type:varchar(20)"`
-	CurrentPrice  *float64   `gorm:"type:decimal(20,8)"`
-	PurchaseDate  *time.Time `gorm:"type:timestamptz"`
-	Notes         *string    `gorm:"type:text"`
-	Quantity      float64    `gorm:"type:decimal(20,8);not null"`
-	PurchasePrice float64    `gorm:"type:decimal(20,8);not null"`
+	// Pointer-containing fields (Sort by size: 24, 16, 8)
+	Metadata     json.RawMessage `gorm:"type:jsonb;default:'{}'"`
+	CreatedAt    time.Time       `gorm:"type:timestamptz;not null;default:now()"`
+	UpdatedAt    time.Time       `gorm:"type:timestamptz;not null;default:now()"`
+	Type         string          `gorm:"type:varchar(50);not null"`
+	Name         string          `gorm:"type:varchar(255);not null"`
+	Currency     string          `gorm:"type:varchar(10);not null;default:'USD'"`
+	Symbol       *string         `gorm:"type:varchar(20)"`
+	CurrentPrice *float64        `gorm:"type:decimal(20,8)"`
+	PurchaseDate *time.Time      `gorm:"type:timestamptz"`
+	Notes        *string         `gorm:"type:text"`
+
+	// Non-pointer fields (Sort by size: 16, 8)
+	ID            uuid.UUID `gorm:"type:uuid;primaryKey"`
+	UserID        uuid.UUID `gorm:"type:uuid;not null;index"`
+	Quantity      float64   `gorm:"type:decimal(20,8);not null"`
+	PurchasePrice float64   `gorm:"type:decimal(20,8);not null"`
 }
 
 func (AssetModel) TableName() string {
