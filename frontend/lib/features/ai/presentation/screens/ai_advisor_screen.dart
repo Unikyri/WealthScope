@@ -36,6 +36,16 @@ class AIAdvisorScreen extends StatelessWidget {
             ),
             const SizedBox(height: 32),
 
+            // Morning Briefing Card (NEW!)
+            _FeatureCard(
+              icon: Icons.wb_sunny_outlined,
+              iconColor: Colors.amber,
+              title: 'Morning Briefing',
+              description: 'Get your personalized daily financial briefing with AI-powered insights and portfolio updates.',
+              onTap: () => context.push('/ai-briefing'),
+            ),
+            const SizedBox(height: 16),
+
             // AI Chat Card
             _FeatureCard(
               icon: Icons.chat_bubble_outline,
