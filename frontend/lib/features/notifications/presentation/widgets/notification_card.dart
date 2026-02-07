@@ -24,15 +24,27 @@ class NotificationCard extends ConsumerWidget {
           : theme.colorScheme.primaryContainer.withOpacity(0.1),
       child: InkWell(
         onTap: () async {
+          // Mark as read
           if (!notification.isRead) {
             try {
               await ref.read(markInsightAsReadProvider.notifier).mark(notification.id);
             } catch (e) {
-              // Handle error silently or show a snackbar
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Error marking as read: $e')),
+                );
+              }
             }
           }
-          if (notification.assetId != null) {
-            // Navigate to asset detail
+          
+          // Navigate to briefing screen if it's a daily briefing
+          if (context.mounted) {
+            if (notification.type == NotificationType.portfolioUpdate) {
+              context.push('/ai-briefing');
+            } else if (notification.assetId != null) {
+              // Navigate to asset detail if available
+              // context.push('/assets/${notification.assetId}');
+            }
           }
         },
         borderRadius: BorderRadius.circular(12),
@@ -93,7 +105,24 @@ class NotificationCard extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  if (notification.assetId != null)
+                  if (notification.type == NotificationType.portfolioUpdate)
+                    TextButton.icon(
+                      onPressed: () async {
+                        if (!notification.isRead) {
+                          try {
+                            await ref.read(markInsightAsReadProvider.notifier).mark(notification.id);
+                          } catch (e) {
+                            // Handle error
+                          }
+                        }
+                        if (context.mounted) {
+                          context.push('/ai-briefing');
+                        }
+                      },
+                      icon: const Icon(Icons.article, size: 18),
+                      label: const Text('View Full Briefing'),
+                    )
+                  else if (notification.assetId != null)
                     TextButton.icon(
                       onPressed: () async {
                         if (!notification.isRead) {
