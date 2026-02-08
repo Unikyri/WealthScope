@@ -52,6 +52,9 @@ class AssetFormSubmission extends _$AssetFormSubmission {
       final repository = ref.read(assetRepositoryProvider);
       final savedAsset = await repository.addAsset(asset);
 
+      // Check if provider is still mounted after async gap
+      if (!ref.mounted) return;
+
       // Invalidate assets list and portfolio summary to trigger refresh
       ref.invalidate(allAssetsProvider);
       ref.invalidate(dashboardPortfolioSummaryProvider);
@@ -105,6 +108,9 @@ class AssetFormSubmission extends _$AssetFormSubmission {
       final repository = ref.read(assetRepositoryProvider);
       final updatedAsset = await repository.updateAsset(asset);
 
+      // Check if provider is still mounted after async gap
+      if (!ref.mounted) return;
+
       // Invalidate assets list and portfolio summary to trigger refresh
       ref.invalidate(allAssetsProvider);
       ref.invalidate(dashboardPortfolioSummaryProvider);
@@ -154,6 +160,9 @@ class AssetFormSubmission extends _$AssetFormSubmission {
     try {
       final repository = ref.read(assetRepositoryProvider);
       await repository.deleteAsset(assetId);
+
+      // Check if provider is still mounted after async gap
+      if (!ref.mounted) return;
 
       // Invalidate assets list and portfolio summary to trigger refresh
       ref.invalidate(allAssetsProvider);

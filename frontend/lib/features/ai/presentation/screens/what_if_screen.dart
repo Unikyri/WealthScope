@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wealthscope_app/features/ai/presentation/providers/simulator_provider.dart';
-import 'package:wealthscope_app/features/ai/domain/entities/scenario_result.dart';
+import 'package:wealthscope_app/features/scenarios/presentation/providers/scenarios_providers.dart';
+import 'package:wealthscope_app/features/scenarios/domain/entities/scenario_entity.dart';
 
 enum ScenarioType {
-  marketMove('Market Movement', Icons.trending_down),
-  buyAsset('Buy Asset', Icons.add_shopping_cart),
-  sellAsset('Sell Asset', Icons.sell),
-  newAsset('Add New Asset', Icons.add_circle),
-  rebalance('Rebalance Portfolio', Icons.balance);
+  marketMove('Market Movement', Icons.trending_down, 'market_move'),
+  buyAsset('Buy Asset', Icons.add_shopping_cart, 'buy_asset'),
+  sellAsset('Sell Asset', Icons.sell, 'sell_asset'),
+  newAsset('Add New Asset', Icons.add_circle, 'new_asset'),
+  rebalance('Rebalance Portfolio', Icons.balance, 'rebalance');
 
   final String label;
   final IconData icon;
-  const ScenarioType(this.label, this.icon);
+
+  /// The API type value expected by the backend (snake_case)
+  final String apiType;
+  const ScenarioType(this.label, this.icon, this.apiType);
 }
 
 class WhatIfScreen extends ConsumerStatefulWidget {
@@ -35,7 +38,7 @@ class _WhatIfScreenState extends ConsumerState<WhatIfScreen> {
   double _quantity = 0;
   double _price = 0;
 
-  ScenarioResult? _result;
+  SimulationResultEntity? _result;
   bool _isLoading = false;
 
   @override
@@ -138,23 +141,64 @@ class _WhatIfScreenState extends ConsumerState<WhatIfScreen> {
 
   Future<void> _runSimulation() async {
     if (!_formKey.currentState!.validate()) return;
+    if (!mounted) return;
 
     setState(() => _isLoading = true);
 
     try {
-      final result = await ref.read(simulatorProvider.notifier).runSimulation(
-            type: _selectedType.name,
+      print('🎯 [WHAT_IF] Starting simulation...');
+      print('   Type: ${_selectedType.apiType}');
+      print('   Parameters: ${_buildParameters()}');
+
+      // Call simulate on the notifier (uses snake_case API type)
+      await ref.read(runSimulationProvider.notifier).simulate(
+            type: _selectedType.apiType,
             parameters: _buildParameters(),
-            includeAIAnalysis: true,
           );
 
-      if (mounted) {
-        setState(() => _result = result);
+      if (!mounted) {
+        print('⚠️ [WHAT_IF] Widget unmounted after simulation');
+        return;
       }
-    } catch (e) {
+
+      // Read the updated state
+      final providerState = ref.read(runSimulationProvider);
+
+      print(
+          '📊 [WHAT_IF] Got provider state: ${providerState.hasValue ? "has data" : providerState.hasError ? "has error" : "loading"}');
+
+      providerState.when(
+        data: (result) {
+          print('✅ [WHAT_IF] Simulation completed successfully');
+          if (mounted && result != null) {
+            setState(() => _result = result);
+          }
+        },
+        loading: () {
+          print('⏳ [WHAT_IF] Still loading...');
+        },
+        error: (error, stack) {
+          print('❌ [WHAT_IF] Error: $error');
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Simulation failed: ${error.toString()}'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+      );
+    } catch (e, stack) {
+      print('❌ [WHAT_IF] Exception caught: $e');
+      print('   Stack: $stack');
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {
@@ -203,9 +247,8 @@ class _ScenarioTypeSelector extends StatelessWidget {
               avatar: Icon(
                 type.icon,
                 size: 18,
-                color: isSelected
-                    ? Theme.of(context).colorScheme.onPrimary
-                    : null,
+                color:
+                    isSelected ? Theme.of(context).colorScheme.onPrimary : null,
               ),
               label: Text(type.label),
               selected: isSelected,
@@ -457,7 +500,7 @@ class _RebalanceParams extends StatelessWidget {
 }
 
 class _SimulationResults extends StatelessWidget {
-  final ScenarioResult result;
+  final SimulationResultEntity result;
 
   const _SimulationResults({required this.result});
 
@@ -490,13 +533,15 @@ class _SimulationResults extends StatelessWidget {
             // Portfolio value change
             _ResultRow(
               label: 'Current Portfolio Value',
-              value: '\$${result.currentValue.toStringAsFixed(2)}',
+              value: '\$${result.currentState.totalValue.toStringAsFixed(2)}',
             ),
             const SizedBox(height: 8),
             _ResultRow(
               label: 'Projected Portfolio Value',
-              value: '\$${result.projectedValue.toStringAsFixed(2)}',
-              valueColor: result.valueChange >= 0
+              value: '\$${result.projectedState.totalValue.toStringAsFixed(2)}',
+              valueColor: (result.projectedState.totalValue -
+                          result.currentState.totalValue) >=
+                      0
                   ? Colors.green
                   : Colors.red,
             ),
@@ -504,14 +549,16 @@ class _SimulationResults extends StatelessWidget {
             _ResultRow(
               label: 'Change',
               value:
-                  '${result.valueChange >= 0 ? '+' : ''}\$${result.valueChange.toStringAsFixed(2)} (${result.percentChange.toStringAsFixed(2)}%)',
-              valueColor: result.valueChange >= 0
+                  '${(result.projectedState.totalValue - result.currentState.totalValue) >= 0 ? '+' : ''}\$${(result.projectedState.totalValue - result.currentState.totalValue).toStringAsFixed(2)} (${((result.projectedState.totalValue - result.currentState.totalValue) / result.currentState.totalValue * 100).toStringAsFixed(2)}%)',
+              valueColor: (result.projectedState.totalValue -
+                          result.currentState.totalValue) >=
+                      0
                   ? Colors.green
                   : Colors.red,
             ),
 
             // AI Analysis
-            if (result.aiAnalysis != null) ...[
+            if (result.aiAnalysis.isNotEmpty) ...[
               const Divider(height: 32),
               Row(
                 children: [
@@ -535,16 +582,42 @@ class _SimulationResults extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  result.aiAnalysis!,
+                  result.aiAnalysis,
                   style: textTheme.bodyMedium,
                 ),
               ),
             ],
 
-            // Risk score
-            if (result.riskScore != null) ...[
-              const SizedBox(height: 16),
-              _RiskScoreIndicator(score: result.riskScore!),
+            // Warnings
+            if (result.warnings.isNotEmpty) ...[
+              const Divider(height: 24),
+              Row(
+                children: [
+                  Icon(
+                    Icons.warning_amber,
+                    color: Colors.orange,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Warnings',
+                    style: textTheme.titleMedium,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              ...result.warnings.map((warning) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.warning, color: Colors.orange, size: 16),
+                        const SizedBox(width: 8),
+                        Expanded(
+                            child: Text(warning, style: textTheme.bodyMedium)),
+                      ],
+                    ),
+                  )),
             ],
           ],
         ),
@@ -620,7 +693,8 @@ class _RiskScoreIndicator extends StatelessWidget {
           child: LinearProgressIndicator(
             value: score / 100,
             minHeight: 8,
-            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+            backgroundColor:
+                Theme.of(context).colorScheme.surfaceContainerHighest,
             valueColor: AlwaysStoppedAnimation<Color>(color),
           ),
         ),

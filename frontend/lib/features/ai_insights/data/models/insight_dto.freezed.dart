@@ -399,9 +399,9 @@ class _InsightDto implements InsightDto {
       required this.priority,
       required this.title,
       required this.content,
-      @JsonKey(name: 'action_items') required final List<String> actionItems,
+      @JsonKey(name: 'action_items') final List<String> actionItems = const [],
       @JsonKey(name: 'related_symbols')
-      required final List<String> relatedSymbols,
+      final List<String> relatedSymbols = const [],
       @JsonKey(name: 'is_read') required this.isRead,
       @JsonKey(name: 'created_at') required this.createdAt})
       : _actionItems = actionItems,

@@ -20,6 +20,7 @@ class InsightsRepositoryImpl implements InsightsRepository {
     int? limit,
     int? offset,
   }) async {
+    print('🌐 [REPOSITORY] listInsights llamado - params: type=$type, category=$category, priority=$priority, unread=$unread, limit=$limit, offset=$offset');
     try {
       final dtos = await _remoteDataSource.listInsights(
         type: type,
@@ -29,8 +30,10 @@ class InsightsRepositoryImpl implements InsightsRepository {
         limit: limit,
         offset: offset,
       );
+      print('✅ [REPOSITORY] listInsights completado - ${dtos.length} insights');
       return Right(dtos.map((dto) => dto.toDomain()).toList());
     } catch (e) {
+      print('❌ [REPOSITORY] listInsights error: $e');
       return Left(ServerFailure(e.toString()));
     }
   }
@@ -67,10 +70,13 @@ class InsightsRepositoryImpl implements InsightsRepository {
 
   @override
   Future<Either<Failure, int>> getUnreadCount() async {
+    print('🌐 [REPOSITORY] getUnreadCount llamado');
     try {
       final count = await _remoteDataSource.getUnreadCount();
+      print('✅ [REPOSITORY] getUnreadCount completado - count: $count');
       return Right(count);
     } catch (e) {
+      print('❌ [REPOSITORY] getUnreadCount error: $e');
       return Left(ServerFailure(e.toString()));
     }
   }

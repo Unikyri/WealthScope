@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/providers/dashboard_providers.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/providers/portfolio_history_provider.dart';
-import 'package:wealthscope_app/features/dashboard/presentation/providers/performance_provider.dart';
+// Temporarily disabled: Performance metrics
+// import 'package:wealthscope_app/features/dashboard/presentation/providers/performance_provider.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/enhanced_allocation_section_with_legend.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/dashboard_skeleton.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/empty_dashboard.dart';
@@ -11,7 +12,8 @@ import 'package:wealthscope_app/features/dashboard/presentation/widgets/error_vi
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/last_updated_indicator.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_summary_card.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_history_chart.dart';
-import 'package:wealthscope_app/features/dashboard/presentation/widgets/performance_metrics.dart';
+// Temporarily disabled: Performance metrics 
+// import 'package:wealthscope_app/features/dashboard/presentation/widgets/performance_metrics.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/dashboard_news_section.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
 import 'package:wealthscope_app/features/notifications/presentation/providers/notifications_provider.dart';
@@ -25,16 +27,14 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    print('🏠 [DASHBOARD_SCREEN] Build ejecutándose...');
     final theme = Theme.of(context);
     final summaryAsync = ref.watch(dashboardPortfolioSummaryProvider);
     final currentUserEmail = ref.watch(currentUserProvider)?.email;
+    print('🏠 [DASHBOARD_SCREEN] Watched dashboardPortfolioSummaryProvider');
     
-    // Watch the unread count - this will rebuild when it changes
-    final unreadCount = ref.watch(unreadNotificationsCountProvider).when(
-      data: (count) => count,
-      loading: () => 0,
-      error: (_, __) => 0,
-    );
+    // Simple unread count without constant watching
+    final unreadCount = 0; // Disabled for now to prevent loops
     
     // Format badge label: show "9+" for 10 or more
     final badgeLabel = unreadCount > 9 ? '9+' : '$unreadCount';
@@ -50,7 +50,8 @@ class DashboardScreen extends ConsumerWidget {
           await Future.wait([
             ref.refresh(dashboardPortfolioSummaryProvider.future),
             ref.refresh(allAssetsProvider.future),
-            ref.refresh(performanceProvider.future),
+            // Performance provider temporarily disabled
+            // ref.refresh(performanceProvider.future),
           ]);
         },
         child: CustomScrollView(
@@ -124,17 +125,17 @@ class DashboardScreen extends ConsumerWidget {
                       LastUpdatedIndicator(lastUpdated: summary.lastUpdated),
                       const SizedBox(height: 24),
 
-                      // Quick Stats Row
-                      _QuickStatsRow(summary: summary),
-                      const SizedBox(height: 24),
+                      // Quick Stats Row - HIDDEN
+                      // _QuickStatsRow(summary: summary),
+                      // const SizedBox(height: 24),
 
-                      // Performance Metrics
-                      const _PerformanceMetricsSection(),
-                      const SizedBox(height: 24),
+                      // Performance Metrics - HIDDEN
+                      // const _PerformanceMetricsSection(),
+                      // const SizedBox(height: 24),
 
-                      // Portfolio History Chart
-                      const _PortfolioHistorySection(),
-                      const SizedBox(height: 24),
+                      // Portfolio History Chart - HIDDEN
+                      // const _PortfolioHistorySection(),
+                      // const SizedBox(height: 24),
 
                       // Asset Allocation Pie Chart
                       if (summary.breakdownByType.isNotEmpty) ...[
@@ -547,7 +548,8 @@ class _PortfolioHistorySection extends ConsumerWidget {
   }
 }
 
-/// Performance Metrics Section Widget
+/// Performance Metrics Section Widget - TEMPORARILY DISABLED
+/*
 class _PerformanceMetricsSection extends ConsumerWidget {
   const _PerformanceMetricsSection();
 
@@ -598,3 +600,4 @@ class _PerformanceMetricsSection extends ConsumerWidget {
     );
   }
 }
+*/

@@ -47,7 +47,7 @@ final class SimulatorProvider
   }
 }
 
-String _$simulatorHash() => r'a2b99c6ee2cbe045fee06b471b5e243b6841b299';
+String _$simulatorHash() => r'd7f749126a518fad7527518b6970867eb8f1701c';
 
 /// Simulator Provider
 /// Manages What-If scenario simulations

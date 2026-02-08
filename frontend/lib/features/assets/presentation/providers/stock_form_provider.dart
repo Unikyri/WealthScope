@@ -66,6 +66,9 @@ class StockForm extends _$StockForm {
       // Call the submission provider to handle API interaction
       await ref.read(assetFormSubmissionProvider.notifier).submitCreate(asset);
       
+      // Check if provider is still mounted after async gap
+      if (!ref.mounted) return;
+      
       // Check if submission was successful
       final submissionState = ref.read(assetFormSubmissionProvider);
       

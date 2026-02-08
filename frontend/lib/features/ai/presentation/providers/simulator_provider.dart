@@ -25,12 +25,16 @@ class Simulator extends _$Simulator {
       // Simulate processing delay
       await Future.delayed(const Duration(seconds: 2));
 
+      // Check if provider is still mounted after async gap
+      if (!ref.mounted) throw Exception('Provider disposed');
+
       // Mock result for now
       final result = _generateMockResult(type, parameters, includeAIAnalysis);
 
       state = AsyncValue.data(result);
       return result;
     } catch (e, stack) {
+      if (!ref.mounted) rethrow;
       state = AsyncValue.error(e, stack);
       rethrow;
     }

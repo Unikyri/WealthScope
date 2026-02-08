@@ -62,6 +62,10 @@ class News extends _$News {
     
     try {
       await Future.delayed(const Duration(milliseconds: 800));
+      
+      // Check if provider is still mounted after async gap
+      if (!ref.mounted) return;
+      
       final articles = _getMockArticles(
         page: 1,
         category: state.selectedCategory,
@@ -75,6 +79,7 @@ class News extends _$News {
         hasMore: articles.length >= _pageSize,
       );
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(
         isLoading: false,
         error: e.toString(),
@@ -101,6 +106,10 @@ class News extends _$News {
 
     try {
       await Future.delayed(const Duration(milliseconds: 800));
+      
+      // Check if provider is still mounted after async gap
+      if (!ref.mounted) return;
+      
       final newArticles = _getMockArticles(
         page: state.currentPage + 1,
         category: state.selectedCategory,
@@ -114,6 +123,7 @@ class News extends _$News {
         hasMore: newArticles.length >= _pageSize,
       );
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(
         isLoading: false,
         error: e.toString(),

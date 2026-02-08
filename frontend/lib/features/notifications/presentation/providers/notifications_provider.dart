@@ -5,14 +5,17 @@ import '../../domain/entities/notification.dart';
 
 part 'notifications_provider.g.dart';
 
-/// Backwards compatibility: Convert insights to notifications format
-/// Backwards compatibility: Convert insights to notifications format
+/// Simple notifications provider that maps insights to notifications
+/// Uses FutureProvider for simplicity
 @riverpod
 Future<List<AppNotification>> notifications(Ref ref) async {
-  // Use insightsListProvider from insights_providers.dart
-  final insightsList = await ref.watch(insightsListProvider().future);
+  print('🔔 [NOTIFICATIONS_PROVIDER] Ejecutando notifications provider...');
+  // Get insights list
+  final insights = await ref.watch(defaultInsightsListProvider.future);
+  print('🔔 [NOTIFICATIONS_PROVIDER] Insights obtenidos: ${insights.length} items');
   
-  return insightsList.map((insight) {
+  // Convert to notifications
+  return insights.map((insight) {
     return AppNotification(
       id: insight.id,
       title: insight.title,
@@ -24,6 +27,15 @@ Future<List<AppNotification>> notifications(Ref ref) async {
       actionUrl: null,
     );
   }).toList();
+}
+
+/// Simple unread count provider
+@riverpod
+Future<int> unreadNotificationsCount(Ref ref) async {
+  print('🔢 [UNREAD_COUNT_PROVIDER] Ejecutando unreadNotificationsCount provider...');
+  final count = await ref.watch(unreadInsightsCountProvider.future);
+  print('🔢 [UNREAD_COUNT_PROVIDER] Count obtenido: $count');
+  return count;
 }
 
 /// Truncate long content for notification preview
@@ -45,14 +57,6 @@ String _truncateContent(String content) {
   return lastSpace > 0 
       ? '${truncated.substring(0, lastSpace)}...'
       : '${truncated}...';
-}
-
-/// Provider for unread notifications count (backwards compatibility)
-@riverpod
-Future<int> unreadNotificationsCount(Ref ref) async {
-  // Watch the insights count directly to ensure reactivity
-  final count = await ref.watch(unreadInsightsCountProvider.future);
-  return count;
 }
 
 /// Helper to map insight type to notification type

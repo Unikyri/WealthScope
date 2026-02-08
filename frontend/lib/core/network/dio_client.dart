@@ -37,8 +37,9 @@ class DioClient {
     );
 
     // Add interceptors in order: Auth -> Error -> Logging
+    // Pass dio instance to AuthInterceptor so it can retry with same config
     dio.interceptors.addAll([
-      AuthInterceptor(Supabase.instance.client),
+      AuthInterceptor(Supabase.instance.client, dio),
       ErrorInterceptor(),
       LogInterceptor(
         requestBody: true,
