@@ -5,7 +5,7 @@ part 'ocr_dto.freezed.dart';
 part 'ocr_dto.g.dart';
 
 @freezed
-class ExtractedAssetDto with _$ExtractedAssetDto {
+abstract class ExtractedAssetDto with _$ExtractedAssetDto {
   const factory ExtractedAssetDto({
     required String name,
     String? symbol,
@@ -22,7 +22,7 @@ class ExtractedAssetDto with _$ExtractedAssetDto {
 }
 
 @freezed
-class OCRResultDto with _$OCRResultDto {
+abstract class OCRResultDto with _$OCRResultDto {
   const factory OCRResultDto({
     @JsonKey(name: 'document_type') required String documentType,
     required List<ExtractedAssetDto> assets,
@@ -34,7 +34,7 @@ class OCRResultDto with _$OCRResultDto {
 }
 
 @freezed
-class OCRConfirmationDto with _$OCRConfirmationDto {
+abstract class OCRConfirmationDto with _$OCRConfirmationDto {
   const factory OCRConfirmationDto({
     @JsonKey(name: 'asset_ids') required List<String> assetIds,
     @JsonKey(name: 'created_count') required int createdCount,
@@ -81,7 +81,7 @@ extension OCRConfirmationDtoX on OCRConfirmationDto {
 
 /// Request DTO for confirming assets
 @freezed
-class ConfirmAssetsRequestDto with _$ConfirmAssetsRequestDto {
+abstract class ConfirmAssetsRequestDto with _$ConfirmAssetsRequestDto {
   const factory ConfirmAssetsRequestDto({
     required List<ConfirmAssetDto> assets,
   }) = _ConfirmAssetsRequestDto;
@@ -91,7 +91,7 @@ class ConfirmAssetsRequestDto with _$ConfirmAssetsRequestDto {
 }
 
 @freezed
-class ConfirmAssetDto with _$ConfirmAssetDto {
+abstract class ConfirmAssetDto with _$ConfirmAssetDto {
   const factory ConfirmAssetDto({
     required String name,
     String? symbol,

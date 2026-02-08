@@ -254,7 +254,7 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
       ref.invalidate(assetDetailProvider(widget.assetId));
       ref.invalidate(allAssetsProvider);
       // Invalidate portfolio summary to update totals
-      ref.invalidate(portfolioSummaryProvider);
+      ref.invalidate(dashboardPortfolioSummaryProvider);
       
       if (!mounted) return;
       

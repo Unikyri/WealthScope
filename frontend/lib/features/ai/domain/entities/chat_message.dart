@@ -10,7 +10,7 @@ enum MessageRole {
 }
 
 @freezed
-class ChatMessage with _$ChatMessage {
+abstract class ChatMessage with _$ChatMessage {
   const factory ChatMessage({
     required String id,
     required String role, // 'user' or 'assistant'
@@ -23,7 +23,7 @@ class ChatMessage with _$ChatMessage {
 }
 
 @freezed
-class ChatResponse with _$ChatResponse {
+abstract class ChatResponse with _$ChatResponse {
   const factory ChatResponse({
     required ChatMessage userMessage,
     required ChatMessage aiMessage,
@@ -36,7 +36,7 @@ class ChatResponse with _$ChatResponse {
 }
 
 @freezed
-class InsightsResponse with _$InsightsResponse {
+abstract class InsightsResponse with _$InsightsResponse {
   const factory InsightsResponse({
     required String summary,
     required List<String> keyPoints,

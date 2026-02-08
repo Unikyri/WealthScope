@@ -27,7 +27,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _handleLogin() async {
     if (_formKey.currentState?.validate() ?? false) {
-      final success = await ref.read(loginNotifierProvider.notifier).login(
+      final success = await ref.read(loginProvider.notifier).login(
             email: _emailController.text.trim(),
             password: _passwordController.text,
           );
@@ -45,12 +45,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final loginState = ref.watch(loginNotifierProvider);
+    final loginState = ref.watch(loginProvider);
     final theme = Theme.of(context);
 
     // Show error snackbar when there's an error
     ref.listen<LoginState>(
-      loginNotifierProvider,
+      loginProvider,
       (previous, next) {
         if (next.errorMessage != null && next.errorMessage!.isNotEmpty && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -66,7 +66,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   if (mounted) {
                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   }
-                  ref.read(loginNotifierProvider.notifier).clearError();
+                  ref.read(loginProvider.notifier).clearError();
                 },
               ),
             ),
@@ -166,7 +166,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                           onPressed: () {
                             ref
-                                .read(loginNotifierProvider.notifier)
+                                .read(loginProvider.notifier)
                                 .togglePasswordVisibility();
                           },
                         ),

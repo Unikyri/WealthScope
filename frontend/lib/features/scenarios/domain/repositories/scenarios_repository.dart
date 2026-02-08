@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/error/failures.dart';
+import '../../../../core/errors/failures.dart';
 import '../../../ai/domain/entities/chain_result.dart';
 import '../entities/scenario_entity.dart';
 

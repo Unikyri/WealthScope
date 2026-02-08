@@ -6,6 +6,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 part 'document_picker_service.g.dart';
 
 class DocumentPickerService {
@@ -147,6 +149,6 @@ class DocumentPickerService {
 
 // Provider
 @riverpod
-DocumentPickerService documentPickerService(DocumentPickerServiceRef ref) {
+DocumentPickerService documentPickerService(Ref ref) {
   return DocumentPickerService();
 }

@@ -6,7 +6,7 @@ part 'portfolio_risk.freezed.dart';
 /// Portfolio Risk Analysis Entity
 /// From GET /api/v1/portfolio/risk
 @freezed
-class PortfolioRisk with _$PortfolioRisk {
+abstract class PortfolioRisk with _$PortfolioRisk {
   const factory PortfolioRisk({
     required int riskScore,
     required String diversificationLevel,

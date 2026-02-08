@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,139 +9,84 @@ part of 'insight_dto.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-InsightDto _$InsightDtoFromJson(Map<String, dynamic> json) {
-  return _InsightDto.fromJson(json);
-}
 
 /// @nodoc
 mixin _$InsightDto {
-  String get id => throw _privateConstructorUsedError;
-  String get type => throw _privateConstructorUsedError;
-  String get category => throw _privateConstructorUsedError;
-  String get priority => throw _privateConstructorUsedError;
-  String get title => throw _privateConstructorUsedError;
-  String get content => throw _privateConstructorUsedError;
+  String get id;
+  String get type;
+  String get category;
+  String get priority;
+  String get title;
+  String get content;
   @JsonKey(name: 'action_items')
-  List<String> get actionItems => throw _privateConstructorUsedError;
+  List<String> get actionItems;
   @JsonKey(name: 'related_symbols')
-  List<String> get relatedSymbols => throw _privateConstructorUsedError;
+  List<String> get relatedSymbols;
   @JsonKey(name: 'is_read')
-  bool get isRead => throw _privateConstructorUsedError;
+  bool get isRead;
   @JsonKey(name: 'created_at')
-  String get createdAt => throw _privateConstructorUsedError;
-
-  /// Serializes this InsightDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get createdAt;
 
   /// Create a copy of InsightDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $InsightDtoCopyWith<InsightDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $InsightDtoCopyWith<$Res> {
-  factory $InsightDtoCopyWith(
-          InsightDto value, $Res Function(InsightDto) then) =
-      _$InsightDtoCopyWithImpl<$Res, InsightDto>;
-  @useResult
-  $Res call(
-      {String id,
-      String type,
-      String category,
-      String priority,
-      String title,
-      String content,
-      @JsonKey(name: 'action_items') List<String> actionItems,
-      @JsonKey(name: 'related_symbols') List<String> relatedSymbols,
-      @JsonKey(name: 'is_read') bool isRead,
-      @JsonKey(name: 'created_at') String createdAt});
-}
-
-/// @nodoc
-class _$InsightDtoCopyWithImpl<$Res, $Val extends InsightDto>
-    implements $InsightDtoCopyWith<$Res> {
-  _$InsightDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of InsightDto
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $InsightDtoCopyWith<InsightDto> get copyWith =>
+      _$InsightDtoCopyWithImpl<InsightDto>(this as InsightDto, _$identity);
+
+  /// Serializes this InsightDto to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? id = null,
-    Object? type = null,
-    Object? category = null,
-    Object? priority = null,
-    Object? title = null,
-    Object? content = null,
-    Object? actionItems = null,
-    Object? relatedSymbols = null,
-    Object? isRead = null,
-    Object? createdAt = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as String,
-      category: null == category
-          ? _value.category
-          : category // ignore: cast_nullable_to_non_nullable
-              as String,
-      priority: null == priority
-          ? _value.priority
-          : priority // ignore: cast_nullable_to_non_nullable
-              as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      content: null == content
-          ? _value.content
-          : content // ignore: cast_nullable_to_non_nullable
-              as String,
-      actionItems: null == actionItems
-          ? _value.actionItems
-          : actionItems // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      relatedSymbols: null == relatedSymbols
-          ? _value.relatedSymbols
-          : relatedSymbols // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      isRead: null == isRead
-          ? _value.isRead
-          : isRead // ignore: cast_nullable_to_non_nullable
-              as bool,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is InsightDto &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.category, category) ||
+                other.category == category) &&
+            (identical(other.priority, priority) ||
+                other.priority == priority) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.content, content) || other.content == content) &&
+            const DeepCollectionEquality()
+                .equals(other.actionItems, actionItems) &&
+            const DeepCollectionEquality()
+                .equals(other.relatedSymbols, relatedSymbols) &&
+            (identical(other.isRead, isRead) || other.isRead == isRead) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      type,
+      category,
+      priority,
+      title,
+      content,
+      const DeepCollectionEquality().hash(actionItems),
+      const DeepCollectionEquality().hash(relatedSymbols),
+      isRead,
+      createdAt);
+
+  @override
+  String toString() {
+    return 'InsightDto(id: $id, type: $type, category: $category, priority: $priority, title: $title, content: $content, actionItems: $actionItems, relatedSymbols: $relatedSymbols, isRead: $isRead, createdAt: $createdAt)';
   }
 }
 
 /// @nodoc
-abstract class _$$InsightDtoImplCopyWith<$Res>
-    implements $InsightDtoCopyWith<$Res> {
-  factory _$$InsightDtoImplCopyWith(
-          _$InsightDtoImpl value, $Res Function(_$InsightDtoImpl) then) =
-      __$$InsightDtoImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $InsightDtoCopyWith<$Res> {
+  factory $InsightDtoCopyWith(
+          InsightDto value, $Res Function(InsightDto) _then) =
+      _$InsightDtoCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -157,12 +102,11 @@ abstract class _$$InsightDtoImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$InsightDtoImplCopyWithImpl<$Res>
-    extends _$InsightDtoCopyWithImpl<$Res, _$InsightDtoImpl>
-    implements _$$InsightDtoImplCopyWith<$Res> {
-  __$$InsightDtoImplCopyWithImpl(
-      _$InsightDtoImpl _value, $Res Function(_$InsightDtoImpl) _then)
-      : super(_value, _then);
+class _$InsightDtoCopyWithImpl<$Res> implements $InsightDtoCopyWith<$Res> {
+  _$InsightDtoCopyWithImpl(this._self, this._then);
+
+  final InsightDto _self;
+  final $Res Function(InsightDto) _then;
 
   /// Create a copy of InsightDto
   /// with the given fields replaced by the non-null parameter values.
@@ -180,55 +124,275 @@ class __$$InsightDtoImplCopyWithImpl<$Res>
     Object? isRead = null,
     Object? createdAt = null,
   }) {
-    return _then(_$InsightDtoImpl(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       type: null == type
-          ? _value.type
+          ? _self.type
           : type // ignore: cast_nullable_to_non_nullable
               as String,
       category: null == category
-          ? _value.category
+          ? _self.category
           : category // ignore: cast_nullable_to_non_nullable
               as String,
       priority: null == priority
-          ? _value.priority
+          ? _self.priority
           : priority // ignore: cast_nullable_to_non_nullable
               as String,
       title: null == title
-          ? _value.title
+          ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
       content: null == content
-          ? _value.content
+          ? _self.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
       actionItems: null == actionItems
-          ? _value._actionItems
+          ? _self.actionItems
           : actionItems // ignore: cast_nullable_to_non_nullable
               as List<String>,
       relatedSymbols: null == relatedSymbols
-          ? _value._relatedSymbols
+          ? _self.relatedSymbols
           : relatedSymbols // ignore: cast_nullable_to_non_nullable
               as List<String>,
       isRead: null == isRead
-          ? _value.isRead
+          ? _self.isRead
           : isRead // ignore: cast_nullable_to_non_nullable
               as bool,
       createdAt: null == createdAt
-          ? _value.createdAt
+          ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as String,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [InsightDto].
+extension InsightDtoPatterns on InsightDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_InsightDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _InsightDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_InsightDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _InsightDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_InsightDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _InsightDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String type,
+            String category,
+            String priority,
+            String title,
+            String content,
+            @JsonKey(name: 'action_items') List<String> actionItems,
+            @JsonKey(name: 'related_symbols') List<String> relatedSymbols,
+            @JsonKey(name: 'is_read') bool isRead,
+            @JsonKey(name: 'created_at') String createdAt)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _InsightDto() when $default != null:
+        return $default(
+            _that.id,
+            _that.type,
+            _that.category,
+            _that.priority,
+            _that.title,
+            _that.content,
+            _that.actionItems,
+            _that.relatedSymbols,
+            _that.isRead,
+            _that.createdAt);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String type,
+            String category,
+            String priority,
+            String title,
+            String content,
+            @JsonKey(name: 'action_items') List<String> actionItems,
+            @JsonKey(name: 'related_symbols') List<String> relatedSymbols,
+            @JsonKey(name: 'is_read') bool isRead,
+            @JsonKey(name: 'created_at') String createdAt)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _InsightDto():
+        return $default(
+            _that.id,
+            _that.type,
+            _that.category,
+            _that.priority,
+            _that.title,
+            _that.content,
+            _that.actionItems,
+            _that.relatedSymbols,
+            _that.isRead,
+            _that.createdAt);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            String type,
+            String category,
+            String priority,
+            String title,
+            String content,
+            @JsonKey(name: 'action_items') List<String> actionItems,
+            @JsonKey(name: 'related_symbols') List<String> relatedSymbols,
+            @JsonKey(name: 'is_read') bool isRead,
+            @JsonKey(name: 'created_at') String createdAt)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _InsightDto() when $default != null:
+        return $default(
+            _that.id,
+            _that.type,
+            _that.category,
+            _that.priority,
+            _that.title,
+            _that.content,
+            _that.actionItems,
+            _that.relatedSymbols,
+            _that.isRead,
+            _that.createdAt);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$InsightDtoImpl implements _InsightDto {
-  const _$InsightDtoImpl(
+class _InsightDto implements InsightDto {
+  const _InsightDto(
       {required this.id,
       required this.type,
       required this.category,
@@ -242,9 +406,8 @@ class _$InsightDtoImpl implements _InsightDto {
       @JsonKey(name: 'created_at') required this.createdAt})
       : _actionItems = actionItems,
         _relatedSymbols = relatedSymbols;
-
-  factory _$InsightDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$InsightDtoImplFromJson(json);
+  factory _InsightDto.fromJson(Map<String, dynamic> json) =>
+      _$InsightDtoFromJson(json);
 
   @override
   final String id;
@@ -283,16 +446,26 @@ class _$InsightDtoImpl implements _InsightDto {
   @JsonKey(name: 'created_at')
   final String createdAt;
 
+  /// Create a copy of InsightDto
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'InsightDto(id: $id, type: $type, category: $category, priority: $priority, title: $title, content: $content, actionItems: $actionItems, relatedSymbols: $relatedSymbols, isRead: $isRead, createdAt: $createdAt)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$InsightDtoCopyWith<_InsightDto> get copyWith =>
+      __$InsightDtoCopyWithImpl<_InsightDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$InsightDtoToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$InsightDtoImpl &&
+            other is _InsightDto &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.category, category) ||
@@ -325,162 +498,155 @@ class _$InsightDtoImpl implements _InsightDto {
       isRead,
       createdAt);
 
-  /// Create a copy of InsightDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$InsightDtoImplCopyWith<_$InsightDtoImpl> get copyWith =>
-      __$$InsightDtoImplCopyWithImpl<_$InsightDtoImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$InsightDtoImplToJson(
-      this,
-    );
+  String toString() {
+    return 'InsightDto(id: $id, type: $type, category: $category, priority: $priority, title: $title, content: $content, actionItems: $actionItems, relatedSymbols: $relatedSymbols, isRead: $isRead, createdAt: $createdAt)';
   }
 }
 
-abstract class _InsightDto implements InsightDto {
-  const factory _InsightDto(
-          {required final String id,
-          required final String type,
-          required final String category,
-          required final String priority,
-          required final String title,
-          required final String content,
-          @JsonKey(name: 'action_items') final List<String> actionItems,
-          @JsonKey(name: 'related_symbols') final List<String> relatedSymbols,
-          @JsonKey(name: 'is_read') required final bool isRead,
-          @JsonKey(name: 'created_at') required final String createdAt}) =
-      _$InsightDtoImpl;
+/// @nodoc
+abstract mixin class _$InsightDtoCopyWith<$Res>
+    implements $InsightDtoCopyWith<$Res> {
+  factory _$InsightDtoCopyWith(
+          _InsightDto value, $Res Function(_InsightDto) _then) =
+      __$InsightDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String type,
+      String category,
+      String priority,
+      String title,
+      String content,
+      @JsonKey(name: 'action_items') List<String> actionItems,
+      @JsonKey(name: 'related_symbols') List<String> relatedSymbols,
+      @JsonKey(name: 'is_read') bool isRead,
+      @JsonKey(name: 'created_at') String createdAt});
+}
 
-  factory _InsightDto.fromJson(Map<String, dynamic> json) =
-      _$InsightDtoImpl.fromJson;
+/// @nodoc
+class __$InsightDtoCopyWithImpl<$Res> implements _$InsightDtoCopyWith<$Res> {
+  __$InsightDtoCopyWithImpl(this._self, this._then);
 
-  @override
-  String get id;
-  @override
-  String get type;
-  @override
-  String get category;
-  @override
-  String get priority;
-  @override
-  String get title;
-  @override
-  String get content;
-  @override
-  @JsonKey(name: 'action_items')
-  List<String> get actionItems;
-  @override
-  @JsonKey(name: 'related_symbols')
-  List<String> get relatedSymbols;
-  @override
-  @JsonKey(name: 'is_read')
-  bool get isRead;
-  @override
-  @JsonKey(name: 'created_at')
-  String get createdAt;
+  final _InsightDto _self;
+  final $Res Function(_InsightDto) _then;
 
   /// Create a copy of InsightDto
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$InsightDtoImplCopyWith<_$InsightDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-InsightListDto _$InsightListDtoFromJson(Map<String, dynamic> json) {
-  return _InsightListDto.fromJson(json);
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? type = null,
+    Object? category = null,
+    Object? priority = null,
+    Object? title = null,
+    Object? content = null,
+    Object? actionItems = null,
+    Object? relatedSymbols = null,
+    Object? isRead = null,
+    Object? createdAt = null,
+  }) {
+    return _then(_InsightDto(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      type: null == type
+          ? _self.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
+      category: null == category
+          ? _self.category
+          : category // ignore: cast_nullable_to_non_nullable
+              as String,
+      priority: null == priority
+          ? _self.priority
+          : priority // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _self.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      content: null == content
+          ? _self.content
+          : content // ignore: cast_nullable_to_non_nullable
+              as String,
+      actionItems: null == actionItems
+          ? _self._actionItems
+          : actionItems // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      relatedSymbols: null == relatedSymbols
+          ? _self._relatedSymbols
+          : relatedSymbols // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      isRead: null == isRead
+          ? _self.isRead
+          : isRead // ignore: cast_nullable_to_non_nullable
+              as bool,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
 }
 
 /// @nodoc
 mixin _$InsightListDto {
-  List<InsightDto> get insights => throw _privateConstructorUsedError;
-  int get total => throw _privateConstructorUsedError;
-  int get limit => throw _privateConstructorUsedError;
-  int get offset => throw _privateConstructorUsedError;
+  List<InsightDto> get insights;
+  int get total;
+  int get limit;
+  int get offset;
   @JsonKey(name: 'unread_count')
-  int get unreadCount => throw _privateConstructorUsedError;
-
-  /// Serializes this InsightListDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  int get unreadCount;
 
   /// Create a copy of InsightListDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $InsightListDtoCopyWith<InsightListDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $InsightListDtoCopyWith<$Res> {
-  factory $InsightListDtoCopyWith(
-          InsightListDto value, $Res Function(InsightListDto) then) =
-      _$InsightListDtoCopyWithImpl<$Res, InsightListDto>;
-  @useResult
-  $Res call(
-      {List<InsightDto> insights,
-      int total,
-      int limit,
-      int offset,
-      @JsonKey(name: 'unread_count') int unreadCount});
-}
-
-/// @nodoc
-class _$InsightListDtoCopyWithImpl<$Res, $Val extends InsightListDto>
-    implements $InsightListDtoCopyWith<$Res> {
-  _$InsightListDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of InsightListDto
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $InsightListDtoCopyWith<InsightListDto> get copyWith =>
+      _$InsightListDtoCopyWithImpl<InsightListDto>(
+          this as InsightListDto, _$identity);
+
+  /// Serializes this InsightListDto to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? insights = null,
-    Object? total = null,
-    Object? limit = null,
-    Object? offset = null,
-    Object? unreadCount = null,
-  }) {
-    return _then(_value.copyWith(
-      insights: null == insights
-          ? _value.insights
-          : insights // ignore: cast_nullable_to_non_nullable
-              as List<InsightDto>,
-      total: null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
-              as int,
-      limit: null == limit
-          ? _value.limit
-          : limit // ignore: cast_nullable_to_non_nullable
-              as int,
-      offset: null == offset
-          ? _value.offset
-          : offset // ignore: cast_nullable_to_non_nullable
-              as int,
-      unreadCount: null == unreadCount
-          ? _value.unreadCount
-          : unreadCount // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is InsightListDto &&
+            const DeepCollectionEquality().equals(other.insights, insights) &&
+            (identical(other.total, total) || other.total == total) &&
+            (identical(other.limit, limit) || other.limit == limit) &&
+            (identical(other.offset, offset) || other.offset == offset) &&
+            (identical(other.unreadCount, unreadCount) ||
+                other.unreadCount == unreadCount));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(insights),
+      total,
+      limit,
+      offset,
+      unreadCount);
+
+  @override
+  String toString() {
+    return 'InsightListDto(insights: $insights, total: $total, limit: $limit, offset: $offset, unreadCount: $unreadCount)';
   }
 }
 
 /// @nodoc
-abstract class _$$InsightListDtoImplCopyWith<$Res>
-    implements $InsightListDtoCopyWith<$Res> {
-  factory _$$InsightListDtoImplCopyWith(_$InsightListDtoImpl value,
-          $Res Function(_$InsightListDtoImpl) then) =
-      __$$InsightListDtoImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $InsightListDtoCopyWith<$Res> {
+  factory $InsightListDtoCopyWith(
+          InsightListDto value, $Res Function(InsightListDto) _then) =
+      _$InsightListDtoCopyWithImpl;
   @useResult
   $Res call(
       {List<InsightDto> insights,
@@ -491,12 +657,12 @@ abstract class _$$InsightListDtoImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$InsightListDtoImplCopyWithImpl<$Res>
-    extends _$InsightListDtoCopyWithImpl<$Res, _$InsightListDtoImpl>
-    implements _$$InsightListDtoImplCopyWith<$Res> {
-  __$$InsightListDtoImplCopyWithImpl(
-      _$InsightListDtoImpl _value, $Res Function(_$InsightListDtoImpl) _then)
-      : super(_value, _then);
+class _$InsightListDtoCopyWithImpl<$Res>
+    implements $InsightListDtoCopyWith<$Res> {
+  _$InsightListDtoCopyWithImpl(this._self, this._then);
+
+  final InsightListDto _self;
+  final $Res Function(InsightListDto) _then;
 
   /// Create a copy of InsightListDto
   /// with the given fields replaced by the non-null parameter values.
@@ -509,44 +675,209 @@ class __$$InsightListDtoImplCopyWithImpl<$Res>
     Object? offset = null,
     Object? unreadCount = null,
   }) {
-    return _then(_$InsightListDtoImpl(
+    return _then(_self.copyWith(
       insights: null == insights
-          ? _value._insights
+          ? _self.insights
           : insights // ignore: cast_nullable_to_non_nullable
               as List<InsightDto>,
       total: null == total
-          ? _value.total
+          ? _self.total
           : total // ignore: cast_nullable_to_non_nullable
               as int,
       limit: null == limit
-          ? _value.limit
+          ? _self.limit
           : limit // ignore: cast_nullable_to_non_nullable
               as int,
       offset: null == offset
-          ? _value.offset
+          ? _self.offset
           : offset // ignore: cast_nullable_to_non_nullable
               as int,
       unreadCount: null == unreadCount
-          ? _value.unreadCount
+          ? _self.unreadCount
           : unreadCount // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [InsightListDto].
+extension InsightListDtoPatterns on InsightListDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_InsightListDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _InsightListDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_InsightListDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _InsightListDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_InsightListDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _InsightListDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(List<InsightDto> insights, int total, int limit,
+            int offset, @JsonKey(name: 'unread_count') int unreadCount)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _InsightListDto() when $default != null:
+        return $default(_that.insights, _that.total, _that.limit, _that.offset,
+            _that.unreadCount);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(List<InsightDto> insights, int total, int limit,
+            int offset, @JsonKey(name: 'unread_count') int unreadCount)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _InsightListDto():
+        return $default(_that.insights, _that.total, _that.limit, _that.offset,
+            _that.unreadCount);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(List<InsightDto> insights, int total, int limit,
+            int offset, @JsonKey(name: 'unread_count') int unreadCount)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _InsightListDto() when $default != null:
+        return $default(_that.insights, _that.total, _that.limit, _that.offset,
+            _that.unreadCount);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$InsightListDtoImpl implements _InsightListDto {
-  const _$InsightListDtoImpl(
+class _InsightListDto implements InsightListDto {
+  const _InsightListDto(
       {required final List<InsightDto> insights,
       required this.total,
       required this.limit,
       required this.offset,
       @JsonKey(name: 'unread_count') required this.unreadCount})
       : _insights = insights;
-
-  factory _$InsightListDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$InsightListDtoImplFromJson(json);
+  factory _InsightListDto.fromJson(Map<String, dynamic> json) =>
+      _$InsightListDtoFromJson(json);
 
   final List<InsightDto> _insights;
   @override
@@ -566,16 +897,26 @@ class _$InsightListDtoImpl implements _InsightListDto {
   @JsonKey(name: 'unread_count')
   final int unreadCount;
 
+  /// Create a copy of InsightListDto
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'InsightListDto(insights: $insights, total: $total, limit: $limit, offset: $offset, unreadCount: $unreadCount)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$InsightListDtoCopyWith<_InsightListDto> get copyWith =>
+      __$InsightListDtoCopyWithImpl<_InsightListDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$InsightListDtoToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$InsightListDtoImpl &&
+            other is _InsightListDto &&
             const DeepCollectionEquality().equals(other._insights, _insights) &&
             (identical(other.total, total) || other.total == total) &&
             (identical(other.limit, limit) || other.limit == limit) &&
@@ -594,164 +935,92 @@ class _$InsightListDtoImpl implements _InsightListDto {
       offset,
       unreadCount);
 
-  /// Create a copy of InsightListDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$InsightListDtoImplCopyWith<_$InsightListDtoImpl> get copyWith =>
-      __$$InsightListDtoImplCopyWithImpl<_$InsightListDtoImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$InsightListDtoImplToJson(
-      this,
-    );
+  String toString() {
+    return 'InsightListDto(insights: $insights, total: $total, limit: $limit, offset: $offset, unreadCount: $unreadCount)';
   }
 }
 
-abstract class _InsightListDto implements InsightListDto {
-  const factory _InsightListDto(
-          {required final List<InsightDto> insights,
-          required final int total,
-          required final int limit,
-          required final int offset,
-          @JsonKey(name: 'unread_count') required final int unreadCount}) =
-      _$InsightListDtoImpl;
+/// @nodoc
+abstract mixin class _$InsightListDtoCopyWith<$Res>
+    implements $InsightListDtoCopyWith<$Res> {
+  factory _$InsightListDtoCopyWith(
+          _InsightListDto value, $Res Function(_InsightListDto) _then) =
+      __$InsightListDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {List<InsightDto> insights,
+      int total,
+      int limit,
+      int offset,
+      @JsonKey(name: 'unread_count') int unreadCount});
+}
 
-  factory _InsightListDto.fromJson(Map<String, dynamic> json) =
-      _$InsightListDtoImpl.fromJson;
+/// @nodoc
+class __$InsightListDtoCopyWithImpl<$Res>
+    implements _$InsightListDtoCopyWith<$Res> {
+  __$InsightListDtoCopyWithImpl(this._self, this._then);
 
-  @override
-  List<InsightDto> get insights;
-  @override
-  int get total;
-  @override
-  int get limit;
-  @override
-  int get offset;
-  @override
-  @JsonKey(name: 'unread_count')
-  int get unreadCount;
+  final _InsightListDto _self;
+  final $Res Function(_InsightListDto) _then;
 
   /// Create a copy of InsightListDto
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$InsightListDtoImplCopyWith<_$InsightListDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-UnreadCountDto _$UnreadCountDtoFromJson(Map<String, dynamic> json) {
-  return _UnreadCountDto.fromJson(json);
-}
-
-/// @nodoc
-mixin _$UnreadCountDto {
-  int get count => throw _privateConstructorUsedError;
-
-  /// Serializes this UnreadCountDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of UnreadCountDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $UnreadCountDtoCopyWith<UnreadCountDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $UnreadCountDtoCopyWith<$Res> {
-  factory $UnreadCountDtoCopyWith(
-          UnreadCountDto value, $Res Function(UnreadCountDto) then) =
-      _$UnreadCountDtoCopyWithImpl<$Res, UnreadCountDto>;
-  @useResult
-  $Res call({int count});
-}
-
-/// @nodoc
-class _$UnreadCountDtoCopyWithImpl<$Res, $Val extends UnreadCountDto>
-    implements $UnreadCountDtoCopyWith<$Res> {
-  _$UnreadCountDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of UnreadCountDto
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
-  @override
   $Res call({
-    Object? count = null,
+    Object? insights = null,
+    Object? total = null,
+    Object? limit = null,
+    Object? offset = null,
+    Object? unreadCount = null,
   }) {
-    return _then(_value.copyWith(
-      count: null == count
-          ? _value.count
-          : count // ignore: cast_nullable_to_non_nullable
+    return _then(_InsightListDto(
+      insights: null == insights
+          ? _self._insights
+          : insights // ignore: cast_nullable_to_non_nullable
+              as List<InsightDto>,
+      total: null == total
+          ? _self.total
+          : total // ignore: cast_nullable_to_non_nullable
               as int,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$UnreadCountDtoImplCopyWith<$Res>
-    implements $UnreadCountDtoCopyWith<$Res> {
-  factory _$$UnreadCountDtoImplCopyWith(_$UnreadCountDtoImpl value,
-          $Res Function(_$UnreadCountDtoImpl) then) =
-      __$$UnreadCountDtoImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({int count});
-}
-
-/// @nodoc
-class __$$UnreadCountDtoImplCopyWithImpl<$Res>
-    extends _$UnreadCountDtoCopyWithImpl<$Res, _$UnreadCountDtoImpl>
-    implements _$$UnreadCountDtoImplCopyWith<$Res> {
-  __$$UnreadCountDtoImplCopyWithImpl(
-      _$UnreadCountDtoImpl _value, $Res Function(_$UnreadCountDtoImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of UnreadCountDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? count = null,
-  }) {
-    return _then(_$UnreadCountDtoImpl(
-      count: null == count
-          ? _value.count
-          : count // ignore: cast_nullable_to_non_nullable
+      limit: null == limit
+          ? _self.limit
+          : limit // ignore: cast_nullable_to_non_nullable
+              as int,
+      offset: null == offset
+          ? _self.offset
+          : offset // ignore: cast_nullable_to_non_nullable
+              as int,
+      unreadCount: null == unreadCount
+          ? _self.unreadCount
+          : unreadCount // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }
 }
 
 /// @nodoc
-@JsonSerializable()
-class _$UnreadCountDtoImpl implements _UnreadCountDto {
-  const _$UnreadCountDtoImpl({required this.count});
+mixin _$UnreadCountDto {
+  int get count;
 
-  factory _$UnreadCountDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$UnreadCountDtoImplFromJson(json);
+  /// Create a copy of UnreadCountDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $UnreadCountDtoCopyWith<UnreadCountDto> get copyWith =>
+      _$UnreadCountDtoCopyWithImpl<UnreadCountDto>(
+          this as UnreadCountDto, _$identity);
 
-  @override
-  final int count;
-
-  @override
-  String toString() {
-    return 'UnreadCountDto(count: $count)';
-  }
+  /// Serializes this UnreadCountDto to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$UnreadCountDtoImpl &&
+            other is UnreadCountDto &&
             (identical(other.count, count) || other.count == count));
   }
 
@@ -759,37 +1028,278 @@ class _$UnreadCountDtoImpl implements _UnreadCountDto {
   @override
   int get hashCode => Object.hash(runtimeType, count);
 
-  /// Create a copy of UnreadCountDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$UnreadCountDtoImplCopyWith<_$UnreadCountDtoImpl> get copyWith =>
-      __$$UnreadCountDtoImplCopyWithImpl<_$UnreadCountDtoImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$UnreadCountDtoImplToJson(
-      this,
-    );
+  String toString() {
+    return 'UnreadCountDto(count: $count)';
   }
 }
 
-abstract class _UnreadCountDto implements UnreadCountDto {
-  const factory _UnreadCountDto({required final int count}) =
-      _$UnreadCountDtoImpl;
+/// @nodoc
+abstract mixin class $UnreadCountDtoCopyWith<$Res> {
+  factory $UnreadCountDtoCopyWith(
+          UnreadCountDto value, $Res Function(UnreadCountDto) _then) =
+      _$UnreadCountDtoCopyWithImpl;
+  @useResult
+  $Res call({int count});
+}
 
-  factory _UnreadCountDto.fromJson(Map<String, dynamic> json) =
-      _$UnreadCountDtoImpl.fromJson;
+/// @nodoc
+class _$UnreadCountDtoCopyWithImpl<$Res>
+    implements $UnreadCountDtoCopyWith<$Res> {
+  _$UnreadCountDtoCopyWithImpl(this._self, this._then);
+
+  final UnreadCountDto _self;
+  final $Res Function(UnreadCountDto) _then;
+
+  /// Create a copy of UnreadCountDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? count = null,
+  }) {
+    return _then(_self.copyWith(
+      count: null == count
+          ? _self.count
+          : count // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [UnreadCountDto].
+extension UnreadCountDtoPatterns on UnreadCountDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_UnreadCountDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _UnreadCountDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_UnreadCountDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UnreadCountDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_UnreadCountDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UnreadCountDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(int count)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _UnreadCountDto() when $default != null:
+        return $default(_that.count);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(int count) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UnreadCountDto():
+        return $default(_that.count);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(int count)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UnreadCountDto() when $default != null:
+        return $default(_that.count);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _UnreadCountDto implements UnreadCountDto {
+  const _UnreadCountDto({required this.count});
+  factory _UnreadCountDto.fromJson(Map<String, dynamic> json) =>
+      _$UnreadCountDtoFromJson(json);
 
   @override
-  int get count;
+  final int count;
 
   /// Create a copy of UnreadCountDto
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$UnreadCountDtoImplCopyWith<_$UnreadCountDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  _$UnreadCountDtoCopyWith<_UnreadCountDto> get copyWith =>
+      __$UnreadCountDtoCopyWithImpl<_UnreadCountDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$UnreadCountDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _UnreadCountDto &&
+            (identical(other.count, count) || other.count == count));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, count);
+
+  @override
+  String toString() {
+    return 'UnreadCountDto(count: $count)';
+  }
 }
+
+/// @nodoc
+abstract mixin class _$UnreadCountDtoCopyWith<$Res>
+    implements $UnreadCountDtoCopyWith<$Res> {
+  factory _$UnreadCountDtoCopyWith(
+          _UnreadCountDto value, $Res Function(_UnreadCountDto) _then) =
+      __$UnreadCountDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call({int count});
+}
+
+/// @nodoc
+class __$UnreadCountDtoCopyWithImpl<$Res>
+    implements _$UnreadCountDtoCopyWith<$Res> {
+  __$UnreadCountDtoCopyWithImpl(this._self, this._then);
+
+  final _UnreadCountDto _self;
+  final $Res Function(_UnreadCountDto) _then;
+
+  /// Create a copy of UnreadCountDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? count = null,
+  }) {
+    return _then(_UnreadCountDto(
+      count: null == count
+          ? _self.count
+          : count // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+// dart format on

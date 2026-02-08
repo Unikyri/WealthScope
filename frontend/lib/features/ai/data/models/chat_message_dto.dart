@@ -5,7 +5,7 @@ part 'chat_message_dto.freezed.dart';
 part 'chat_message_dto.g.dart';
 
 @freezed
-class ChatMessageDTO with _$ChatMessageDTO {
+abstract class ChatMessageDTO with _$ChatMessageDTO {
   const ChatMessageDTO._();
   
   const factory ChatMessageDTO({

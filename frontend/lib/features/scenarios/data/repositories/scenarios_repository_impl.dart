@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/error/failures.dart';
+import '../../../../core/errors/failures.dart';
 import '../../../ai/domain/entities/chain_result.dart';
 import '../../domain/entities/scenario_entity.dart';
 import '../../domain/repositories/scenarios_repository.dart';
@@ -24,7 +24,7 @@ class ScenariosRepositoryImpl implements ScenariosRepository {
       );
       return Right(dto.toDomain());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -40,7 +40,7 @@ class ScenariosRepositoryImpl implements ScenariosRepository {
       );
       return Right(ChainResult.fromJson(data));
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -56,7 +56,7 @@ class ScenariosRepositoryImpl implements ScenariosRepository {
       );
       return Right(dto.toDomain());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -66,7 +66,7 @@ class ScenariosRepositoryImpl implements ScenariosRepository {
       final dtos = await _remoteDataSource.getTemplates();
       return Right(dtos.map((dto) => dto.toDomain()).toList());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 }

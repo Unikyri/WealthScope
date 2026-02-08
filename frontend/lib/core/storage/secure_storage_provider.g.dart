@@ -6,26 +6,55 @@ part of 'secure_storage_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$secureStorageHash() => r'2d1b50b6b0f996e6de362851704ccbc88b980cd8';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Provider for the secure storage service.
+/// Returns a singleton instance of [SecureStorageService].
+
+@ProviderFor(secureStorage)
+final secureStorageProvider = SecureStorageProvider._();
 
 /// Provider for the secure storage service.
 /// Returns a singleton instance of [SecureStorageService].
-///
-/// Copied from [secureStorage].
-@ProviderFor(secureStorage)
-final secureStorageProvider =
-    AutoDisposeProvider<SecureStorageService>.internal(
-  secureStorage,
-  name: r'secureStorageProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$secureStorageHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef SecureStorageRef = AutoDisposeProviderRef<SecureStorageService>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class SecureStorageProvider extends $FunctionalProvider<
+    SecureStorageService,
+    SecureStorageService,
+    SecureStorageService> with $Provider<SecureStorageService> {
+  /// Provider for the secure storage service.
+  /// Returns a singleton instance of [SecureStorageService].
+  SecureStorageProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'secureStorageProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$secureStorageHash();
+
+  @$internal
+  @override
+  $ProviderElement<SecureStorageService> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  SecureStorageService create(Ref ref) {
+    return secureStorage(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SecureStorageService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SecureStorageService>(value),
+    );
+  }
+}
+
+String _$secureStorageHash() => r'c032f21d630c1eab845b23a171feca7df6b2844c';

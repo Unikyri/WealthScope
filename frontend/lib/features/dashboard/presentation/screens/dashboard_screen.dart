@@ -26,7 +26,7 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final summaryAsync = ref.watch(portfolioSummaryProvider);
+    final summaryAsync = ref.watch(dashboardPortfolioSummaryProvider);
     final currentUserEmail = ref.watch(currentUserProvider)?.email;
     
     // Watch the unread count - this will rebuild when it changes
@@ -48,7 +48,7 @@ class DashboardScreen extends ConsumerWidget {
         onRefresh: () async {
           // Refresh all dashboard data simultaneously
           await Future.wait([
-            ref.refresh(portfolioSummaryProvider.future),
+            ref.refresh(dashboardPortfolioSummaryProvider.future),
             ref.refresh(allAssetsProvider.future),
             ref.refresh(performanceProvider.future),
           ]);
@@ -179,7 +179,7 @@ class DashboardScreen extends ConsumerWidget {
               error: (error, _) => SliverFillRemaining(
                 child: ErrorView(
                   message: error.toString(),
-                  onRetry: () => ref.invalidate(portfolioSummaryProvider),
+                  onRetry: () => ref.invalidate(dashboardPortfolioSummaryProvider),
                 ),
               ),
             ),

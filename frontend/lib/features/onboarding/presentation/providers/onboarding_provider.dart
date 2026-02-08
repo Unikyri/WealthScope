@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wealthscope_app/features/onboarding/data/repositories/onboarding_repository_impl.dart';
@@ -7,13 +8,13 @@ part 'onboarding_provider.g.dart';
 
 /// Provider for SharedPreferences instance
 @Riverpod(keepAlive: true)
-Future<SharedPreferences> sharedPreferences(SharedPreferencesRef ref) async {
+Future<SharedPreferences> sharedPreferences(Ref ref) async {
   return await SharedPreferences.getInstance();
 }
 
 /// Provider for OnboardingRepository
 @Riverpod(keepAlive: true)
-Future<OnboardingRepository> onboardingRepository(OnboardingRepositoryRef ref) async {
+Future<OnboardingRepository> onboardingRepository(Ref ref) async {
   final prefs = await ref.watch(sharedPreferencesProvider.future);
   return OnboardingRepositoryImpl(prefs);
 }

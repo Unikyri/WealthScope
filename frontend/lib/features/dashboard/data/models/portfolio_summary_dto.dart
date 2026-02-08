@@ -7,7 +7,7 @@ part 'portfolio_summary_dto.g.dart';
 /// Portfolio Summary DTO
 /// Matches GET /api/v1/portfolio/summary response
 @freezed
-class PortfolioSummaryDto with _$PortfolioSummaryDto {
+abstract class PortfolioSummaryDto with _$PortfolioSummaryDto {
   const factory PortfolioSummaryDto({
     @JsonKey(name: 'total_value') required double totalValue,
     @JsonKey(name: 'total_invested') required double totalInvested,
@@ -27,7 +27,7 @@ class PortfolioSummaryDto with _$PortfolioSummaryDto {
 /// Asset Type Breakdown DTO
 /// Matches breakdown_by_type array from API
 @freezed
-class AssetTypeBreakdownDto with _$AssetTypeBreakdownDto {
+abstract class AssetTypeBreakdownDto with _$AssetTypeBreakdownDto {
   const factory AssetTypeBreakdownDto({
     required String type,
     required double value,

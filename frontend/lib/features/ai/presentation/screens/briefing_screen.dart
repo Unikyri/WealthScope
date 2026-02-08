@@ -19,7 +19,7 @@ class _BriefingScreenState extends ConsumerState<BriefingScreen> {
     super.initState();
     // Load briefing when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(briefingNotifierProvider.notifier).loadBriefing();
+      ref.read(briefingProvider.notifier).loadBriefing();
     });
   }
 
@@ -27,7 +27,7 @@ class _BriefingScreenState extends ConsumerState<BriefingScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final state = ref.watch(briefingNotifierProvider);
+    final state = ref.watch(briefingProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -35,7 +35,7 @@ class _BriefingScreenState extends ConsumerState<BriefingScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => ref.read(briefingNotifierProvider.notifier).refresh(),
+            onPressed: () => ref.read(briefingProvider.notifier).refresh(),
             tooltip: 'Refresh',
           ),
         ],
@@ -130,7 +130,7 @@ class _BriefingScreenState extends ConsumerState<BriefingScreen> {
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
-              onPressed: () => ref.read(briefingNotifierProvider.notifier).refresh(),
+              onPressed: () => ref.read(briefingProvider.notifier).refresh(),
               icon: const Icon(Icons.refresh),
               label: const Text('Retry'),
             ),

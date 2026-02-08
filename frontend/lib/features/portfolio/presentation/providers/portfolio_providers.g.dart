@@ -6,68 +6,138 @@ part of 'portfolio_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$portfolioRepositoryHash() =>
-    r'876027183d3e2f469809311a885c4f3ca415f088';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Provider for PortfolioRepository
+
+@ProviderFor(portfolioRepository)
+final portfolioRepositoryProvider = PortfolioRepositoryProvider._();
 
 /// Provider for PortfolioRepository
-///
-/// Copied from [portfolioRepository].
-@ProviderFor(portfolioRepository)
-final portfolioRepositoryProvider =
-    AutoDisposeProvider<PortfolioRepository>.internal(
-  portfolioRepository,
-  name: r'portfolioRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$portfolioRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef PortfolioRepositoryRef = AutoDisposeProviderRef<PortfolioRepository>;
-String _$portfolioSummaryHash() => r'fb3ea7e4664615db54c1338332f86a8b25bc9394';
+final class PortfolioRepositoryProvider extends $FunctionalProvider<
+    PortfolioRepository,
+    PortfolioRepository,
+    PortfolioRepository> with $Provider<PortfolioRepository> {
+  /// Provider for PortfolioRepository
+  PortfolioRepositoryProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'portfolioRepositoryProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$portfolioRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<PortfolioRepository> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  PortfolioRepository create(Ref ref) {
+    return portfolioRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(PortfolioRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PortfolioRepository>(value),
+    );
+  }
+}
+
+String _$portfolioRepositoryHash() =>
+    r'25a44b90a8d3eb97f3a9b5dcfd0ad6e630c81856';
 
 /// Provider to fetch portfolio summary
-///
-/// Copied from [portfolioSummary].
-@ProviderFor(portfolioSummary)
-final portfolioSummaryProvider =
-    AutoDisposeFutureProvider<PortfolioSummary>.internal(
-  portfolioSummary,
-  name: r'portfolioSummaryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$portfolioSummaryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef PortfolioSummaryRef = AutoDisposeFutureProviderRef<PortfolioSummary>;
-String _$portfolioRiskAnalysisHash() =>
-    r'002b0f4b294ebcacd3a529205cf15561552dffe5';
+@ProviderFor(portfolioSummary)
+final portfolioSummaryProvider = PortfolioSummaryProvider._();
+
+/// Provider to fetch portfolio summary
+
+final class PortfolioSummaryProvider extends $FunctionalProvider<
+        AsyncValue<PortfolioSummary>,
+        PortfolioSummary,
+        FutureOr<PortfolioSummary>>
+    with $FutureModifier<PortfolioSummary>, $FutureProvider<PortfolioSummary> {
+  /// Provider to fetch portfolio summary
+  PortfolioSummaryProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'portfolioSummaryProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$portfolioSummaryHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<PortfolioSummary> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<PortfolioSummary> create(Ref ref) {
+    return portfolioSummary(ref);
+  }
+}
+
+String _$portfolioSummaryHash() => r'4da1de30f3c5cdec8a217adfac8a01e69cf2e00c';
 
 /// Provider to fetch portfolio risk analysis
-///
-/// Copied from [portfolioRiskAnalysis].
-@ProviderFor(portfolioRiskAnalysis)
-final portfolioRiskAnalysisProvider =
-    AutoDisposeFutureProvider<PortfolioRiskAnalysis>.internal(
-  portfolioRiskAnalysis,
-  name: r'portfolioRiskAnalysisProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$portfolioRiskAnalysisHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef PortfolioRiskAnalysisRef
-    = AutoDisposeFutureProviderRef<PortfolioRiskAnalysis>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+@ProviderFor(portfolioRiskAnalysis)
+final portfolioRiskAnalysisProvider = PortfolioRiskAnalysisProvider._();
+
+/// Provider to fetch portfolio risk analysis
+
+final class PortfolioRiskAnalysisProvider extends $FunctionalProvider<
+        AsyncValue<PortfolioRiskAnalysis>,
+        PortfolioRiskAnalysis,
+        FutureOr<PortfolioRiskAnalysis>>
+    with
+        $FutureModifier<PortfolioRiskAnalysis>,
+        $FutureProvider<PortfolioRiskAnalysis> {
+  /// Provider to fetch portfolio risk analysis
+  PortfolioRiskAnalysisProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'portfolioRiskAnalysisProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$portfolioRiskAnalysisHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<PortfolioRiskAnalysis> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<PortfolioRiskAnalysis> create(Ref ref) {
+    return portfolioRiskAnalysis(ref);
+  }
+}
+
+String _$portfolioRiskAnalysisHash() =>
+    r'228a2239a10e3c4bfc8ebeb9ae5c30131eb0022c';

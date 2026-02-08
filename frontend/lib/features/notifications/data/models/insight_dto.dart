@@ -5,7 +5,7 @@ part 'insight_dto.freezed.dart';
 part 'insight_dto.g.dart';
 
 @freezed
-class InsightDto with _$InsightDto {
+abstract class InsightDto with _$InsightDto {
   const factory InsightDto({
     required String id,
     required String type,
@@ -24,7 +24,7 @@ class InsightDto with _$InsightDto {
 }
 
 @freezed
-class InsightListDto with _$InsightListDto {
+abstract class InsightListDto with _$InsightListDto {
   const factory InsightListDto({
     required List<InsightDto> insights,
     required int total,
@@ -38,7 +38,7 @@ class InsightListDto with _$InsightListDto {
 }
 
 @freezed
-class UnreadCountDto with _$UnreadCountDto {
+abstract class UnreadCountDto with _$UnreadCountDto {
   const factory UnreadCountDto({
     required int count,
   }) = _UnreadCountDto;

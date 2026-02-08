@@ -54,7 +54,7 @@ class AssetFormSubmission extends _$AssetFormSubmission {
 
       // Invalidate assets list and portfolio summary to trigger refresh
       ref.invalidate(allAssetsProvider);
-      ref.invalidate(portfolioSummaryProvider);
+      ref.invalidate(dashboardPortfolioSummaryProvider);
 
       state = state.copyWith(
         isLoading: false,
@@ -107,7 +107,7 @@ class AssetFormSubmission extends _$AssetFormSubmission {
 
       // Invalidate assets list and portfolio summary to trigger refresh
       ref.invalidate(allAssetsProvider);
-      ref.invalidate(portfolioSummaryProvider);
+      ref.invalidate(dashboardPortfolioSummaryProvider);
 
       state = state.copyWith(
         isLoading: false,
@@ -157,7 +157,7 @@ class AssetFormSubmission extends _$AssetFormSubmission {
 
       // Invalidate assets list and portfolio summary to trigger refresh
       ref.invalidate(allAssetsProvider);
-      ref.invalidate(portfolioSummaryProvider);
+      ref.invalidate(dashboardPortfolioSummaryProvider);
 
       state = state.copyWith(
         isLoading: false,

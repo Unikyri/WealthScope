@@ -6,7 +6,7 @@ part 'insight_dto.g.dart';
 
 /// Data Transfer Object for Insights
 @freezed
-class InsightDto with _$InsightDto {
+abstract class InsightDto with _$InsightDto {
   const factory InsightDto({
     required String id,
     required String type,

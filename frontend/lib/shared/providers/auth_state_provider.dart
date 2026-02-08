@@ -70,24 +70,24 @@ class AuthState extends _$AuthState {
 
 /// Convenience provider: checks if user is authenticated
 @riverpod
-bool isAuthenticated(IsAuthenticatedRef ref) {
+bool isAuthenticated(Ref ref) {
   return ref.watch(authStateProvider).isAuthenticated;
 }
 
 /// Convenience provider: gets current user
 @riverpod
-User? currentUser(CurrentUserRef ref) {
+User? currentUser(Ref ref) {
   return ref.watch(authStateProvider).user;
 }
 
 /// Convenience provider: gets current user ID
 @riverpod
-String? userId(UserIdRef ref) {
+String? userId(Ref ref) {
   return ref.watch(authStateProvider).userId;
 }
 
 /// Convenience provider: gets current user email
 @riverpod
-String? userEmail(UserEmailRef ref) {
+String? userEmail(Ref ref) {
   return ref.watch(authStateProvider).userEmail;
 }

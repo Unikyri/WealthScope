@@ -6,15 +6,14 @@ part of 'chat_message.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ChatMessageImpl _$$ChatMessageImplFromJson(Map<String, dynamic> json) =>
-    _$ChatMessageImpl(
+_ChatMessage _$ChatMessageFromJson(Map<String, dynamic> json) => _ChatMessage(
       id: json['id'] as String,
       role: json['role'] as String,
       content: json['content'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
     );
 
-Map<String, dynamic> _$$ChatMessageImplToJson(_$ChatMessageImpl instance) =>
+Map<String, dynamic> _$ChatMessageToJson(_ChatMessage instance) =>
     <String, dynamic>{
       'id': instance.id,
       'role': instance.role,
@@ -22,8 +21,8 @@ Map<String, dynamic> _$$ChatMessageImplToJson(_$ChatMessageImpl instance) =>
       'created_at': instance.createdAt.toIso8601String(),
     };
 
-_$ChatResponseImpl _$$ChatResponseImplFromJson(Map<String, dynamic> json) =>
-    _$ChatResponseImpl(
+_ChatResponse _$ChatResponseFromJson(Map<String, dynamic> json) =>
+    _ChatResponse(
       userMessage:
           ChatMessage.fromJson(json['user_message'] as Map<String, dynamic>),
       aiMessage:
@@ -32,7 +31,7 @@ _$ChatResponseImpl _$$ChatResponseImplFromJson(Map<String, dynamic> json) =>
       tokensUsed: (json['tokens_used'] as num?)?.toInt(),
     );
 
-Map<String, dynamic> _$$ChatResponseImplToJson(_$ChatResponseImpl instance) =>
+Map<String, dynamic> _$ChatResponseToJson(_ChatResponse instance) =>
     <String, dynamic>{
       'user_message': instance.userMessage.toJson(),
       'ai_message': instance.aiMessage.toJson(),
@@ -40,9 +39,8 @@ Map<String, dynamic> _$$ChatResponseImplToJson(_$ChatResponseImpl instance) =>
       'tokens_used': instance.tokensUsed,
     };
 
-_$InsightsResponseImpl _$$InsightsResponseImplFromJson(
-        Map<String, dynamic> json) =>
-    _$InsightsResponseImpl(
+_InsightsResponse _$InsightsResponseFromJson(Map<String, dynamic> json) =>
+    _InsightsResponse(
       summary: json['summary'] as String,
       keyPoints: (json['key_points'] as List<dynamic>)
           .map((e) => e as String)
@@ -50,8 +48,7 @@ _$InsightsResponseImpl _$$InsightsResponseImplFromJson(
       briefing: json['briefing'] as String?,
     );
 
-Map<String, dynamic> _$$InsightsResponseImplToJson(
-        _$InsightsResponseImpl instance) =>
+Map<String, dynamic> _$InsightsResponseToJson(_InsightsResponse instance) =>
     <String, dynamic>{
       'summary': instance.summary,
       'key_points': instance.keyPoints,

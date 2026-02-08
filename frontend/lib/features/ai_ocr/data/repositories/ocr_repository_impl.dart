@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/error/failures.dart';
+import '../../../../core/errors/failures.dart';
 import '../../domain/entities/ocr_entity.dart';
 import '../../domain/repositories/ocr_repository.dart';
 import '../datasources/ocr_remote_datasource.dart';
@@ -23,7 +23,7 @@ class OCRRepositoryImpl implements OCRRepository {
       );
       return Right(dto.toDomain());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -48,7 +48,7 @@ class OCRRepositoryImpl implements OCRRepository {
       final dto = await _remoteDataSource.confirmAssets(assets: assetDtos);
       return Right(dto.toDomain());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 }

@@ -5,7 +5,7 @@ part 'conversation_dto.freezed.dart';
 part 'conversation_dto.g.dart';
 
 @freezed
-class ConversationDto with _$ConversationDto {
+abstract class ConversationDto with _$ConversationDto {
   const factory ConversationDto({
     required String id,
     required String title,
@@ -18,7 +18,7 @@ class ConversationDto with _$ConversationDto {
 }
 
 @freezed
-class MessageDto with _$MessageDto {
+abstract class MessageDto with _$MessageDto {
   const factory MessageDto({
     required String id,
     @JsonKey(name: 'conversation_id') required String conversationId,
@@ -32,7 +32,7 @@ class MessageDto with _$MessageDto {
 }
 
 @freezed
-class ConversationWithMessagesDto with _$ConversationWithMessagesDto {
+abstract class ConversationWithMessagesDto with _$ConversationWithMessagesDto {
   const factory ConversationWithMessagesDto({
     required ConversationDto conversation,
     required List<MessageDto> messages,
@@ -43,7 +43,7 @@ class ConversationWithMessagesDto with _$ConversationWithMessagesDto {
 }
 
 @freezed
-class ConversationListDto with _$ConversationListDto {
+abstract class ConversationListDto with _$ConversationListDto {
   const factory ConversationListDto({
     required List<ConversationDto> conversations,
     required int total,
@@ -56,7 +56,7 @@ class ConversationListDto with _$ConversationListDto {
 }
 
 @freezed
-class WelcomeMessageDto with _$WelcomeMessageDto {
+abstract class WelcomeMessageDto with _$WelcomeMessageDto {
   const factory WelcomeMessageDto({
     required String message,
     @JsonKey(name: 'conversation_starters')
@@ -68,7 +68,7 @@ class WelcomeMessageDto with _$WelcomeMessageDto {
 }
 
 @freezed
-class CreateConversationRequestDto with _$CreateConversationRequestDto {
+abstract class CreateConversationRequestDto with _$CreateConversationRequestDto {
   const factory CreateConversationRequestDto({
     required String title,
   }) = _CreateConversationRequestDto;
@@ -78,7 +78,7 @@ class CreateConversationRequestDto with _$CreateConversationRequestDto {
 }
 
 @freezed
-class UpdateConversationRequestDto with _$UpdateConversationRequestDto {
+abstract class UpdateConversationRequestDto with _$UpdateConversationRequestDto {
   const factory UpdateConversationRequestDto({
     required String title,
   }) = _UpdateConversationRequestDto;

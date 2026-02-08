@@ -192,12 +192,12 @@ class PortfolioHistoryChart extends ConsumerWidget {
               ],
               lineTouchData: LineTouchData(
                 touchTooltipData: LineTouchTooltipData(
-                  tooltipBgColor: colorScheme.surfaceContainerHighest,
+                  getTooltipColor: (spot) => colorScheme.surfaceContainerHighest,
                   tooltipBorder: BorderSide(
                     color: lineColor.withOpacity(0.3),
                     width: 1.5,
                   ),
-                  tooltipRoundedRadius: 12,
+
                   tooltipPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 10,

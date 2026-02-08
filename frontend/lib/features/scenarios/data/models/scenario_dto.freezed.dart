@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,147 +9,31 @@ part of 'scenario_dto.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-AllocationItemDto _$AllocationItemDtoFromJson(Map<String, dynamic> json) {
-  return _AllocationItemDto.fromJson(json);
-}
 
 /// @nodoc
 mixin _$AllocationItemDto {
-  String get type => throw _privateConstructorUsedError;
-  double get value => throw _privateConstructorUsedError;
-  double get percent => throw _privateConstructorUsedError;
-
-  /// Serializes this AllocationItemDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get type;
+  double get value;
+  double get percent;
 
   /// Create a copy of AllocationItemDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $AllocationItemDtoCopyWith<AllocationItemDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+      _$AllocationItemDtoCopyWithImpl<AllocationItemDto>(
+          this as AllocationItemDto, _$identity);
 
-/// @nodoc
-abstract class $AllocationItemDtoCopyWith<$Res> {
-  factory $AllocationItemDtoCopyWith(
-          AllocationItemDto value, $Res Function(AllocationItemDto) then) =
-      _$AllocationItemDtoCopyWithImpl<$Res, AllocationItemDto>;
-  @useResult
-  $Res call({String type, double value, double percent});
-}
-
-/// @nodoc
-class _$AllocationItemDtoCopyWithImpl<$Res, $Val extends AllocationItemDto>
-    implements $AllocationItemDtoCopyWith<$Res> {
-  _$AllocationItemDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of AllocationItemDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? type = null,
-    Object? value = null,
-    Object? percent = null,
-  }) {
-    return _then(_value.copyWith(
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as String,
-      value: null == value
-          ? _value.value
-          : value // ignore: cast_nullable_to_non_nullable
-              as double,
-      percent: null == percent
-          ? _value.percent
-          : percent // ignore: cast_nullable_to_non_nullable
-              as double,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$AllocationItemDtoImplCopyWith<$Res>
-    implements $AllocationItemDtoCopyWith<$Res> {
-  factory _$$AllocationItemDtoImplCopyWith(_$AllocationItemDtoImpl value,
-          $Res Function(_$AllocationItemDtoImpl) then) =
-      __$$AllocationItemDtoImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({String type, double value, double percent});
-}
-
-/// @nodoc
-class __$$AllocationItemDtoImplCopyWithImpl<$Res>
-    extends _$AllocationItemDtoCopyWithImpl<$Res, _$AllocationItemDtoImpl>
-    implements _$$AllocationItemDtoImplCopyWith<$Res> {
-  __$$AllocationItemDtoImplCopyWithImpl(_$AllocationItemDtoImpl _value,
-      $Res Function(_$AllocationItemDtoImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of AllocationItemDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? type = null,
-    Object? value = null,
-    Object? percent = null,
-  }) {
-    return _then(_$AllocationItemDtoImpl(
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as String,
-      value: null == value
-          ? _value.value
-          : value // ignore: cast_nullable_to_non_nullable
-              as double,
-      percent: null == percent
-          ? _value.percent
-          : percent // ignore: cast_nullable_to_non_nullable
-              as double,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$AllocationItemDtoImpl implements _AllocationItemDto {
-  const _$AllocationItemDtoImpl(
-      {required this.type, required this.value, required this.percent});
-
-  factory _$AllocationItemDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$AllocationItemDtoImplFromJson(json);
-
-  @override
-  final String type;
-  @override
-  final double value;
-  @override
-  final double percent;
-
-  @override
-  String toString() {
-    return 'AllocationItemDto(type: $type, value: $value, percent: $percent)';
-  }
+  /// Serializes this AllocationItemDto to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$AllocationItemDtoImpl &&
+            other is AllocationItemDto &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.value, value) || other.value == value) &&
             (identical(other.percent, percent) || other.percent == percent));
@@ -159,148 +43,373 @@ class _$AllocationItemDtoImpl implements _AllocationItemDto {
   @override
   int get hashCode => Object.hash(runtimeType, type, value, percent);
 
-  /// Create a copy of AllocationItemDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$AllocationItemDtoImplCopyWith<_$AllocationItemDtoImpl> get copyWith =>
-      __$$AllocationItemDtoImplCopyWithImpl<_$AllocationItemDtoImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$AllocationItemDtoImplToJson(
-      this,
-    );
+  String toString() {
+    return 'AllocationItemDto(type: $type, value: $value, percent: $percent)';
   }
 }
 
-abstract class _AllocationItemDto implements AllocationItemDto {
-  const factory _AllocationItemDto(
-      {required final String type,
-      required final double value,
-      required final double percent}) = _$AllocationItemDtoImpl;
+/// @nodoc
+abstract mixin class $AllocationItemDtoCopyWith<$Res> {
+  factory $AllocationItemDtoCopyWith(
+          AllocationItemDto value, $Res Function(AllocationItemDto) _then) =
+      _$AllocationItemDtoCopyWithImpl;
+  @useResult
+  $Res call({String type, double value, double percent});
+}
 
-  factory _AllocationItemDto.fromJson(Map<String, dynamic> json) =
-      _$AllocationItemDtoImpl.fromJson;
+/// @nodoc
+class _$AllocationItemDtoCopyWithImpl<$Res>
+    implements $AllocationItemDtoCopyWith<$Res> {
+  _$AllocationItemDtoCopyWithImpl(this._self, this._then);
+
+  final AllocationItemDto _self;
+  final $Res Function(AllocationItemDto) _then;
+
+  /// Create a copy of AllocationItemDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? type = null,
+    Object? value = null,
+    Object? percent = null,
+  }) {
+    return _then(_self.copyWith(
+      type: null == type
+          ? _self.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
+      value: null == value
+          ? _self.value
+          : value // ignore: cast_nullable_to_non_nullable
+              as double,
+      percent: null == percent
+          ? _self.percent
+          : percent // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [AllocationItemDto].
+extension AllocationItemDtoPatterns on AllocationItemDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_AllocationItemDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _AllocationItemDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_AllocationItemDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AllocationItemDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_AllocationItemDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AllocationItemDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String type, double value, double percent)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _AllocationItemDto() when $default != null:
+        return $default(_that.type, _that.value, _that.percent);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String type, double value, double percent) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AllocationItemDto():
+        return $default(_that.type, _that.value, _that.percent);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String type, double value, double percent)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AllocationItemDto() when $default != null:
+        return $default(_that.type, _that.value, _that.percent);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _AllocationItemDto implements AllocationItemDto {
+  const _AllocationItemDto(
+      {required this.type, required this.value, required this.percent});
+  factory _AllocationItemDto.fromJson(Map<String, dynamic> json) =>
+      _$AllocationItemDtoFromJson(json);
 
   @override
-  String get type;
+  final String type;
   @override
-  double get value;
+  final double value;
   @override
-  double get percent;
+  final double percent;
 
   /// Create a copy of AllocationItemDto
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$AllocationItemDtoImplCopyWith<_$AllocationItemDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  _$AllocationItemDtoCopyWith<_AllocationItemDto> get copyWith =>
+      __$AllocationItemDtoCopyWithImpl<_AllocationItemDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$AllocationItemDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _AllocationItemDto &&
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.value, value) || other.value == value) &&
+            (identical(other.percent, percent) || other.percent == percent));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, type, value, percent);
+
+  @override
+  String toString() {
+    return 'AllocationItemDto(type: $type, value: $value, percent: $percent)';
+  }
 }
 
-PortfolioStateDto _$PortfolioStateDtoFromJson(Map<String, dynamic> json) {
-  return _PortfolioStateDto.fromJson(json);
+/// @nodoc
+abstract mixin class _$AllocationItemDtoCopyWith<$Res>
+    implements $AllocationItemDtoCopyWith<$Res> {
+  factory _$AllocationItemDtoCopyWith(
+          _AllocationItemDto value, $Res Function(_AllocationItemDto) _then) =
+      __$AllocationItemDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String type, double value, double percent});
+}
+
+/// @nodoc
+class __$AllocationItemDtoCopyWithImpl<$Res>
+    implements _$AllocationItemDtoCopyWith<$Res> {
+  __$AllocationItemDtoCopyWithImpl(this._self, this._then);
+
+  final _AllocationItemDto _self;
+  final $Res Function(_AllocationItemDto) _then;
+
+  /// Create a copy of AllocationItemDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? type = null,
+    Object? value = null,
+    Object? percent = null,
+  }) {
+    return _then(_AllocationItemDto(
+      type: null == type
+          ? _self.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
+      value: null == value
+          ? _self.value
+          : value // ignore: cast_nullable_to_non_nullable
+              as double,
+      percent: null == percent
+          ? _self.percent
+          : percent // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
+  }
 }
 
 /// @nodoc
 mixin _$PortfolioStateDto {
   @JsonKey(name: 'total_value')
-  double get totalValue => throw _privateConstructorUsedError;
+  double get totalValue;
   @JsonKey(name: 'total_invested')
-  double get totalInvested => throw _privateConstructorUsedError;
+  double get totalInvested;
   @JsonKey(name: 'gain_loss')
-  double get gainLoss => throw _privateConstructorUsedError;
+  double get gainLoss;
   @JsonKey(name: 'gain_loss_percent')
-  double get gainLossPercent => throw _privateConstructorUsedError;
+  double get gainLossPercent;
   @JsonKey(name: 'asset_count')
-  int get assetCount => throw _privateConstructorUsedError;
-  List<AllocationItemDto> get allocation => throw _privateConstructorUsedError;
-
-  /// Serializes this PortfolioStateDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  int get assetCount;
+  List<AllocationItemDto> get allocation;
 
   /// Create a copy of PortfolioStateDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $PortfolioStateDtoCopyWith<PortfolioStateDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $PortfolioStateDtoCopyWith<$Res> {
-  factory $PortfolioStateDtoCopyWith(
-          PortfolioStateDto value, $Res Function(PortfolioStateDto) then) =
-      _$PortfolioStateDtoCopyWithImpl<$Res, PortfolioStateDto>;
-  @useResult
-  $Res call(
-      {@JsonKey(name: 'total_value') double totalValue,
-      @JsonKey(name: 'total_invested') double totalInvested,
-      @JsonKey(name: 'gain_loss') double gainLoss,
-      @JsonKey(name: 'gain_loss_percent') double gainLossPercent,
-      @JsonKey(name: 'asset_count') int assetCount,
-      List<AllocationItemDto> allocation});
-}
-
-/// @nodoc
-class _$PortfolioStateDtoCopyWithImpl<$Res, $Val extends PortfolioStateDto>
-    implements $PortfolioStateDtoCopyWith<$Res> {
-  _$PortfolioStateDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of PortfolioStateDto
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $PortfolioStateDtoCopyWith<PortfolioStateDto> get copyWith =>
+      _$PortfolioStateDtoCopyWithImpl<PortfolioStateDto>(
+          this as PortfolioStateDto, _$identity);
+
+  /// Serializes this PortfolioStateDto to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? totalValue = null,
-    Object? totalInvested = null,
-    Object? gainLoss = null,
-    Object? gainLossPercent = null,
-    Object? assetCount = null,
-    Object? allocation = null,
-  }) {
-    return _then(_value.copyWith(
-      totalValue: null == totalValue
-          ? _value.totalValue
-          : totalValue // ignore: cast_nullable_to_non_nullable
-              as double,
-      totalInvested: null == totalInvested
-          ? _value.totalInvested
-          : totalInvested // ignore: cast_nullable_to_non_nullable
-              as double,
-      gainLoss: null == gainLoss
-          ? _value.gainLoss
-          : gainLoss // ignore: cast_nullable_to_non_nullable
-              as double,
-      gainLossPercent: null == gainLossPercent
-          ? _value.gainLossPercent
-          : gainLossPercent // ignore: cast_nullable_to_non_nullable
-              as double,
-      assetCount: null == assetCount
-          ? _value.assetCount
-          : assetCount // ignore: cast_nullable_to_non_nullable
-              as int,
-      allocation: null == allocation
-          ? _value.allocation
-          : allocation // ignore: cast_nullable_to_non_nullable
-              as List<AllocationItemDto>,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is PortfolioStateDto &&
+            (identical(other.totalValue, totalValue) ||
+                other.totalValue == totalValue) &&
+            (identical(other.totalInvested, totalInvested) ||
+                other.totalInvested == totalInvested) &&
+            (identical(other.gainLoss, gainLoss) ||
+                other.gainLoss == gainLoss) &&
+            (identical(other.gainLossPercent, gainLossPercent) ||
+                other.gainLossPercent == gainLossPercent) &&
+            (identical(other.assetCount, assetCount) ||
+                other.assetCount == assetCount) &&
+            const DeepCollectionEquality()
+                .equals(other.allocation, allocation));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      totalValue,
+      totalInvested,
+      gainLoss,
+      gainLossPercent,
+      assetCount,
+      const DeepCollectionEquality().hash(allocation));
+
+  @override
+  String toString() {
+    return 'PortfolioStateDto(totalValue: $totalValue, totalInvested: $totalInvested, gainLoss: $gainLoss, gainLossPercent: $gainLossPercent, assetCount: $assetCount, allocation: $allocation)';
   }
 }
 
 /// @nodoc
-abstract class _$$PortfolioStateDtoImplCopyWith<$Res>
-    implements $PortfolioStateDtoCopyWith<$Res> {
-  factory _$$PortfolioStateDtoImplCopyWith(_$PortfolioStateDtoImpl value,
-          $Res Function(_$PortfolioStateDtoImpl) then) =
-      __$$PortfolioStateDtoImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $PortfolioStateDtoCopyWith<$Res> {
+  factory $PortfolioStateDtoCopyWith(
+          PortfolioStateDto value, $Res Function(PortfolioStateDto) _then) =
+      _$PortfolioStateDtoCopyWithImpl;
   @useResult
   $Res call(
       {@JsonKey(name: 'total_value') double totalValue,
@@ -312,12 +421,12 @@ abstract class _$$PortfolioStateDtoImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$PortfolioStateDtoImplCopyWithImpl<$Res>
-    extends _$PortfolioStateDtoCopyWithImpl<$Res, _$PortfolioStateDtoImpl>
-    implements _$$PortfolioStateDtoImplCopyWith<$Res> {
-  __$$PortfolioStateDtoImplCopyWithImpl(_$PortfolioStateDtoImpl _value,
-      $Res Function(_$PortfolioStateDtoImpl) _then)
-      : super(_value, _then);
+class _$PortfolioStateDtoCopyWithImpl<$Res>
+    implements $PortfolioStateDtoCopyWith<$Res> {
+  _$PortfolioStateDtoCopyWithImpl(this._self, this._then);
+
+  final PortfolioStateDto _self;
+  final $Res Function(PortfolioStateDto) _then;
 
   /// Create a copy of PortfolioStateDto
   /// with the given fields replaced by the non-null parameter values.
@@ -331,39 +440,220 @@ class __$$PortfolioStateDtoImplCopyWithImpl<$Res>
     Object? assetCount = null,
     Object? allocation = null,
   }) {
-    return _then(_$PortfolioStateDtoImpl(
+    return _then(_self.copyWith(
       totalValue: null == totalValue
-          ? _value.totalValue
+          ? _self.totalValue
           : totalValue // ignore: cast_nullable_to_non_nullable
               as double,
       totalInvested: null == totalInvested
-          ? _value.totalInvested
+          ? _self.totalInvested
           : totalInvested // ignore: cast_nullable_to_non_nullable
               as double,
       gainLoss: null == gainLoss
-          ? _value.gainLoss
+          ? _self.gainLoss
           : gainLoss // ignore: cast_nullable_to_non_nullable
               as double,
       gainLossPercent: null == gainLossPercent
-          ? _value.gainLossPercent
+          ? _self.gainLossPercent
           : gainLossPercent // ignore: cast_nullable_to_non_nullable
               as double,
       assetCount: null == assetCount
-          ? _value.assetCount
+          ? _self.assetCount
           : assetCount // ignore: cast_nullable_to_non_nullable
               as int,
       allocation: null == allocation
-          ? _value._allocation
+          ? _self.allocation
           : allocation // ignore: cast_nullable_to_non_nullable
               as List<AllocationItemDto>,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [PortfolioStateDto].
+extension PortfolioStateDtoPatterns on PortfolioStateDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_PortfolioStateDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _PortfolioStateDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_PortfolioStateDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _PortfolioStateDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_PortfolioStateDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _PortfolioStateDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            @JsonKey(name: 'total_value') double totalValue,
+            @JsonKey(name: 'total_invested') double totalInvested,
+            @JsonKey(name: 'gain_loss') double gainLoss,
+            @JsonKey(name: 'gain_loss_percent') double gainLossPercent,
+            @JsonKey(name: 'asset_count') int assetCount,
+            List<AllocationItemDto> allocation)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _PortfolioStateDto() when $default != null:
+        return $default(_that.totalValue, _that.totalInvested, _that.gainLoss,
+            _that.gainLossPercent, _that.assetCount, _that.allocation);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            @JsonKey(name: 'total_value') double totalValue,
+            @JsonKey(name: 'total_invested') double totalInvested,
+            @JsonKey(name: 'gain_loss') double gainLoss,
+            @JsonKey(name: 'gain_loss_percent') double gainLossPercent,
+            @JsonKey(name: 'asset_count') int assetCount,
+            List<AllocationItemDto> allocation)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _PortfolioStateDto():
+        return $default(_that.totalValue, _that.totalInvested, _that.gainLoss,
+            _that.gainLossPercent, _that.assetCount, _that.allocation);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            @JsonKey(name: 'total_value') double totalValue,
+            @JsonKey(name: 'total_invested') double totalInvested,
+            @JsonKey(name: 'gain_loss') double gainLoss,
+            @JsonKey(name: 'gain_loss_percent') double gainLossPercent,
+            @JsonKey(name: 'asset_count') int assetCount,
+            List<AllocationItemDto> allocation)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _PortfolioStateDto() when $default != null:
+        return $default(_that.totalValue, _that.totalInvested, _that.gainLoss,
+            _that.gainLossPercent, _that.assetCount, _that.allocation);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$PortfolioStateDtoImpl implements _PortfolioStateDto {
-  const _$PortfolioStateDtoImpl(
+class _PortfolioStateDto implements PortfolioStateDto {
+  const _PortfolioStateDto(
       {@JsonKey(name: 'total_value') required this.totalValue,
       @JsonKey(name: 'total_invested') required this.totalInvested,
       @JsonKey(name: 'gain_loss') required this.gainLoss,
@@ -371,9 +661,8 @@ class _$PortfolioStateDtoImpl implements _PortfolioStateDto {
       @JsonKey(name: 'asset_count') required this.assetCount,
       required final List<AllocationItemDto> allocation})
       : _allocation = allocation;
-
-  factory _$PortfolioStateDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$PortfolioStateDtoImplFromJson(json);
+  factory _PortfolioStateDto.fromJson(Map<String, dynamic> json) =>
+      _$PortfolioStateDtoFromJson(json);
 
   @override
   @JsonKey(name: 'total_value')
@@ -398,16 +687,26 @@ class _$PortfolioStateDtoImpl implements _PortfolioStateDto {
     return EqualUnmodifiableListView(_allocation);
   }
 
+  /// Create a copy of PortfolioStateDto
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'PortfolioStateDto(totalValue: $totalValue, totalInvested: $totalInvested, gainLoss: $gainLoss, gainLossPercent: $gainLossPercent, assetCount: $assetCount, allocation: $allocation)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$PortfolioStateDtoCopyWith<_PortfolioStateDto> get copyWith =>
+      __$PortfolioStateDtoCopyWithImpl<_PortfolioStateDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$PortfolioStateDtoToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$PortfolioStateDtoImpl &&
+            other is _PortfolioStateDto &&
             (identical(other.totalValue, totalValue) ||
                 other.totalValue == totalValue) &&
             (identical(other.totalInvested, totalInvested) ||
@@ -433,242 +732,104 @@ class _$PortfolioStateDtoImpl implements _PortfolioStateDto {
       assetCount,
       const DeepCollectionEquality().hash(_allocation));
 
-  /// Create a copy of PortfolioStateDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$PortfolioStateDtoImplCopyWith<_$PortfolioStateDtoImpl> get copyWith =>
-      __$$PortfolioStateDtoImplCopyWithImpl<_$PortfolioStateDtoImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$PortfolioStateDtoImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _PortfolioStateDto implements PortfolioStateDto {
-  const factory _PortfolioStateDto(
-      {@JsonKey(name: 'total_value') required final double totalValue,
-      @JsonKey(name: 'total_invested') required final double totalInvested,
-      @JsonKey(name: 'gain_loss') required final double gainLoss,
-      @JsonKey(name: 'gain_loss_percent') required final double gainLossPercent,
-      @JsonKey(name: 'asset_count') required final int assetCount,
-      required final List<AllocationItemDto>
-          allocation}) = _$PortfolioStateDtoImpl;
-
-  factory _PortfolioStateDto.fromJson(Map<String, dynamic> json) =
-      _$PortfolioStateDtoImpl.fromJson;
-
-  @override
-  @JsonKey(name: 'total_value')
-  double get totalValue;
-  @override
-  @JsonKey(name: 'total_invested')
-  double get totalInvested;
-  @override
-  @JsonKey(name: 'gain_loss')
-  double get gainLoss;
-  @override
-  @JsonKey(name: 'gain_loss_percent')
-  double get gainLossPercent;
-  @override
-  @JsonKey(name: 'asset_count')
-  int get assetCount;
-  @override
-  List<AllocationItemDto> get allocation;
-
-  /// Create a copy of PortfolioStateDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$PortfolioStateDtoImplCopyWith<_$PortfolioStateDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-ChangeDetailDto _$ChangeDetailDtoFromJson(Map<String, dynamic> json) {
-  return _ChangeDetailDto.fromJson(json);
-}
-
-/// @nodoc
-mixin _$ChangeDetailDto {
-  String get type => throw _privateConstructorUsedError;
-  String get description => throw _privateConstructorUsedError;
-  @JsonKey(name: 'old_value')
-  double get oldValue => throw _privateConstructorUsedError;
-  @JsonKey(name: 'new_value')
-  double get newValue => throw _privateConstructorUsedError;
-  double get difference => throw _privateConstructorUsedError;
-
-  /// Serializes this ChangeDetailDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of ChangeDetailDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $ChangeDetailDtoCopyWith<ChangeDetailDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $ChangeDetailDtoCopyWith<$Res> {
-  factory $ChangeDetailDtoCopyWith(
-          ChangeDetailDto value, $Res Function(ChangeDetailDto) then) =
-      _$ChangeDetailDtoCopyWithImpl<$Res, ChangeDetailDto>;
-  @useResult
-  $Res call(
-      {String type,
-      String description,
-      @JsonKey(name: 'old_value') double oldValue,
-      @JsonKey(name: 'new_value') double newValue,
-      double difference});
-}
-
-/// @nodoc
-class _$ChangeDetailDtoCopyWithImpl<$Res, $Val extends ChangeDetailDto>
-    implements $ChangeDetailDtoCopyWith<$Res> {
-  _$ChangeDetailDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of ChangeDetailDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? type = null,
-    Object? description = null,
-    Object? oldValue = null,
-    Object? newValue = null,
-    Object? difference = null,
-  }) {
-    return _then(_value.copyWith(
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      oldValue: null == oldValue
-          ? _value.oldValue
-          : oldValue // ignore: cast_nullable_to_non_nullable
-              as double,
-      newValue: null == newValue
-          ? _value.newValue
-          : newValue // ignore: cast_nullable_to_non_nullable
-              as double,
-      difference: null == difference
-          ? _value.difference
-          : difference // ignore: cast_nullable_to_non_nullable
-              as double,
-    ) as $Val);
+  String toString() {
+    return 'PortfolioStateDto(totalValue: $totalValue, totalInvested: $totalInvested, gainLoss: $gainLoss, gainLossPercent: $gainLossPercent, assetCount: $assetCount, allocation: $allocation)';
   }
 }
 
 /// @nodoc
-abstract class _$$ChangeDetailDtoImplCopyWith<$Res>
-    implements $ChangeDetailDtoCopyWith<$Res> {
-  factory _$$ChangeDetailDtoImplCopyWith(_$ChangeDetailDtoImpl value,
-          $Res Function(_$ChangeDetailDtoImpl) then) =
-      __$$ChangeDetailDtoImplCopyWithImpl<$Res>;
+abstract mixin class _$PortfolioStateDtoCopyWith<$Res>
+    implements $PortfolioStateDtoCopyWith<$Res> {
+  factory _$PortfolioStateDtoCopyWith(
+          _PortfolioStateDto value, $Res Function(_PortfolioStateDto) _then) =
+      __$PortfolioStateDtoCopyWithImpl;
   @override
   @useResult
   $Res call(
-      {String type,
-      String description,
-      @JsonKey(name: 'old_value') double oldValue,
-      @JsonKey(name: 'new_value') double newValue,
-      double difference});
+      {@JsonKey(name: 'total_value') double totalValue,
+      @JsonKey(name: 'total_invested') double totalInvested,
+      @JsonKey(name: 'gain_loss') double gainLoss,
+      @JsonKey(name: 'gain_loss_percent') double gainLossPercent,
+      @JsonKey(name: 'asset_count') int assetCount,
+      List<AllocationItemDto> allocation});
 }
 
 /// @nodoc
-class __$$ChangeDetailDtoImplCopyWithImpl<$Res>
-    extends _$ChangeDetailDtoCopyWithImpl<$Res, _$ChangeDetailDtoImpl>
-    implements _$$ChangeDetailDtoImplCopyWith<$Res> {
-  __$$ChangeDetailDtoImplCopyWithImpl(
-      _$ChangeDetailDtoImpl _value, $Res Function(_$ChangeDetailDtoImpl) _then)
-      : super(_value, _then);
+class __$PortfolioStateDtoCopyWithImpl<$Res>
+    implements _$PortfolioStateDtoCopyWith<$Res> {
+  __$PortfolioStateDtoCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of ChangeDetailDto
+  final _PortfolioStateDto _self;
+  final $Res Function(_PortfolioStateDto) _then;
+
+  /// Create a copy of PortfolioStateDto
   /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
   @override
+  @pragma('vm:prefer-inline')
   $Res call({
-    Object? type = null,
-    Object? description = null,
-    Object? oldValue = null,
-    Object? newValue = null,
-    Object? difference = null,
+    Object? totalValue = null,
+    Object? totalInvested = null,
+    Object? gainLoss = null,
+    Object? gainLossPercent = null,
+    Object? assetCount = null,
+    Object? allocation = null,
   }) {
-    return _then(_$ChangeDetailDtoImpl(
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      oldValue: null == oldValue
-          ? _value.oldValue
-          : oldValue // ignore: cast_nullable_to_non_nullable
+    return _then(_PortfolioStateDto(
+      totalValue: null == totalValue
+          ? _self.totalValue
+          : totalValue // ignore: cast_nullable_to_non_nullable
               as double,
-      newValue: null == newValue
-          ? _value.newValue
-          : newValue // ignore: cast_nullable_to_non_nullable
+      totalInvested: null == totalInvested
+          ? _self.totalInvested
+          : totalInvested // ignore: cast_nullable_to_non_nullable
               as double,
-      difference: null == difference
-          ? _value.difference
-          : difference // ignore: cast_nullable_to_non_nullable
+      gainLoss: null == gainLoss
+          ? _self.gainLoss
+          : gainLoss // ignore: cast_nullable_to_non_nullable
               as double,
+      gainLossPercent: null == gainLossPercent
+          ? _self.gainLossPercent
+          : gainLossPercent // ignore: cast_nullable_to_non_nullable
+              as double,
+      assetCount: null == assetCount
+          ? _self.assetCount
+          : assetCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      allocation: null == allocation
+          ? _self._allocation
+          : allocation // ignore: cast_nullable_to_non_nullable
+              as List<AllocationItemDto>,
     ));
   }
 }
 
 /// @nodoc
-@JsonSerializable()
-class _$ChangeDetailDtoImpl implements _ChangeDetailDto {
-  const _$ChangeDetailDtoImpl(
-      {required this.type,
-      required this.description,
-      @JsonKey(name: 'old_value') required this.oldValue,
-      @JsonKey(name: 'new_value') required this.newValue,
-      required this.difference});
-
-  factory _$ChangeDetailDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ChangeDetailDtoImplFromJson(json);
-
-  @override
-  final String type;
-  @override
-  final String description;
-  @override
+mixin _$ChangeDetailDto {
+  String get type;
+  String get description;
   @JsonKey(name: 'old_value')
-  final double oldValue;
-  @override
+  double get oldValue;
   @JsonKey(name: 'new_value')
-  final double newValue;
-  @override
-  final double difference;
+  double get newValue;
+  double get difference;
 
-  @override
-  String toString() {
-    return 'ChangeDetailDto(type: $type, description: $description, oldValue: $oldValue, newValue: $newValue, difference: $difference)';
-  }
+  /// Create a copy of ChangeDetailDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ChangeDetailDtoCopyWith<ChangeDetailDto> get copyWith =>
+      _$ChangeDetailDtoCopyWithImpl<ChangeDetailDto>(
+          this as ChangeDetailDto, _$identity);
+
+  /// Serializes this ChangeDetailDto to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ChangeDetailDtoImpl &&
+            other is ChangeDetailDto &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.description, description) ||
                 other.description == description) &&
@@ -685,85 +846,433 @@ class _$ChangeDetailDtoImpl implements _ChangeDetailDto {
   int get hashCode => Object.hash(
       runtimeType, type, description, oldValue, newValue, difference);
 
-  /// Create a copy of ChangeDetailDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$ChangeDetailDtoImplCopyWith<_$ChangeDetailDtoImpl> get copyWith =>
-      __$$ChangeDetailDtoImplCopyWithImpl<_$ChangeDetailDtoImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ChangeDetailDtoImplToJson(
-      this,
-    );
+  String toString() {
+    return 'ChangeDetailDto(type: $type, description: $description, oldValue: $oldValue, newValue: $newValue, difference: $difference)';
   }
 }
 
-abstract class _ChangeDetailDto implements ChangeDetailDto {
-  const factory _ChangeDetailDto(
-      {required final String type,
-      required final String description,
-      @JsonKey(name: 'old_value') required final double oldValue,
-      @JsonKey(name: 'new_value') required final double newValue,
-      required final double difference}) = _$ChangeDetailDtoImpl;
+/// @nodoc
+abstract mixin class $ChangeDetailDtoCopyWith<$Res> {
+  factory $ChangeDetailDtoCopyWith(
+          ChangeDetailDto value, $Res Function(ChangeDetailDto) _then) =
+      _$ChangeDetailDtoCopyWithImpl;
+  @useResult
+  $Res call(
+      {String type,
+      String description,
+      @JsonKey(name: 'old_value') double oldValue,
+      @JsonKey(name: 'new_value') double newValue,
+      double difference});
+}
 
-  factory _ChangeDetailDto.fromJson(Map<String, dynamic> json) =
-      _$ChangeDetailDtoImpl.fromJson;
+/// @nodoc
+class _$ChangeDetailDtoCopyWithImpl<$Res>
+    implements $ChangeDetailDtoCopyWith<$Res> {
+  _$ChangeDetailDtoCopyWithImpl(this._self, this._then);
+
+  final ChangeDetailDto _self;
+  final $Res Function(ChangeDetailDto) _then;
+
+  /// Create a copy of ChangeDetailDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? type = null,
+    Object? description = null,
+    Object? oldValue = null,
+    Object? newValue = null,
+    Object? difference = null,
+  }) {
+    return _then(_self.copyWith(
+      type: null == type
+          ? _self.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: null == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String,
+      oldValue: null == oldValue
+          ? _self.oldValue
+          : oldValue // ignore: cast_nullable_to_non_nullable
+              as double,
+      newValue: null == newValue
+          ? _self.newValue
+          : newValue // ignore: cast_nullable_to_non_nullable
+              as double,
+      difference: null == difference
+          ? _self.difference
+          : difference // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [ChangeDetailDto].
+extension ChangeDetailDtoPatterns on ChangeDetailDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_ChangeDetailDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ChangeDetailDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_ChangeDetailDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ChangeDetailDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_ChangeDetailDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ChangeDetailDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String type,
+            String description,
+            @JsonKey(name: 'old_value') double oldValue,
+            @JsonKey(name: 'new_value') double newValue,
+            double difference)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ChangeDetailDto() when $default != null:
+        return $default(_that.type, _that.description, _that.oldValue,
+            _that.newValue, _that.difference);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String type,
+            String description,
+            @JsonKey(name: 'old_value') double oldValue,
+            @JsonKey(name: 'new_value') double newValue,
+            double difference)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ChangeDetailDto():
+        return $default(_that.type, _that.description, _that.oldValue,
+            _that.newValue, _that.difference);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String type,
+            String description,
+            @JsonKey(name: 'old_value') double oldValue,
+            @JsonKey(name: 'new_value') double newValue,
+            double difference)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ChangeDetailDto() when $default != null:
+        return $default(_that.type, _that.description, _that.oldValue,
+            _that.newValue, _that.difference);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _ChangeDetailDto implements ChangeDetailDto {
+  const _ChangeDetailDto(
+      {required this.type,
+      required this.description,
+      @JsonKey(name: 'old_value') required this.oldValue,
+      @JsonKey(name: 'new_value') required this.newValue,
+      required this.difference});
+  factory _ChangeDetailDto.fromJson(Map<String, dynamic> json) =>
+      _$ChangeDetailDtoFromJson(json);
 
   @override
-  String get type;
+  final String type;
   @override
-  String get description;
+  final String description;
   @override
   @JsonKey(name: 'old_value')
-  double get oldValue;
+  final double oldValue;
   @override
   @JsonKey(name: 'new_value')
-  double get newValue;
+  final double newValue;
   @override
-  double get difference;
+  final double difference;
 
   /// Create a copy of ChangeDetailDto
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ChangeDetailDtoImplCopyWith<_$ChangeDetailDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  _$ChangeDetailDtoCopyWith<_ChangeDetailDto> get copyWith =>
+      __$ChangeDetailDtoCopyWithImpl<_ChangeDetailDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ChangeDetailDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _ChangeDetailDto &&
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.oldValue, oldValue) ||
+                other.oldValue == oldValue) &&
+            (identical(other.newValue, newValue) ||
+                other.newValue == newValue) &&
+            (identical(other.difference, difference) ||
+                other.difference == difference));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, type, description, oldValue, newValue, difference);
+
+  @override
+  String toString() {
+    return 'ChangeDetailDto(type: $type, description: $description, oldValue: $oldValue, newValue: $newValue, difference: $difference)';
+  }
 }
 
-SimulationResultDto _$SimulationResultDtoFromJson(Map<String, dynamic> json) {
-  return _SimulationResultDto.fromJson(json);
+/// @nodoc
+abstract mixin class _$ChangeDetailDtoCopyWith<$Res>
+    implements $ChangeDetailDtoCopyWith<$Res> {
+  factory _$ChangeDetailDtoCopyWith(
+          _ChangeDetailDto value, $Res Function(_ChangeDetailDto) _then) =
+      __$ChangeDetailDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String type,
+      String description,
+      @JsonKey(name: 'old_value') double oldValue,
+      @JsonKey(name: 'new_value') double newValue,
+      double difference});
+}
+
+/// @nodoc
+class __$ChangeDetailDtoCopyWithImpl<$Res>
+    implements _$ChangeDetailDtoCopyWith<$Res> {
+  __$ChangeDetailDtoCopyWithImpl(this._self, this._then);
+
+  final _ChangeDetailDto _self;
+  final $Res Function(_ChangeDetailDto) _then;
+
+  /// Create a copy of ChangeDetailDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? type = null,
+    Object? description = null,
+    Object? oldValue = null,
+    Object? newValue = null,
+    Object? difference = null,
+  }) {
+    return _then(_ChangeDetailDto(
+      type: null == type
+          ? _self.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: null == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String,
+      oldValue: null == oldValue
+          ? _self.oldValue
+          : oldValue // ignore: cast_nullable_to_non_nullable
+              as double,
+      newValue: null == newValue
+          ? _self.newValue
+          : newValue // ignore: cast_nullable_to_non_nullable
+              as double,
+      difference: null == difference
+          ? _self.difference
+          : difference // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
+  }
 }
 
 /// @nodoc
 mixin _$SimulationResultDto {
   @JsonKey(name: 'current_state')
-  PortfolioStateDto get currentState => throw _privateConstructorUsedError;
+  PortfolioStateDto get currentState;
   @JsonKey(name: 'projected_state')
-  PortfolioStateDto get projectedState => throw _privateConstructorUsedError;
-  List<ChangeDetailDto> get changes => throw _privateConstructorUsedError;
+  PortfolioStateDto get projectedState;
+  List<ChangeDetailDto> get changes;
   @JsonKey(name: 'ai_analysis')
-  String get aiAnalysis => throw _privateConstructorUsedError;
-  List<String> get warnings => throw _privateConstructorUsedError;
-
-  /// Serializes this SimulationResultDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get aiAnalysis;
+  List<String> get warnings;
 
   /// Create a copy of SimulationResultDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $SimulationResultDtoCopyWith<SimulationResultDto> get copyWith =>
-      throw _privateConstructorUsedError;
+      _$SimulationResultDtoCopyWithImpl<SimulationResultDto>(
+          this as SimulationResultDto, _$identity);
+
+  /// Serializes this SimulationResultDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SimulationResultDto &&
+            (identical(other.currentState, currentState) ||
+                other.currentState == currentState) &&
+            (identical(other.projectedState, projectedState) ||
+                other.projectedState == projectedState) &&
+            const DeepCollectionEquality().equals(other.changes, changes) &&
+            (identical(other.aiAnalysis, aiAnalysis) ||
+                other.aiAnalysis == aiAnalysis) &&
+            const DeepCollectionEquality().equals(other.warnings, warnings));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      currentState,
+      projectedState,
+      const DeepCollectionEquality().hash(changes),
+      aiAnalysis,
+      const DeepCollectionEquality().hash(warnings));
+
+  @override
+  String toString() {
+    return 'SimulationResultDto(currentState: $currentState, projectedState: $projectedState, changes: $changes, aiAnalysis: $aiAnalysis, warnings: $warnings)';
+  }
 }
 
 /// @nodoc
-abstract class $SimulationResultDtoCopyWith<$Res> {
+abstract mixin class $SimulationResultDtoCopyWith<$Res> {
   factory $SimulationResultDtoCopyWith(
-          SimulationResultDto value, $Res Function(SimulationResultDto) then) =
-      _$SimulationResultDtoCopyWithImpl<$Res, SimulationResultDto>;
+          SimulationResultDto value, $Res Function(SimulationResultDto) _then) =
+      _$SimulationResultDtoCopyWithImpl;
   @useResult
   $Res call(
       {@JsonKey(name: 'current_state') PortfolioStateDto currentState,
@@ -777,14 +1286,12 @@ abstract class $SimulationResultDtoCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$SimulationResultDtoCopyWithImpl<$Res, $Val extends SimulationResultDto>
+class _$SimulationResultDtoCopyWithImpl<$Res>
     implements $SimulationResultDtoCopyWith<$Res> {
-  _$SimulationResultDtoCopyWithImpl(this._value, this._then);
+  _$SimulationResultDtoCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final SimulationResultDto _self;
+  final $Res Function(SimulationResultDto) _then;
 
   /// Create a copy of SimulationResultDto
   /// with the given fields replaced by the non-null parameter values.
@@ -797,28 +1304,28 @@ class _$SimulationResultDtoCopyWithImpl<$Res, $Val extends SimulationResultDto>
     Object? aiAnalysis = null,
     Object? warnings = null,
   }) {
-    return _then(_value.copyWith(
+    return _then(_self.copyWith(
       currentState: null == currentState
-          ? _value.currentState
+          ? _self.currentState
           : currentState // ignore: cast_nullable_to_non_nullable
               as PortfolioStateDto,
       projectedState: null == projectedState
-          ? _value.projectedState
+          ? _self.projectedState
           : projectedState // ignore: cast_nullable_to_non_nullable
               as PortfolioStateDto,
       changes: null == changes
-          ? _value.changes
+          ? _self.changes
           : changes // ignore: cast_nullable_to_non_nullable
               as List<ChangeDetailDto>,
       aiAnalysis: null == aiAnalysis
-          ? _value.aiAnalysis
+          ? _self.aiAnalysis
           : aiAnalysis // ignore: cast_nullable_to_non_nullable
               as String,
       warnings: null == warnings
-          ? _value.warnings
+          ? _self.warnings
           : warnings // ignore: cast_nullable_to_non_nullable
               as List<String>,
-    ) as $Val);
+    ));
   }
 
   /// Create a copy of SimulationResultDto
@@ -826,8 +1333,8 @@ class _$SimulationResultDtoCopyWithImpl<$Res, $Val extends SimulationResultDto>
   @override
   @pragma('vm:prefer-inline')
   $PortfolioStateDtoCopyWith<$Res> get currentState {
-    return $PortfolioStateDtoCopyWith<$Res>(_value.currentState, (value) {
-      return _then(_value.copyWith(currentState: value) as $Val);
+    return $PortfolioStateDtoCopyWith<$Res>(_self.currentState, (value) {
+      return _then(_self.copyWith(currentState: value));
     });
   }
 
@@ -836,81 +1343,194 @@ class _$SimulationResultDtoCopyWithImpl<$Res, $Val extends SimulationResultDto>
   @override
   @pragma('vm:prefer-inline')
   $PortfolioStateDtoCopyWith<$Res> get projectedState {
-    return $PortfolioStateDtoCopyWith<$Res>(_value.projectedState, (value) {
-      return _then(_value.copyWith(projectedState: value) as $Val);
+    return $PortfolioStateDtoCopyWith<$Res>(_self.projectedState, (value) {
+      return _then(_self.copyWith(projectedState: value));
     });
   }
 }
 
-/// @nodoc
-abstract class _$$SimulationResultDtoImplCopyWith<$Res>
-    implements $SimulationResultDtoCopyWith<$Res> {
-  factory _$$SimulationResultDtoImplCopyWith(_$SimulationResultDtoImpl value,
-          $Res Function(_$SimulationResultDtoImpl) then) =
-      __$$SimulationResultDtoImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {@JsonKey(name: 'current_state') PortfolioStateDto currentState,
-      @JsonKey(name: 'projected_state') PortfolioStateDto projectedState,
-      List<ChangeDetailDto> changes,
-      @JsonKey(name: 'ai_analysis') String aiAnalysis,
-      List<String> warnings});
+/// Adds pattern-matching-related methods to [SimulationResultDto].
+extension SimulationResultDtoPatterns on SimulationResultDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
 
-  @override
-  $PortfolioStateDtoCopyWith<$Res> get currentState;
-  @override
-  $PortfolioStateDtoCopyWith<$Res> get projectedState;
-}
-
-/// @nodoc
-class __$$SimulationResultDtoImplCopyWithImpl<$Res>
-    extends _$SimulationResultDtoCopyWithImpl<$Res, _$SimulationResultDtoImpl>
-    implements _$$SimulationResultDtoImplCopyWith<$Res> {
-  __$$SimulationResultDtoImplCopyWithImpl(_$SimulationResultDtoImpl _value,
-      $Res Function(_$SimulationResultDtoImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of SimulationResultDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? currentState = null,
-    Object? projectedState = null,
-    Object? changes = null,
-    Object? aiAnalysis = null,
-    Object? warnings = null,
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SimulationResultDto value)? $default, {
+    required TResult orElse(),
   }) {
-    return _then(_$SimulationResultDtoImpl(
-      currentState: null == currentState
-          ? _value.currentState
-          : currentState // ignore: cast_nullable_to_non_nullable
-              as PortfolioStateDto,
-      projectedState: null == projectedState
-          ? _value.projectedState
-          : projectedState // ignore: cast_nullable_to_non_nullable
-              as PortfolioStateDto,
-      changes: null == changes
-          ? _value._changes
-          : changes // ignore: cast_nullable_to_non_nullable
-              as List<ChangeDetailDto>,
-      aiAnalysis: null == aiAnalysis
-          ? _value.aiAnalysis
-          : aiAnalysis // ignore: cast_nullable_to_non_nullable
-              as String,
-      warnings: null == warnings
-          ? _value._warnings
-          : warnings // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-    ));
+    final _that = this;
+    switch (_that) {
+      case _SimulationResultDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SimulationResultDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SimulationResultDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SimulationResultDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SimulationResultDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            @JsonKey(name: 'current_state') PortfolioStateDto currentState,
+            @JsonKey(name: 'projected_state') PortfolioStateDto projectedState,
+            List<ChangeDetailDto> changes,
+            @JsonKey(name: 'ai_analysis') String aiAnalysis,
+            List<String> warnings)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SimulationResultDto() when $default != null:
+        return $default(_that.currentState, _that.projectedState, _that.changes,
+            _that.aiAnalysis, _that.warnings);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            @JsonKey(name: 'current_state') PortfolioStateDto currentState,
+            @JsonKey(name: 'projected_state') PortfolioStateDto projectedState,
+            List<ChangeDetailDto> changes,
+            @JsonKey(name: 'ai_analysis') String aiAnalysis,
+            List<String> warnings)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SimulationResultDto():
+        return $default(_that.currentState, _that.projectedState, _that.changes,
+            _that.aiAnalysis, _that.warnings);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            @JsonKey(name: 'current_state') PortfolioStateDto currentState,
+            @JsonKey(name: 'projected_state') PortfolioStateDto projectedState,
+            List<ChangeDetailDto> changes,
+            @JsonKey(name: 'ai_analysis') String aiAnalysis,
+            List<String> warnings)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SimulationResultDto() when $default != null:
+        return $default(_that.currentState, _that.projectedState, _that.changes,
+            _that.aiAnalysis, _that.warnings);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$SimulationResultDtoImpl implements _SimulationResultDto {
-  const _$SimulationResultDtoImpl(
+class _SimulationResultDto implements SimulationResultDto {
+  const _SimulationResultDto(
       {@JsonKey(name: 'current_state') required this.currentState,
       @JsonKey(name: 'projected_state') required this.projectedState,
       required final List<ChangeDetailDto> changes,
@@ -918,9 +1538,8 @@ class _$SimulationResultDtoImpl implements _SimulationResultDto {
       required final List<String> warnings})
       : _changes = changes,
         _warnings = warnings;
-
-  factory _$SimulationResultDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$SimulationResultDtoImplFromJson(json);
+  factory _SimulationResultDto.fromJson(Map<String, dynamic> json) =>
+      _$SimulationResultDtoFromJson(json);
 
   @override
   @JsonKey(name: 'current_state')
@@ -947,16 +1566,27 @@ class _$SimulationResultDtoImpl implements _SimulationResultDto {
     return EqualUnmodifiableListView(_warnings);
   }
 
+  /// Create a copy of SimulationResultDto
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'SimulationResultDto(currentState: $currentState, projectedState: $projectedState, changes: $changes, aiAnalysis: $aiAnalysis, warnings: $warnings)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SimulationResultDtoCopyWith<_SimulationResultDto> get copyWith =>
+      __$SimulationResultDtoCopyWithImpl<_SimulationResultDto>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$SimulationResultDtoToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$SimulationResultDtoImpl &&
+            other is _SimulationResultDto &&
             (identical(other.currentState, currentState) ||
                 other.currentState == currentState) &&
             (identical(other.projectedState, projectedState) ||
@@ -977,328 +1607,133 @@ class _$SimulationResultDtoImpl implements _SimulationResultDto {
       aiAnalysis,
       const DeepCollectionEquality().hash(_warnings));
 
-  /// Create a copy of SimulationResultDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$SimulationResultDtoImplCopyWith<_$SimulationResultDtoImpl> get copyWith =>
-      __$$SimulationResultDtoImplCopyWithImpl<_$SimulationResultDtoImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$SimulationResultDtoImplToJson(
-      this,
-    );
+  String toString() {
+    return 'SimulationResultDto(currentState: $currentState, projectedState: $projectedState, changes: $changes, aiAnalysis: $aiAnalysis, warnings: $warnings)';
   }
 }
 
-abstract class _SimulationResultDto implements SimulationResultDto {
-  const factory _SimulationResultDto(
-      {@JsonKey(name: 'current_state')
-      required final PortfolioStateDto currentState,
-      @JsonKey(name: 'projected_state')
-      required final PortfolioStateDto projectedState,
-      required final List<ChangeDetailDto> changes,
-      @JsonKey(name: 'ai_analysis') required final String aiAnalysis,
-      required final List<String> warnings}) = _$SimulationResultDtoImpl;
+/// @nodoc
+abstract mixin class _$SimulationResultDtoCopyWith<$Res>
+    implements $SimulationResultDtoCopyWith<$Res> {
+  factory _$SimulationResultDtoCopyWith(_SimulationResultDto value,
+          $Res Function(_SimulationResultDto) _then) =
+      __$SimulationResultDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {@JsonKey(name: 'current_state') PortfolioStateDto currentState,
+      @JsonKey(name: 'projected_state') PortfolioStateDto projectedState,
+      List<ChangeDetailDto> changes,
+      @JsonKey(name: 'ai_analysis') String aiAnalysis,
+      List<String> warnings});
 
-  factory _SimulationResultDto.fromJson(Map<String, dynamic> json) =
-      _$SimulationResultDtoImpl.fromJson;
+  @override
+  $PortfolioStateDtoCopyWith<$Res> get currentState;
+  @override
+  $PortfolioStateDtoCopyWith<$Res> get projectedState;
+}
 
-  @override
-  @JsonKey(name: 'current_state')
-  PortfolioStateDto get currentState;
-  @override
-  @JsonKey(name: 'projected_state')
-  PortfolioStateDto get projectedState;
-  @override
-  List<ChangeDetailDto> get changes;
-  @override
-  @JsonKey(name: 'ai_analysis')
-  String get aiAnalysis;
-  @override
-  List<String> get warnings;
+/// @nodoc
+class __$SimulationResultDtoCopyWithImpl<$Res>
+    implements _$SimulationResultDtoCopyWith<$Res> {
+  __$SimulationResultDtoCopyWithImpl(this._self, this._then);
+
+  final _SimulationResultDto _self;
+  final $Res Function(_SimulationResultDto) _then;
 
   /// Create a copy of SimulationResultDto
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$SimulationResultDtoImplCopyWith<_$SimulationResultDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? currentState = null,
+    Object? projectedState = null,
+    Object? changes = null,
+    Object? aiAnalysis = null,
+    Object? warnings = null,
+  }) {
+    return _then(_SimulationResultDto(
+      currentState: null == currentState
+          ? _self.currentState
+          : currentState // ignore: cast_nullable_to_non_nullable
+              as PortfolioStateDto,
+      projectedState: null == projectedState
+          ? _self.projectedState
+          : projectedState // ignore: cast_nullable_to_non_nullable
+              as PortfolioStateDto,
+      changes: null == changes
+          ? _self._changes
+          : changes // ignore: cast_nullable_to_non_nullable
+              as List<ChangeDetailDto>,
+      aiAnalysis: null == aiAnalysis
+          ? _self.aiAnalysis
+          : aiAnalysis // ignore: cast_nullable_to_non_nullable
+              as String,
+      warnings: null == warnings
+          ? _self._warnings
+          : warnings // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+    ));
+  }
 
-HistoricalStatsDto _$HistoricalStatsDtoFromJson(Map<String, dynamic> json) {
-  return _HistoricalStatsDto.fromJson(json);
+  /// Create a copy of SimulationResultDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $PortfolioStateDtoCopyWith<$Res> get currentState {
+    return $PortfolioStateDtoCopyWith<$Res>(_self.currentState, (value) {
+      return _then(_self.copyWith(currentState: value));
+    });
+  }
+
+  /// Create a copy of SimulationResultDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $PortfolioStateDtoCopyWith<$Res> get projectedState {
+    return $PortfolioStateDtoCopyWith<$Res>(_self.projectedState, (value) {
+      return _then(_self.copyWith(projectedState: value));
+    });
+  }
 }
 
 /// @nodoc
 mixin _$HistoricalStatsDto {
-  String get symbol => throw _privateConstructorUsedError;
-  String get period => throw _privateConstructorUsedError;
-  double get volatility => throw _privateConstructorUsedError;
+  String get symbol;
+  String get period;
+  double get volatility;
   @JsonKey(name: 'max_drawdown')
-  double get maxDrawdown => throw _privateConstructorUsedError;
+  double get maxDrawdown;
   @JsonKey(name: 'average_return')
-  double get averageReturn => throw _privateConstructorUsedError;
+  double get averageReturn;
   @JsonKey(name: 'best_day')
-  double get bestDay => throw _privateConstructorUsedError;
+  double get bestDay;
   @JsonKey(name: 'worst_day')
-  double get worstDay => throw _privateConstructorUsedError;
+  double get worstDay;
   @JsonKey(name: 'positive_days')
-  int get positiveDays => throw _privateConstructorUsedError;
+  int get positiveDays;
   @JsonKey(name: 'negative_days')
-  int get negativeDays => throw _privateConstructorUsedError;
+  int get negativeDays;
   @JsonKey(name: 'data_points')
-  int get dataPoints => throw _privateConstructorUsedError;
-
-  /// Serializes this HistoricalStatsDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  int get dataPoints;
 
   /// Create a copy of HistoricalStatsDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $HistoricalStatsDtoCopyWith<HistoricalStatsDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+      _$HistoricalStatsDtoCopyWithImpl<HistoricalStatsDto>(
+          this as HistoricalStatsDto, _$identity);
 
-/// @nodoc
-abstract class $HistoricalStatsDtoCopyWith<$Res> {
-  factory $HistoricalStatsDtoCopyWith(
-          HistoricalStatsDto value, $Res Function(HistoricalStatsDto) then) =
-      _$HistoricalStatsDtoCopyWithImpl<$Res, HistoricalStatsDto>;
-  @useResult
-  $Res call(
-      {String symbol,
-      String period,
-      double volatility,
-      @JsonKey(name: 'max_drawdown') double maxDrawdown,
-      @JsonKey(name: 'average_return') double averageReturn,
-      @JsonKey(name: 'best_day') double bestDay,
-      @JsonKey(name: 'worst_day') double worstDay,
-      @JsonKey(name: 'positive_days') int positiveDays,
-      @JsonKey(name: 'negative_days') int negativeDays,
-      @JsonKey(name: 'data_points') int dataPoints});
-}
-
-/// @nodoc
-class _$HistoricalStatsDtoCopyWithImpl<$Res, $Val extends HistoricalStatsDto>
-    implements $HistoricalStatsDtoCopyWith<$Res> {
-  _$HistoricalStatsDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of HistoricalStatsDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? symbol = null,
-    Object? period = null,
-    Object? volatility = null,
-    Object? maxDrawdown = null,
-    Object? averageReturn = null,
-    Object? bestDay = null,
-    Object? worstDay = null,
-    Object? positiveDays = null,
-    Object? negativeDays = null,
-    Object? dataPoints = null,
-  }) {
-    return _then(_value.copyWith(
-      symbol: null == symbol
-          ? _value.symbol
-          : symbol // ignore: cast_nullable_to_non_nullable
-              as String,
-      period: null == period
-          ? _value.period
-          : period // ignore: cast_nullable_to_non_nullable
-              as String,
-      volatility: null == volatility
-          ? _value.volatility
-          : volatility // ignore: cast_nullable_to_non_nullable
-              as double,
-      maxDrawdown: null == maxDrawdown
-          ? _value.maxDrawdown
-          : maxDrawdown // ignore: cast_nullable_to_non_nullable
-              as double,
-      averageReturn: null == averageReturn
-          ? _value.averageReturn
-          : averageReturn // ignore: cast_nullable_to_non_nullable
-              as double,
-      bestDay: null == bestDay
-          ? _value.bestDay
-          : bestDay // ignore: cast_nullable_to_non_nullable
-              as double,
-      worstDay: null == worstDay
-          ? _value.worstDay
-          : worstDay // ignore: cast_nullable_to_non_nullable
-              as double,
-      positiveDays: null == positiveDays
-          ? _value.positiveDays
-          : positiveDays // ignore: cast_nullable_to_non_nullable
-              as int,
-      negativeDays: null == negativeDays
-          ? _value.negativeDays
-          : negativeDays // ignore: cast_nullable_to_non_nullable
-              as int,
-      dataPoints: null == dataPoints
-          ? _value.dataPoints
-          : dataPoints // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$HistoricalStatsDtoImplCopyWith<$Res>
-    implements $HistoricalStatsDtoCopyWith<$Res> {
-  factory _$$HistoricalStatsDtoImplCopyWith(_$HistoricalStatsDtoImpl value,
-          $Res Function(_$HistoricalStatsDtoImpl) then) =
-      __$$HistoricalStatsDtoImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String symbol,
-      String period,
-      double volatility,
-      @JsonKey(name: 'max_drawdown') double maxDrawdown,
-      @JsonKey(name: 'average_return') double averageReturn,
-      @JsonKey(name: 'best_day') double bestDay,
-      @JsonKey(name: 'worst_day') double worstDay,
-      @JsonKey(name: 'positive_days') int positiveDays,
-      @JsonKey(name: 'negative_days') int negativeDays,
-      @JsonKey(name: 'data_points') int dataPoints});
-}
-
-/// @nodoc
-class __$$HistoricalStatsDtoImplCopyWithImpl<$Res>
-    extends _$HistoricalStatsDtoCopyWithImpl<$Res, _$HistoricalStatsDtoImpl>
-    implements _$$HistoricalStatsDtoImplCopyWith<$Res> {
-  __$$HistoricalStatsDtoImplCopyWithImpl(_$HistoricalStatsDtoImpl _value,
-      $Res Function(_$HistoricalStatsDtoImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of HistoricalStatsDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? symbol = null,
-    Object? period = null,
-    Object? volatility = null,
-    Object? maxDrawdown = null,
-    Object? averageReturn = null,
-    Object? bestDay = null,
-    Object? worstDay = null,
-    Object? positiveDays = null,
-    Object? negativeDays = null,
-    Object? dataPoints = null,
-  }) {
-    return _then(_$HistoricalStatsDtoImpl(
-      symbol: null == symbol
-          ? _value.symbol
-          : symbol // ignore: cast_nullable_to_non_nullable
-              as String,
-      period: null == period
-          ? _value.period
-          : period // ignore: cast_nullable_to_non_nullable
-              as String,
-      volatility: null == volatility
-          ? _value.volatility
-          : volatility // ignore: cast_nullable_to_non_nullable
-              as double,
-      maxDrawdown: null == maxDrawdown
-          ? _value.maxDrawdown
-          : maxDrawdown // ignore: cast_nullable_to_non_nullable
-              as double,
-      averageReturn: null == averageReturn
-          ? _value.averageReturn
-          : averageReturn // ignore: cast_nullable_to_non_nullable
-              as double,
-      bestDay: null == bestDay
-          ? _value.bestDay
-          : bestDay // ignore: cast_nullable_to_non_nullable
-              as double,
-      worstDay: null == worstDay
-          ? _value.worstDay
-          : worstDay // ignore: cast_nullable_to_non_nullable
-              as double,
-      positiveDays: null == positiveDays
-          ? _value.positiveDays
-          : positiveDays // ignore: cast_nullable_to_non_nullable
-              as int,
-      negativeDays: null == negativeDays
-          ? _value.negativeDays
-          : negativeDays // ignore: cast_nullable_to_non_nullable
-              as int,
-      dataPoints: null == dataPoints
-          ? _value.dataPoints
-          : dataPoints // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$HistoricalStatsDtoImpl implements _HistoricalStatsDto {
-  const _$HistoricalStatsDtoImpl(
-      {required this.symbol,
-      required this.period,
-      required this.volatility,
-      @JsonKey(name: 'max_drawdown') required this.maxDrawdown,
-      @JsonKey(name: 'average_return') required this.averageReturn,
-      @JsonKey(name: 'best_day') required this.bestDay,
-      @JsonKey(name: 'worst_day') required this.worstDay,
-      @JsonKey(name: 'positive_days') required this.positiveDays,
-      @JsonKey(name: 'negative_days') required this.negativeDays,
-      @JsonKey(name: 'data_points') required this.dataPoints});
-
-  factory _$HistoricalStatsDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$HistoricalStatsDtoImplFromJson(json);
-
-  @override
-  final String symbol;
-  @override
-  final String period;
-  @override
-  final double volatility;
-  @override
-  @JsonKey(name: 'max_drawdown')
-  final double maxDrawdown;
-  @override
-  @JsonKey(name: 'average_return')
-  final double averageReturn;
-  @override
-  @JsonKey(name: 'best_day')
-  final double bestDay;
-  @override
-  @JsonKey(name: 'worst_day')
-  final double worstDay;
-  @override
-  @JsonKey(name: 'positive_days')
-  final int positiveDays;
-  @override
-  @JsonKey(name: 'negative_days')
-  final int negativeDays;
-  @override
-  @JsonKey(name: 'data_points')
-  final int dataPoints;
-
-  @override
-  String toString() {
-    return 'HistoricalStatsDto(symbol: $symbol, period: $period, volatility: $volatility, maxDrawdown: $maxDrawdown, averageReturn: $averageReturn, bestDay: $bestDay, worstDay: $worstDay, positiveDays: $positiveDays, negativeDays: $negativeDays, dataPoints: $dataPoints)';
-  }
+  /// Serializes this HistoricalStatsDto to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$HistoricalStatsDtoImpl &&
+            other is HistoricalStatsDto &&
             (identical(other.symbol, symbol) || other.symbol == symbol) &&
             (identical(other.period, period) || other.period == period) &&
             (identical(other.volatility, volatility) ||
@@ -1333,165 +1768,564 @@ class _$HistoricalStatsDtoImpl implements _HistoricalStatsDto {
       negativeDays,
       dataPoints);
 
-  /// Create a copy of HistoricalStatsDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$HistoricalStatsDtoImplCopyWith<_$HistoricalStatsDtoImpl> get copyWith =>
-      __$$HistoricalStatsDtoImplCopyWithImpl<_$HistoricalStatsDtoImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$HistoricalStatsDtoImplToJson(
-      this,
-    );
+  String toString() {
+    return 'HistoricalStatsDto(symbol: $symbol, period: $period, volatility: $volatility, maxDrawdown: $maxDrawdown, averageReturn: $averageReturn, bestDay: $bestDay, worstDay: $worstDay, positiveDays: $positiveDays, negativeDays: $negativeDays, dataPoints: $dataPoints)';
   }
 }
 
-abstract class _HistoricalStatsDto implements HistoricalStatsDto {
-  const factory _HistoricalStatsDto(
-          {required final String symbol,
-          required final String period,
-          required final double volatility,
-          @JsonKey(name: 'max_drawdown') required final double maxDrawdown,
-          @JsonKey(name: 'average_return') required final double averageReturn,
-          @JsonKey(name: 'best_day') required final double bestDay,
-          @JsonKey(name: 'worst_day') required final double worstDay,
-          @JsonKey(name: 'positive_days') required final int positiveDays,
-          @JsonKey(name: 'negative_days') required final int negativeDays,
-          @JsonKey(name: 'data_points') required final int dataPoints}) =
-      _$HistoricalStatsDtoImpl;
+/// @nodoc
+abstract mixin class $HistoricalStatsDtoCopyWith<$Res> {
+  factory $HistoricalStatsDtoCopyWith(
+          HistoricalStatsDto value, $Res Function(HistoricalStatsDto) _then) =
+      _$HistoricalStatsDtoCopyWithImpl;
+  @useResult
+  $Res call(
+      {String symbol,
+      String period,
+      double volatility,
+      @JsonKey(name: 'max_drawdown') double maxDrawdown,
+      @JsonKey(name: 'average_return') double averageReturn,
+      @JsonKey(name: 'best_day') double bestDay,
+      @JsonKey(name: 'worst_day') double worstDay,
+      @JsonKey(name: 'positive_days') int positiveDays,
+      @JsonKey(name: 'negative_days') int negativeDays,
+      @JsonKey(name: 'data_points') int dataPoints});
+}
 
-  factory _HistoricalStatsDto.fromJson(Map<String, dynamic> json) =
-      _$HistoricalStatsDtoImpl.fromJson;
+/// @nodoc
+class _$HistoricalStatsDtoCopyWithImpl<$Res>
+    implements $HistoricalStatsDtoCopyWith<$Res> {
+  _$HistoricalStatsDtoCopyWithImpl(this._self, this._then);
+
+  final HistoricalStatsDto _self;
+  final $Res Function(HistoricalStatsDto) _then;
+
+  /// Create a copy of HistoricalStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? symbol = null,
+    Object? period = null,
+    Object? volatility = null,
+    Object? maxDrawdown = null,
+    Object? averageReturn = null,
+    Object? bestDay = null,
+    Object? worstDay = null,
+    Object? positiveDays = null,
+    Object? negativeDays = null,
+    Object? dataPoints = null,
+  }) {
+    return _then(_self.copyWith(
+      symbol: null == symbol
+          ? _self.symbol
+          : symbol // ignore: cast_nullable_to_non_nullable
+              as String,
+      period: null == period
+          ? _self.period
+          : period // ignore: cast_nullable_to_non_nullable
+              as String,
+      volatility: null == volatility
+          ? _self.volatility
+          : volatility // ignore: cast_nullable_to_non_nullable
+              as double,
+      maxDrawdown: null == maxDrawdown
+          ? _self.maxDrawdown
+          : maxDrawdown // ignore: cast_nullable_to_non_nullable
+              as double,
+      averageReturn: null == averageReturn
+          ? _self.averageReturn
+          : averageReturn // ignore: cast_nullable_to_non_nullable
+              as double,
+      bestDay: null == bestDay
+          ? _self.bestDay
+          : bestDay // ignore: cast_nullable_to_non_nullable
+              as double,
+      worstDay: null == worstDay
+          ? _self.worstDay
+          : worstDay // ignore: cast_nullable_to_non_nullable
+              as double,
+      positiveDays: null == positiveDays
+          ? _self.positiveDays
+          : positiveDays // ignore: cast_nullable_to_non_nullable
+              as int,
+      negativeDays: null == negativeDays
+          ? _self.negativeDays
+          : negativeDays // ignore: cast_nullable_to_non_nullable
+              as int,
+      dataPoints: null == dataPoints
+          ? _self.dataPoints
+          : dataPoints // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [HistoricalStatsDto].
+extension HistoricalStatsDtoPatterns on HistoricalStatsDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_HistoricalStatsDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _HistoricalStatsDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_HistoricalStatsDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HistoricalStatsDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_HistoricalStatsDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HistoricalStatsDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String symbol,
+            String period,
+            double volatility,
+            @JsonKey(name: 'max_drawdown') double maxDrawdown,
+            @JsonKey(name: 'average_return') double averageReturn,
+            @JsonKey(name: 'best_day') double bestDay,
+            @JsonKey(name: 'worst_day') double worstDay,
+            @JsonKey(name: 'positive_days') int positiveDays,
+            @JsonKey(name: 'negative_days') int negativeDays,
+            @JsonKey(name: 'data_points') int dataPoints)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _HistoricalStatsDto() when $default != null:
+        return $default(
+            _that.symbol,
+            _that.period,
+            _that.volatility,
+            _that.maxDrawdown,
+            _that.averageReturn,
+            _that.bestDay,
+            _that.worstDay,
+            _that.positiveDays,
+            _that.negativeDays,
+            _that.dataPoints);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String symbol,
+            String period,
+            double volatility,
+            @JsonKey(name: 'max_drawdown') double maxDrawdown,
+            @JsonKey(name: 'average_return') double averageReturn,
+            @JsonKey(name: 'best_day') double bestDay,
+            @JsonKey(name: 'worst_day') double worstDay,
+            @JsonKey(name: 'positive_days') int positiveDays,
+            @JsonKey(name: 'negative_days') int negativeDays,
+            @JsonKey(name: 'data_points') int dataPoints)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HistoricalStatsDto():
+        return $default(
+            _that.symbol,
+            _that.period,
+            _that.volatility,
+            _that.maxDrawdown,
+            _that.averageReturn,
+            _that.bestDay,
+            _that.worstDay,
+            _that.positiveDays,
+            _that.negativeDays,
+            _that.dataPoints);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String symbol,
+            String period,
+            double volatility,
+            @JsonKey(name: 'max_drawdown') double maxDrawdown,
+            @JsonKey(name: 'average_return') double averageReturn,
+            @JsonKey(name: 'best_day') double bestDay,
+            @JsonKey(name: 'worst_day') double worstDay,
+            @JsonKey(name: 'positive_days') int positiveDays,
+            @JsonKey(name: 'negative_days') int negativeDays,
+            @JsonKey(name: 'data_points') int dataPoints)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HistoricalStatsDto() when $default != null:
+        return $default(
+            _that.symbol,
+            _that.period,
+            _that.volatility,
+            _that.maxDrawdown,
+            _that.averageReturn,
+            _that.bestDay,
+            _that.worstDay,
+            _that.positiveDays,
+            _that.negativeDays,
+            _that.dataPoints);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _HistoricalStatsDto implements HistoricalStatsDto {
+  const _HistoricalStatsDto(
+      {required this.symbol,
+      required this.period,
+      required this.volatility,
+      @JsonKey(name: 'max_drawdown') required this.maxDrawdown,
+      @JsonKey(name: 'average_return') required this.averageReturn,
+      @JsonKey(name: 'best_day') required this.bestDay,
+      @JsonKey(name: 'worst_day') required this.worstDay,
+      @JsonKey(name: 'positive_days') required this.positiveDays,
+      @JsonKey(name: 'negative_days') required this.negativeDays,
+      @JsonKey(name: 'data_points') required this.dataPoints});
+  factory _HistoricalStatsDto.fromJson(Map<String, dynamic> json) =>
+      _$HistoricalStatsDtoFromJson(json);
 
   @override
-  String get symbol;
+  final String symbol;
   @override
-  String get period;
+  final String period;
   @override
-  double get volatility;
+  final double volatility;
   @override
   @JsonKey(name: 'max_drawdown')
-  double get maxDrawdown;
+  final double maxDrawdown;
   @override
   @JsonKey(name: 'average_return')
-  double get averageReturn;
+  final double averageReturn;
   @override
   @JsonKey(name: 'best_day')
-  double get bestDay;
+  final double bestDay;
   @override
   @JsonKey(name: 'worst_day')
-  double get worstDay;
+  final double worstDay;
   @override
   @JsonKey(name: 'positive_days')
-  int get positiveDays;
+  final int positiveDays;
   @override
   @JsonKey(name: 'negative_days')
-  int get negativeDays;
+  final int negativeDays;
   @override
   @JsonKey(name: 'data_points')
-  int get dataPoints;
+  final int dataPoints;
 
   /// Create a copy of HistoricalStatsDto
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$HistoricalStatsDtoImplCopyWith<_$HistoricalStatsDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  _$HistoricalStatsDtoCopyWith<_HistoricalStatsDto> get copyWith =>
+      __$HistoricalStatsDtoCopyWithImpl<_HistoricalStatsDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$HistoricalStatsDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _HistoricalStatsDto &&
+            (identical(other.symbol, symbol) || other.symbol == symbol) &&
+            (identical(other.period, period) || other.period == period) &&
+            (identical(other.volatility, volatility) ||
+                other.volatility == volatility) &&
+            (identical(other.maxDrawdown, maxDrawdown) ||
+                other.maxDrawdown == maxDrawdown) &&
+            (identical(other.averageReturn, averageReturn) ||
+                other.averageReturn == averageReturn) &&
+            (identical(other.bestDay, bestDay) || other.bestDay == bestDay) &&
+            (identical(other.worstDay, worstDay) ||
+                other.worstDay == worstDay) &&
+            (identical(other.positiveDays, positiveDays) ||
+                other.positiveDays == positiveDays) &&
+            (identical(other.negativeDays, negativeDays) ||
+                other.negativeDays == negativeDays) &&
+            (identical(other.dataPoints, dataPoints) ||
+                other.dataPoints == dataPoints));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      symbol,
+      period,
+      volatility,
+      maxDrawdown,
+      averageReturn,
+      bestDay,
+      worstDay,
+      positiveDays,
+      negativeDays,
+      dataPoints);
+
+  @override
+  String toString() {
+    return 'HistoricalStatsDto(symbol: $symbol, period: $period, volatility: $volatility, maxDrawdown: $maxDrawdown, averageReturn: $averageReturn, bestDay: $bestDay, worstDay: $worstDay, positiveDays: $positiveDays, negativeDays: $negativeDays, dataPoints: $dataPoints)';
+  }
 }
 
-ScenarioTemplateDto _$ScenarioTemplateDtoFromJson(Map<String, dynamic> json) {
-  return _ScenarioTemplateDto.fromJson(json);
+/// @nodoc
+abstract mixin class _$HistoricalStatsDtoCopyWith<$Res>
+    implements $HistoricalStatsDtoCopyWith<$Res> {
+  factory _$HistoricalStatsDtoCopyWith(
+          _HistoricalStatsDto value, $Res Function(_HistoricalStatsDto) _then) =
+      __$HistoricalStatsDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String symbol,
+      String period,
+      double volatility,
+      @JsonKey(name: 'max_drawdown') double maxDrawdown,
+      @JsonKey(name: 'average_return') double averageReturn,
+      @JsonKey(name: 'best_day') double bestDay,
+      @JsonKey(name: 'worst_day') double worstDay,
+      @JsonKey(name: 'positive_days') int positiveDays,
+      @JsonKey(name: 'negative_days') int negativeDays,
+      @JsonKey(name: 'data_points') int dataPoints});
+}
+
+/// @nodoc
+class __$HistoricalStatsDtoCopyWithImpl<$Res>
+    implements _$HistoricalStatsDtoCopyWith<$Res> {
+  __$HistoricalStatsDtoCopyWithImpl(this._self, this._then);
+
+  final _HistoricalStatsDto _self;
+  final $Res Function(_HistoricalStatsDto) _then;
+
+  /// Create a copy of HistoricalStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? symbol = null,
+    Object? period = null,
+    Object? volatility = null,
+    Object? maxDrawdown = null,
+    Object? averageReturn = null,
+    Object? bestDay = null,
+    Object? worstDay = null,
+    Object? positiveDays = null,
+    Object? negativeDays = null,
+    Object? dataPoints = null,
+  }) {
+    return _then(_HistoricalStatsDto(
+      symbol: null == symbol
+          ? _self.symbol
+          : symbol // ignore: cast_nullable_to_non_nullable
+              as String,
+      period: null == period
+          ? _self.period
+          : period // ignore: cast_nullable_to_non_nullable
+              as String,
+      volatility: null == volatility
+          ? _self.volatility
+          : volatility // ignore: cast_nullable_to_non_nullable
+              as double,
+      maxDrawdown: null == maxDrawdown
+          ? _self.maxDrawdown
+          : maxDrawdown // ignore: cast_nullable_to_non_nullable
+              as double,
+      averageReturn: null == averageReturn
+          ? _self.averageReturn
+          : averageReturn // ignore: cast_nullable_to_non_nullable
+              as double,
+      bestDay: null == bestDay
+          ? _self.bestDay
+          : bestDay // ignore: cast_nullable_to_non_nullable
+              as double,
+      worstDay: null == worstDay
+          ? _self.worstDay
+          : worstDay // ignore: cast_nullable_to_non_nullable
+              as double,
+      positiveDays: null == positiveDays
+          ? _self.positiveDays
+          : positiveDays // ignore: cast_nullable_to_non_nullable
+              as int,
+      negativeDays: null == negativeDays
+          ? _self.negativeDays
+          : negativeDays // ignore: cast_nullable_to_non_nullable
+              as int,
+      dataPoints: null == dataPoints
+          ? _self.dataPoints
+          : dataPoints // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
 }
 
 /// @nodoc
 mixin _$ScenarioTemplateDto {
-  String get id => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
-  String get description => throw _privateConstructorUsedError;
-  String get type => throw _privateConstructorUsedError;
-  Map<String, dynamic> get parameters => throw _privateConstructorUsedError;
-
-  /// Serializes this ScenarioTemplateDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get id;
+  String get name;
+  String get description;
+  String get type;
+  Map<String, dynamic> get parameters;
 
   /// Create a copy of ScenarioTemplateDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $ScenarioTemplateDtoCopyWith<ScenarioTemplateDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $ScenarioTemplateDtoCopyWith<$Res> {
-  factory $ScenarioTemplateDtoCopyWith(
-          ScenarioTemplateDto value, $Res Function(ScenarioTemplateDto) then) =
-      _$ScenarioTemplateDtoCopyWithImpl<$Res, ScenarioTemplateDto>;
-  @useResult
-  $Res call(
-      {String id,
-      String name,
-      String description,
-      String type,
-      Map<String, dynamic> parameters});
-}
-
-/// @nodoc
-class _$ScenarioTemplateDtoCopyWithImpl<$Res, $Val extends ScenarioTemplateDto>
-    implements $ScenarioTemplateDtoCopyWith<$Res> {
-  _$ScenarioTemplateDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of ScenarioTemplateDto
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $ScenarioTemplateDtoCopyWith<ScenarioTemplateDto> get copyWith =>
+      _$ScenarioTemplateDtoCopyWithImpl<ScenarioTemplateDto>(
+          this as ScenarioTemplateDto, _$identity);
+
+  /// Serializes this ScenarioTemplateDto to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? id = null,
-    Object? name = null,
-    Object? description = null,
-    Object? type = null,
-    Object? parameters = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as String,
-      parameters: null == parameters
-          ? _value.parameters
-          : parameters // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ScenarioTemplateDto &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.type, type) || other.type == type) &&
+            const DeepCollectionEquality()
+                .equals(other.parameters, parameters));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, name, description, type,
+      const DeepCollectionEquality().hash(parameters));
+
+  @override
+  String toString() {
+    return 'ScenarioTemplateDto(id: $id, name: $name, description: $description, type: $type, parameters: $parameters)';
   }
 }
 
 /// @nodoc
-abstract class _$$ScenarioTemplateDtoImplCopyWith<$Res>
-    implements $ScenarioTemplateDtoCopyWith<$Res> {
-  factory _$$ScenarioTemplateDtoImplCopyWith(_$ScenarioTemplateDtoImpl value,
-          $Res Function(_$ScenarioTemplateDtoImpl) then) =
-      __$$ScenarioTemplateDtoImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $ScenarioTemplateDtoCopyWith<$Res> {
+  factory $ScenarioTemplateDtoCopyWith(
+          ScenarioTemplateDto value, $Res Function(ScenarioTemplateDto) _then) =
+      _$ScenarioTemplateDtoCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -1502,12 +2336,12 @@ abstract class _$$ScenarioTemplateDtoImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$ScenarioTemplateDtoImplCopyWithImpl<$Res>
-    extends _$ScenarioTemplateDtoCopyWithImpl<$Res, _$ScenarioTemplateDtoImpl>
-    implements _$$ScenarioTemplateDtoImplCopyWith<$Res> {
-  __$$ScenarioTemplateDtoImplCopyWithImpl(_$ScenarioTemplateDtoImpl _value,
-      $Res Function(_$ScenarioTemplateDtoImpl) _then)
-      : super(_value, _then);
+class _$ScenarioTemplateDtoCopyWithImpl<$Res>
+    implements $ScenarioTemplateDtoCopyWith<$Res> {
+  _$ScenarioTemplateDtoCopyWithImpl(this._self, this._then);
+
+  final ScenarioTemplateDto _self;
+  final $Res Function(ScenarioTemplateDto) _then;
 
   /// Create a copy of ScenarioTemplateDto
   /// with the given fields replaced by the non-null parameter values.
@@ -1520,44 +2354,209 @@ class __$$ScenarioTemplateDtoImplCopyWithImpl<$Res>
     Object? type = null,
     Object? parameters = null,
   }) {
-    return _then(_$ScenarioTemplateDtoImpl(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       name: null == name
-          ? _value.name
+          ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
       description: null == description
-          ? _value.description
+          ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
               as String,
       type: null == type
-          ? _value.type
+          ? _self.type
           : type // ignore: cast_nullable_to_non_nullable
               as String,
       parameters: null == parameters
-          ? _value._parameters
+          ? _self.parameters
           : parameters // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [ScenarioTemplateDto].
+extension ScenarioTemplateDtoPatterns on ScenarioTemplateDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_ScenarioTemplateDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ScenarioTemplateDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_ScenarioTemplateDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ScenarioTemplateDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_ScenarioTemplateDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ScenarioTemplateDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String id, String name, String description, String type,
+            Map<String, dynamic> parameters)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ScenarioTemplateDto() when $default != null:
+        return $default(_that.id, _that.name, _that.description, _that.type,
+            _that.parameters);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String id, String name, String description, String type,
+            Map<String, dynamic> parameters)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ScenarioTemplateDto():
+        return $default(_that.id, _that.name, _that.description, _that.type,
+            _that.parameters);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String id, String name, String description, String type,
+            Map<String, dynamic> parameters)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ScenarioTemplateDto() when $default != null:
+        return $default(_that.id, _that.name, _that.description, _that.type,
+            _that.parameters);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$ScenarioTemplateDtoImpl implements _ScenarioTemplateDto {
-  const _$ScenarioTemplateDtoImpl(
+class _ScenarioTemplateDto implements ScenarioTemplateDto {
+  const _ScenarioTemplateDto(
       {required this.id,
       required this.name,
       required this.description,
       required this.type,
       required final Map<String, dynamic> parameters})
       : _parameters = parameters;
-
-  factory _$ScenarioTemplateDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ScenarioTemplateDtoImplFromJson(json);
+  factory _ScenarioTemplateDto.fromJson(Map<String, dynamic> json) =>
+      _$ScenarioTemplateDtoFromJson(json);
 
   @override
   final String id;
@@ -1575,16 +2574,27 @@ class _$ScenarioTemplateDtoImpl implements _ScenarioTemplateDto {
     return EqualUnmodifiableMapView(_parameters);
   }
 
+  /// Create a copy of ScenarioTemplateDto
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'ScenarioTemplateDto(id: $id, name: $name, description: $description, type: $type, parameters: $parameters)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$ScenarioTemplateDtoCopyWith<_ScenarioTemplateDto> get copyWith =>
+      __$ScenarioTemplateDtoCopyWithImpl<_ScenarioTemplateDto>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ScenarioTemplateDtoToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ScenarioTemplateDtoImpl &&
+            other is _ScenarioTemplateDto &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.description, description) ||
@@ -1599,147 +2609,66 @@ class _$ScenarioTemplateDtoImpl implements _ScenarioTemplateDto {
   int get hashCode => Object.hash(runtimeType, id, name, description, type,
       const DeepCollectionEquality().hash(_parameters));
 
-  /// Create a copy of ScenarioTemplateDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$ScenarioTemplateDtoImplCopyWith<_$ScenarioTemplateDtoImpl> get copyWith =>
-      __$$ScenarioTemplateDtoImplCopyWithImpl<_$ScenarioTemplateDtoImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ScenarioTemplateDtoImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _ScenarioTemplateDto implements ScenarioTemplateDto {
-  const factory _ScenarioTemplateDto(
-          {required final String id,
-          required final String name,
-          required final String description,
-          required final String type,
-          required final Map<String, dynamic> parameters}) =
-      _$ScenarioTemplateDtoImpl;
-
-  factory _ScenarioTemplateDto.fromJson(Map<String, dynamic> json) =
-      _$ScenarioTemplateDtoImpl.fromJson;
-
-  @override
-  String get id;
-  @override
-  String get name;
-  @override
-  String get description;
-  @override
-  String get type;
-  @override
-  Map<String, dynamic> get parameters;
-
-  /// Create a copy of ScenarioTemplateDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ScenarioTemplateDtoImplCopyWith<_$ScenarioTemplateDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-SimulateRequestDto _$SimulateRequestDtoFromJson(Map<String, dynamic> json) {
-  return _SimulateRequestDto.fromJson(json);
-}
-
-/// @nodoc
-mixin _$SimulateRequestDto {
-  String get type => throw _privateConstructorUsedError;
-  Map<String, dynamic> get parameters => throw _privateConstructorUsedError;
-
-  /// Serializes this SimulateRequestDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of SimulateRequestDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $SimulateRequestDtoCopyWith<SimulateRequestDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $SimulateRequestDtoCopyWith<$Res> {
-  factory $SimulateRequestDtoCopyWith(
-          SimulateRequestDto value, $Res Function(SimulateRequestDto) then) =
-      _$SimulateRequestDtoCopyWithImpl<$Res, SimulateRequestDto>;
-  @useResult
-  $Res call({String type, Map<String, dynamic> parameters});
-}
-
-/// @nodoc
-class _$SimulateRequestDtoCopyWithImpl<$Res, $Val extends SimulateRequestDto>
-    implements $SimulateRequestDtoCopyWith<$Res> {
-  _$SimulateRequestDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of SimulateRequestDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? type = null,
-    Object? parameters = null,
-  }) {
-    return _then(_value.copyWith(
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as String,
-      parameters: null == parameters
-          ? _value.parameters
-          : parameters // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>,
-    ) as $Val);
+  String toString() {
+    return 'ScenarioTemplateDto(id: $id, name: $name, description: $description, type: $type, parameters: $parameters)';
   }
 }
 
 /// @nodoc
-abstract class _$$SimulateRequestDtoImplCopyWith<$Res>
-    implements $SimulateRequestDtoCopyWith<$Res> {
-  factory _$$SimulateRequestDtoImplCopyWith(_$SimulateRequestDtoImpl value,
-          $Res Function(_$SimulateRequestDtoImpl) then) =
-      __$$SimulateRequestDtoImplCopyWithImpl<$Res>;
+abstract mixin class _$ScenarioTemplateDtoCopyWith<$Res>
+    implements $ScenarioTemplateDtoCopyWith<$Res> {
+  factory _$ScenarioTemplateDtoCopyWith(_ScenarioTemplateDto value,
+          $Res Function(_ScenarioTemplateDto) _then) =
+      __$ScenarioTemplateDtoCopyWithImpl;
   @override
   @useResult
-  $Res call({String type, Map<String, dynamic> parameters});
+  $Res call(
+      {String id,
+      String name,
+      String description,
+      String type,
+      Map<String, dynamic> parameters});
 }
 
 /// @nodoc
-class __$$SimulateRequestDtoImplCopyWithImpl<$Res>
-    extends _$SimulateRequestDtoCopyWithImpl<$Res, _$SimulateRequestDtoImpl>
-    implements _$$SimulateRequestDtoImplCopyWith<$Res> {
-  __$$SimulateRequestDtoImplCopyWithImpl(_$SimulateRequestDtoImpl _value,
-      $Res Function(_$SimulateRequestDtoImpl) _then)
-      : super(_value, _then);
+class __$ScenarioTemplateDtoCopyWithImpl<$Res>
+    implements _$ScenarioTemplateDtoCopyWith<$Res> {
+  __$ScenarioTemplateDtoCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of SimulateRequestDto
+  final _ScenarioTemplateDto _self;
+  final $Res Function(_ScenarioTemplateDto) _then;
+
+  /// Create a copy of ScenarioTemplateDto
   /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
   @override
+  @pragma('vm:prefer-inline')
   $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? description = null,
     Object? type = null,
     Object? parameters = null,
   }) {
-    return _then(_$SimulateRequestDtoImpl(
+    return _then(_ScenarioTemplateDto(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: null == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String,
       type: null == type
-          ? _value.type
+          ? _self.type
           : type // ignore: cast_nullable_to_non_nullable
               as String,
       parameters: null == parameters
-          ? _value._parameters
+          ? _self._parameters
           : parameters // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>,
     ));
@@ -1747,14 +2676,245 @@ class __$$SimulateRequestDtoImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
+mixin _$SimulateRequestDto {
+  String get type;
+  Map<String, dynamic> get parameters;
+
+  /// Create a copy of SimulateRequestDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $SimulateRequestDtoCopyWith<SimulateRequestDto> get copyWith =>
+      _$SimulateRequestDtoCopyWithImpl<SimulateRequestDto>(
+          this as SimulateRequestDto, _$identity);
+
+  /// Serializes this SimulateRequestDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SimulateRequestDto &&
+            (identical(other.type, type) || other.type == type) &&
+            const DeepCollectionEquality()
+                .equals(other.parameters, parameters));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, type, const DeepCollectionEquality().hash(parameters));
+
+  @override
+  String toString() {
+    return 'SimulateRequestDto(type: $type, parameters: $parameters)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $SimulateRequestDtoCopyWith<$Res> {
+  factory $SimulateRequestDtoCopyWith(
+          SimulateRequestDto value, $Res Function(SimulateRequestDto) _then) =
+      _$SimulateRequestDtoCopyWithImpl;
+  @useResult
+  $Res call({String type, Map<String, dynamic> parameters});
+}
+
+/// @nodoc
+class _$SimulateRequestDtoCopyWithImpl<$Res>
+    implements $SimulateRequestDtoCopyWith<$Res> {
+  _$SimulateRequestDtoCopyWithImpl(this._self, this._then);
+
+  final SimulateRequestDto _self;
+  final $Res Function(SimulateRequestDto) _then;
+
+  /// Create a copy of SimulateRequestDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? type = null,
+    Object? parameters = null,
+  }) {
+    return _then(_self.copyWith(
+      type: null == type
+          ? _self.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
+      parameters: null == parameters
+          ? _self.parameters
+          : parameters // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [SimulateRequestDto].
+extension SimulateRequestDtoPatterns on SimulateRequestDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SimulateRequestDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SimulateRequestDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SimulateRequestDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SimulateRequestDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SimulateRequestDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SimulateRequestDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String type, Map<String, dynamic> parameters)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SimulateRequestDto() when $default != null:
+        return $default(_that.type, _that.parameters);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String type, Map<String, dynamic> parameters) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SimulateRequestDto():
+        return $default(_that.type, _that.parameters);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String type, Map<String, dynamic> parameters)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SimulateRequestDto() when $default != null:
+        return $default(_that.type, _that.parameters);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
 @JsonSerializable()
-class _$SimulateRequestDtoImpl implements _SimulateRequestDto {
-  const _$SimulateRequestDtoImpl(
+class _SimulateRequestDto implements SimulateRequestDto {
+  const _SimulateRequestDto(
       {required this.type, required final Map<String, dynamic> parameters})
       : _parameters = parameters;
-
-  factory _$SimulateRequestDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$SimulateRequestDtoImplFromJson(json);
+  factory _SimulateRequestDto.fromJson(Map<String, dynamic> json) =>
+      _$SimulateRequestDtoFromJson(json);
 
   @override
   final String type;
@@ -1766,16 +2926,26 @@ class _$SimulateRequestDtoImpl implements _SimulateRequestDto {
     return EqualUnmodifiableMapView(_parameters);
   }
 
+  /// Create a copy of SimulateRequestDto
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'SimulateRequestDto(type: $type, parameters: $parameters)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SimulateRequestDtoCopyWith<_SimulateRequestDto> get copyWith =>
+      __$SimulateRequestDtoCopyWithImpl<_SimulateRequestDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$SimulateRequestDtoToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$SimulateRequestDtoImpl &&
+            other is _SimulateRequestDto &&
             (identical(other.type, type) || other.type == type) &&
             const DeepCollectionEquality()
                 .equals(other._parameters, _parameters));
@@ -1786,41 +2956,50 @@ class _$SimulateRequestDtoImpl implements _SimulateRequestDto {
   int get hashCode => Object.hash(
       runtimeType, type, const DeepCollectionEquality().hash(_parameters));
 
-  /// Create a copy of SimulateRequestDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$SimulateRequestDtoImplCopyWith<_$SimulateRequestDtoImpl> get copyWith =>
-      __$$SimulateRequestDtoImplCopyWithImpl<_$SimulateRequestDtoImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$SimulateRequestDtoImplToJson(
-      this,
-    );
+  String toString() {
+    return 'SimulateRequestDto(type: $type, parameters: $parameters)';
   }
 }
 
-abstract class _SimulateRequestDto implements SimulateRequestDto {
-  const factory _SimulateRequestDto(
-          {required final String type,
-          required final Map<String, dynamic> parameters}) =
-      _$SimulateRequestDtoImpl;
-
-  factory _SimulateRequestDto.fromJson(Map<String, dynamic> json) =
-      _$SimulateRequestDtoImpl.fromJson;
-
+/// @nodoc
+abstract mixin class _$SimulateRequestDtoCopyWith<$Res>
+    implements $SimulateRequestDtoCopyWith<$Res> {
+  factory _$SimulateRequestDtoCopyWith(
+          _SimulateRequestDto value, $Res Function(_SimulateRequestDto) _then) =
+      __$SimulateRequestDtoCopyWithImpl;
   @override
-  String get type;
-  @override
-  Map<String, dynamic> get parameters;
+  @useResult
+  $Res call({String type, Map<String, dynamic> parameters});
+}
+
+/// @nodoc
+class __$SimulateRequestDtoCopyWithImpl<$Res>
+    implements _$SimulateRequestDtoCopyWith<$Res> {
+  __$SimulateRequestDtoCopyWithImpl(this._self, this._then);
+
+  final _SimulateRequestDto _self;
+  final $Res Function(_SimulateRequestDto) _then;
 
   /// Create a copy of SimulateRequestDto
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$SimulateRequestDtoImplCopyWith<_$SimulateRequestDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? type = null,
+    Object? parameters = null,
+  }) {
+    return _then(_SimulateRequestDto(
+      type: null == type
+          ? _self.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
+      parameters: null == parameters
+          ? _self._parameters
+          : parameters // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
+    ));
+  }
 }
+
+// dart format on

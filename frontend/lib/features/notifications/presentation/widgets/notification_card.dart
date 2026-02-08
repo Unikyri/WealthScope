@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../domain/entities/notification.dart';
 import '../providers/notifications_provider.dart';
+import '../../../../features/ai_insights/presentation/providers/insights_providers.dart';
 
 class NotificationCard extends ConsumerWidget {
   final AppNotification notification;
@@ -27,7 +28,7 @@ class NotificationCard extends ConsumerWidget {
           // Mark as read
           if (!notification.isRead) {
             try {
-              await ref.read(markInsightAsReadProvider.notifier).mark(notification.id);
+              await ref.read(markInsightAsReadProvider.notifier).call(notification.id);
             } catch (e) {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -110,7 +111,7 @@ class NotificationCard extends ConsumerWidget {
                       onPressed: () async {
                         if (!notification.isRead) {
                           try {
-                            await ref.read(markInsightAsReadProvider.notifier).mark(notification.id);
+                            await ref.read(markInsightAsReadProvider.notifier).call(notification.id);
                           } catch (e) {
                             // Handle error
                           }
@@ -127,7 +128,7 @@ class NotificationCard extends ConsumerWidget {
                       onPressed: () async {
                         if (!notification.isRead) {
                           try {
-                            await ref.read(markInsightAsReadProvider.notifier).mark(notification.id);
+                            await ref.read(markInsightAsReadProvider.notifier).call(notification.id);
                           } catch (e) {
                             // Handle error
                           }

@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/error/failures.dart';
+import '../../../../core/errors/failures.dart';
 import '../../domain/entities/insight_entity.dart';
 import '../../domain/repositories/insights_repository.dart';
 import '../datasources/insights_remote_datasource.dart';
@@ -31,7 +31,7 @@ class InsightsRepositoryImpl implements InsightsRepository {
       );
       return Right(dtos.map((dto) => dto.toDomain()).toList());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -41,7 +41,7 @@ class InsightsRepositoryImpl implements InsightsRepository {
       final dto = await _remoteDataSource.getDailyBriefing();
       return Right(dto.toDomain());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -51,7 +51,7 @@ class InsightsRepositoryImpl implements InsightsRepository {
       final dto = await _remoteDataSource.getInsightById(id);
       return Right(dto.toDomain());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -61,7 +61,7 @@ class InsightsRepositoryImpl implements InsightsRepository {
       await _remoteDataSource.markAsRead(id);
       return const Right(null);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -71,7 +71,7 @@ class InsightsRepositoryImpl implements InsightsRepository {
       final count = await _remoteDataSource.getUnreadCount();
       return Right(count);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -81,7 +81,7 @@ class InsightsRepositoryImpl implements InsightsRepository {
       final dtos = await _remoteDataSource.generateInsights();
       return Right(dtos.map((dto) => dto.toDomain()).toList());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 }

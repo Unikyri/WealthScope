@@ -1,5 +1,6 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../../../core/network/dio_client.dart';
+import '../../../../core/network/dio_client_provider.dart';
 import '../../../dashboard/domain/entities/portfolio_summary.dart';
 import '../../data/datasources/portfolio_remote_datasource.dart';
 import '../../data/repositories/portfolio_repository_impl.dart';
@@ -9,7 +10,7 @@ part 'portfolio_providers.g.dart';
 
 /// Provider for PortfolioRepository
 @riverpod
-PortfolioRepository portfolioRepository(PortfolioRepositoryRef ref) {
+PortfolioRepository portfolioRepository(Ref ref) {
   final dio = ref.watch(dioClientProvider);
   final dataSource = PortfolioRemoteDataSource(dio);
   return PortfolioRepositoryImpl(dataSource);
@@ -17,7 +18,7 @@ PortfolioRepository portfolioRepository(PortfolioRepositoryRef ref) {
 
 /// Provider to fetch portfolio summary
 @riverpod
-Future<PortfolioSummary> portfolioSummary(PortfolioSummaryRef ref) async {
+Future<PortfolioSummary> portfolioSummary(Ref ref) async {
   final repository = ref.watch(portfolioRepositoryProvider);
   final result = await repository.getSummary();
   return result.fold(
@@ -29,7 +30,7 @@ Future<PortfolioSummary> portfolioSummary(PortfolioSummaryRef ref) async {
 /// Provider to fetch portfolio risk analysis
 @riverpod
 Future<PortfolioRiskAnalysis> portfolioRiskAnalysis(
-  PortfolioRiskAnalysisRef ref,
+  Ref ref,
 ) async {
   final repository = ref.watch(portfolioRepositoryProvider);
   final result = await repository.getRiskAnalysis();

@@ -6,24 +6,49 @@ part of 'user_sync_service_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$userSyncServiceHash() => r'530167db22e6a499c67ac0f0ee7cadcd56982808';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Provider for UserSyncService instance
+
+@ProviderFor(userSyncService)
+final userSyncServiceProvider = UserSyncServiceProvider._();
 
 /// Provider for UserSyncService instance
-///
-/// Copied from [userSyncService].
-@ProviderFor(userSyncService)
-final userSyncServiceProvider = AutoDisposeProvider<UserSyncService>.internal(
-  userSyncService,
-  name: r'userSyncServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$userSyncServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef UserSyncServiceRef = AutoDisposeProviderRef<UserSyncService>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class UserSyncServiceProvider extends $FunctionalProvider<UserSyncService,
+    UserSyncService, UserSyncService> with $Provider<UserSyncService> {
+  /// Provider for UserSyncService instance
+  UserSyncServiceProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'userSyncServiceProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$userSyncServiceHash();
+
+  @$internal
+  @override
+  $ProviderElement<UserSyncService> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  UserSyncService create(Ref ref) {
+    return userSyncService(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(UserSyncService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<UserSyncService>(value),
+    );
+  }
+}
+
+String _$userSyncServiceHash() => r'02df0a8ffe6e52883b6ea91135c9b8399fc4e039';

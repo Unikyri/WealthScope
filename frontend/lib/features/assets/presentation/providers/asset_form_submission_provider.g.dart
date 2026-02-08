@@ -6,26 +6,70 @@ part of 'asset_form_submission_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$assetFormSubmissionHash() =>
-    r'7630147642d3c70b421e63940a5fd068b50411de';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Asset Form Submission Provider
+/// Manages the submission of asset creation/update forms to the backend API.
+/// Handles loading states, success, and error scenarios.
+
+@ProviderFor(AssetFormSubmission)
+final assetFormSubmissionProvider = AssetFormSubmissionProvider._();
 
 /// Asset Form Submission Provider
 /// Manages the submission of asset creation/update forms to the backend API.
 /// Handles loading states, success, and error scenarios.
-///
-/// Copied from [AssetFormSubmission].
-@ProviderFor(AssetFormSubmission)
-final assetFormSubmissionProvider = AutoDisposeNotifierProvider<
-    AssetFormSubmission, AssetFormSubmissionState>.internal(
-  AssetFormSubmission.new,
-  name: r'assetFormSubmissionProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$assetFormSubmissionHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final class AssetFormSubmissionProvider
+    extends $NotifierProvider<AssetFormSubmission, AssetFormSubmissionState> {
+  /// Asset Form Submission Provider
+  /// Manages the submission of asset creation/update forms to the backend API.
+  /// Handles loading states, success, and error scenarios.
+  AssetFormSubmissionProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'assetFormSubmissionProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
 
-typedef _$AssetFormSubmission = AutoDisposeNotifier<AssetFormSubmissionState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+  @override
+  String debugGetCreateSourceHash() => _$assetFormSubmissionHash();
+
+  @$internal
+  @override
+  AssetFormSubmission create() => AssetFormSubmission();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AssetFormSubmissionState value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AssetFormSubmissionState>(value),
+    );
+  }
+}
+
+String _$assetFormSubmissionHash() =>
+    r'7a57a06b6664736435e8c23373b38f92053fe28a';
+
+/// Asset Form Submission Provider
+/// Manages the submission of asset creation/update forms to the backend API.
+/// Handles loading states, success, and error scenarios.
+
+abstract class _$AssetFormSubmission
+    extends $Notifier<AssetFormSubmissionState> {
+  AssetFormSubmissionState build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref as $Ref<AssetFormSubmissionState, AssetFormSubmissionState>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AssetFormSubmissionState, AssetFormSubmissionState>,
+        AssetFormSubmissionState,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}
