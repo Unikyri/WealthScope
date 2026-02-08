@@ -12,15 +12,26 @@ class ScenariosRemoteDataSource {
     required String type,
     required Map<String, dynamic> parameters,
   }) async {
+    print('🚀 [SCENARIOS_DS] simulate called');
+    print('   Type: $type');
+    print('   Parameters: $parameters');
+    
     final request = SimulateRequestDto(
       type: type,
       parameters: parameters,
     );
 
+    print('🌐 [SCENARIOS_DS] Sending POST to /ai/simulate');
+    print('   Request body: ${request.toJson()}');
+    
     final response = await _dio.post(
       '/ai/simulate',
       data: request.toJson(),
     );
+
+    print('✅ [SCENARIOS_DS] Response received');
+    print('   Status: ${response.statusCode}');
+    print('   Data keys: ${response.data?.keys}');
 
     return SimulationResultDto.fromJson(
       response.data['data'] as Map<String, dynamic>,

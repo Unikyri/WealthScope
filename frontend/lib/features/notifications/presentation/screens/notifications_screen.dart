@@ -5,14 +5,17 @@ import '../providers/notifications_provider.dart';
 import '../widgets/notification_card.dart';
 import '../widgets/notifications_list_skeleton.dart';
 import 'package:wealthscope_app/shared/widgets/empty_state.dart';
+import 'package:wealthscope_app/features/ai_insights/presentation/providers/insights_providers.dart';
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    print('🖥️ [NOTIFICATIONS_SCREEN] Build ejecutándose...');
     final theme = Theme.of(context);
     final notificationsAsync = ref.watch(notificationsProvider);
+    print('🖥️ [NOTIFICATIONS_SCREEN] Watched notificationsProvider');
 
     return Scaffold(
       appBar: AppBar(
@@ -21,7 +24,9 @@ class NotificationsScreen extends ConsumerWidget {
           // Show unread count badge
           Consumer(
             builder: (context, ref, _) {
+              print('🔢 [NOTIFICATIONS_SCREEN_CONSUMER] Build Consumer ejecutándose...');
               final unreadAsync = ref.watch(unreadNotificationsCountProvider);
+              print('🔢 [NOTIFICATIONS_SCREEN_CONSUMER] Watched unreadNotificationsCountProvider');
               return unreadAsync.when(
                 data: (count) => count > 0
                     ? Padding(
@@ -50,8 +55,13 @@ class NotificationsScreen extends ConsumerWidget {
           
           return RefreshIndicator(
             onRefresh: () async {
+              // Invalidate all related providers to force refresh
+              ref.invalidate(defaultInsightsListProvider);
               ref.invalidate(notificationsProvider);
               ref.invalidate(unreadNotificationsCountProvider);
+              ref.invalidate(unreadInsightsCountProvider);
+              // Wait for reload
+              await ref.read(notificationsProvider.future);
             },
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -72,7 +82,10 @@ class NotificationsScreen extends ConsumerWidget {
               Text('Failed to load notifications'),
               const SizedBox(height: 8),
               ElevatedButton(
-                onPressed: () => ref.invalidate(notificationsProvider),
+                onPressed: () {
+                  ref.invalidate(defaultInsightsListProvider);
+                  ref.invalidate(notificationsProvider);
+                },
                 child: const Text('Retry'),
               ),
             ],

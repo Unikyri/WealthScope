@@ -25,14 +25,12 @@ class MainShell extends StatelessWidget {
 class _MainBottomNavigationBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    print('📱 [MAIN_SHELL] Build ejecutándose...');
     final location = GoRouterState.of(context).uri.path;
+    print('📱 [MAIN_SHELL] Location: $location');
     
-    // Watch the unread count - this will rebuild when it changes
-    final unreadCount = ref.watch(unreadNotificationsCountProvider).when(
-      data: (count) => count,
-      loading: () => 0,
-      error: (_, __) => 0,
-    );
+    // Simple unread count without constant watching
+    final unreadCount = 0; // Disabled for now to prevent loops
     
     // Format badge label: show "9+" for 10 or more
     final badgeLabel = unreadCount > 9 ? '9+' : '$unreadCount';

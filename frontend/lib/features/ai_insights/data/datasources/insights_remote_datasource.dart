@@ -16,6 +16,7 @@ class InsightsRemoteDataSource {
     int? limit,
     int? offset,
   }) async {
+    print('🚀 [DATASOURCE] Llamando API: GET /ai/insights - params: type=$type, category=$category, priority=$priority, unread=$unread, limit=$limit, offset=$offset');
     final response = await _dio.get(
       '/ai/insights',
       queryParameters: {
@@ -27,10 +28,12 @@ class InsightsRemoteDataSource {
         if (offset != null) 'offset': offset,
       },
     );
+    print('✅ [DATASOURCE] API Response recibido: GET /ai/insights - status: ${response.statusCode}');
 
     final insights = (response.data['data']['insights'] as List)
         .map((json) => InsightDto.fromJson(json as Map<String, dynamic>))
         .toList();
+    print('✅ [DATASOURCE] Insights parseados: ${insights.length} items');
 
     return insights;
   }
@@ -54,8 +57,11 @@ class InsightsRemoteDataSource {
 
   /// GET /api/v1/ai/insights/unread/count
   Future<int> getUnreadCount() async {
+    print('🚀 [DATASOURCE] Llamando API: GET /ai/insights/unread/count');
     final response = await _dio.get('/ai/insights/unread/count');
-    return response.data['data']['count'] as int;
+    final count = response.data['data']['count'] as int;
+    print('✅ [DATASOURCE] API Response recibido: count=$count');
+    return count;
   }
 
   /// POST /api/v1/ai/insights/generate

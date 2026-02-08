@@ -195,6 +195,9 @@ class RealEstateForm extends _$RealEstateForm {
       // Submit via API
       await ref.read(assetFormSubmissionProvider.notifier).submitCreate(asset);
 
+      // Check if provider is still mounted after async gap
+      if (!ref.mounted) return false;
+
       // Check result
       final submissionState = ref.read(assetFormSubmissionProvider);
       if (submissionState.error != null) {

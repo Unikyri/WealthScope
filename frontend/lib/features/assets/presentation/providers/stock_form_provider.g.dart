@@ -47,7 +47,7 @@ final class StockFormProvider
   }
 }
 
-String _$stockFormHash() => r'2c7c6af97269f33e5aa65a4210f38aee364f767f';
+String _$stockFormHash() => r'925c89c6bf6091996e162ad6a19f74aa7e368fc3';
 
 /// Stock Form Provider
 /// Manages the state and business logic for the stock/ETF form.

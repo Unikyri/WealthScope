@@ -1,0 +1,25 @@
+# =============================================================================
+# TEMPLATE: key.properties
+# =============================================================================
+# Copia este archivo a 'key.properties' y completa con tus valores reales
+# NUNCA subas key.properties a Git - ya está en .gitignore
+
+# Instrucciones para crear el keystore:
+# 
+# cd android
+# keytool -genkey -v -keystore wealthscope-keystore.jks \
+#   -keyalg RSA -keysize 2048 -validity 10000 \
+#   -alias wealthscope
+#
+# Sigue las instrucciones y RECUERDA los passwords que ingresas
+
+storePassword=TU_PASSWORD_DEL_KEYSTORE
+keyPassword=TU_PASSWORD_DE_LA_KEY  
+keyAlias=wealthscope
+storeFile=../wealthscope-keystore.jks
+
+# IMPORTANTE:
+# - Guarda wealthscope-keystore.jks en un lugar SEGURO
+# - Haz backup del keystore en múltiples ubicaciones
+# - Si pierdes el keystore, NO podrás actualizar la app en Play Store
+# - Nunca compartas estos archivos públicamente

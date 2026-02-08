@@ -43,7 +43,7 @@ final class NewsProvider extends $NotifierProvider<News, NewsState> {
   }
 }
 
-String _$newsHash() => r'6939dc1c336131a30f5878bc3fd6ffa200c6d830';
+String _$newsHash() => r'41bf277715c9eda3eaf36fb5cc72d575dfa78a0d';
 
 /// News provider with pagination, filtering, and search
 

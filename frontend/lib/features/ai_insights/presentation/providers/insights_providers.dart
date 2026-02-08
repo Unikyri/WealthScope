@@ -42,6 +42,26 @@ Future<List<InsightEntity>> insightsList(
   );
 }
 
+/// Provider to fetch default insights list (no parameters)
+/// Simple FutureProvider without keepAlive
+@riverpod
+Future<List<InsightEntity>> defaultInsightsList(Ref ref) async {
+  print('📋 [DEFAULT_INSIGHTS_PROVIDER] Ejecutando defaultInsightsList provider...');
+  final repository = ref.watch(insightsRepositoryProvider);
+  print('📋 [DEFAULT_INSIGHTS_PROVIDER] Llamando a API listInsights...');
+  final result = await repository.listInsights();
+  return result.fold(
+    (failure) {
+      print('❌ [DEFAULT_INSIGHTS_PROVIDER] Error: ${failure.message}');
+      throw Exception(failure.message);
+    },
+    (insights) {
+      print('✅ [DEFAULT_INSIGHTS_PROVIDER] Insights obtenidos: ${insights.length} items');
+      return insights;
+    },
+  );
+}
+
 /// Provider to fetch daily briefing
 @riverpod
 Future<InsightEntity> dailyBriefing(Ref ref) async {
@@ -56,11 +76,19 @@ Future<InsightEntity> dailyBriefing(Ref ref) async {
 /// Provider to fetch unread count
 @riverpod
 Future<int> unreadInsightsCount(Ref ref) async {
+  print('🔢 [UNREAD_INSIGHTS_COUNT] Ejecutando unreadInsightsCount provider...');
   final repository = ref.watch(insightsRepositoryProvider);
+  print('🔢 [UNREAD_INSIGHTS_COUNT] Llamando a API getUnreadCount...');
   final result = await repository.getUnreadCount();
   return result.fold(
-    (failure) => throw Exception(failure.message),
-    (count) => count,
+    (failure) {
+      print('❌ [UNREAD_INSIGHTS_COUNT] Error: ${failure.message}');
+      throw Exception(failure.message);
+    },
+    (count) {
+      print('✅ [UNREAD_INSIGHTS_COUNT] Count obtenido: $count');
+      return count;
+    },
   );
 }
 

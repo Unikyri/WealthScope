@@ -8,14 +8,14 @@ part of 'notifications_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Backwards compatibility: Convert insights to notifications format
-/// Backwards compatibility: Convert insights to notifications format
+/// Simple notifications provider that maps insights to notifications
+/// Uses FutureProvider for simplicity
 
 @ProviderFor(notifications)
 final notificationsProvider = NotificationsProvider._();
 
-/// Backwards compatibility: Convert insights to notifications format
-/// Backwards compatibility: Convert insights to notifications format
+/// Simple notifications provider that maps insights to notifications
+/// Uses FutureProvider for simplicity
 
 final class NotificationsProvider extends $FunctionalProvider<
         AsyncValue<List<AppNotification>>,
@@ -24,8 +24,8 @@ final class NotificationsProvider extends $FunctionalProvider<
     with
         $FutureModifier<List<AppNotification>>,
         $FutureProvider<List<AppNotification>> {
-  /// Backwards compatibility: Convert insights to notifications format
-  /// Backwards compatibility: Convert insights to notifications format
+  /// Simple notifications provider that maps insights to notifications
+  /// Uses FutureProvider for simplicity
   NotificationsProvider._()
       : super(
           from: null,
@@ -52,19 +52,19 @@ final class NotificationsProvider extends $FunctionalProvider<
   }
 }
 
-String _$notificationsHash() => r'e742ad7b940df5af87d8e403219444c271246078';
+String _$notificationsHash() => r'dbb9fcf3efccad7be6225255251341ead88b01df';
 
-/// Provider for unread notifications count (backwards compatibility)
+/// Simple unread count provider
 
 @ProviderFor(unreadNotificationsCount)
 final unreadNotificationsCountProvider = UnreadNotificationsCountProvider._();
 
-/// Provider for unread notifications count (backwards compatibility)
+/// Simple unread count provider
 
 final class UnreadNotificationsCountProvider
     extends $FunctionalProvider<AsyncValue<int>, int, FutureOr<int>>
     with $FutureModifier<int>, $FutureProvider<int> {
-  /// Provider for unread notifications count (backwards compatibility)
+  /// Simple unread count provider
   UnreadNotificationsCountProvider._()
       : super(
           from: null,
@@ -91,4 +91,4 @@ final class UnreadNotificationsCountProvider
 }
 
 String _$unreadNotificationsCountHash() =>
-    r'327aacca23724cca2da09a11a40625753f870a5f';
+    r'3c76ee69b533f0feabb9b62ea6346c348a3f49ed';

@@ -187,6 +187,53 @@ final class InsightsListFamily extends $Family
   String toString() => r'insightsListProvider';
 }
 
+/// Provider to fetch default insights list (no parameters)
+/// Simple FutureProvider without keepAlive
+
+@ProviderFor(defaultInsightsList)
+final defaultInsightsListProvider = DefaultInsightsListProvider._();
+
+/// Provider to fetch default insights list (no parameters)
+/// Simple FutureProvider without keepAlive
+
+final class DefaultInsightsListProvider extends $FunctionalProvider<
+        AsyncValue<List<InsightEntity>>,
+        List<InsightEntity>,
+        FutureOr<List<InsightEntity>>>
+    with
+        $FutureModifier<List<InsightEntity>>,
+        $FutureProvider<List<InsightEntity>> {
+  /// Provider to fetch default insights list (no parameters)
+  /// Simple FutureProvider without keepAlive
+  DefaultInsightsListProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'defaultInsightsListProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$defaultInsightsListHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<InsightEntity>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<InsightEntity>> create(Ref ref) {
+    return defaultInsightsList(ref);
+  }
+}
+
+String _$defaultInsightsListHash() =>
+    r'b6ad23cccefff22983fb00f369dc29fc20122f35';
+
 /// Provider to fetch daily briefing
 
 @ProviderFor(dailyBriefing)
@@ -263,7 +310,7 @@ final class UnreadInsightsCountProvider
 }
 
 String _$unreadInsightsCountHash() =>
-    r'cca57c78e40f10775f5362c7d4a61b60553f4035';
+    r'f690003646017e1181ddd8396a0965f3003d0e97';
 
 /// Provider to mark insight as read
 

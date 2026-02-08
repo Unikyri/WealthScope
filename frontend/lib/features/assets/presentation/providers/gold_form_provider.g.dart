@@ -44,7 +44,7 @@ final class GoldFormProvider
   }
 }
 
-String _$goldFormHash() => r'376c9f050b790a00c13dad6c23fb6f9475bf8338';
+String _$goldFormHash() => r'b30a13d749066532aee4dc5509dbaaf0afcb9086';
 
 /// Gold Form Provider
 

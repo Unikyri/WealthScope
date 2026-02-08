@@ -51,7 +51,7 @@ final class AssetFormSubmissionProvider
 }
 
 String _$assetFormSubmissionHash() =>
-    r'7a57a06b6664736435e8c23373b38f92053fe28a';
+    r'68bb1a14637942470c8f94ce39e661d38a496abe';
 
 /// Asset Form Submission Provider
 /// Manages the submission of asset creation/update forms to the backend API.
