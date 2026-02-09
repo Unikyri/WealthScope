@@ -72,23 +72,21 @@ Based on the portfolio analysis, suggest specific improvements the user could ma
 - Maximum 3 action items per recommendation`
 
 // PortfolioDataForPrompt represents portfolio data formatted for prompts.
-//
-//nolint:govet // fieldalignment: keep logical field grouping for readability
 type PortfolioDataForPrompt struct {
+	TopGainers        []AssetPerformanceData
+	TopLosers         []AssetPerformanceData
+	Allocations       []AllocationData
+	RiskAlerts        []RiskAlertData
+	RelevantNews      []NewsData
+	Diversification   string
+	PreferredLanguage string
 	TotalValue        float64
 	TotalInvested     float64
 	GainLoss          float64
 	GainLossPercent   float64
 	AssetCount        int
-	TopGainers        []AssetPerformanceData
-	TopLosers         []AssetPerformanceData
-	Allocations       []AllocationData
 	RiskScore         int
-	Diversification   string
-	RiskAlerts        []RiskAlertData
-	RelevantNews      []NewsData
 	HasPortfolio      bool
-	PreferredLanguage string
 }
 
 // AssetPerformanceData represents asset performance for prompts.

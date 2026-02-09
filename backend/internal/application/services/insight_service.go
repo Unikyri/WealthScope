@@ -444,9 +444,9 @@ func (s *InsightService) IsEnabled() bool {
 // AssetAnalysisResult represents the structured analysis of an asset.
 type AssetAnalysisResult struct {
 	Summary        string   `json:"summary"`
+	SentimentTrend string   `json:"sentiment_trend"`
 	KeyPoints      []string `json:"key_points"`
 	SentimentScore float64  `json:"sentiment_score"`
-	SentimentTrend string   `json:"sentiment_trend"`
 }
 
 // GenerateAssetAnalysis generates an AI analysis for a specific asset.
