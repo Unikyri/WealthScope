@@ -10,11 +10,11 @@ import (
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type Conversation struct {
-	ID        uuid.UUID `json:"id"`
-	UserID    uuid.UUID `json:"user_id"`
-	Title     string    `json:"title"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+	Title     string    `json:"title"`
+	ID        uuid.UUID `json:"id"`
+	UserID    uuid.UUID `json:"user_id"`
 }
 
 // NewConversation creates a new conversation with default values.
@@ -36,11 +36,11 @@ func NewConversation(userID uuid.UUID, title string) *Conversation {
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type Message struct {
+	CreatedAt      time.Time `json:"created_at"`
+	Role           string    `json:"role"`
+	Content        string    `json:"content"`
 	ID             uuid.UUID `json:"id"`
 	ConversationID uuid.UUID `json:"conversation_id"`
-	Role           string    `json:"role"` // "user", "assistant", "system"
-	Content        string    `json:"content"`
-	CreatedAt      time.Time `json:"created_at"`
 }
 
 // MessageRole constants for message types.

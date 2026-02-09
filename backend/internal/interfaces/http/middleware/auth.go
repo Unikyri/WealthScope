@@ -27,9 +27,9 @@ const (
 //
 //nolint:govet // fieldalignment: keep related fields together for readability
 type jwksCache struct {
-	mu      sync.RWMutex
 	keyfunc jwt.Keyfunc
 	jwksURL string
+	mu      sync.RWMutex
 }
 
 var globalJWKSCache = &jwksCache{}

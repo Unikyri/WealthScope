@@ -46,8 +46,22 @@ class AIRemoteDataSource {
       );
 
       return response.data['data'];
+
     } on DioException catch (e) {
       throw Exception('Failed to get insights: ${e.message}');
+    }
+  }
+
+  Future<Map<String, dynamic>> getAssetAnalysis({required String symbol}) async {
+    try {
+      final response = await _dio.get(
+        '/ai/insights/asset',
+        queryParameters: {'symbol': symbol},
+      );
+      return response.data['data'];
+    } on DioException catch (e) {
+      print('⚠️ [RemoteDataSource] Dio Error: ${e.response?.statusCode} - ${e.response?.data}');
+      throw Exception('Failed to get asset analysis: ${e.message}');
     }
   }
 

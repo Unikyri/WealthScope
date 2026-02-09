@@ -23,9 +23,9 @@ const (
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type BinanceClient struct {
 	httpClient   *http.Client
-	baseURL      string
 	rateLimiter  *RateLimiter
 	symbolMapper *CryptoSymbolMapper
+	baseURL      string
 }
 
 // NewBinanceClient creates a new Binance client.

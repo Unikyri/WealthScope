@@ -8,17 +8,15 @@ import (
 )
 
 // Config holds all configuration for the application
-//
-//nolint:govet // fieldalignment: keep grouped sub-configs for readability
 type Config struct {
-	Pricing    PricingConfig
-	MarketData MarketDataConfig
-	News       NewsConfig
-	AI         AIConfig
-	Database   DatabaseConfig
-	Server     ServerConfig
-	Log        LogConfig
 	Supabase   SupabaseConfig
+	Server     ServerConfig
+	Database   DatabaseConfig
+	Log        LogConfig
+	AI         AIConfig
+	News       NewsConfig
+	MarketData MarketDataConfig
+	Pricing    PricingConfig
 }
 
 // ServerConfig holds server-specific configuration
@@ -44,67 +42,41 @@ type PricingConfig struct {
 // MarketDataConfig holds multi-provider market data API keys, enabled flags, and rate limits.
 // If a provider is disabled or has no key (where required), it is not registered.
 // Yahoo can be enabled without a key (public endpoint).
-//
-//nolint:govet // fieldalignment: keep grouped by provider for readability
 type MarketDataConfig struct {
-	// Alpha Vantage (equities)
-	AlphaVantageAPIKey    string
-	AlphaVantageEnabled   bool
-	AlphaVantageRateLimit int // requests per minute
-
-	// Finnhub (equities)
-	FinnhubAPIKey    string
-	FinnhubEnabled   bool
-	FinnhubRateLimit int // requests per minute
-
-	// Yahoo Finance (equities)
-	YahooFinanceAPIKey  string
-	YahooFinanceEnabled bool
-	YahooRateLimit      int // requests per minute
-
-	// CoinGecko (crypto)
-	CoinGeckoAPIKey    string
-	CoinGeckoEnabled   bool
-	CoinGeckoRateLimit int // requests per minute
-
-	// Binance (crypto)
-	BinanceEnabled   bool
-	BinanceRateLimit int // requests per minute
-
-	// Frankfurter (forex - no API key required)
-	FrankfurterEnabled   bool
-	FrankfurterRateLimit int // requests per minute
-
-	// ExchangeRate API (forex)
+	YahooFinanceAPIKey    string
+	MetalsAPIKey          string
 	ExchangeRateAPIKey    string
+	FinnhubAPIKey         string
+	AlphaVantageAPIKey    string
+	CoinGeckoAPIKey       string
+	FrankfurterRateLimit  int
+	AlphaVantageRateLimit int
+	YahooRateLimit        int
+	FinnhubRateLimit      int
+	CacheTTLSeconds       int
+	CoinGeckoRateLimit    int
+	MetalsAPIRateLimit    int
+	BinanceRateLimit      int
+	ExchangeRateRateLimit int
+	FinnhubEnabled        bool
+	YahooFinanceEnabled   bool
 	ExchangeRateEnabled   bool
-	ExchangeRateRateLimit int // requests per minute
-
-	// Metals-API (precious metals - gold, silver, platinum, palladium)
-	MetalsAPIKey       string
-	MetalsAPIEnabled   bool
-	MetalsAPIRateLimit int // requests per minute
-
-	// Cache settings
-	CacheTTLSeconds int
+	FrankfurterEnabled    bool
+	AlphaVantageEnabled   bool
+	MetalsAPIEnabled      bool
+	BinanceEnabled        bool
+	CoinGeckoEnabled      bool
 }
 
 // NewsConfig holds news provider configuration
-//
-//nolint:govet // fieldalignment: keep grouped by provider for readability
 type NewsConfig struct {
-	// NewsData.io
-	NewsDataAPIKey    string
-	NewsDataEnabled   bool
-	NewsDataRateLimit int // requests per minute
-
-	// Marketaux
-	MarketauxAPIKey    string
-	MarketauxEnabled   bool
-	MarketauxRateLimit int // requests per minute
-
-	// Cache settings
+	NewsDataAPIKey      string
+	MarketauxAPIKey     string
+	NewsDataRateLimit   int
+	MarketauxRateLimit  int
 	NewsCacheTTLSeconds int
+	NewsDataEnabled     bool
+	MarketauxEnabled    bool
 }
 
 // AIConfig holds AI provider configuration (Google Gemini)

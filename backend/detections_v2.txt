@@ -1,0 +1,5 @@
+﻿C:\Users\jeaqh\Desktop\Proyectos\WealthScope\backend\internal\infrastructure\config\config.go:13:13: struct with 424 pointer bytes could be 344
+C:\Users\jeaqh\Desktop\Proyectos\WealthScope\backend\internal\domain\entities\scenario.go:43:22: struct with 80 pointer bytes could be 64
+C:\Users\jeaqh\Desktop\Proyectos\WealthScope\backend\internal\domain\entities\scenario.go:52:21: struct with 48 pointer bytes could be 32
+C:\Users\jeaqh\Desktop\Proyectos\WealthScope\backend\internal\domain\entities\scenario.go:139:23: struct with 128 pointer bytes could be 112
+C:\Users\jeaqh\Desktop\Proyectos\WealthScope\backend\internal\domain\entities\scenario.go:220:19: struct with 80 pointer bytes could be 64

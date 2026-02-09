@@ -12,6 +12,7 @@ import (
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type HealthScore struct {
+	Suggestions     []string `json:"suggestions"`
 	Overall         int      `json:"overall"`         // 0-100 weighted average
 	Diversification int      `json:"diversification"` // 25% weight
 	SectorBalance   int      `json:"sector_balance"`  // 20% weight
@@ -19,7 +20,6 @@ type HealthScore struct {
 	Performance     int      `json:"performance"`     // 15% weight
 	Correlation     int      `json:"correlation"`     // 10% weight - placeholder
 	Liquidity       int      `json:"liquidity"`       // 10% weight
-	Suggestions     []string `json:"suggestions"`
 }
 
 // Scoring weights

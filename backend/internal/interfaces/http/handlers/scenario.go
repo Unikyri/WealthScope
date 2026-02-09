@@ -41,11 +41,11 @@ type SimulateRequest struct {
 //
 //nolint:govet // fieldalignment: keep JSON field order for readability
 type SimulateResponse struct {
+	AIAnalysis     string                  `json:"ai_analysis,omitempty"`
+	Changes        []entities.ChangeDetail `json:"changes"`
+	Warnings       []string                `json:"warnings,omitempty"`
 	CurrentState   entities.PortfolioState `json:"current_state"`
 	ProjectedState entities.PortfolioState `json:"projected_state"`
-	Changes        []entities.ChangeDetail `json:"changes"`
-	AIAnalysis     string                  `json:"ai_analysis,omitempty"`
-	Warnings       []string                `json:"warnings,omitempty"`
 }
 
 // TemplatesResponse represents the response from the templates endpoint.

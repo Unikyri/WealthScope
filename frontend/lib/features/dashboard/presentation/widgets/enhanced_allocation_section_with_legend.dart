@@ -1,17 +1,21 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wealthscope_app/core/theme/app_theme.dart';
+import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/dashboard/domain/entities/portfolio_summary.dart';
-import 'package:wealthscope_app/features/dashboard/presentation/widgets/allocation_legend.dart';
-import 'package:wealthscope_app/features/dashboard/presentation/widgets/allocation_pie_chart.dart';
+import 'package:wealthscope_app/core/currency/currency_extensions.dart';
 
-/// Enhanced Allocation Section Widget
-/// Displays asset allocation using an interactive pie chart with legend
-/// Supports selection synchronization between chart and legend
+/// Enhanced Allocation Section - Crypto Blue Style
+/// Matches specific user request: Donut with Total in center, side-by-side legend.
 class EnhancedAllocationSection extends StatefulWidget {
   final List<AssetTypeBreakdown> allocations;
+  final double totalValue; // Added to display in center
 
   const EnhancedAllocationSection({
     super.key,
     required this.allocations,
+    required this.totalValue, // Required now
   });
 
   @override
@@ -20,90 +24,246 @@ class EnhancedAllocationSection extends StatefulWidget {
 }
 
 class _EnhancedAllocationSectionState extends State<EnhancedAllocationSection> {
-  int? selectedIndex;
+  int touchedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    // Filter out very small segments for cleaner chart
+    final data = widget.allocations.where((e) => e.percent > 1).toList();
+    // Sort by percent desc
+    data.sort((a, b) => b.percent.compareTo(a.percent));
 
-    if (widget.allocations.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppTheme.cardGrey,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.02)),
+         boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 12,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Asset Allocation',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+      child: Column(
+        children: [
+          // Header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Asset Allocation',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+              ),
+              Text(
+                'View Details',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppTheme.electricBlue,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          
+          // Content Row
+          Row(
+            children: [
+              // 1. Donut Chart (Left)
+              Expanded(
+                flex: 4,
+                child: SizedBox(
+                  height: 160,
+                  child: Stack(
                     children: [
-                      Icon(
-                        Icons.pie_chart,
-                        size: 16,
-                        color: theme.colorScheme.onPrimaryContainer,
+                      PieChart(
+                        PieChartData(
+                          pieTouchData: PieTouchData(
+                            touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                              setState(() {
+                                if (!event.isInterestedForInteractions ||
+                                    pieTouchResponse == null ||
+                                    pieTouchResponse.touchedSection == null) {
+                                  touchedIndex = -1;
+                                  return;
+                                }
+                                touchedIndex = pieTouchResponse
+                                    .touchedSection!.touchedSectionIndex;
+                              });
+                            },
+                          ),
+                          borderData: FlBorderData(show: false),
+                          sectionsSpace: 0,
+                          centerSpaceRadius: 60, // Large center hole
+                          sections: _buildSections(data),
+                        ),
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${widget.allocations.length} types',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.w600,
+                      // Center Text
+                      Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Total',
+                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: AppTheme.textGrey,
+                              ),
+                            ),
+                            Text(
+                              _formatCompactCurrency(widget.totalValue),
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            // Pie Chart with bidirectional sync
-            AllocationPieChart(
-              allocations: widget.allocations,
-              selectedIndex: selectedIndex,
-              onSectionTouched: (index) {
-                setState(() {
-                  selectedIndex = index;
-                });
-              },
-            ),
-            const SizedBox(height: 24),
-            const Divider(),
-            const SizedBox(height: 16),
-            // Legend with bidirectional sync
-            AllocationLegend(
-              allocations: widget.allocations,
-              selectedIndex: selectedIndex,
-              onTap: (index) {
-                setState(() {
-                  // Toggle selection: deselect if already selected
-                  selectedIndex = selectedIndex == index ? null : index;
-                });
-              },
-            ),
-          ],
-        ),
+              ),
+              
+              const SizedBox(width: 24),
+
+              // 2. Legend List (Right)
+              Expanded(
+                flex: 5,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: data.take(4).map((item) {
+                     final index = data.indexOf(item);
+                     final isTouched = index == touchedIndex;
+                     
+                     return Padding(
+                       padding: const EdgeInsets.symmetric(vertical: 6.0),
+                       child: Row(
+                         children: [
+                           // Dot
+                           Container(
+                             width: 8,
+                             height: 8,
+                             decoration: BoxDecoration(
+                               color: _getTypeColor(item.type),
+                               shape: BoxShape.circle,
+                               boxShadow: [
+                                 BoxShadow(
+                                   color: _getTypeColor(item.type).withOpacity(0.5),
+                                   blurRadius: 4,
+                                   spreadRadius: 1,
+                                 ),
+                               ]
+                             ),
+                           ),
+                           const SizedBox(width: 12),
+                           // Name
+                           Text(
+                             _getTypeLabel(item.type),
+                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                               color: isTouched ? Colors.white : AppTheme.textGrey,
+                               fontWeight: isTouched ? FontWeight.bold : FontWeight.normal,
+                             ),
+                           ),
+                           const Spacer(),
+                           // Percent
+                           Text(
+                             '${item.percent.toStringAsFixed(0)}%',
+                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                               color: Colors.white,
+                               fontWeight: FontWeight.bold,
+                             ),
+                           ),
+                         ],
+                       ),
+                     );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
+  }
+
+  List<PieChartSectionData> _buildSections(List<AssetTypeBreakdown> data) {
+    return data.asMap().entries.map((entry) {
+      final index = entry.key;
+      final item = entry.value;
+      final isTouched = index == touchedIndex;
+      final radius = isTouched ? 25.0 : 20.0;
+      final color = _getTypeColor(item.type);
+
+      return PieChartSectionData(
+        color: color,
+        value: item.percent,
+        title: '', // No title on chart
+        radius: radius,
+        badgeWidget: isTouched ? _buildBadge(item.percent) : null,
+        badgePositionPercentageOffset: 1.3,
+        borderSide: BorderSide(
+          color: AppTheme.cardGrey, // Gap color matches bg
+          width: 4,
+        ),
+      );
+    }).toList();
+  }
+  
+  Widget _buildBadge(double percent) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        '${percent.toStringAsFixed(0)}%',
+        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black),
+      ),
+    );
+  }
+
+  // Helper Methods for Colors and Labels
+   Color _getTypeColor(String typeString) {
+    final type = _parseAssetType(typeString);
+    switch (type) {
+      case AssetType.crypto: return AppTheme.electricBlue;
+      case AssetType.stock: return AppTheme.emeraldAccent;
+      case AssetType.realEstate: return Colors.purpleAccent;
+      case AssetType.cash: return AppTheme.textGrey;
+      case AssetType.etf: return Colors.amber;
+      case AssetType.gold: return Colors.orange;
+      case AssetType.bond: return Colors.teal;
+      default: return Colors.grey;
+    }
+  }
+
+  String _getTypeLabel(String typeString) {
+    final type = _parseAssetType(typeString);
+    switch (type) {
+      case AssetType.realEstate: return 'Real Est.';
+      case AssetType.etf: return 'ETF';
+      default: return typeString[0].toUpperCase() + typeString.substring(1);
+    }
+  }
+
+  AssetType _parseAssetType(String typeString) {
+    try {
+      return AssetType.fromString(typeString);
+    } catch (e) {
+      return AssetType.other;
+    }
+  }
+
+  String _formatCompactCurrency(double value) {
+    if (value >= 1000000000) return '\$${(value / 1000000000).toStringAsFixed(1)}B';
+    if (value >= 1000000) return '\$${(value / 1000000).toStringAsFixed(1)}M';
+    if (value >= 1000) return '\$${(value / 1000).toStringAsFixed(1)}K';
+    return '\$${value.toStringAsFixed(0)}';
   }
 }

@@ -28,23 +28,23 @@ type AssetPerformance struct {
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type AllocationInsight struct {
 	Type       string  `json:"type"`
-	Percent    float64 `json:"percent"`
-	Status     string  `json:"status"` // overweight, underweight, balanced
+	Status     string  `json:"status"`
 	Suggestion string  `json:"suggestion"`
+	Percent    float64 `json:"percent"`
 }
 
 // PortfolioAnalysis contains comprehensive portfolio analysis data.
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type PortfolioAnalysis struct {
+	AnalyzedAt    time.Time                      `json:"analyzed_at"`
 	Summary       *repositories.PortfolioSummary `json:"summary"`
 	RiskMetrics   *PortfolioRisk                 `json:"risk_metrics"`
+	MarketContext string                         `json:"market_context"`
 	TopGainers    []AssetPerformance             `json:"top_gainers"`
 	TopLosers     []AssetPerformance             `json:"top_losers"`
 	Allocations   []AllocationInsight            `json:"allocations"`
 	RelevantNews  []domainsvc.NewsArticle        `json:"relevant_news"`
-	MarketContext string                         `json:"market_context"`
-	AnalyzedAt    time.Time                      `json:"analyzed_at"`
 }
 
 // PortfolioAnalyzer aggregates data from multiple sources to build portfolio analysis.

@@ -29,11 +29,11 @@ const (
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type AlertTrigger struct {
 	Type        AlertTriggerType `json:"type"`
-	Threshold   float64          `json:"threshold"`
-	ActualValue float64          `json:"actual_value"`
-	Severity    string           `json:"severity"` // critical, warning, info
+	Severity    string           `json:"severity"`
 	Title       string           `json:"title"`
 	Message     string           `json:"message"`
+	Threshold   float64          `json:"threshold"`
+	ActualValue float64          `json:"actual_value"`
 }
 
 // AlertThresholds defines the thresholds for various alert types.
@@ -74,14 +74,12 @@ type notificationRecord struct {
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type NotificationService struct {
-	insightRepo repositories.InsightRepository
-	thresholds  AlertThresholds
-	logger      *zap.Logger
-
-	// In-memory tracking to avoid duplicate notifications
+	insightRepo         repositories.InsightRepository
+	logger              *zap.Logger
 	recentNotifications map[string]*notificationRecord
-	mu                  sync.RWMutex
+	thresholds          AlertThresholds
 	cooldownPeriod      time.Duration
+	mu                  sync.RWMutex
 }
 
 // NewNotificationService creates a new NotificationService.

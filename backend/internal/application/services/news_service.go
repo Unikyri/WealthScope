@@ -19,10 +19,10 @@ import (
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type NewsService struct {
-	providers []services.NewsClient
 	cache     map[string]*cachedNews
-	cacheTTL  time.Duration
 	logger    *zap.Logger
+	providers []services.NewsClient
+	cacheTTL  time.Duration
 	mu        sync.RWMutex
 }
 
@@ -30,8 +30,8 @@ type NewsService struct {
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type cachedNews struct {
-	articles  []services.NewsArticle
 	fetchedAt time.Time
+	articles  []services.NewsArticle
 }
 
 // NewNewsService creates a new NewsService with the given providers.

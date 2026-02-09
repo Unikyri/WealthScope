@@ -38,32 +38,21 @@ func (t ScenarioType) IsValid() bool {
 }
 
 // ScenarioRequest is the input for a simulation
-//
-//nolint:govet // fieldalignment: keep logical field grouping for readability
 type ScenarioRequest struct {
-	UserID     uuid.UUID      `json:"user_id"`
 	Type       ScenarioType   `json:"type"`
 	Parameters ScenarioParams `json:"parameters"`
+	UserID     uuid.UUID      `json:"user_id"`
 }
 
 // ScenarioParams contains type-specific parameters for simulation
-//
-//nolint:govet // fieldalignment: keep logical field grouping for readability
 type ScenarioParams struct {
-	// For buy/sell scenarios
-	AssetID  *uuid.UUID `json:"asset_id,omitempty"`
-	Quantity float64    `json:"quantity,omitempty"`
-	Price    float64    `json:"price,omitempty"`
-
-	// For market move scenarios
-	ChangePercent float64  `json:"change_percent,omitempty"` // e.g., -20 for 20% drop
-	AssetTypes    []string `json:"asset_types,omitempty"`    // Affected asset types (empty = all)
-
-	// For new asset scenarios
-	NewAsset *NewAssetParams `json:"new_asset,omitempty"`
-
-	// For rebalance scenarios
-	TargetAllocation map[string]float64 `json:"target_allocation,omitempty"` // type -> percentage
+	TargetAllocation map[string]float64 `json:"target_allocation,omitempty"`
+	AssetID          *uuid.UUID         `json:"asset_id,omitempty"`
+	NewAsset         *NewAssetParams    `json:"new_asset,omitempty"`
+	AssetTypes       []string           `json:"asset_types,omitempty"`
+	Quantity         float64            `json:"quantity,omitempty"`
+	Price            float64            `json:"price,omitempty"`
+	ChangePercent    float64            `json:"change_percent,omitempty"`
 }
 
 // NewAssetParams defines parameters for adding a new hypothetical asset
@@ -76,26 +65,22 @@ type NewAssetParams struct {
 }
 
 // ScenarioResult is the output of a simulation
-//
-//nolint:govet // fieldalignment: keep logical field grouping for readability
 type ScenarioResult struct {
+	Changes        []ChangeDetail `json:"changes"`
+	Warnings       []string       `json:"warnings,omitempty"`
+	AIAnalysis     string         `json:"ai_analysis,omitempty"`
 	CurrentState   PortfolioState `json:"current_state"`
 	ProjectedState PortfolioState `json:"projected_state"`
-	Changes        []ChangeDetail `json:"changes"`
-	AIAnalysis     string         `json:"ai_analysis,omitempty"`
-	Warnings       []string       `json:"warnings,omitempty"`
 }
 
 // PortfolioState represents the state of a portfolio at a point in time
-//
-//nolint:govet // fieldalignment: keep logical field grouping for readability
 type PortfolioState struct {
+	Allocation      []AllocationItem `json:"allocation"`
 	TotalValue      float64          `json:"total_value"`
 	TotalInvested   float64          `json:"total_invested"`
 	GainLoss        float64          `json:"gain_loss"`
 	GainLossPercent float64          `json:"gain_loss_percent"`
 	AssetCount      int              `json:"asset_count"`
-	Allocation      []AllocationItem `json:"allocation"`
 }
 
 // AllocationItem represents an allocation by asset type
@@ -120,13 +105,13 @@ type ChangeDetail struct {
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type Scenario struct {
-	ID         uuid.UUID       `json:"id"`
-	UserID     uuid.UUID       `json:"user_id"`
+	CreatedAt  time.Time       `json:"created_at"`
+	AIAnalysis *string         `json:"ai_analysis,omitempty"`
 	Type       ScenarioType    `json:"type"`
 	Query      json.RawMessage `json:"query"`
 	Result     json.RawMessage `json:"result"`
-	AIAnalysis *string         `json:"ai_analysis,omitempty"`
-	CreatedAt  time.Time       `json:"created_at"`
+	ID         uuid.UUID       `json:"id"`
+	UserID     uuid.UUID       `json:"user_id"`
 }
 
 // NewScenario creates a new Scenario entity
@@ -144,11 +129,11 @@ func NewScenario(userID uuid.UUID, scenarioType ScenarioType, query, result json
 
 // ScenarioTemplate represents a predefined scenario template
 type ScenarioTemplate struct {
-	Parameters  ScenarioParams `json:"parameters"`
 	ID          string         `json:"id"`
 	Name        string         `json:"name"`
 	Description string         `json:"description"`
 	Type        ScenarioType   `json:"type"`
+	Parameters  ScenarioParams `json:"parameters"`
 }
 
 // GetPredefinedTemplates returns the list of predefined scenario templates
@@ -217,17 +202,17 @@ func GetPredefinedTemplates() []ScenarioTemplate {
 //
 //nolint:govet // fieldalignment: keep logical field grouping
 type ScenarioChainRequest struct {
-	UserID uuid.UUID      `json:"user_id"`
 	Steps  []ScenarioStep `json:"steps"`
+	UserID uuid.UUID      `json:"user_id"`
 }
 
 // ScenarioStep represents a single step in a scenario chain
 //
 //nolint:govet // fieldalignment: keep logical field grouping
 type ScenarioStep struct {
-	Order      int            `json:"order"`
 	Type       ScenarioType   `json:"type"`
 	Parameters ScenarioParams `json:"parameters"`
+	Order      int            `json:"order"`
 }
 
 // ChainResult represents the result of a scenario chain simulation
@@ -235,26 +220,26 @@ type ScenarioStep struct {
 //nolint:govet // fieldalignment: keep logical field grouping
 type ChainResult struct {
 	Steps       []StepResult    `json:"steps"`
-	FinalState  PortfolioState  `json:"final_state"`
-	TotalImpact float64         `json:"total_impact"` // Initial vs Final total value
 	Risk        *RiskAssessment `json:"risk,omitempty"`
+	FinalState  PortfolioState  `json:"final_state"`
+	TotalImpact float64         `json:"total_impact"`
 }
 
 // StepResult represents the result of a single step
 //
 //nolint:govet // fieldalignment: keep logical field grouping
 type StepResult struct {
-	Step   ScenarioStep    `json:"step"`
 	Result *ScenarioResult `json:"result"`
+	Step   ScenarioStep    `json:"step"`
 }
 
 // RiskAssessment represents the calculated risk of the final portfolio state
 //
 //nolint:govet // fieldalignment: keep logical field grouping
 type RiskAssessment struct {
-	Score          int      `json:"score"` // 0-100 high is risky
-	Level          string   `json:"level"` // low, medium, high, critical
+	Level          string   `json:"level"`
+	Recommendation string   `json:"recommendation"`
 	Factors        []string `json:"factors"`
 	Warnings       []string `json:"warnings"`
-	Recommendation string   `json:"recommendation"`
+	Score          int      `json:"score"`
 }

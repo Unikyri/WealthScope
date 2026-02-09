@@ -53,12 +53,12 @@ const FinancialAdvisorSystemPrompt = `You are WealthScope AI, an intelligent fin
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type UserContext struct {
-	HasPortfolio  bool
+	RiskProfile   string
+	PreferredLang string
+	TopAssetTypes []string
 	TotalValue    float64
 	AssetCount    int
-	TopAssetTypes []string
-	RiskProfile   string // conservative, moderate, aggressive
-	PreferredLang string // en, es
+	HasPortfolio  bool
 }
 
 // PromptBuilder constructs personalized system prompts.

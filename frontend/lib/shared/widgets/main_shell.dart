@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../features/notifications/presentation/providers/notifications_provider.dart';
+import 'package:wealthscope_app/features/ai/presentation/widgets/ai_nexus_widget.dart';
+import 'package:wealthscope_app/shared/widgets/constellation_background.dart';
+
+import 'package:wealthscope_app/shared/widgets/custom_bottom_nav_bar.dart';
 
 /// MainShell wraps the main navigation structure of the app
 /// with a bottom navigation bar for protected routes
@@ -15,25 +18,34 @@ class MainShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: child,
-      bottomNavigationBar: _MainBottomNavigationBar(),
+    return Stack(
+      children: [
+        // Background Layer
+        const ConstellationBackground(
+          particleCount: 80,
+          interactive: true,
+        ),
+        
+        // Main Content Layer
+        Scaffold(
+          backgroundColor: Colors.transparent, // Allow background to show through
+          extendBody: true, // Allow body to extend behind the bottom nav bar
+          body: child,
+          bottomNavigationBar: _MainBottomNavigationBar(),
+        ),
+        
+        // AI Layer
+        const AiNexusWidget(),
+      ],
     );
   }
 }
 
+// Custom Bottom Navigation Bar implementation
 class _MainBottomNavigationBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print('📱 [MAIN_SHELL] Build ejecutándose...');
     final location = GoRouterState.of(context).uri.path;
-    print('📱 [MAIN_SHELL] Location: $location');
-    
-    // Simple unread count without constant watching
-    final unreadCount = 0; // Disabled for now to prevent loops
-    
-    // Format badge label: show "9+" for 10 or more
-    final badgeLabel = unreadCount > 9 ? '9+' : '$unreadCount';
     
     // Determine selected index based on current route
     int selectedIndex = 0;
@@ -49,7 +61,7 @@ class _MainBottomNavigationBar extends ConsumerWidget {
       selectedIndex = 3;
     }
 
-    return NavigationBar(
+    return CustomBottomNavBar(
       selectedIndex: selectedIndex,
       onDestinationSelected: (index) {
         switch (index) {
@@ -67,36 +79,6 @@ class _MainBottomNavigationBar extends ConsumerWidget {
             break;
         }
       },
-      destinations: [
-        NavigationDestination(
-          icon: Badge(
-            label: Text(badgeLabel),
-            isLabelVisible: unreadCount > 0,
-            child: const Icon(Icons.dashboard_outlined),
-          ),
-          selectedIcon: Badge(
-            label: Text(badgeLabel),
-            isLabelVisible: unreadCount > 0,
-            child: const Icon(Icons.dashboard),
-          ),
-          label: 'Dashboard',
-        ),
-        const NavigationDestination(
-          icon: Icon(Icons.account_balance_wallet_outlined),
-          selectedIcon: Icon(Icons.account_balance_wallet),
-          label: 'Assets',
-        ),
-        const NavigationDestination(
-          icon: Icon(Icons.psychology_outlined),
-          selectedIcon: Icon(Icons.psychology),
-          label: 'AI Advisor',
-        ),
-        const NavigationDestination(
-          icon: Icon(Icons.person_outline),
-          selectedIcon: Icon(Icons.person),
-          label: 'Profile',
-        ),
-      ],
     );
   }
 }

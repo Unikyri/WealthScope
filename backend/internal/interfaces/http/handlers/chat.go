@@ -50,27 +50,27 @@ type UpdateConversationRequest struct {
 //
 //nolint:govet // fieldalignment: keep JSON field order for readability
 type MessageResponse struct {
-	ID             uuid.UUID `json:"id"`
-	ConversationID uuid.UUID `json:"conversation_id"`
+	CreatedAt      time.Time `json:"created_at"`
 	Role           string    `json:"role"`
 	Content        string    `json:"content"`
-	CreatedAt      time.Time `json:"created_at"`
+	ID             uuid.UUID `json:"id"`
+	ConversationID uuid.UUID `json:"conversation_id"`
 }
 
 // ConversationResponse represents a conversation in API responses.
 //
 //nolint:govet // fieldalignment: keep JSON field order for readability
 type ConversationResponse struct {
-	ID        uuid.UUID `json:"id"`
-	Title     string    `json:"title"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+	Title     string    `json:"title"`
+	ID        uuid.UUID `json:"id"`
 }
 
 // ConversationWithMessagesResponse represents a conversation with messages.
 type ConversationWithMessagesResponse struct {
-	Conversation ConversationResponse `json:"conversation"`
 	Messages     []MessageResponse    `json:"messages"`
+	Conversation ConversationResponse `json:"conversation"`
 }
 
 // ConversationListResponse represents a list of conversations.
@@ -85,9 +85,9 @@ type ConversationListResponse struct {
 //
 //nolint:govet // fieldalignment: keep JSON field order for readability
 type ChatResponseDTO struct {
-	ConversationID uuid.UUID       `json:"conversation_id"`
 	UserMessage    MessageResponse `json:"user_message"`
 	AIMessage      MessageResponse `json:"ai_message"`
+	ConversationID uuid.UUID       `json:"conversation_id"`
 }
 
 // WelcomeResponse represents the welcome endpoint response.

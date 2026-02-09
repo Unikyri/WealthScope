@@ -16,11 +16,11 @@ import (
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type MessageModel struct {
-	ID             uuid.UUID `gorm:"type:uuid;primaryKey"`
-	ConversationID uuid.UUID `gorm:"type:uuid;not null;index"`
+	CreatedAt      time.Time `gorm:"not null"`
 	Role           string    `gorm:"type:varchar(20);not null"`
 	Content        string    `gorm:"type:text;not null"`
-	CreatedAt      time.Time `gorm:"not null"`
+	ID             uuid.UUID `gorm:"type:uuid;primaryKey"`
+	ConversationID uuid.UUID `gorm:"type:uuid;not null;index"`
 }
 
 // TableName returns the table name for MessageModel.

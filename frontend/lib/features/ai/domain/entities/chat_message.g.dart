@@ -46,6 +46,8 @@ _InsightsResponse _$InsightsResponseFromJson(Map<String, dynamic> json) =>
           .map((e) => e as String)
           .toList(),
       briefing: json['briefing'] as String?,
+      sentimentScore: (json['sentiment_score'] as num?)?.toDouble(),
+      sentimentTrend: json['sentiment_trend'] as String?,
     );
 
 Map<String, dynamic> _$InsightsResponseToJson(_InsightsResponse instance) =>
@@ -53,4 +55,6 @@ Map<String, dynamic> _$InsightsResponseToJson(_InsightsResponse instance) =>
       'summary': instance.summary,
       'key_points': instance.keyPoints,
       'briefing': instance.briefing,
+      'sentiment_score': instance.sentimentScore,
+      'sentiment_trend': instance.sentimentTrend,
     };

@@ -32,13 +32,11 @@ type Message struct {
 }
 
 // GeminiClient wraps the Google Gemini API client.
-//
-//nolint:govet // fieldalignment: keep logical field grouping for readability
 type GeminiClient struct {
 	client      *genai.Client
-	model       string
 	rateLimiter *marketdata.RateLimiter
 	logger      *zap.Logger
+	model       string
 }
 
 // NewGeminiClient creates a new Gemini API client.

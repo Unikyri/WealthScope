@@ -2,7 +2,9 @@ package services
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -28,8 +30,8 @@ type cachedInsight struct {
 
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type cachedCount struct {
-	count     int
 	expiresAt time.Time
+	count     int
 }
 
 // NewInsightCache creates a new InsightCache.
@@ -437,4 +439,53 @@ func (s *InsightService) GetInsightByID(ctx context.Context, insightID, userID u
 // IsEnabled returns true if the service is properly configured.
 func (s *InsightService) IsEnabled() bool {
 	return s.geminiClient != nil && s.analyzer != nil
+}
+
+// AssetAnalysisResult represents the structured analysis of an asset.
+type AssetAnalysisResult struct {
+	Summary        string   `json:"summary"`
+	SentimentTrend string   `json:"sentiment_trend"`
+	KeyPoints      []string `json:"key_points"`
+	SentimentScore float64  `json:"sentiment_score"`
+}
+
+// GenerateAssetAnalysis generates an AI analysis for a specific asset.
+func (s *InsightService) GenerateAssetAnalysis(ctx context.Context, symbol string) (*AssetAnalysisResult, error) {
+	prompt := ai.BuildAssetAnalysisPrompt(symbol)
+
+	content, err := s.geminiClient.Chat(ctx, []ai.Message{
+		{Role: "user", Content: prompt},
+	}, ai.AssetAnalysisSystemPrompt)
+
+	if err != nil {
+		s.logger.Error("failed to generate asset analysis", zap.String("symbol", symbol), zap.Error(err))
+		return nil, fmt.Errorf("failed to generate analysis: %w", err)
+	}
+
+	// Clean up content if it contains markdown code blocks
+	content = cleanJSONContent(content)
+
+	var result AssetAnalysisResult
+	if err := json.Unmarshal([]byte(content), &result); err != nil {
+		s.logger.Error("failed to parse asset analysis JSON",
+			zap.String("symbol", symbol),
+			zap.String("content", content),
+			zap.Error(err))
+		return nil, fmt.Errorf("failed to parse analysis response: %w", err)
+	}
+
+	return &result, nil
+}
+
+// cleanJSONContent removes markdown code blocks from JSON string
+func cleanJSONContent(content string) string {
+	content = strings.TrimSpace(content)
+	if strings.HasPrefix(content, "```json") {
+		content = strings.TrimPrefix(content, "```json")
+		content = strings.TrimSuffix(content, "```")
+	} else if strings.HasPrefix(content, "```") {
+		content = strings.TrimPrefix(content, "```")
+		content = strings.TrimSuffix(content, "```")
+	}
+	return strings.TrimSpace(content)
 }

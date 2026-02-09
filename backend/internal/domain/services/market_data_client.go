@@ -20,14 +20,14 @@ const (
 //
 //nolint:govet // fieldalignment: readability over micro-optimization for DTO
 type Quote struct {
+	UpdatedAt     time.Time `json:"updated_at"`
 	Symbol        string    `json:"symbol"`
 	MarketState   string    `json:"market_state,omitempty"`
 	Currency      string    `json:"currency,omitempty"`
+	Source        string    `json:"source,omitempty"`
 	Price         float64   `json:"price"`
 	Change        float64   `json:"change"`
 	ChangePercent float64   `json:"change_percent"`
-	UpdatedAt     time.Time `json:"updated_at"`
-	Source        string    `json:"source,omitempty"` // provider name, set by registry
 }
 
 // PricePoint is an OHLCV data point for historical series.

@@ -57,15 +57,13 @@ type Highlight struct {
 }
 
 // BriefingResponse represents the daily briefing response.
-//
-//nolint:govet // fieldalignment: keep JSON field order for readability
 type BriefingResponse struct {
-	Briefing        string                    `json:"briefing"`        // AI-generated narrative
-	Highlights      []Highlight               `json:"highlights"`      // Key events
-	Alerts          []services.PortfolioAlert `json:"alerts"`          // Portfolio alerts
-	Recommendations []string                  `json:"recommendations"` // Action items
-	HealthScore     services.HealthScore      `json:"health_score"`    // Portfolio health
-	GeneratedAt     time.Time                 `json:"generated_at"`    // Timestamp
+	Highlights      []Highlight               `json:"highlights"`
+	Alerts          []services.PortfolioAlert `json:"alerts"`
+	Recommendations []string                  `json:"recommendations"`
+	GeneratedAt     time.Time                 `json:"generated_at"`
+	Briefing        string                    `json:"briefing"`
+	HealthScore     services.HealthScore      `json:"health_score"`
 }
 
 // GetBriefing handles GET /api/v1/ai/briefing

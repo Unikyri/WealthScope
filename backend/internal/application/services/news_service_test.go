@@ -16,9 +16,9 @@ import (
 //
 //nolint:govet // fieldalignment: test mock struct
 type mockNewsClient struct {
+	err      error
 	name     string
 	articles []services.NewsArticle
-	err      error
 }
 
 func (m *mockNewsClient) GetNews(_ context.Context, _ services.NewsQuery) ([]services.NewsArticle, error) {

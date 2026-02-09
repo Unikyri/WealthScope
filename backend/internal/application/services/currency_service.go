@@ -16,8 +16,8 @@ import (
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type CurrencyService struct {
 	forexClient services.MarketDataClient
-	cacheTTL    time.Duration
 	rateCache   map[string]*cachedRate
+	cacheTTL    time.Duration
 	mu          sync.RWMutex
 }
 
@@ -25,8 +25,8 @@ type CurrencyService struct {
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type cachedRate struct {
-	rate      float64
 	fetchedAt time.Time
+	rate      float64
 }
 
 // NewCurrencyService creates a new CurrencyService with the given forex client and cache TTL.

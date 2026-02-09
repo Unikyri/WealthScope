@@ -17,8 +17,8 @@ import (
 type Correlation struct {
 	Asset1 string  `json:"asset1"`
 	Asset2 string  `json:"asset2"`
-	Value  float64 `json:"value"` // -1 to 1
-	Type   string  `json:"type"`  // positive, negative, neutral
+	Type   string  `json:"type"`
+	Value  float64 `json:"value"`
 }
 
 // CorrelationDetector identifies correlations between portfolio assets.

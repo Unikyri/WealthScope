@@ -82,6 +82,9 @@ dependencies:
   # UI
   cupertino_icons: ^1.0.8
   dartz: ^0.10.1
+  google_fonts: ^8.0.1
+  flutter_animate: ^4.5.2
+  phosphor_flutter: ^2.1.0
 
 dev_dependencies:
   flutter_test:

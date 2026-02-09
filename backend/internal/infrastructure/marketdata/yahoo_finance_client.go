@@ -21,8 +21,8 @@ import (
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type YahooFinanceClient struct {
 	httpClient  *http.Client
-	baseURL     string
 	rateLimiter *RateLimiter
+	baseURL     string
 }
 
 // NewYahooFinanceClient creates a new YahooFinanceClient.
@@ -163,10 +163,10 @@ type yahooQuoteResponse struct {
 
 //nolint:govet // fieldalignment: readability over micro-optimization for DTO
 type yahooQuoteResult struct {
-	RegularMarketPrice         float64 `json:"regularMarketPrice"`
-	RegularMarketChange        float64 `json:"regularMarketChange"`
-	RegularMarketChangePercent float64 `json:"regularMarketChangePercent"`
 	Symbol                     string  `json:"symbol"`
 	MarketState                string  `json:"marketState"`
 	Currency                   string  `json:"currency"`
+	RegularMarketPrice         float64 `json:"regularMarketPrice"`
+	RegularMarketChange        float64 `json:"regularMarketChange"`
+	RegularMarketChangePercent float64 `json:"regularMarketChangePercent"`
 }

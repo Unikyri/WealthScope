@@ -63,9 +63,9 @@ type RiskAlertResponse struct {
 //
 //nolint:govet // fieldalignment: keep response DTO readable
 type PortfolioRiskResponse struct {
+	DiversificationLevel string              `json:"diversification_level" example:"moderate"`
 	Alerts               []RiskAlertResponse `json:"alerts"`
 	RiskScore            int                 `json:"risk_score" example:"35"`
-	DiversificationLevel string              `json:"diversification_level" example:"moderate"`
 }
 
 // ====================================
