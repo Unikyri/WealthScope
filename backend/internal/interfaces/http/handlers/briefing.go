@@ -61,9 +61,9 @@ type BriefingResponse struct {
 	Highlights      []Highlight               `json:"highlights"`
 	Alerts          []services.PortfolioAlert `json:"alerts"`
 	Recommendations []string                  `json:"recommendations"`
+	GeneratedAt     time.Time                 `json:"generated_at"`
 	Briefing        string                    `json:"briefing"`
 	HealthScore     services.HealthScore      `json:"health_score"`
-	GeneratedAt     time.Time                 `json:"generated_at"`
 }
 
 // GetBriefing handles GET /api/v1/ai/briefing

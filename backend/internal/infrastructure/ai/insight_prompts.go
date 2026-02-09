@@ -73,13 +73,13 @@ Based on the portfolio analysis, suggest specific improvements the user could ma
 
 // PortfolioDataForPrompt represents portfolio data formatted for prompts.
 type PortfolioDataForPrompt struct {
+	Diversification   string
+	PreferredLanguage string
 	TopGainers        []AssetPerformanceData
 	TopLosers         []AssetPerformanceData
 	Allocations       []AllocationData
 	RiskAlerts        []RiskAlertData
 	RelevantNews      []NewsData
-	Diversification   string
-	PreferredLanguage string
 	TotalValue        float64
 	TotalInvested     float64
 	GainLoss          float64
@@ -97,12 +97,10 @@ type AssetPerformanceData struct {
 }
 
 // AllocationData represents allocation data for prompts.
-//
-//nolint:govet // fieldalignment: keep logical field grouping for readability
 type AllocationData struct {
-	Type    string
-	Percent float64
-	Status  string
+	Type    string  `json:"type"`
+	Status  string  `json:"status"`
+	Percent float64 `json:"percent"`
 }
 
 // RiskAlertData represents risk alert data for prompts.
