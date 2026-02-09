@@ -22,17 +22,18 @@ type NewsClient interface {
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type NewsQuery struct {
-	Symbols  []string // Filter by stock symbols (e.g., AAPL, TSLA)
-	Keywords string   // Search keywords
-	Language string   // Language filter (e.g., "en", "es")
-	Limit    int      // Max articles to return
-	Page     int      // Pagination page number
+	Keywords string
+	Language string
+	Symbols  []string
+	Limit    int
+	Page     int
 }
 
 // NewsArticle represents a news article from any provider.
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type NewsArticle struct {
+	PublishedAt time.Time `json:"published_at"`
 	ID          string    `json:"id"`
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
@@ -40,10 +41,9 @@ type NewsArticle struct {
 	URL         string    `json:"url"`
 	ImageURL    string    `json:"image_url,omitempty"`
 	Source      string    `json:"source"`
-	PublishedAt time.Time `json:"published_at"`
-	Symbols     []string  `json:"symbols,omitempty"`
-	Sentiment   float64   `json:"sentiment,omitempty"` // -1 (negative) to +1 (positive)
 	Provider    string    `json:"provider"`
+	Symbols     []string  `json:"symbols,omitempty"`
+	Sentiment   float64   `json:"sentiment,omitempty"`
 }
 
 // NewsResponse represents the paginated response for news queries.

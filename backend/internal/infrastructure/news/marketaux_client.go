@@ -26,9 +26,9 @@ const (
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type MarketauxClient struct {
 	httpClient  *http.Client
+	rateLimiter *marketdata.RateLimiter
 	apiKey      string
 	baseURL     string
-	rateLimiter *marketdata.RateLimiter
 }
 
 // NewMarketauxClient creates a new Marketaux client.
@@ -47,32 +47,32 @@ func NewMarketauxClient(apiKey string, rateLimiter *marketdata.RateLimiter) *Mar
 //
 //nolint:govet // fieldalignment: keep JSON field order
 type marketauxResponse struct {
+	Data []marketauxArticle `json:"data"`
 	Meta struct {
 		Found    int `json:"found"`
 		Returned int `json:"returned"`
 		Limit    int `json:"limit"`
 		Page     int `json:"page"`
 	} `json:"meta"`
-	Data []marketauxArticle `json:"data"`
 }
 
 // marketauxArticle represents a single article from Marketaux.
 //
 //nolint:govet // fieldalignment: keep JSON field order
 type marketauxArticle struct {
-	UUID           string             `json:"uuid"`
+	ImageURL       string             `json:"image_url"`
 	Title          string             `json:"title"`
 	Description    string             `json:"description"`
 	Keywords       string             `json:"keywords"`
 	Snippet        string             `json:"snippet"`
 	URL            string             `json:"url"`
-	ImageURL       string             `json:"image_url"`
+	UUID           string             `json:"uuid"`
 	Language       string             `json:"language"`
 	PublishedAt    string             `json:"published_at"`
 	Source         string             `json:"source"`
-	RelevanceScore float64            `json:"relevance_score"`
 	Entities       []marketauxEntity  `json:"entities"`
 	Similar        []marketauxArticle `json:"similar"`
+	RelevanceScore float64            `json:"relevance_score"`
 }
 
 // marketauxEntity represents an entity identified in an article.
@@ -86,9 +86,9 @@ type marketauxEntity struct {
 	Country        string               `json:"country"`
 	Type           string               `json:"type"`
 	Industry       string               `json:"industry"`
+	Highlights     []marketauxHighlight `json:"highlights"`
 	MatchScore     float64              `json:"match_score"`
 	SentimentScore float64              `json:"sentiment_score"`
-	Highlights     []marketauxHighlight `json:"highlights"`
 }
 
 // marketauxHighlight represents a text highlight for an entity.
@@ -96,8 +96,8 @@ type marketauxEntity struct {
 //nolint:govet // fieldalignment: keep JSON field order
 type marketauxHighlight struct {
 	Highlight     string  `json:"highlight"`
-	Sentiment     float64 `json:"sentiment"`
 	HighlightedIn string  `json:"highlighted_in"`
+	Sentiment     float64 `json:"sentiment"`
 }
 
 // GetNews retrieves news articles based on the query parameters.

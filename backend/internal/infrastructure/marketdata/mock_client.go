@@ -16,9 +16,9 @@ import (
 //
 //nolint:govet // fieldalignment: keep maps and mutex grouped for test readability
 type MockClient struct {
+	FailSymbols map[string]bool
+	Supported   map[string]bool
 	NameStr     string
-	FailSymbols map[string]bool // symbol -> true to fail
-	Supported   map[string]bool // symbol -> true to support; nil = support all
 	mu          sync.RWMutex
 }
 

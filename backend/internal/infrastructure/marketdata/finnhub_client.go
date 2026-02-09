@@ -23,9 +23,9 @@ const (
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type FinnhubClient struct {
 	httpClient  *http.Client
+	rateLimiter *RateLimiter
 	apiKey      string
 	baseURL     string
-	rateLimiter *RateLimiter
 }
 
 // NewFinnhubClient creates a new Finnhub client with the given API key.

@@ -24,9 +24,9 @@ const (
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type AlphaVantageClient struct {
 	httpClient  *http.Client
+	rateLimiter *RateLimiter
 	apiKey      string
 	baseURL     string
-	rateLimiter *RateLimiter
 }
 
 // NewAlphaVantageClient creates a new Alpha Vantage client with the given API key.

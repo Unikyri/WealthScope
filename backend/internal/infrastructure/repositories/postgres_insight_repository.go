@@ -18,8 +18,9 @@ import (
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type InsightModel struct {
-	ID             uuid.UUID  `gorm:"type:uuid;primaryKey"`
-	UserID         uuid.UUID  `gorm:"type:uuid;not null;index"`
+	CreatedAt      time.Time  `gorm:"type:timestamptz;not null;index:idx_insights_created_at"`
+	ExpiresAt      *time.Time `gorm:"type:timestamptz"`
+	ReadAt         *time.Time `gorm:"type:timestamptz"`
 	Type           string     `gorm:"type:varchar(50);not null;index"`
 	Title          string     `gorm:"type:varchar(255);not null"`
 	Content        string     `gorm:"type:text;not null"`
@@ -27,9 +28,8 @@ type InsightModel struct {
 	Category       string     `gorm:"type:varchar(50);not null"`
 	ActionItems    string     `gorm:"type:jsonb;default:'[]'"`
 	RelatedSymbols string     `gorm:"type:jsonb;default:'[]'"`
-	ExpiresAt      *time.Time `gorm:"type:timestamptz"`
-	ReadAt         *time.Time `gorm:"type:timestamptz"`
-	CreatedAt      time.Time  `gorm:"type:timestamptz;not null;index:idx_insights_created_at"`
+	ID             uuid.UUID  `gorm:"type:uuid;primaryKey"`
+	UserID         uuid.UUID  `gorm:"type:uuid;not null;index"`
 }
 
 // TableName returns the table name for InsightModel.

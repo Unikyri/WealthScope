@@ -17,38 +17,38 @@ import (
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type ChatRequest struct {
-	UserID         uuid.UUID
-	ConversationID *uuid.UUID // Optional, creates new if nil
+	ConversationID *uuid.UUID
 	Message        string
-	UserContext    ai.UserContext // Portfolio context for personalized responses
+	UserContext    ai.UserContext
+	UserID         uuid.UUID
 }
 
 // ChatResponse represents the response from the AI.
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type ChatResponse struct {
-	ConversationID uuid.UUID        `json:"conversation_id"`
 	UserMessage    entities.Message `json:"user_message"`
 	AIMessage      entities.Message `json:"ai_message"`
+	ConversationID uuid.UUID        `json:"conversation_id"`
 }
 
 // ConversationWithMessages represents a conversation with its messages.
 type ConversationWithMessages struct {
-	Conversation entities.Conversation `json:"conversation"`
 	Messages     []entities.Message    `json:"messages"`
+	Conversation entities.Conversation `json:"conversation"`
 }
 
 // AIService handles AI chat functionality with conversation management.
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type AIService struct {
-	geminiClient       *ai.GeminiClient
-	promptBuilder      *ai.PromptBuilder
 	conversationRepo   repositories.ConversationRepository
 	messageRepo        repositories.MessageRepository
+	geminiClient       *ai.GeminiClient
+	promptBuilder      *ai.PromptBuilder
+	logger             *zap.Logger
 	maxConversations   int
 	maxMessagesPerConv int
-	logger             *zap.Logger
 }
 
 // NewAIService creates a new AIService.

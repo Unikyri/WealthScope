@@ -5,20 +5,13 @@ package dto
 //
 //nolint:govet // fieldalignment: keep logical field order for JSON serialization
 type ExtractedAsset struct {
-	// Name is the name of the asset (e.g., "Apple Inc.", "Bitcoin")
-	Name string `json:"name"`
-	// Type is the asset category (stock, etf, bond, crypto, real_estate, gold, cash, other)
-	Type string `json:"type"`
-	// Symbol is the ticker symbol (optional, e.g., "AAPL", "BTC")
-	Symbol *string `json:"symbol,omitempty"`
-	// Quantity is the number of units held
-	Quantity float64 `json:"quantity"`
-	// PurchasePrice is the unit price (or current value if purchase price unknown)
+	Symbol        *string `json:"symbol,omitempty"`
+	Name          string  `json:"name"`
+	Type          string  `json:"type"`
+	Currency      string  `json:"currency"`
+	Quantity      float64 `json:"quantity"`
 	PurchasePrice float64 `json:"purchase_price"`
-	// Currency is the currency code (e.g., "USD", "EUR")
-	Currency string `json:"currency"`
-	// Confidence is the OCR confidence score (0.0 to 1.0)
-	Confidence float64 `json:"confidence"`
+	Confidence    float64 `json:"confidence"`
 }
 
 // OCRResult represents the complete result of OCR document processing.
@@ -51,18 +44,12 @@ type ConfirmOCRAssetsRequest struct {
 //
 //nolint:govet // fieldalignment: keep logical field order for JSON serialization
 type ConfirmAsset struct {
-	// Name is the asset name (required)
-	Name string `json:"name" binding:"required"`
-	// Type is the asset type (required)
-	Type string `json:"type" binding:"required"`
-	// Symbol is the ticker symbol (optional)
-	Symbol *string `json:"symbol,omitempty"`
-	// Quantity is the number of units (required, must be positive)
-	Quantity float64 `json:"quantity" binding:"required,gt=0"`
-	// PurchasePrice is the unit price (required, must be non-negative)
+	Symbol        *string `json:"symbol,omitempty"`
+	Name          string  `json:"name" binding:"required"`
+	Type          string  `json:"type" binding:"required"`
+	Currency      string  `json:"currency" binding:"required"`
+	Quantity      float64 `json:"quantity" binding:"required,gt=0"`
 	PurchasePrice float64 `json:"purchase_price" binding:"required,gte=0"`
-	// Currency is the currency code (required)
-	Currency string `json:"currency" binding:"required"`
 }
 
 // OCRResponse represents the API response for OCR processing.
@@ -79,30 +66,20 @@ type OCRResponse struct {
 //
 //nolint:govet // fieldalignment: keep logical field order for JSON serialization
 type ExtractedAssetResponse struct {
-	// Name is the name of the asset
-	Name string `json:"name"`
-	// Type is the asset category
-	Type string `json:"type"`
-	// Symbol is the ticker symbol (optional)
-	Symbol *string `json:"symbol,omitempty"`
-	// Quantity is the number of units held
-	Quantity float64 `json:"quantity"`
-	// PurchasePrice is the unit price
+	Symbol        *string `json:"symbol,omitempty"`
+	Name          string  `json:"name"`
+	Type          string  `json:"type"`
+	Currency      string  `json:"currency"`
+	Quantity      float64 `json:"quantity"`
 	PurchasePrice float64 `json:"purchase_price"`
-	// Currency is the currency code
-	Currency string `json:"currency"`
-	// Confidence is the OCR confidence score (0.0 to 1.0)
-	Confidence float64 `json:"confidence"`
-	// TotalValue is the calculated total value (quantity * price)
-	TotalValue float64 `json:"total_value"`
+	Confidence    float64 `json:"confidence"`
+	TotalValue    float64 `json:"total_value"`
 }
 
 // ConfirmOCRAssetsResponse represents the response after creating assets from OCR.
 //
 //nolint:govet // fieldalignment: keep logical field order for JSON serialization
 type ConfirmOCRAssetsResponse struct {
-	// CreatedCount is the number of assets successfully created
-	CreatedCount int `json:"created_count"`
-	// AssetIDs contains the IDs of the created assets
-	AssetIDs []string `json:"asset_ids"`
+	AssetIDs     []string `json:"asset_ids"`
+	CreatedCount int      `json:"created_count"`
 }

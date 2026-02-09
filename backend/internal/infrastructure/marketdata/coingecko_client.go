@@ -25,10 +25,10 @@ const (
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type CoinGeckoClient struct {
 	httpClient   *http.Client
-	apiKey       string
-	baseURL      string
 	rateLimiter  *RateLimiter
 	symbolMapper *CryptoSymbolMapper
+	apiKey       string
+	baseURL      string
 }
 
 // NewCoinGeckoClient creates a new CoinGecko client.

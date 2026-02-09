@@ -30,7 +30,7 @@ func NewInsightsHandler(insightService *services.InsightService) *InsightsHandle
 //
 //nolint:govet // fieldalignment: keep JSON field order for readability
 type InsightResponse struct {
-	ID             uuid.UUID `json:"id"`
+	CreatedAt      time.Time `json:"created_at"`
 	Type           string    `json:"type"`
 	Title          string    `json:"title"`
 	Content        string    `json:"content"`
@@ -38,8 +38,8 @@ type InsightResponse struct {
 	Category       string    `json:"category"`
 	ActionItems    []string  `json:"action_items,omitempty"`
 	RelatedSymbols []string  `json:"related_symbols,omitempty"`
+	ID             uuid.UUID `json:"id"`
 	IsRead         bool      `json:"is_read"`
-	CreatedAt      time.Time `json:"created_at"`
 }
 
 // InsightListResponse represents a list of insights.

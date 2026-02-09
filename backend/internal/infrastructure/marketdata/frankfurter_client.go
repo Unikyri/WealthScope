@@ -25,9 +25,9 @@ const (
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type FrankfurterClient struct {
 	httpClient   *http.Client
-	baseURL      string
 	rateLimiter  *RateLimiter
 	symbolMapper *ForexSymbolMapper
+	baseURL      string
 }
 
 // NewFrankfurterClient creates a new Frankfurter client.
@@ -47,21 +47,21 @@ func NewFrankfurterClient(rateLimiter *RateLimiter, mapper *ForexSymbolMapper) *
 //
 //nolint:govet // fieldalignment: match API response structure
 type frankfurterLatestResponse struct {
-	Amount float64            `json:"amount"`
+	Rates  map[string]float64 `json:"rates"`
 	Base   string             `json:"base"`
 	Date   string             `json:"date"`
-	Rates  map[string]float64 `json:"rates"`
+	Amount float64            `json:"amount"`
 }
 
 // frankfurterTimeseriesResponse represents the /timeseries endpoint response.
 //
 //nolint:govet // fieldalignment: match API response structure
 type frankfurterTimeseriesResponse struct {
-	Amount    float64                       `json:"amount"`
+	Rates     map[string]map[string]float64 `json:"rates"`
 	Base      string                        `json:"base"`
 	StartDate string                        `json:"start_date"`
 	EndDate   string                        `json:"end_date"`
-	Rates     map[string]map[string]float64 `json:"rates"` // date -> currency -> rate
+	Amount    float64                       `json:"amount"`
 }
 
 // GetQuote fetches the latest exchange rate for a forex pair.

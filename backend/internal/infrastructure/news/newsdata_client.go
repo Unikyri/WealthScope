@@ -26,9 +26,9 @@ const (
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type NewsDataClient struct {
 	httpClient  *http.Client
+	rateLimiter *marketdata.RateLimiter
 	apiKey      string
 	baseURL     string
-	rateLimiter *marketdata.RateLimiter
 }
 
 // NewNewsDataClient creates a new NewsData.io client.
@@ -48,9 +48,9 @@ func NewNewsDataClient(apiKey string, rateLimiter *marketdata.RateLimiter) *News
 //nolint:govet // fieldalignment: keep JSON field order
 type newsDataResponse struct {
 	Status       string            `json:"status"`
-	TotalResults int               `json:"totalResults"`
-	Results      []newsDataArticle `json:"results"`
 	NextPage     string            `json:"nextPage,omitempty"`
+	Results      []newsDataArticle `json:"results"`
+	TotalResults int               `json:"totalResults"`
 }
 
 // newsDataArticle represents a single article from NewsData.io.

@@ -38,13 +38,13 @@ const (
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type PortfolioAlert struct {
-	ID        uuid.UUID     `json:"id"`
+	CreatedAt time.Time     `json:"created_at"`
 	Type      AlertType     `json:"type"`
 	Severity  AlertSeverity `json:"severity"`
 	Message   string        `json:"message"`
 	Asset     string        `json:"asset,omitempty"`
 	Action    string        `json:"action,omitempty"`
-	CreatedAt time.Time     `json:"created_at"`
+	ID        uuid.UUID     `json:"id"`
 }
 
 // AlertGenerator generates portfolio alerts based on analysis.

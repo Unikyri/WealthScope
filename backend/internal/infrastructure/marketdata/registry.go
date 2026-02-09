@@ -16,13 +16,13 @@ import (
 //
 //nolint:govet // fieldalignment: keep logger and map grouped for readability
 type ProviderRegistry struct {
-	mu           sync.RWMutex
 	providers    map[services.AssetCategory][]services.MarketDataClient
-	defaultCat   services.AssetCategory
 	logger       *zap.Logger
 	cryptoMapper *CryptoSymbolMapper
 	forexMapper  *ForexSymbolMapper
 	metalsMapper *MetalsSymbolMapper
+	defaultCat   services.AssetCategory
+	mu           sync.RWMutex
 }
 
 // NewProviderRegistry creates a registry with default category equity and optional logger.

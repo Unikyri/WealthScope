@@ -40,8 +40,9 @@ const (
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type Insight struct {
-	ID             uuid.UUID       `json:"id"`
-	UserID         uuid.UUID       `json:"user_id"`
+	CreatedAt      time.Time       `json:"created_at"`
+	ExpiresAt      *time.Time      `json:"expires_at,omitempty"`
+	ReadAt         *time.Time      `json:"read_at,omitempty"`
 	Type           InsightType     `json:"type"`
 	Title          string          `json:"title"`
 	Content        string          `json:"content"`
@@ -49,9 +50,8 @@ type Insight struct {
 	Category       InsightCategory `json:"category"`
 	ActionItems    []string        `json:"action_items,omitempty"`
 	RelatedSymbols []string        `json:"related_symbols,omitempty"`
-	ExpiresAt      *time.Time      `json:"expires_at,omitempty"`
-	ReadAt         *time.Time      `json:"read_at,omitempty"`
-	CreatedAt      time.Time       `json:"created_at"`
+	ID             uuid.UUID       `json:"id"`
+	UserID         uuid.UUID       `json:"user_id"`
 }
 
 // NewInsight creates a new Insight with default values.

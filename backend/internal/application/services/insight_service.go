@@ -30,8 +30,8 @@ type cachedInsight struct {
 
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type cachedCount struct {
-	count     int
 	expiresAt time.Time
+	count     int
 }
 
 // NewInsightCache creates a new InsightCache.

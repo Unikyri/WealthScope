@@ -26,10 +26,10 @@ const (
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type MetalsAPIClient struct {
 	httpClient   *http.Client
-	apiKey       string
-	baseURL      string
 	rateLimiter  *RateLimiter
 	symbolMapper *MetalsSymbolMapper
+	apiKey       string
+	baseURL      string
 }
 
 // NewMetalsAPIClient creates a new MetalPriceAPI client.
@@ -50,23 +50,23 @@ func NewMetalsAPIClient(apiKey string, rateLimiter *RateLimiter, mapper *MetalsS
 //
 //nolint:govet // fieldalignment: match API response structure
 type metalsAPILatestResponse struct {
-	Success   bool               `json:"success"`
-	Timestamp int64              `json:"timestamp"`
+	Rates     map[string]float64 `json:"rates"`
 	Base      string             `json:"base"`
 	Date      string             `json:"date"`
-	Rates     map[string]float64 `json:"rates"`
+	Timestamp int64              `json:"timestamp"`
+	Success   bool               `json:"success"`
 }
 
 // metalsAPIHistoricalResponse represents the /{date} endpoint response.
 //
 //nolint:govet // fieldalignment: match API response structure
 type metalsAPIHistoricalResponse struct {
-	Success    bool               `json:"success"`
-	Historical bool               `json:"historical"`
-	Timestamp  int64              `json:"timestamp"`
+	Rates      map[string]float64 `json:"rates"`
 	Base       string             `json:"base"`
 	Date       string             `json:"date"`
-	Rates      map[string]float64 `json:"rates"`
+	Timestamp  int64              `json:"timestamp"`
+	Success    bool               `json:"success"`
+	Historical bool               `json:"historical"`
 }
 
 // GetQuote fetches the latest price for a precious metal.

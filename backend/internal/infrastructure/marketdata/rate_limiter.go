@@ -11,10 +11,10 @@ import (
 //
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type RateLimiter struct {
+	lastRefill time.Time
 	maxTokens  int
 	tokens     int
-	refillRate time.Duration // duration per token refill
-	lastRefill time.Time
+	refillRate time.Duration
 	mu         sync.Mutex
 }
 

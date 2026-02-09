@@ -21,10 +21,10 @@ const (
 //nolint:govet // fieldalignment: keep logical field grouping for readability
 type ExchangeRateClient struct {
 	httpClient   *http.Client
-	apiKey       string // Optional, for paid tier
-	baseURL      string
 	rateLimiter  *RateLimiter
 	symbolMapper *ForexSymbolMapper
+	apiKey       string
+	baseURL      string
 }
 
 // NewExchangeRateClient creates a new ExchangeRate-API client.
@@ -46,15 +46,15 @@ func NewExchangeRateClient(apiKey string, rateLimiter *RateLimiter, mapper *Fore
 //
 //nolint:govet // fieldalignment: match API response structure
 type exchangeRateLatestResponse struct {
+	Rates              map[string]float64 `json:"rates"`
 	Result             string             `json:"result"`
 	Documentation      string             `json:"documentation"`
 	TermsOfUse         string             `json:"terms_of_use"`
-	TimeLastUpdateUnix int64              `json:"time_last_update_unix"`
 	TimeLastUpdateUTC  string             `json:"time_last_update_utc"`
-	TimeNextUpdateUnix int64              `json:"time_next_update_unix"`
 	TimeNextUpdateUTC  string             `json:"time_next_update_utc"`
 	BaseCode           string             `json:"base_code"`
-	Rates              map[string]float64 `json:"rates"`
+	TimeLastUpdateUnix int64              `json:"time_last_update_unix"`
+	TimeNextUpdateUnix int64              `json:"time_next_update_unix"`
 }
 
 // GetQuote fetches the latest exchange rate for a forex pair.
