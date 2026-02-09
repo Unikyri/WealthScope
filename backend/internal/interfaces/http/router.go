@@ -113,7 +113,8 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 	// Initialize news handler
 	var newsHandler *handlers.NewsHandler
 	if deps.NewsService != nil {
-		newsHandler = handlers.NewNewsHandler(deps.NewsService)
+		// We pass assetRepo (can be nil if DB not connected, but handle it in handler)
+		newsHandler = handlers.NewNewsHandler(deps.NewsService, assetRepo)
 	}
 
 	// Initialize chat handler
@@ -226,6 +227,7 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 					ai.GET("/insights/daily", insightsHandler.GetDailyBriefing)
 					ai.POST("/insights/generate", insightsHandler.GenerateInsights)
 					ai.GET("/insights/unread/count", insightsHandler.GetUnreadCount)
+					ai.GET("/insights/asset/:symbol", insightsHandler.GetAssetAnalysis)
 					ai.GET("/insights/:id", insightsHandler.GetInsightByID)
 					ai.PUT("/insights/:id/read", insightsHandler.MarkAsRead)
 				}

@@ -344,3 +344,41 @@ func (h *InsightsHandler) GetInsightByID(c *gin.Context) {
 
 	response.Success(c, toInsightResponse(*insight))
 }
+
+// GetAssetAnalysis handles GET /api/v1/ai/insights/asset/:symbol
+// @Summary Get AI analysis for a specific asset
+// @Description Generates or retrieves AI analysis for a specific asset symbol
+// @Tags AI Insights
+// @Produce json
+// @Param symbol path string true "Asset Symbol"
+// @Success 200 {object} response.Response{data=services.AssetAnalysisResult}
+// @Failure 401 {object} response.Response
+// @Failure 500 {object} response.Response
+// @Router /api/v1/ai/insights/asset/{symbol} [get]
+func (h *InsightsHandler) GetAssetAnalysis(c *gin.Context) {
+	if h.insightService == nil || !h.insightService.IsEnabled() {
+		response.InternalError(c, "Insight service is not available")
+		return
+	}
+
+	userID, ok := middleware.GetUserID(c)
+	if !ok {
+		response.Unauthorized(c, "User not authenticated")
+		return
+	}
+	_ = userID // Not used yet, but good to have for future personalization
+
+	symbol := c.Param("symbol")
+	if symbol == "" {
+		response.BadRequest(c, "Symbol is required")
+		return
+	}
+
+	analysis, err := h.insightService.GenerateAssetAnalysis(c.Request.Context(), symbol)
+	if err != nil {
+		response.InternalError(c, "Failed to generate asset analysis: "+err.Error())
+		return
+	}
+
+	response.Success(c, analysis)
+}

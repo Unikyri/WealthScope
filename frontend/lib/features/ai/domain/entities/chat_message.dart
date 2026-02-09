@@ -41,6 +41,8 @@ abstract class InsightsResponse with _$InsightsResponse {
     required String summary,
     required List<String> keyPoints,
     String? briefing,
+    double? sentimentScore,
+    String? sentimentTrend,
   }) = _InsightsResponse;
 
   factory InsightsResponse.fromJson(Map<String, dynamic> json) =>

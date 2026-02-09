@@ -12,6 +12,10 @@ abstract class AIRepository {
   Future<Either<Failure, InsightsResponse>> getInsights({
     bool includeBriefing = true,
   });
+
+  Future<Either<Failure, InsightsResponse>> getAssetAnalysis({
+    required String symbol,
+  });
   
   Future<Either<Failure, Briefing>> getBriefing();
   

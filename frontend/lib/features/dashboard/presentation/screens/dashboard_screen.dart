@@ -1,188 +1,192 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:wealthscope_app/core/theme/custom_icons.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/providers/dashboard_providers.dart';
-import 'package:wealthscope_app/features/dashboard/presentation/providers/portfolio_history_provider.dart';
-// Temporarily disabled: Performance metrics
-// import 'package:wealthscope_app/features/dashboard/presentation/providers/performance_provider.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/enhanced_allocation_section_with_legend.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/dashboard_skeleton.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/empty_dashboard.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/error_view.dart';
-import 'package:wealthscope_app/features/dashboard/presentation/widgets/last_updated_indicator.dart';
-import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_summary_card.dart';
-import 'package:wealthscope_app/features/dashboard/presentation/widgets/portfolio_history_chart.dart';
-// Temporarily disabled: Performance metrics 
-// import 'package:wealthscope_app/features/dashboard/presentation/widgets/performance_metrics.dart';
+import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/dashboard_news_section.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
-import 'package:wealthscope_app/features/notifications/presentation/providers/notifications_provider.dart';
 import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
+import 'package:wealthscope_app/shared/widgets/tech_card.dart';
 import 'package:wealthscope_app/shared/widgets/speed_dial_fab.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/crypto_net_worth_hero.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/ai_trigger_button.dart';
 
-/// Dashboard Screen
-/// Main screen displaying portfolio overview
+/// Dashboard Screen - Crypto Blue Pivot
+/// Matches HTML Reference structure
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print('🏠 [DASHBOARD_SCREEN] Build ejecutándose...');
+    print('🏠 [DASHBOARD_SCREEN] Build (Crypto Blue)');
     final theme = Theme.of(context);
     final summaryAsync = ref.watch(dashboardPortfolioSummaryProvider);
     final currentUserEmail = ref.watch(currentUserProvider)?.email;
-    print('🏠 [DASHBOARD_SCREEN] Watched dashboardPortfolioSummaryProvider');
-    
-    // Simple unread count without constant watching
-    final unreadCount = 0; // Disabled for now to prevent loops
-    
-    // Format badge label: show "9+" for 10 or more
-    final badgeLabel = unreadCount > 9 ? '9+' : '$unreadCount';
-
-    // Extract first name from email
     final userName = currentUserEmail?.split('@').first.capitalize() ?? 'User';
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: theme.colorScheme.background,
       body: RefreshIndicator(
         onRefresh: () async {
-          // Refresh all dashboard data simultaneously
           await Future.wait([
             ref.refresh(dashboardPortfolioSummaryProvider.future),
             ref.refresh(allAssetsProvider.future),
-            // Performance provider temporarily disabled
-            // ref.refresh(performanceProvider.future),
           ]);
         },
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            // Floating App Bar
+            // Top App Bar (Header)
             SliverAppBar(
-              floating: true,
-              snap: true,
-              expandedHeight: 80,
-              backgroundColor: theme.colorScheme.surface,
+              backgroundColor: theme.colorScheme.background.withOpacity(0.9),
               elevation: 0,
-              flexibleSpace: FlexibleSpaceBar(
-                titlePadding: const EdgeInsets.only(left: 16, bottom: 16),
-                title: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Hello, $userName',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.onSurface,
+              pinned: true,
+              centerTitle: false,
+              title: Row(
+                children: [
+                  // User Avatar
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppTheme.cardGrey,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white.withOpacity(0.1)),
+                      image: const DecorationImage(
+                        image: NetworkImage('https://ui-avatars.com/api/?name=User&background=137FEC&color=fff'), // Placeholder
                       ),
                     ),
-                    Text(
-                      'Your Financial Summary',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  ),
+                  const SizedBox(width: 12),
+                  // Greeting
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Good Morning',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppTheme.textGrey,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                      Text(
+                        userName,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
               actions: [
-                IconButton(
-                  icon: Badge(
-                    label: Text(badgeLabel),
-                    isLabelVisible: unreadCount > 0,
-                    child: const Icon(Icons.notifications_outlined),
+                // Sync Status
+                Container(
+                  margin: const EdgeInsets.only(right: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.cardGrey.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white.withOpacity(0.05)),
                   ),
-                  onPressed: () {
-                    context.push('/notifications');
-                  },
-                  tooltip: 'Notifications',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.sync, size: 14, color: AppTheme.emeraldAccent),
+                      const SizedBox(width: 4),
+                      Text(
+                        'SYNCED',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: AppTheme.textGrey,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Notifications
+                IconButton(
+                  icon: const Icon(Icons.notifications_outlined),
+                  onPressed: () => context.push('/notifications'),
                 ),
               ],
             ),
 
-            // Dashboard Content
+            // Main Content
             summaryAsync.when(
               data: (summary) {
-                // Check if portfolio is empty
-                if (summary.totalValue == 0 && summary.breakdownByType.isEmpty) {
-                  return SliverFillRemaining(
-                    child: EmptyDashboard(
-                      onAddAsset: () => context.go('/assets/select-type'),
-                    ),
-                  );
-                }
-
                 final assetsAsync = ref.watch(allAssetsProvider);
 
                 return SliverPadding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
-                      // Main Portfolio Card
-                      PortfolioSummaryCard(summary: summary),
-                      const SizedBox(height: 8),
-                      LastUpdatedIndicator(lastUpdated: summary.lastUpdated),
+                      // 1. Hero Sparkline Card
+                      CryptoNetWorthHero(
+                        totalValue: summary.totalValue,
+                        change: summary.gainLoss,
+                        changePercent: summary.gainLossPercent,
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      
+                      // 2. AI Trigger Button
+                      AiTriggerButton(
+                        onTap: () {
+                           context.push('/ai-command');
+                        },
+                      ),
+                      
                       const SizedBox(height: 24),
-
-                      // Quick Stats Row - HIDDEN
-                      // _QuickStatsRow(summary: summary),
-                      // const SizedBox(height: 24),
-
-                      // Performance Metrics - HIDDEN
-                      // const _PerformanceMetricsSection(),
-                      // const SizedBox(height: 24),
-
-                      // Portfolio History Chart - HIDDEN
-                      // const _PortfolioHistorySection(),
-                      // const SizedBox(height: 24),
-
-                      // Asset Allocation Pie Chart
+                      
+                      // 3. Asset Allocation Donut
                       if (summary.breakdownByType.isNotEmpty) ...[
                         EnhancedAllocationSection(
                           allocations: summary.breakdownByType,
+                          totalValue: summary.totalValue,
                         ),
                         const SizedBox(height: 24),
                       ],
-
-                      // Top Assets Section
-                      assetsAsync.when(
-                        data: (assets) {
-                          if (assets.isEmpty) {
-                            return const SizedBox.shrink();
-                          }
-
-                          // Sort by total value and take top 3
-                          final sortedAssets = List<dynamic>.from(assets)
-                            ..sort((a, b) =>
-                                (b.totalValue ?? 0).compareTo(a.totalValue ?? 0));
-                          final topAssets = sortedAssets.take(3).toList();
-
-                          return _TopAssetsCard(assets: topAssets);
-                        },
-                        loading: () => const SizedBox.shrink(),
-                        error: (error, stack) => const SizedBox.shrink(),
-                      ),
-
+                      
+                      // 4. Intelligence Grid (Sentiment & Risk)
+                      const _IntelligenceGrid(),
+                      
                       const SizedBox(height: 24),
 
-                      // Latest Financial News (moved to bottom)
-                      const DashboardNewsSection(),
+                      // 5. Top Movers
+                      const _SectionHeader(title: 'Top Movers'),
+                      const SizedBox(height: 12),
+                      assetsAsync.when(
+                        data: (assets) {
+                          if (assets.isEmpty) return const SizedBox.shrink();
+                          
+                          // Convert to local model or generic mock for UI if needed
+                          // Sorting rationale: Show biggest holdings first as proxy for 'top movers' for now
+                          final sortedAssets = List<dynamic>.from(assets)
+                            ..sort((a, b) => (b.totalValue ?? 0).compareTo(a.totalValue ?? 0));
+                          final topAssets = sortedAssets.take(3).toList();
 
-                      const SizedBox(height: 80), // Space for FAB
+                          return Column(
+                            children: topAssets.map((asset) => _TopMoverItem(asset: asset)).toList(),
+                          );
+                        },
+                        loading: () => const SizedBox.shrink(),
+                        error: (_, __) => const SizedBox.shrink(),
+                      ),
+
+                      const SizedBox(height: 80), // Fab space
                     ]),
                   ),
                 );
               },
-              loading: () => const SliverFillRemaining(
-                child: DashboardSkeleton(),
-              ),
-              error: (error, _) => SliverFillRemaining(
-                child: ErrorView(
-                  message: error.toString(),
-                  onRetry: () => ref.invalidate(dashboardPortfolioSummaryProvider),
-                ),
-              ),
+              loading: () => const SliverFillRemaining(child: DashboardSkeleton()),
+              error: (e, _) => SliverFillRemaining(child: ErrorView(message: e.toString(), onRetry: () {})),
             ),
           ],
         ),
@@ -192,164 +196,160 @@ class DashboardScreen extends ConsumerWidget {
   }
 }
 
-/// Extension to capitalize string
-extension StringExtension on String {
-  String capitalize() {
-    if (isEmpty) return this;
-    return '${this[0].toUpperCase()}${substring(1)}';
-  }
-}
-
-/// Quick Stats Row Widget
-class _QuickStatsRow extends StatelessWidget {
-  final dynamic summary;
-
-  const _QuickStatsRow({required this.summary});
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  const _SectionHeader({required this.title});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(
-          child: _StatCard(
-            icon: Icons.account_balance_wallet,
-            label: 'Assets',
-            value: '${summary.assetCount}',
-            color: theme.colorScheme.primary,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _StatCard(
-            icon: Icons.trending_up,
-            label: 'Gain/Loss',
-            value: _formatCurrency(summary.gainLoss),
-            color: summary.gainLoss >= 0 ? Colors.green : Colors.red,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _StatCard(
-            icon: Icons.pie_chart,
-            label: 'Types',
-            value: '${summary.breakdownByType.length}',
-            color: theme.colorScheme.secondary,
+        Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
       ],
     );
   }
-
-  String _formatCurrency(double value) {
-    if (value.abs() >= 1000000000) {
-      return '\$${(value / 1000000000).toStringAsFixed(2)}B';
-    } else if (value.abs() >= 1000000) {
-      return '\$${(value / 1000000).toStringAsFixed(2)}M';
-    } else if (value.abs() >= 1000) {
-      return '\$${(value / 1000).toStringAsFixed(2)}K';
-    }
-    return '\$${value.toStringAsFixed(2)}';
-  }
 }
 
-/// Stat Card Widget
-class _StatCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color color;
-
-  const _StatCard({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.color,
-  });
+class _IntelligenceGrid extends StatelessWidget {
+  const _IntelligenceGrid();
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-          width: 1,
+    return GridView.count(
+      crossAxisCount: 2,
+      crossAxisSpacing: 16,
+      mainAxisSpacing: 16,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      childAspectRatio: 1.4,
+      children: const [
+        _GridCard(
+          icon: CustomIcons.trendingUp,
+          watermarkIcon: CustomIcons.trendingUp, // Rocket/Trending
+          iconColor: AppTheme.emeraldAccent,
+          label: 'Sentiment',
+          value: 'Bullish',
+          subtext: 'Market is hot',
         ),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
-            ),
-          ),
-        ],
-      ),
+        _GridCard(
+          icon: Icons.security,
+          watermarkIcon: Icons.security,
+          iconColor: Colors.amber,
+          label: 'Risk Level',
+          value: 'Medium',
+          subtext: 'Balanced Portfolio',
+        ),
+      ],
     );
   }
 }
 
-/// Top Assets Card Widget
-class _TopAssetsCard extends ConsumerWidget {
-  final List<dynamic> assets;
+class _GridCard extends StatelessWidget {
+  final IconData icon;
+  final IconData watermarkIcon;
+  final Color iconColor;
+  final String label;
+  final String value;
+  final String subtext;
 
-  const _TopAssetsCard({required this.assets});
+  const _GridCard({
+    required this.icon,
+    required this.watermarkIcon,
+    required this.iconColor,
+    required this.label,
+    required this.value,
+    required this.subtext,
+  });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.cardGrey,
+        borderRadius: BorderRadius.circular(24), // Match new theme
+        border: Border.all(color: Colors.white.withOpacity(0.02)), // Subtle border
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 12,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Stack(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Top Assets',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+            // Watermark Icon
+            Positioned(
+              right: -10,
+              top: -10,
+              child: Transform.rotate(
+                angle: 0.2, // Slight tilt
+                child: Icon(
+                  watermarkIcon,
+                  size: 80,
+                  color: iconColor.withOpacity(0.07), // Very subtle
                 ),
-                TextButton(
-                  onPressed: () => context.go('/assets'),
-                  child: const Text('View All'),
-                ),
-              ],
+              ),
             ),
-            const SizedBox(height: 16),
-            ...assets.asMap().entries.map((entry) {
-              final index = entry.key;
-              final asset = entry.value;
-              final isLast = index == assets.length - 1;
-
-              return Column(
+            
+            // Content
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _AssetListItem(asset: asset),
-                  if (!isLast) const Divider(height: 24),
+                  Row(
+                    children: [
+                      Icon(icon, size: 18, color: iconColor),
+                      const SizedBox(width: 8),
+                      Text(
+                        label.toUpperCase(),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: AppTheme.textGrey,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        value,
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Text(
+                            subtext,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: iconColor,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(CustomIcons.arrowRight, size: 10, color: iconColor),
+                        ],
+                      ),
+                    ],
+                  )
                 ],
-              );
-            }),
+              ),
+            ),
           ],
         ),
       ),
@@ -357,60 +357,62 @@ class _TopAssetsCard extends ConsumerWidget {
   }
 }
 
-/// Asset List Item Widget
-class _AssetListItem extends StatelessWidget {
+class _TopMoverItem extends ConsumerWidget {
   final dynamic asset;
 
-  const _AssetListItem({required this.asset});
+  const _TopMoverItem({required this.asset});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    // Mock change percentage for demo as it might not be in asset model
+    final mockChange = 5.2; 
 
-    return InkWell(
-      onTap: () => context.push('/assets/${asset.id}'),
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+    return GestureDetector(
+      onTap: () {
+        if (asset.id != null) {
+          context.push('/assets/${asset.id}');
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppTheme.cardGrey,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white.withOpacity(0.05)),
+        ),
         child: Row(
           children: [
-            // Asset Icon
+            // Icon
             Container(
               width: 40,
               height: 40,
-              decoration: BoxDecoration(
-                color: _getTypeColor(asset.type.toApiString(), theme).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
+              decoration: const BoxDecoration(
+                color: AppTheme.deepBlue,
+                shape: BoxShape.circle,
               ),
-              child: Icon(
-                _getTypeIcon(asset.type.toApiString()),
-                color: _getTypeColor(asset.type.toApiString(), theme),
-                size: 20,
-              ),
+              child: const Icon(CustomIcons.assets, color: Colors.white, size: 20),
             ),
             const SizedBox(width: 12),
-            // Asset Info
+            // Name
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     asset.name,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                  if (asset.symbol != null) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      asset.symbol!,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
-                      ),
+                  Text(
+                    asset.symbol ?? 'ASSET',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppTheme.textGrey,
                     ),
-                  ],
+                  ),
                 ],
               ),
             ),
@@ -420,16 +422,22 @@ class _AssetListItem extends StatelessWidget {
               children: [
                 Text(
                   _formatCurrency(asset.totalValue ?? 0),
-                  style: theme.textTheme.titleSmall?.copyWith(
+                  style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  '${asset.quantity.toStringAsFixed(0)} units',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      '+$mockChange%',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: AppTheme.emeraldAccent,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Icon(Icons.arrow_upward, size: 12, color: AppTheme.emeraldAccent),
+                  ],
                 ),
               ],
             ),
@@ -437,48 +445,6 @@ class _AssetListItem extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  IconData _getTypeIcon(String type) {
-    switch (type.toLowerCase()) {
-      case 'stock':
-        return Icons.show_chart;
-      case 'etf':
-        return Icons.pie_chart;
-      case 'bond':
-        return Icons.receipt_long;
-      case 'crypto':
-        return Icons.currency_bitcoin;
-      case 'real_estate':
-        return Icons.home;
-      case 'gold':
-        return Icons.star;
-      case 'cash':
-        return Icons.account_balance_wallet;
-      default:
-        return Icons.inventory_2;
-    }
-  }
-
-  Color _getTypeColor(String type, ThemeData theme) {
-    switch (type.toLowerCase()) {
-      case 'stock':
-        return Colors.blue;
-      case 'etf':
-        return Colors.purple;
-      case 'bond':
-        return Colors.green;
-      case 'crypto':
-        return Colors.orange;
-      case 'real_estate':
-        return Colors.brown;
-      case 'gold':
-        return Colors.amber;
-      case 'cash':
-        return Colors.teal;
-      default:
-        return theme.colorScheme.primary;
-    }
   }
 
   String _formatCurrency(double value) {
@@ -489,115 +455,13 @@ class _AssetListItem extends StatelessWidget {
     } else if (value >= 1000) {
       return '\$${(value / 1000).toStringAsFixed(2)}K';
     }
-    return '\$${value.toStringAsFixed(2)}';
+    return '\$${value.toStringAsFixed(2)}'; 
   }
 }
 
-/// Portfolio History Section Widget
-class _PortfolioHistorySection extends ConsumerWidget {
-  const _PortfolioHistorySection();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final selectedPeriod = ref.watch(selectedPeriodProvider);
-    final historyAsync = ref.watch(portfolioHistoryProvider(selectedPeriod));
-
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: theme.colorScheme.outlineVariant.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            historyAsync.when(
-              data: (data) => PortfolioHistoryChart(
-                data: data,
-                period: selectedPeriod,
-                onPeriodChanged: (period) {
-                  ref.read(selectedPeriodProvider.notifier).setPeriod(period);
-                },
-              ),
-              loading: () => const SizedBox(
-                height: 300,
-                child: Center(child: CircularProgressIndicator()),
-              ),
-              error: (error, _) => SizedBox(
-                height: 300,
-                child: Center(
-                  child: Text(
-                    'Error loading history',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.error,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+extension StringExtension on String {
+  String capitalize() {
+    if (isEmpty) return this;
+    return '${this[0].toUpperCase()}${substring(1)}';
   }
 }
-
-/// Performance Metrics Section Widget - TEMPORARILY DISABLED
-/*
-class _PerformanceMetricsSection extends ConsumerWidget {
-  const _PerformanceMetricsSection();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final performanceAsync = ref.watch(performanceProvider);
-
-    return performanceAsync.when(
-      data: (performance) => PerformanceMetrics(
-        performance: performance,
-      ),
-      loading: () => Card(
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(
-            color: theme.colorScheme.outlineVariant.withOpacity(0.3),
-            width: 1,
-          ),
-        ),
-        child: const SizedBox(
-          height: 200,
-          child: Center(child: CircularProgressIndicator()),
-        ),
-      ),
-      error: (error, _) => Card(
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(
-            color: theme.colorScheme.outlineVariant.withOpacity(0.3),
-            width: 1,
-          ),
-        ),
-        child: SizedBox(
-          height: 200,
-          child: Center(
-            child: Text(
-              'Error loading performance',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.error,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-*/

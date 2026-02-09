@@ -807,6 +807,8 @@ mixin _$InsightsResponse {
   String get summary;
   List<String> get keyPoints;
   String? get briefing;
+  double? get sentimentScore;
+  String? get sentimentTrend;
 
   /// Create a copy of InsightsResponse
   /// with the given fields replaced by the non-null parameter values.
@@ -827,17 +829,26 @@ mixin _$InsightsResponse {
             (identical(other.summary, summary) || other.summary == summary) &&
             const DeepCollectionEquality().equals(other.keyPoints, keyPoints) &&
             (identical(other.briefing, briefing) ||
-                other.briefing == briefing));
+                other.briefing == briefing) &&
+            (identical(other.sentimentScore, sentimentScore) ||
+                other.sentimentScore == sentimentScore) &&
+            (identical(other.sentimentTrend, sentimentTrend) ||
+                other.sentimentTrend == sentimentTrend));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, summary,
-      const DeepCollectionEquality().hash(keyPoints), briefing);
+  int get hashCode => Object.hash(
+      runtimeType,
+      summary,
+      const DeepCollectionEquality().hash(keyPoints),
+      briefing,
+      sentimentScore,
+      sentimentTrend);
 
   @override
   String toString() {
-    return 'InsightsResponse(summary: $summary, keyPoints: $keyPoints, briefing: $briefing)';
+    return 'InsightsResponse(summary: $summary, keyPoints: $keyPoints, briefing: $briefing, sentimentScore: $sentimentScore, sentimentTrend: $sentimentTrend)';
   }
 }
 
@@ -847,7 +858,12 @@ abstract mixin class $InsightsResponseCopyWith<$Res> {
           InsightsResponse value, $Res Function(InsightsResponse) _then) =
       _$InsightsResponseCopyWithImpl;
   @useResult
-  $Res call({String summary, List<String> keyPoints, String? briefing});
+  $Res call(
+      {String summary,
+      List<String> keyPoints,
+      String? briefing,
+      double? sentimentScore,
+      String? sentimentTrend});
 }
 
 /// @nodoc
@@ -866,6 +882,8 @@ class _$InsightsResponseCopyWithImpl<$Res>
     Object? summary = null,
     Object? keyPoints = null,
     Object? briefing = freezed,
+    Object? sentimentScore = freezed,
+    Object? sentimentTrend = freezed,
   }) {
     return _then(_self.copyWith(
       summary: null == summary
@@ -879,6 +897,14 @@ class _$InsightsResponseCopyWithImpl<$Res>
       briefing: freezed == briefing
           ? _self.briefing
           : briefing // ignore: cast_nullable_to_non_nullable
+              as String?,
+      sentimentScore: freezed == sentimentScore
+          ? _self.sentimentScore
+          : sentimentScore // ignore: cast_nullable_to_non_nullable
+              as double?,
+      sentimentTrend: freezed == sentimentTrend
+          ? _self.sentimentTrend
+          : sentimentTrend // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
@@ -977,14 +1003,16 @@ extension InsightsResponsePatterns on InsightsResponse {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String summary, List<String> keyPoints, String? briefing)?
+    TResult Function(String summary, List<String> keyPoints, String? briefing,
+            double? sentimentScore, String? sentimentTrend)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _InsightsResponse() when $default != null:
-        return $default(_that.summary, _that.keyPoints, _that.briefing);
+        return $default(_that.summary, _that.keyPoints, _that.briefing,
+            _that.sentimentScore, _that.sentimentTrend);
       case _:
         return orElse();
     }
@@ -1005,13 +1033,15 @@ extension InsightsResponsePatterns on InsightsResponse {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String summary, List<String> keyPoints, String? briefing)
+    TResult Function(String summary, List<String> keyPoints, String? briefing,
+            double? sentimentScore, String? sentimentTrend)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _InsightsResponse():
-        return $default(_that.summary, _that.keyPoints, _that.briefing);
+        return $default(_that.summary, _that.keyPoints, _that.briefing,
+            _that.sentimentScore, _that.sentimentTrend);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -1031,13 +1061,15 @@ extension InsightsResponsePatterns on InsightsResponse {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String summary, List<String> keyPoints, String? briefing)?
+    TResult? Function(String summary, List<String> keyPoints, String? briefing,
+            double? sentimentScore, String? sentimentTrend)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _InsightsResponse() when $default != null:
-        return $default(_that.summary, _that.keyPoints, _that.briefing);
+        return $default(_that.summary, _that.keyPoints, _that.briefing,
+            _that.sentimentScore, _that.sentimentTrend);
       case _:
         return null;
     }
@@ -1050,7 +1082,9 @@ class _InsightsResponse implements InsightsResponse {
   const _InsightsResponse(
       {required this.summary,
       required final List<String> keyPoints,
-      this.briefing})
+      this.briefing,
+      this.sentimentScore,
+      this.sentimentTrend})
       : _keyPoints = keyPoints;
   factory _InsightsResponse.fromJson(Map<String, dynamic> json) =>
       _$InsightsResponseFromJson(json);
@@ -1067,6 +1101,10 @@ class _InsightsResponse implements InsightsResponse {
 
   @override
   final String? briefing;
+  @override
+  final double? sentimentScore;
+  @override
+  final String? sentimentTrend;
 
   /// Create a copy of InsightsResponse
   /// with the given fields replaced by the non-null parameter values.
@@ -1092,17 +1130,26 @@ class _InsightsResponse implements InsightsResponse {
             const DeepCollectionEquality()
                 .equals(other._keyPoints, _keyPoints) &&
             (identical(other.briefing, briefing) ||
-                other.briefing == briefing));
+                other.briefing == briefing) &&
+            (identical(other.sentimentScore, sentimentScore) ||
+                other.sentimentScore == sentimentScore) &&
+            (identical(other.sentimentTrend, sentimentTrend) ||
+                other.sentimentTrend == sentimentTrend));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, summary,
-      const DeepCollectionEquality().hash(_keyPoints), briefing);
+  int get hashCode => Object.hash(
+      runtimeType,
+      summary,
+      const DeepCollectionEquality().hash(_keyPoints),
+      briefing,
+      sentimentScore,
+      sentimentTrend);
 
   @override
   String toString() {
-    return 'InsightsResponse(summary: $summary, keyPoints: $keyPoints, briefing: $briefing)';
+    return 'InsightsResponse(summary: $summary, keyPoints: $keyPoints, briefing: $briefing, sentimentScore: $sentimentScore, sentimentTrend: $sentimentTrend)';
   }
 }
 
@@ -1114,7 +1161,12 @@ abstract mixin class _$InsightsResponseCopyWith<$Res>
       __$InsightsResponseCopyWithImpl;
   @override
   @useResult
-  $Res call({String summary, List<String> keyPoints, String? briefing});
+  $Res call(
+      {String summary,
+      List<String> keyPoints,
+      String? briefing,
+      double? sentimentScore,
+      String? sentimentTrend});
 }
 
 /// @nodoc
@@ -1133,6 +1185,8 @@ class __$InsightsResponseCopyWithImpl<$Res>
     Object? summary = null,
     Object? keyPoints = null,
     Object? briefing = freezed,
+    Object? sentimentScore = freezed,
+    Object? sentimentTrend = freezed,
   }) {
     return _then(_InsightsResponse(
       summary: null == summary
@@ -1146,6 +1200,14 @@ class __$InsightsResponseCopyWithImpl<$Res>
       briefing: freezed == briefing
           ? _self.briefing
           : briefing // ignore: cast_nullable_to_non_nullable
+              as String?,
+      sentimentScore: freezed == sentimentScore
+          ? _self.sentimentScore
+          : sentimentScore // ignore: cast_nullable_to_non_nullable
+              as double?,
+      sentimentTrend: freezed == sentimentTrend
+          ? _self.sentimentTrend
+          : sentimentTrend // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
