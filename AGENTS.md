@@ -18,7 +18,7 @@ WealthScope is a mobile-first investment intelligence application that consolida
 | State Management | Riverpod | 2.x |
 | Database | PostgreSQL | Supabase |
 | Auth | Supabase Auth | - |
-| AI/LLM | OpenAI GPT-4o | - |
+| AI/LLM | Google Gemini 3.0 | - |
 | Payments | RevenueCat | - |
 | Hosting | Railway (backend) | - |
 
@@ -132,7 +132,7 @@ Refer to the wiki for detailed specifications:
 - `WealthScope.wiki/System-Architecture.md` - Technical architecture
 - `WealthScope.wiki/API-Design.md` - API endpoints and contracts
 - `WealthScope.wiki/Data-Model.md` - Database schema
-- `WealthScope.wiki/AI-Integration.md` - OpenAI integration details
+- `WealthScope.wiki/AI-Integration.md` - Google Gemini integration details
 - `WealthScope.wiki/Shadow-Pricing.md` - Illiquid asset valuation
 - `WealthScope.wiki/Security-Privacy.md` - Security requirements
 - `WealthScope.wiki/Sprint-Plan.md` - Development timeline
@@ -195,7 +195,7 @@ When helping with this project:
 # Backend
 DATABASE_URL=postgres://...
 SUPABASE_JWT_SECRET=...
-OPENAI_API_KEY=sk-...
+GEMINI_API_KEY=your-gemini-api-key
 REVENUECAT_API_KEY=sk_...
 REVENUECAT_WEBHOOK_SECRET=whsec_...
 YAHOO_FINANCE_API_KEY=...

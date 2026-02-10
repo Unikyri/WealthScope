@@ -1,0 +1,2208 @@
+basePath: /
+definitions:
+  database.HealthStatus:
+    properties:
+      connected:
+        type: boolean
+      error:
+        type: string
+      idle:
+        type: integer
+      in_use:
+        type: integer
+      latency:
+        type: string
+      max_open_connections:
+        type: integer
+      open_connections:
+        type: integer
+    type: object
+  dto.ConfirmAsset:
+    properties:
+      currency:
+        description: Currency is the currency code (required)
+        type: string
+      name:
+        description: Name is the asset name (required)
+        type: string
+      purchase_price:
+        description: PurchasePrice is the unit price (required, must be non-negative)
+        minimum: 0
+        type: number
+      quantity:
+        description: Quantity is the number of units (required, must be positive)
+        type: number
+      symbol:
+        description: Symbol is the ticker symbol (optional)
+        type: string
+      type:
+        description: Type is the asset type (required)
+        type: string
+    required:
+    - currency
+    - name
+    - purchase_price
+    - quantity
+    - type
+    type: object
+  dto.ConfirmOCRAssetsRequest:
+    properties:
+      assets:
+        description: Assets contains the list of assets to confirm/create
+        items:
+          $ref: '#/definitions/dto.ConfirmAsset'
+        minItems: 1
+        type: array
+    required:
+    - assets
+    type: object
+  dto.ConfirmOCRAssetsResponse:
+    properties:
+      asset_ids:
+        description: AssetIDs contains the IDs of the created assets
+        items:
+          type: string
+        type: array
+      created_count:
+        description: CreatedCount is the number of assets successfully created
+        type: integer
+    type: object
+  dto.ExtractedAssetResponse:
+    properties:
+      confidence:
+        description: Confidence is the OCR confidence score (0.0 to 1.0)
+        type: number
+      currency:
+        description: Currency is the currency code
+        type: string
+      name:
+        description: Name is the name of the asset
+        type: string
+      purchase_price:
+        description: PurchasePrice is the unit price
+        type: number
+      quantity:
+        description: Quantity is the number of units held
+        type: number
+      symbol:
+        description: Symbol is the ticker symbol (optional)
+        type: string
+      total_value:
+        description: TotalValue is the calculated total value (quantity * price)
+        type: number
+      type:
+        description: Type is the asset category
+        type: string
+    type: object
+  dto.OCRResponse:
+    properties:
+      assets:
+        description: Assets contains all extracted financial assets
+        items:
+          $ref: '#/definitions/dto.ExtractedAssetResponse'
+        type: array
+      document_type:
+        description: DocumentType identifies the type of document processed
+        type: string
+      warnings:
+        description: Warnings contains any issues encountered during extraction
+        items:
+          type: string
+        type: array
+    type: object
+  entities.AllocationItem:
+    properties:
+      percent:
+        type: number
+      type:
+        type: string
+      value:
+        type: number
+    type: object
+  entities.ChainResult:
+    properties:
+      final_state:
+        $ref: '#/definitions/entities.PortfolioState'
+      risk:
+        $ref: '#/definitions/entities.RiskAssessment'
+      steps:
+        items:
+          $ref: '#/definitions/entities.StepResult'
+        type: array
+      total_impact:
+        description: Initial vs Final total value
+        type: number
+    type: object
+  entities.ChangeDetail:
+    properties:
+      description:
+        type: string
+      difference:
+        type: number
+      new_value:
+        type: number
+      old_value:
+        type: number
+      type:
+        description: increase, decrease, new, removed
+        type: string
+    type: object
+  entities.NewAssetParams:
+    properties:
+      name:
+        type: string
+      purchase_price:
+        type: number
+      quantity:
+        type: number
+      symbol:
+        type: string
+      type:
+        type: string
+    type: object
+  entities.PortfolioState:
+    properties:
+      allocation:
+        items:
+          $ref: '#/definitions/entities.AllocationItem'
+        type: array
+      asset_count:
+        type: integer
+      gain_loss:
+        type: number
+      gain_loss_percent:
+        type: number
+      total_invested:
+        type: number
+      total_value:
+        type: number
+    type: object
+  entities.RiskAssessment:
+    properties:
+      factors:
+        items:
+          type: string
+        type: array
+      level:
+        description: low, medium, high, critical
+        type: string
+      recommendation:
+        type: string
+      score:
+        description: 0-100 high is risky
+        type: integer
+      warnings:
+        items:
+          type: string
+        type: array
+    type: object
+  entities.ScenarioChainRequest:
+    properties:
+      steps:
+        items:
+          $ref: '#/definitions/entities.ScenarioStep'
+        type: array
+      user_id:
+        type: string
+    type: object
+  entities.ScenarioParams:
+    properties:
+      asset_id:
+        description: For buy/sell scenarios
+        type: string
+      asset_types:
+        description: Affected asset types (empty = all)
+        items:
+          type: string
+        type: array
+      change_percent:
+        description: For market move scenarios
+        type: number
+      new_asset:
+        allOf:
+        - $ref: '#/definitions/entities.NewAssetParams'
+        description: For new asset scenarios
+      price:
+        type: number
+      quantity:
+        type: number
+      target_allocation:
+        additionalProperties:
+          format: float64
+          type: number
+        description: For rebalance scenarios
+        type: object
+    type: object
+  entities.ScenarioResult:
+    properties:
+      ai_analysis:
+        type: string
+      changes:
+        items:
+          $ref: '#/definitions/entities.ChangeDetail'
+        type: array
+      current_state:
+        $ref: '#/definitions/entities.PortfolioState'
+      projected_state:
+        $ref: '#/definitions/entities.PortfolioState'
+      warnings:
+        items:
+          type: string
+        type: array
+    type: object
+  entities.ScenarioStep:
+    properties:
+      order:
+        type: integer
+      parameters:
+        $ref: '#/definitions/entities.ScenarioParams'
+      type:
+        $ref: '#/definitions/entities.ScenarioType'
+    type: object
+  entities.ScenarioTemplate:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      parameters:
+        $ref: '#/definitions/entities.ScenarioParams'
+      type:
+        $ref: '#/definitions/entities.ScenarioType'
+    type: object
+  entities.ScenarioType:
+    enum:
+    - buy_asset
+    - sell_asset
+    - market_move
+    - new_asset
+    - rebalance
+    type: string
+    x-enum-varnames:
+    - ScenarioBuyAsset
+    - ScenarioSellAsset
+    - ScenarioMarketMove
+    - ScenarioNewAsset
+    - ScenarioRebalance
+  entities.StepResult:
+    properties:
+      result:
+        $ref: '#/definitions/entities.ScenarioResult'
+      step:
+        $ref: '#/definitions/entities.ScenarioStep'
+    type: object
+  handlers.AssetResponse:
+    properties:
+      created_at:
+        type: string
+      currency:
+        type: string
+      current_price:
+        type: number
+      gain_loss:
+        type: number
+      gain_loss_percent:
+        type: number
+      id:
+        type: string
+      metadata:
+        additionalProperties: true
+        type: object
+      name:
+        type: string
+      notes:
+        type: string
+      purchase_date:
+        type: string
+      purchase_price:
+        type: number
+      quantity:
+        type: number
+      symbol:
+        type: string
+      total_cost:
+        type: number
+      total_value:
+        type: number
+      type:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  handlers.AssetTypeBreakdownResponse:
+    properties:
+      count:
+        type: integer
+      percent:
+        type: number
+      type:
+        type: string
+      value:
+        type: number
+    type: object
+  handlers.BriefingResponse:
+    properties:
+      alerts:
+        description: Portfolio alerts
+        items:
+          $ref: '#/definitions/services.PortfolioAlert'
+        type: array
+      briefing:
+        description: AI-generated narrative
+        type: string
+      generated_at:
+        description: Timestamp
+        type: string
+      health_score:
+        allOf:
+        - $ref: '#/definitions/services.HealthScore'
+        description: Portfolio health
+      highlights:
+        description: Key events
+        items:
+          $ref: '#/definitions/handlers.Highlight'
+        type: array
+      recommendations:
+        description: Action items
+        items:
+          type: string
+        type: array
+    type: object
+  handlers.ChatRequest:
+    properties:
+      conversation_id:
+        type: string
+      message:
+        maxLength: 4000
+        minLength: 1
+        type: string
+    required:
+    - message
+    type: object
+  handlers.ChatResponseDTO:
+    properties:
+      ai_message:
+        $ref: '#/definitions/handlers.MessageResponse'
+      conversation_id:
+        type: string
+      user_message:
+        $ref: '#/definitions/handlers.MessageResponse'
+    type: object
+  handlers.ConversationListResponse:
+    properties:
+      conversations:
+        items:
+          $ref: '#/definitions/handlers.ConversationResponse'
+        type: array
+      limit:
+        type: integer
+      offset:
+        type: integer
+      total:
+        type: integer
+    type: object
+  handlers.ConversationResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  handlers.ConversationWithMessagesResponse:
+    properties:
+      conversation:
+        $ref: '#/definitions/handlers.ConversationResponse'
+      messages:
+        items:
+          $ref: '#/definitions/handlers.MessageResponse'
+        type: array
+    type: object
+  handlers.CreateAssetRequest:
+    properties:
+      currency:
+        type: string
+      current_price:
+        minimum: 0
+        type: number
+      metadata:
+        additionalProperties: true
+        type: object
+      name:
+        maxLength: 255
+        minLength: 1
+        type: string
+      notes:
+        maxLength: 1000
+        type: string
+      purchase_date:
+        type: string
+      purchase_price:
+        minimum: 0
+        type: number
+      quantity:
+        type: number
+      symbol:
+        maxLength: 20
+        type: string
+      type:
+        enum:
+        - stock
+        - etf
+        - bond
+        - crypto
+        - real_estate
+        - gold
+        - cash
+        - other
+        type: string
+    required:
+    - name
+    - purchase_price
+    - quantity
+    - type
+    type: object
+  handlers.CreateConversationRequest:
+    properties:
+      title:
+        maxLength: 255
+        type: string
+    type: object
+  handlers.HealthResponse:
+    properties:
+      database:
+        $ref: '#/definitions/database.HealthStatus'
+      status:
+        type: string
+      timestamp:
+        type: string
+      version:
+        type: string
+    type: object
+  handlers.Highlight:
+    properties:
+      asset:
+        description: Asset name or symbol
+        type: string
+      change:
+        description: '"+5.2%" or "Volatility increased"'
+        type: string
+      message:
+        description: Optional detailed message
+        type: string
+      type:
+        description: '"gain", "loss", "alert"'
+        type: string
+    type: object
+  handlers.InsightListResponse:
+    properties:
+      insights:
+        items:
+          $ref: '#/definitions/handlers.InsightResponse'
+        type: array
+      limit:
+        type: integer
+      offset:
+        type: integer
+      total:
+        type: integer
+      unread_count:
+        type: integer
+    type: object
+  handlers.InsightResponse:
+    properties:
+      action_items:
+        items:
+          type: string
+        type: array
+      category:
+        type: string
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      is_read:
+        type: boolean
+      priority:
+        type: string
+      related_symbols:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      type:
+        type: string
+    type: object
+  handlers.ListAssetsResponse:
+    properties:
+      assets:
+        items:
+          $ref: '#/definitions/handlers.AssetResponse'
+        type: array
+      pagination:
+        $ref: '#/definitions/handlers.PaginationInfo'
+    type: object
+  handlers.MessageResponse:
+    properties:
+      content:
+        type: string
+      conversation_id:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      role:
+        type: string
+    type: object
+  handlers.NewsListResponse:
+    properties:
+      articles:
+        items:
+          $ref: '#/definitions/services.NewsArticle'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  handlers.PaginationInfo:
+    properties:
+      page:
+        type: integer
+      per_page:
+        type: integer
+      total_count:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  handlers.PingResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  handlers.PortfolioRiskResponse:
+    properties:
+      alerts:
+        items:
+          $ref: '#/definitions/handlers.RiskAlertResponse'
+        type: array
+      diversification_level:
+        example: moderate
+        type: string
+      risk_score:
+        example: 35
+        type: integer
+    type: object
+  handlers.PortfolioSummaryResponse:
+    properties:
+      asset_count:
+        type: integer
+      breakdown_by_type:
+        items:
+          $ref: '#/definitions/handlers.AssetTypeBreakdownResponse'
+        type: array
+      gain_loss:
+        type: number
+      gain_loss_percent:
+        type: number
+      last_updated:
+        type: string
+      total_invested:
+        type: number
+      total_value:
+        type: number
+    type: object
+  handlers.RiskAlertResponse:
+    properties:
+      message:
+        example: El 45% de tu portafolio está en un solo sector
+        type: string
+      severity:
+        example: warning
+        type: string
+      threshold:
+        example: 40
+        type: number
+      title:
+        example: Alta concentración en Tecnología
+        type: string
+      type:
+        example: sector_concentration
+        type: string
+      value:
+        example: 45.5
+        type: number
+    type: object
+  handlers.SimulateRequest:
+    type: object
+  handlers.SimulateResponse:
+    properties:
+      ai_analysis:
+        type: string
+      changes:
+        items:
+          $ref: '#/definitions/entities.ChangeDetail'
+        type: array
+      current_state:
+        $ref: '#/definitions/entities.PortfolioState'
+      projected_state:
+        $ref: '#/definitions/entities.PortfolioState'
+      warnings:
+        items:
+          type: string
+        type: array
+    type: object
+  handlers.SyncRequest:
+    properties:
+      display_name:
+        type: string
+    type: object
+  handlers.SyncResponse:
+    properties:
+      created:
+        type: boolean
+      user:
+        $ref: '#/definitions/handlers.UserResponse'
+    type: object
+  handlers.TemplatesResponse:
+    properties:
+      templates:
+        items:
+          $ref: '#/definitions/entities.ScenarioTemplate'
+        type: array
+    type: object
+  handlers.UnreadCountResponse:
+    properties:
+      count:
+        type: integer
+    type: object
+  handlers.UpdateAssetRequest:
+    properties:
+      currency:
+        type: string
+      current_price:
+        minimum: 0
+        type: number
+      metadata:
+        additionalProperties: true
+        type: object
+      name:
+        maxLength: 255
+        minLength: 1
+        type: string
+      notes:
+        maxLength: 1000
+        type: string
+      purchase_date:
+        type: string
+      purchase_price:
+        minimum: 0
+        type: number
+      quantity:
+        type: number
+      symbol:
+        maxLength: 20
+        type: string
+      type:
+        enum:
+        - stock
+        - etf
+        - bond
+        - crypto
+        - real_estate
+        - gold
+        - cash
+        - other
+        type: string
+    type: object
+  handlers.UpdateConversationRequest:
+    properties:
+      title:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - title
+    type: object
+  handlers.UserResponse:
+    properties:
+      avatar_url:
+        type: string
+      created_at:
+        type: string
+      display_name:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  handlers.WelcomeResponse:
+    properties:
+      conversation_starters:
+        items:
+          type: string
+        type: array
+      message:
+        type: string
+    type: object
+  response.ErrorInfo:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  response.Meta:
+    properties:
+      request_id:
+        type: string
+    type: object
+  response.Response:
+    properties:
+      data: {}
+      error:
+        $ref: '#/definitions/response.ErrorInfo'
+      meta:
+        $ref: '#/definitions/response.Meta'
+      success:
+        type: boolean
+    type: object
+  services.AlertSeverity:
+    enum:
+    - info
+    - warning
+    - critical
+    type: string
+    x-enum-varnames:
+    - AlertSeverityInfo
+    - AlertSeverityWarning
+    - AlertSeverityCritical
+  services.AlertType:
+    enum:
+    - price
+    - concentration
+    - correlation
+    - health
+    - performance
+    type: string
+    x-enum-varnames:
+    - AlertTypePrice
+    - AlertTypeConcentration
+    - AlertTypeCorrelation
+    - AlertTypeHealth
+    - AlertTypePerformance
+  services.HealthScore:
+    properties:
+      correlation:
+        description: 10% weight - placeholder
+        type: integer
+      diversification:
+        description: 25% weight
+        type: integer
+      liquidity:
+        description: 10% weight
+        type: integer
+      overall:
+        description: 0-100 weighted average
+        type: integer
+      performance:
+        description: 15% weight
+        type: integer
+      risk_level:
+        description: 20% weight
+        type: integer
+      sector_balance:
+        description: 20% weight
+        type: integer
+      suggestions:
+        items:
+          type: string
+        type: array
+    type: object
+  services.HistoricalStats:
+    properties:
+      average_return:
+        type: number
+      best_day:
+        type: number
+      data_points:
+        type: integer
+      max_drawdown:
+        type: number
+      negative_days:
+        type: integer
+      period:
+        type: string
+      positive_days:
+        type: integer
+      symbol:
+        type: string
+      volatility:
+        type: number
+      worst_day:
+        type: number
+    type: object
+  services.NewsArticle:
+    properties:
+      content:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      provider:
+        type: string
+      published_at:
+        type: string
+      sentiment:
+        description: -1 (negative) to +1 (positive)
+        type: number
+      source:
+        type: string
+      symbols:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      url:
+        type: string
+    type: object
+  services.PortfolioAlert:
+    properties:
+      action:
+        type: string
+      asset:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      message:
+        type: string
+      severity:
+        $ref: '#/definitions/services.AlertSeverity'
+      type:
+        $ref: '#/definitions/services.AlertType'
+    type: object
+host: wealthscope-production.up.railway.app
+info:
+  contact:
+    email: support@wealthscope.app
+    name: WealthScope Team
+    url: https://github.com/Unikyri/WealthScope
+  description: |-
+    API para gestión de portafolio de inversiones personales
+
+    ## Autenticación
+    Esta API utiliza JWT de Supabase Auth. Incluye el token en el header:
+    `Authorization: Bearer <tu-token-jwt>`
+
+    ## Tipos de Activos Soportados
+    - `stock` - Acciones
+    - `etf` - Fondos cotizados
+    - `bond` - Bonos
+    - `crypto` - Criptomonedas
+    - `real_estate` - Bienes raíces
+    - `gold` - Oro
+    - `cash` - Efectivo
+    - `other` - Otros
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: WealthScope API
+  version: 1.0.0
+paths:
+  /api/v1/ai/briefing:
+    get:
+      description: Generates AI-powered portfolio briefing with highlights, recommendations,
+        and health score
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.BriefingResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get autonomous portfolio briefing
+      tags:
+      - AI Portfolio
+  /api/v1/ai/chat:
+    post:
+      consumes:
+      - application/json
+      description: Sends a message to the AI and returns the response
+      parameters:
+      - description: Chat request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ChatRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.ChatResponseDTO'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Send a message to the AI
+      tags:
+      - AI
+  /api/v1/ai/conversations:
+    get:
+      description: Lists all conversations for the authenticated user
+      parameters:
+      - description: Limit (default 20, max 100)
+        in: query
+        name: limit
+        type: integer
+      - description: Offset (default 0)
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.ConversationListResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: List conversations
+      tags:
+      - AI
+    post:
+      consumes:
+      - application/json
+      description: Creates a new AI conversation
+      parameters:
+      - description: Create conversation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateConversationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.ConversationResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create a new conversation
+      tags:
+      - AI
+  /api/v1/ai/conversations/{id}:
+    delete:
+      description: Deletes a conversation and all its messages
+      parameters:
+      - description: Conversation ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Delete a conversation
+      tags:
+      - AI
+    get:
+      description: Gets a conversation with all its messages
+      parameters:
+      - description: Conversation ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.ConversationWithMessagesResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get a conversation
+      tags:
+      - AI
+    put:
+      consumes:
+      - application/json
+      description: Updates a conversation's title
+      parameters:
+      - description: Conversation ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateConversationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Update a conversation
+      tags:
+      - AI
+  /api/v1/ai/insights:
+    get:
+      description: Lists all insights for the authenticated user with optional filters
+      parameters:
+      - description: Filter by type (daily_briefing, alert, recommendation)
+        in: query
+        name: type
+        type: string
+      - description: Filter by category (risk, performance, opportunity, general)
+        in: query
+        name: category
+        type: string
+      - description: Filter by priority (high, medium, low)
+        in: query
+        name: priority
+        type: string
+      - description: Show only unread insights
+        in: query
+        name: unread
+        type: boolean
+      - description: Limit (default 20, max 100)
+        in: query
+        name: limit
+        type: integer
+      - description: Offset (default 0)
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.InsightListResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: List user insights
+      tags:
+      - AI Insights
+  /api/v1/ai/insights/{id}:
+    get:
+      description: Retrieves a specific insight by its ID
+      parameters:
+      - description: Insight ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.InsightResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get insight by ID
+      tags:
+      - AI Insights
+  /api/v1/ai/insights/{id}/read:
+    put:
+      description: Marks a specific insight as read
+      parameters:
+      - description: Insight ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Mark insight as read
+      tags:
+      - AI Insights
+  /api/v1/ai/insights/daily:
+    get:
+      description: Gets or generates today's daily briefing for the user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.InsightResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get today's daily briefing
+      tags:
+      - AI Insights
+  /api/v1/ai/insights/generate:
+    post:
+      description: Forces generation of new insights based on current portfolio analysis
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/handlers.InsightResponse'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Generate new insights
+      tags:
+      - AI Insights
+  /api/v1/ai/insights/unread/count:
+    get:
+      description: Returns the count of unread insights for the user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.UnreadCountResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get unread insight count
+      tags:
+      - AI Insights
+  /api/v1/ai/ocr:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Extract financial assets from a document image using OCR
+      parameters:
+      - description: Document file (image or PDF)
+        in: formData
+        name: document
+        required: true
+        type: file
+      - description: Hint about document type (bank_statement, portfolio_report)
+        in: formData
+        name: document_hint
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.OCRResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Process document with OCR
+      tags:
+      - AI OCR
+  /api/v1/ai/ocr/confirm:
+    post:
+      consumes:
+      - application/json
+      description: Confirm and create assets extracted from OCR processing
+      parameters:
+      - description: Assets to create
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ConfirmOCRAssetsRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ConfirmOCRAssetsResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create assets from OCR results
+      tags:
+      - AI OCR
+  /api/v1/ai/scenarios/historical:
+    get:
+      description: Returns historical volatility, drawdown, and other statistics for
+        a symbol
+      parameters:
+      - description: Asset symbol (e.g., AAPL)
+        in: query
+        name: symbol
+        required: true
+        type: string
+      - default: 1Y
+        description: Analysis period (1M, 3M, 6M, 1Y)
+        in: query
+        name: period
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.HistoricalStats'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Get historical statistics for a symbol
+      tags:
+      - Scenarios
+  /api/v1/ai/scenarios/templates:
+    get:
+      description: Returns a list of predefined scenario templates that users can
+        run
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.TemplatesResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Get predefined scenario templates
+      tags:
+      - Scenarios
+  /api/v1/ai/simulate:
+    post:
+      consumes:
+      - application/json
+      description: Simulates investment scenarios like buying/selling assets, market
+        movements, or portfolio rebalancing
+      parameters:
+      - description: Simulation parameters
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.SimulateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.SimulateResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Run a what-if scenario simulation
+      tags:
+      - Scenarios
+  /api/v1/ai/simulate/chain:
+    post:
+      consumes:
+      - application/json
+      description: Simulates a chain of sequential investment scenarios
+      parameters:
+      - description: Chain parameters
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entities.ScenarioChainRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.ChainResult'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Run a multi-step what-if scenario simulation
+      tags:
+      - Scenarios
+  /api/v1/ai/welcome:
+    get:
+      description: Gets a personalized welcome message and conversation starters
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.WelcomeResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get welcome message
+      tags:
+      - AI
+  /api/v1/assets:
+    get:
+      description: Returns a paginated list of assets for the authenticated user
+      parameters:
+      - description: Filter by asset type
+        in: query
+        name: type
+        type: string
+      - description: Filter by symbol
+        in: query
+        name: symbol
+        type: string
+      - description: Filter by currency
+        in: query
+        name: currency
+        type: string
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Items per page (default: 20, max: 100)'
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.ListAssetsResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: List user's assets
+      tags:
+      - assets
+    post:
+      consumes:
+      - application/json
+      description: Creates a new investment asset for the authenticated user
+      parameters:
+      - description: Asset data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.AssetResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a new asset
+      tags:
+      - assets
+  /api/v1/assets/{id}:
+    delete:
+      description: Deletes an asset by its ID
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete an asset
+      tags:
+      - assets
+    get:
+      description: Returns a specific asset by its ID
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.AssetResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Get asset by ID
+      tags:
+      - assets
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing asset
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated asset data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.AssetResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Update an asset
+      tags:
+      - assets
+  /api/v1/auth/me:
+    get:
+      description: Returns the currently authenticated user's profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.UserResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Get current user
+      tags:
+      - auth
+  /api/v1/auth/sync:
+    post:
+      consumes:
+      - application/json
+      description: Synchronizes user data from Supabase Auth to local database
+      parameters:
+      - description: Sync request
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/handlers.SyncRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.SyncResponse'
+              type: object
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.SyncResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Sync user from Supabase Auth
+      tags:
+      - auth
+  /api/v1/news:
+    get:
+      consumes:
+      - application/json
+      description: Fetch latest financial news with optional filtering by symbols,
+        keywords, language
+      parameters:
+      - description: Comma-separated stock symbols (e.g., AAPL,TSLA)
+        in: query
+        name: symbols
+        type: string
+      - description: Search keywords
+        in: query
+        name: q
+        type: string
+      - description: 'Language code (default: en)'
+        in: query
+        name: language
+        type: string
+      - description: Max articles (default 10, max 50)
+        in: query
+        name: limit
+        type: integer
+      - description: Page number (default 1)
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.NewsListResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get latest financial news
+      tags:
+      - News
+  /api/v1/news/search:
+    get:
+      consumes:
+      - application/json
+      description: Search for financial news articles by keywords
+      parameters:
+      - description: Search keywords
+        in: query
+        name: q
+        required: true
+        type: string
+      - description: Max articles (default 10, max 50)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.NewsListResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Search financial news
+      tags:
+      - News
+  /api/v1/news/symbol/{symbol}:
+    get:
+      consumes:
+      - application/json
+      description: Fetch financial news related to a specific stock or crypto symbol
+      parameters:
+      - description: Stock symbol (e.g., AAPL)
+        in: path
+        name: symbol
+        required: true
+        type: string
+      - description: Max articles (default 10, max 50)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.NewsListResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get news for a specific symbol
+      tags:
+      - News
+  /api/v1/news/trending:
+    get:
+      consumes:
+      - application/json
+      description: Fetch top trending financial news articles
+      parameters:
+      - description: Max articles (default 10, max 50)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.NewsListResponse'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get trending financial news
+      tags:
+      - News
+  /api/v1/ping:
+    get:
+      description: Endpoint simple para verificar conectividad
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.PingResponse'
+              type: object
+      summary: Ping
+      tags:
+      - health
+  /api/v1/portfolio/risk:
+    get:
+      description: Retorna análisis de riesgo y alertas de concentración del portafolio
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.PortfolioRiskResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                error:
+                  type: string
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Get portfolio risk alerts
+      tags:
+      - portfolio
+  /api/v1/portfolio/summary:
+    get:
+      description: Returns complete portfolio summary with asset type breakdown
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.PortfolioSummaryResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                error:
+                  type: string
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Get portfolio summary
+      tags:
+      - portfolio
+  /health:
+    get:
+      description: Retorna el estado de salud del servicio y la conexión a la base
+        de datos
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.HealthResponse'
+              type: object
+      summary: Health check
+      tags:
+      - health
+schemes:
+- https
+- http
+securityDefinitions:
+  BearerAuth:
+    description: 'Ingresa tu JWT token con el prefijo "Bearer ". Ejemplo: "Bearer
+      eyJhbGci..."'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
