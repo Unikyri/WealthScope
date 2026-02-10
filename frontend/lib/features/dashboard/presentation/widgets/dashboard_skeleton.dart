@@ -19,7 +19,7 @@ class DashboardSkeleton extends StatelessWidget {
         : theme.colorScheme.surface;
     final shimmerColor = theme.colorScheme.surfaceContainerHighest;
 
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Shimmer.fromColors(
         baseColor: baseColor,
@@ -97,6 +97,7 @@ class DashboardSkeleton extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
+            const SizedBox(height: 100), // Extra space for FAB
           ],
         ),
       ),

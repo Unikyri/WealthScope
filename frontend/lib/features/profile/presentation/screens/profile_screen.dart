@@ -71,7 +71,7 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 32),
-              
+
               // General Section
               _buildSectionHeader(context, 'General'),
               _buildSettingsTile(
@@ -83,38 +83,11 @@ class ProfileScreen extends ConsumerWidget {
                   context.push('/settings');
                 },
               ),
-              _buildSettingsTile(
-                context: context,
-                icon: Icons.lock_outline_rounded,
-                title: 'Privacy',
-                subtitle: 'Data preferences, security',
-                onTap: () {
-                  // TODO: Navigate to privacy settings
-                },
-              ),
-              _buildSettingsTile(
-                context: context,
-                icon: Icons.help_outline_rounded,
-                title: 'Support',
-                subtitle: 'Troubleshooting, help',
-                onTap: () {
-                  // TODO: Navigate to support
-                },
-              ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Account Section
               _buildSectionHeader(context, 'Account'),
-              _buildSettingsTile(
-                context: context,
-                icon: Icons.person_outline_rounded,
-                title: 'Edit Profile',
-                subtitle: 'Update your personal information',
-                onTap: () {
-                  // TODO: Navigate to edit profile
-                },
-              ),
               _buildSettingsTile(
                 context: context,
                 icon: Icons.notifications_outlined,
@@ -133,32 +106,9 @@ class ProfileScreen extends ConsumerWidget {
                   context.push('/news');
                 },
               ),
-              
+
               const SizedBox(height: 24),
-              
-              // About Section
-              _buildSectionHeader(context, 'About'),
-              _buildSettingsTile(
-                context: context,
-                icon: Icons.info_outline_rounded,
-                title: 'About WealthScope',
-                subtitle: 'Version 1.0.0',
-                onTap: () {
-                  // TODO: Show about dialog
-                },
-              ),
-              _buildSettingsTile(
-                context: context,
-                icon: Icons.description_outlined,
-                title: 'Terms & Privacy',
-                subtitle: 'Legal information',
-                onTap: () {
-                  // TODO: Navigate to terms
-                },
-              ),
-              
-              const SizedBox(height: 24),
-              
+
               // Debug Options (Development only)
               _buildSectionHeader(context, 'Development'),
               _buildSettingsTile(
@@ -169,9 +119,9 @@ class ProfileScreen extends ConsumerWidget {
                 iconColor: colorScheme.secondary,
                 onTap: () => _resetOnboarding(context, ref),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Logout Button
               _buildSettingsTile(
                 context: context,
@@ -235,7 +185,8 @@ class ProfileScreen extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Reset Onboarding'),
-        content: const Text('This will reset the onboarding state and navigate you to the onboarding screen. Continue?'),
+        content: const Text(
+            'This will reset the onboarding state and navigate you to the onboarding screen. Continue?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -290,10 +241,10 @@ class ProfileScreen extends ConsumerWidget {
       child: Text(
         title.toUpperCase(),
         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-          color: Theme.of(context).colorScheme.primary,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.5,
-        ),
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+            ),
       ),
     );
   }

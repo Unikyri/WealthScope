@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/auth/presentation/providers/logout_provider.dart';
 
 /// A button widget that handles user logout
-/// 
+///
 /// Usage:
 /// ```dart
 /// LogoutButton(
@@ -84,41 +84,44 @@ class LogoutButton extends ConsumerWidget {
 
     if (shouldLogout != true) return;
 
-    // Perform logout
-    await ref.read(logoutProvider.notifier).signOut();
+    try {
+      // Perform logout
+      await ref.read(logoutProvider.notifier).signOut();
 
-    // Check if logout was successful
-    final state = ref.read(logoutProvider);
-    if (!context.mounted) return;
+      if (!context.mounted) return;
 
-    state.when(
-      data: (_) {
-        // Logout successful - navigate to login screen
-        onLogoutSuccess?.call();
-        context.go('/login');
-        
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Logged out successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      },
-      loading: () {}, // Still loading
-      error: (error, stack) {
-        // Show error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Logout failed: $error'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-            action: SnackBarAction(
-              label: 'Retry',
-              onPressed: () => _handleLogout(context, ref),
+      // Logout successful - navigate to login screen
+      onLogoutSuccess?.call();
+      context.go('/login');
+
+      // Show success message after a brief delay
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Logged out successfully'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
             ),
+          );
+        }
+      });
+    } catch (error) {
+      if (!context.mounted) return;
+
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Logout failed: $error'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+          behavior: SnackBarBehavior.floating,
+          action: SnackBarAction(
+            label: 'Retry',
+            textColor: Colors.white,
+            onPressed: () => _handleLogout(context, ref),
           ),
-        );
-      },
-    );
+        ),
+      );
+    }
   }
 }

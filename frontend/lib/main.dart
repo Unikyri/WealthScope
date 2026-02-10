@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'app/app.dart';
 import 'core/constants/app_config.dart';
+import 'features/subscriptions/data/services/revenuecat_service.dart';
 
 void main() async {
   // Ensure Flutter bindings are initialized
@@ -22,8 +23,37 @@ void main() async {
   }
 
   runApp(
-    const ProviderScope(
-      child: WealthScopeApp(),
+    ProviderScope(
+      child: _AppInitializer(),
     ),
   );
+}
+
+class _AppInitializer extends ConsumerStatefulWidget {
+  const _AppInitializer();
+
+  @override
+  ConsumerState<_AppInitializer> createState() => _AppInitializerState();
+}
+
+class _AppInitializerState extends ConsumerState<_AppInitializer> {
+  @override
+  void initState() {
+    super.initState();
+    _initializeRevenueCat();
+  }
+
+  Future<void> _initializeRevenueCat() async {
+    try {
+      final revenueCatService = ref.read(revenueCatServiceProvider);
+      await revenueCatService.initialize();
+    } catch (e) {
+      debugPrint('⚠️ RevenueCat initialization failed: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const WealthScopeApp();
+  }
 }

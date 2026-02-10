@@ -26,6 +26,7 @@ import 'package:wealthscope_app/features/settings/presentation/screens/settings_
 import 'package:wealthscope_app/features/splash/presentation/screens/splash_screen.dart';
 import 'package:wealthscope_app/shared/widgets/main_shell.dart';
 import 'package:wealthscope_app/features/ai_command/presentation/screens/ai_command_center_screen.dart';
+import 'package:wealthscope_app/features/subscriptions/presentation/screens/subscription_screen.dart';
 
 /// Application Router Configuration
 /// Define all app routes here using GoRouter.
@@ -206,6 +207,11 @@ class AppRouter {
             path: '/ai-command',
             name: 'ai-command',
             builder: (context, state) => const AiCommandCenterScreen(),
+          ),
+          GoRoute(
+            path: '/subscription',
+            name: 'subscription',
+            builder: (context, state) => const SubscriptionScreen(),
           ),
         ],
       ),

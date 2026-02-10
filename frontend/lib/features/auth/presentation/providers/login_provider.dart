@@ -100,10 +100,15 @@ class LoginNotifier extends _$LoginNotifier {
           debugPrint('⚠️ Backend sync failed: $syncError');
         }
         
+        // Check if provider is still mounted after async gap
+        if (!ref.mounted) return true;
+        
         state = state.copyWith(isLoading: false);
         return true;
       } else {
         // Login failed without exception
+        if (!ref.mounted) return false;
+        
         state = state.copyWith(
           isLoading: false,
           errorMessage: 'Incorrect email or password',
@@ -114,6 +119,8 @@ class LoginNotifier extends _$LoginNotifier {
     } on AuthException catch (e) {
       debugPrint('❌ Login failed with AuthException: ${e.message}');
       
+      if (!ref.mounted) return false;
+      
       final errorMessage = _mapAuthError(e);
       state = state.copyWith(
         isLoading: false,
@@ -123,6 +130,8 @@ class LoginNotifier extends _$LoginNotifier {
       return false;
     } catch (e) {
       debugPrint('❌ Login failed with error: $e');
+      
+      if (!ref.mounted) return false;
       
       // Check for network errors
       String errorMessage = 'An error occurred. Please try again.';

@@ -17,10 +17,20 @@ class AIRemoteDataSource {
           'message': message,
           if (conversationId != null) 'conversation_id': conversationId,
         },
+        options: Options(
+          sendTimeout: const Duration(seconds: 180), // 3 minutes for AI calls
+          receiveTimeout: const Duration(seconds: 180),
+        ),
       );
 
       return response.data['data'];
     } on DioException catch (e) {
+      // Handle timeout errors specifically
+      if (e.type == DioExceptionType.sendTimeout || 
+          e.type == DioExceptionType.receiveTimeout) {
+        throw Exception('La IA está tardando más de lo esperado. Esto puede deberse a una consulta compleja. Por favor, intenta nuevamente.');
+      }
+      
       // Extract error message from API response
       if (e.response?.data != null && e.response!.data is Map) {
         final errorData = e.response!.data as Map<String, dynamic>;
@@ -32,7 +42,7 @@ class AIRemoteDataSource {
           }
         }
       }
-      throw Exception('Failed to send message: ${e.message}');
+      throw Exception('Error al enviar mensaje: ${e.message}');
     }
   }
 
