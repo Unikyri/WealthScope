@@ -56,8 +56,35 @@ class AuthInterceptor extends QueuedInterceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
-      print('⚠️ [AUTH] 401 on ${err.requestOptions.path} - passing to caller');
+      print('⚠️ [AUTH] 401 on ${err.requestOptions.path} - attempting token refresh');
+      
+      try {
+        // Try to refresh the token
+        final refreshResult = await _supabase.auth.refreshSession();
+        
+        if (refreshResult.session != null) {
+          print('✅ [AUTH] Token refreshed successfully, retrying request');
+          
+          // Update the request with new token
+          err.requestOptions.headers['Authorization'] = 
+              'Bearer ${refreshResult.session!.accessToken}';
+          
+          // Retry the request
+          try {
+            final response = await _dio.fetch(err.requestOptions);
+            return handler.resolve(response);
+          } catch (e) {
+            print('❌ [AUTH] Retry failed: $e');
+            return handler.next(err);
+          }
+        } else {
+          print('❌ [AUTH] Token refresh returned null session');
+        }
+      } catch (e) {
+        print('❌ [AUTH] Token refresh error: $e');
+      }
     }
+    
     handler.next(err);
   }
 }

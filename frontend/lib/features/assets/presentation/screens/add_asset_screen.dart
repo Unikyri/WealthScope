@@ -15,7 +15,7 @@ import 'package:wealthscope_app/features/assets/presentation/providers/stock_for
 /// Provides a form for adding assets (Real Estate, Gold, Bond, Crypto, Cash, Other)
 class AddAssetScreen extends ConsumerStatefulWidget {
   final AssetType? assetType;
-  
+
   const AddAssetScreen({
     this.assetType,
     super.key,
@@ -81,12 +81,13 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
     final userId = Supabase.instance.client.auth.currentUser?.id;
     if (userId == null) {
       if (!mounted) return;
-      SnackbarUtils.showError(context, 'Authentication error. Please log in again.');
+      SnackbarUtils.showError(
+          context, 'Authentication error. Please log in again.');
       return;
     }
 
     final currency = ref.read(selectedCurrencyProvider);
-    
+
     final asset = StockAsset(
       userId: userId,
       type: _selectedType,
@@ -94,12 +95,14 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
       symbol: _symbolController.text.trim(),
       quantity: double.parse(_quantityController.text),
       purchasePrice: double.parse(_priceController.text),
-      currentPrice: _currentPriceController.text.isNotEmpty 
+      currentPrice: _currentPriceController.text.isNotEmpty
           ? double.parse(_currentPriceController.text)
           : null,
       purchaseDate: _selectedDate,
       currency: currency,
-      notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+      notes: _notesController.text.trim().isEmpty
+          ? null
+          : _notesController.text.trim(),
     );
 
     await ref.read(stockFormProvider.notifier).submitForm(asset);
@@ -112,10 +115,10 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
       SnackbarUtils.showError(context, state.error!);
     } else if (state.savedAsset != null) {
       SnackbarUtils.showSuccess(
-        context, 
+        context,
         '${_selectedType.label} added successfully',
       );
-      context.pop();
+      context.go('/assets');
     }
   }
 
@@ -194,7 +197,8 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
             const SizedBox(height: 16),
 
             // Symbol Field (optional for most types)
-            if (_selectedType != AssetType.realEstate && _selectedType != AssetType.cash)
+            if (_selectedType != AssetType.realEstate &&
+                _selectedType != AssetType.cash)
               TextFormField(
                 controller: _symbolController,
                 decoration: InputDecoration(
@@ -205,7 +209,8 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
                 ),
                 textCapitalization: TextCapitalization.characters,
               ),
-            if (_selectedType != AssetType.realEstate && _selectedType != AssetType.cash)
+            if (_selectedType != AssetType.realEstate &&
+                _selectedType != AssetType.cash)
               const SizedBox(height: 16),
 
             // Quantity Field
@@ -217,7 +222,8 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.numbers),
               ),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,4}')),
               ],
@@ -235,7 +241,8 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
                 prefixIcon: const Icon(Icons.attach_money),
                 suffixText: selectedCurrency.code,
               ),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
               ],
@@ -253,7 +260,8 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
                 prefixIcon: const Icon(Icons.trending_up),
                 suffixText: selectedCurrency.code,
               ),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
               ],

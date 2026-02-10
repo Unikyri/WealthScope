@@ -83,82 +83,31 @@ class RunSimulation extends _$RunSimulation {
     try {
       final repository = ref.read(scenariosRepositoryProvider);
 
-      // Step 1: Ensure user is synced in backend DB before simulating
+      // Ensure user is synced in backend DB before simulating
       await _ensureUserSynced();
 
       if (!ref.mounted) return;
 
-      // Step 2: Try simulate
+      // Call simulate - AuthInterceptor will handle 401s automatically
       print('🚀 [SIMULATE] Calling /ai/simulate (type: $type)');
-      var result = await repository.simulate(
+      final result = await repository.simulate(
         type: type,
         parameters: parameters,
       );
 
       if (!ref.mounted) return;
 
-      // Step 3: If 401, try refresh token + sync + retry once
-      final isAuth401 = result.fold(
-        (failure) =>
-            failure.message.contains('401') ||
-            failure.message.contains('Authentication required') ||
-            failure.message.contains('Unauthorized'),
-        (_) => false,
+      // Set final state
+      state = result.fold(
+        (failure) {
+          print('❌ [SIMULATE] Error: ${failure.message}');
+          return AsyncError(Exception(failure.message), StackTrace.current);
+        },
+        (simulationResult) {
+          print('✅ [SIMULATE] Simulation completed successfully!');
+          return AsyncData(simulationResult);
+        },
       );
-
-      if (isAuth401) {
-        print('🔄 [SIMULATE] Got 401 - refreshing token and re-syncing...');
-
-        try {
-          // Refresh the Supabase session to get a fresh token
-          final refreshResponse =
-              await Supabase.instance.client.auth.refreshSession();
-
-          if (!ref.mounted) return;
-
-          if (refreshResponse.session != null) {
-            print('✅ [SIMULATE] Token refreshed - Expiry: '
-                '${DateTime.fromMillisecondsSinceEpoch(refreshResponse.session!.expiresAt! * 1000)}');
-
-            // Re-sync user with fresh token
-            await _ensureUserSynced();
-
-            if (!ref.mounted) return;
-
-            // Wait a moment for backend to process
-            await Future.delayed(const Duration(milliseconds: 300));
-
-            if (!ref.mounted) return;
-
-            // Retry simulate
-            print('🔄 [SIMULATE] Retrying simulation with fresh token...');
-            result = await repository.simulate(
-              type: type,
-              parameters: parameters,
-            );
-
-            if (!ref.mounted) return;
-          } else {
-            print('❌ [SIMULATE] Token refresh returned null session');
-          }
-        } catch (refreshError) {
-          print('❌ [SIMULATE] Refresh/sync error: $refreshError');
-        }
-      }
-
-      // Step 4: Set final state
-      if (ref.mounted) {
-        state = result.fold(
-          (failure) {
-            print('❌ [SIMULATE] Final error: ${failure.message}');
-            return AsyncError(Exception(failure.message), StackTrace.current);
-          },
-          (simulationResult) {
-            print('✅ [SIMULATE] Simulation completed successfully!');
-            return AsyncData(simulationResult);
-          },
-        );
-      }
     } catch (e, stackTrace) {
       print('❌ [SIMULATE] Exception: $e');
       if (ref.mounted) {

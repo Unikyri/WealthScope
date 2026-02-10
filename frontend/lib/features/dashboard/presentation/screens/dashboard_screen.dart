@@ -15,7 +15,7 @@ import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
 import 'package:wealthscope_app/shared/widgets/tech_card.dart';
 import 'package:wealthscope_app/shared/widgets/speed_dial_fab.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/crypto_net_worth_hero.dart';
-import 'package:wealthscope_app/features/dashboard/presentation/widgets/ai_trigger_button.dart';
+import 'package:wealthscope_app/features/subscriptions/presentation/widgets/premium_widgets.dart';
 
 /// Dashboard Screen - Crypto Blue Pivot
 /// Matches HTML Reference structure
@@ -59,7 +59,8 @@ class DashboardScreen extends ConsumerWidget {
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white.withOpacity(0.1)),
                       image: const DecorationImage(
-                        image: NetworkImage('https://ui-avatars.com/api/?name=User&background=137FEC&color=fff'), // Placeholder
+                        image: NetworkImage(
+                            'https://ui-avatars.com/api/?name=User&background=137FEC&color=fff'), // Placeholder
                       ),
                     ),
                   ),
@@ -86,10 +87,16 @@ class DashboardScreen extends ConsumerWidget {
                 ],
               ),
               actions: [
+                // Premium Badge
+                Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  child: const PremiumBadge(),
+                ),
                 // Sync Status
                 Container(
                   margin: const EdgeInsets.only(right: 12),
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: AppTheme.cardGrey.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(20),
@@ -97,7 +104,8 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.sync, size: 14, color: AppTheme.emeraldAccent),
+                      const Icon(Icons.sync,
+                          size: 14, color: AppTheme.emeraldAccent),
                       const SizedBox(width: 4),
                       Text(
                         'SYNCED',
@@ -124,7 +132,8 @@ class DashboardScreen extends ConsumerWidget {
                 final assetsAsync = ref.watch(allAssetsProvider);
 
                 return SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
                       // 1. Hero Sparkline Card
@@ -133,18 +142,9 @@ class DashboardScreen extends ConsumerWidget {
                         change: summary.gainLoss,
                         changePercent: summary.gainLossPercent,
                       ),
-                      
-                      const SizedBox(height: 16),
-                      
-                      // 2. AI Trigger Button
-                      AiTriggerButton(
-                        onTap: () {
-                           context.push('/ai-command');
-                        },
-                      ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // 3. Asset Allocation Donut
                       if (summary.breakdownByType.isNotEmpty) ...[
                         EnhancedAllocationSection(
@@ -153,10 +153,10 @@ class DashboardScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 24),
                       ],
-                      
+
                       // 4. Intelligence Grid (Sentiment & Risk)
                       const _IntelligenceGrid(),
-                      
+
                       const SizedBox(height: 24),
 
                       // 5. Top Movers
@@ -165,33 +165,42 @@ class DashboardScreen extends ConsumerWidget {
                       assetsAsync.when(
                         data: (assets) {
                           if (assets.isEmpty) return const SizedBox.shrink();
-                          
+
                           // Convert to local model or generic mock for UI if needed
                           // Sorting rationale: Show biggest holdings first as proxy for 'top movers' for now
                           final sortedAssets = List<dynamic>.from(assets)
-                            ..sort((a, b) => (b.totalValue ?? 0).compareTo(a.totalValue ?? 0));
+                            ..sort((a, b) => (b.totalValue ?? 0)
+                                .compareTo(a.totalValue ?? 0));
                           final topAssets = sortedAssets.take(3).toList();
 
                           return Column(
-                            children: topAssets.map((asset) => _TopMoverItem(asset: asset)).toList(),
+                            children: topAssets
+                                .map((asset) => _TopMoverItem(asset: asset))
+                                .toList(),
                           );
                         },
                         loading: () => const SizedBox.shrink(),
                         error: (_, __) => const SizedBox.shrink(),
                       ),
 
-                      const SizedBox(height: 80), // Fab space
+                      const SizedBox(height: 24), // Bottom spacing
                     ]),
                   ),
                 );
               },
-              loading: () => const SliverFillRemaining(child: DashboardSkeleton()),
-              error: (e, _) => SliverFillRemaining(child: ErrorView(message: e.toString(), onRetry: () {})),
+              loading: () =>
+                  const SliverFillRemaining(child: DashboardSkeleton()),
+              error: (e, _) => SliverFillRemaining(
+                  child: ErrorView(message: e.toString(), onRetry: () {})),
             ),
           ],
         ),
       ),
-      floatingActionButton: const SpeedDialFab(),
+      floatingActionButton: const Padding(
+        padding: EdgeInsets.only(bottom: 8.0),
+        child: SpeedDialFab(),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
@@ -208,9 +217,9 @@ class _SectionHeader extends StatelessWidget {
         Text(
           title,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
         ),
       ],
     );
@@ -228,7 +237,7 @@ class _IntelligenceGrid extends StatelessWidget {
       mainAxisSpacing: 16,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      childAspectRatio: 1.4,
+      childAspectRatio: 1.3,
       children: const [
         _GridCard(
           icon: CustomIcons.trendingUp,
@@ -274,7 +283,8 @@ class _GridCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.cardGrey,
         borderRadius: BorderRadius.circular(24), // Match new theme
-        border: Border.all(color: Colors.white.withOpacity(0.02)), // Subtle border
+        border:
+            Border.all(color: Colors.white.withOpacity(0.02)), // Subtle border
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -300,7 +310,7 @@ class _GridCard extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             // Content
             Padding(
               padding: const EdgeInsets.all(16),
@@ -315,10 +325,10 @@ class _GridCard extends StatelessWidget {
                       Text(
                         label.toUpperCase(),
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: AppTheme.textGrey,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
-                        ),
+                              color: AppTheme.textGrey,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
                       ),
                     ],
                   ),
@@ -327,22 +337,25 @@ class _GridCard extends StatelessWidget {
                     children: [
                       Text(
                         value,
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                       ),
                       const SizedBox(height: 4),
                       Row(
                         children: [
                           Text(
                             subtext,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: iconColor,
-                            ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: iconColor,
+                                    ),
                           ),
                           const SizedBox(width: 4),
-                          Icon(CustomIcons.arrowRight, size: 10, color: iconColor),
+                          Icon(CustomIcons.arrowRight,
+                              size: 10, color: iconColor),
                         ],
                       ),
                     ],
@@ -366,7 +379,7 @@ class _TopMoverItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     // Mock change percentage for demo as it might not be in asset model
-    final mockChange = 5.2; 
+    final mockChange = 5.2;
 
     return GestureDetector(
       onTap: () {
@@ -392,7 +405,8 @@ class _TopMoverItem extends ConsumerWidget {
                 color: AppTheme.deepBlue,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(CustomIcons.assets, color: Colors.white, size: 20),
+              child:
+                  const Icon(CustomIcons.assets, color: Colors.white, size: 20),
             ),
             const SizedBox(width: 12),
             // Name
@@ -436,7 +450,8 @@ class _TopMoverItem extends ConsumerWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const Icon(Icons.arrow_upward, size: 12, color: AppTheme.emeraldAccent),
+                    const Icon(Icons.arrow_upward,
+                        size: 12, color: AppTheme.emeraldAccent),
                   ],
                 ),
               ],
@@ -455,7 +470,7 @@ class _TopMoverItem extends ConsumerWidget {
     } else if (value >= 1000) {
       return '\$${(value / 1000).toStringAsFixed(2)}K';
     }
-    return '\$${value.toStringAsFixed(2)}'; 
+    return '\$${value.toStringAsFixed(2)}';
   }
 }
 

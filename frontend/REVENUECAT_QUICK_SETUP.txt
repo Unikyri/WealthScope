@@ -1,0 +1,189 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║                 CONFIGURACIÓN REVENUECAT - PASO A PASO                   ║
+║                        WealthScope Test Store                            ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+📍 PASO 1: CREAR PRODUCTOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Dashboard → Products → + New
+
+┌─ PRODUCTO 1: PLAN MENSUAL ─────────────────────────────────────────────┐
+│                                                                          │
+│  Product identifier:    wealthscope_monthly                             │
+│  Store:                 Test Store                                      │
+│  Type:                  Subscription                                    │
+│  Display name:          Premium Mensual                                 │
+│  Description:           Acceso premium por mes                          │
+│  Price:                 1.00                                            │
+│  Currency:              USD                                             │
+│  Duration:              1 month                                         │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+
+┌─ PRODUCTO 2: PLAN ANUAL ───────────────────────────────────────────────┐
+│                                                                          │
+│  Product identifier:    wealthscope_yearly                              │
+│  Store:                 Test Store                                      │
+│  Type:                  Subscription                                    │
+│  Display name:          Premium Anual                                   │
+│  Description:           Acceso premium por año - Ahorra 83%             │
+│  Price:                 10.00                                           │
+│  Currency:              USD                                             │
+│  Duration:              1 year                                          │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+
+
+📍 PASO 2: CREAR ENTITLEMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Dashboard → Entitlements → + New
+
+┌─ ENTITLEMENT ──────────────────────────────────────────────────────────┐
+│                                                                          │
+│  Identifier:            premium    ⚠️ DEBE SER EXACTAMENTE "premium"   │
+│  Display name:          Premium Access                                  │
+│                                                                          │
+│  Attached Products:                                                     │
+│    ✓ wealthscope_monthly                                                │
+│    ✓ wealthscope_yearly                                                 │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+
+
+📍 PASO 3: CREAR OFFERING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Dashboard → Offerings → + New
+
+┌─ OFFERING ─────────────────────────────────────────────────────────────┐
+│                                                                          │
+│  Identifier:            default    ⚠️ DEBE SER EXACTAMENTE "default"   │
+│  Description:           WealthScope Premium Plans                       │
+│  ☑ Current offering     ← MARCA ESTA OPCIÓN                            │
+│                                                                          │
+│  Packages:                                                              │
+│    Package 1:                                                           │
+│      Name:     monthly  (o usa preset: $rc_monthly)                    │
+│      Product:  wealthscope_monthly                                      │
+│                                                                          │
+│    Package 2:                                                           │
+│      Name:     annual   (o usa preset: $rc_annual)                     │
+│      Product:  wealthscope_yearly                                       │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+
+
+📍 PASO 4: OBTENER API KEY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Dashboard → API Keys → Copiar "Public app-specific API key"
+
+Ejemplo: appl_xxxxxxxxxxxxxxxxxxxxxxxx
+
+⚠️ NUNCA uses la "Secret Key" en tu app
+
+
+📍 PASO 5: CONFIGURAR API KEY EN CÓDIGO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Archivo: lib/features/subscriptions/data/services/revenuecat_service.dart
+
+Líneas 9-11, reemplaza:
+
+  static const String _testStoreApiKey = 'YOUR_TEST_STORE_API_KEY';
+  static const String _appleApiKey = 'YOUR_APPLE_API_KEY';
+  static const String _googleApiKey = 'YOUR_GOOGLE_API_KEY';
+
+Con tu API key:
+
+  static const String _testStoreApiKey = 'appl_xxxxxxxx';
+  static const String _appleApiKey = 'appl_xxxxxxxx';
+  static const String _googleApiKey = 'appl_xxxxxxxx';
+
+
+📍 PASO 6: REINICIAR APP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Terminal:
+  1. Detén la app (Ctrl+C o Stop en VS Code)
+  2. Ejecuta: flutter run -d chrome --dart-define-from-file=.env
+
+O si ya está corriendo:
+  Presiona R (hot restart)
+
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║                           ✅ CHECKLIST FINAL                             ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+Pre-lanzamiento:
+  ☐ Productos creados (monthly + yearly)
+  ☐ Entitlement "premium" creado
+  ☐ Productos asociados al entitlement
+  ☐ Offering "default" creado
+  ☐ Offering marcado como "Current"
+  ☐ Packages agregados al offering
+  ☐ API key copiada
+  ☐ API key pegada en código
+  ☐ App reiniciada
+
+Verificar en la app:
+  ☐ Se muestran 2 planes
+  ☐ Plan anual tiene badge "MEJOR VALOR"
+  ☐ Plan anual muestra "Ahorra 83%"
+  ☐ Plan anual muestra "~$0.83/mes"
+  ☐ Puedes seleccionar un plan
+  ☐ Botón "Continuar" está activo
+  ☐ "Restaurar Compras" visible
+
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║                        🎉 RESULTADO ESPERADO                             ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+En la pantalla de suscripción verás:
+
+  ┌────────────────────────────────────────────────┐
+  │  Premium Mensual               $1.00           │
+  │  Acceso premium por mes                        │
+  └────────────────────────────────────────────────┘
+
+  ┌────────────────────────────────────────────────┐
+  │  🏆 MEJOR VALOR                                │
+  │  Premium Anual                 $10.00          │
+  │  Acceso premium por año        ~$0.83/mes      │
+  │  🎯 Ahorra 83%                                 │
+  └────────────────────────────────────────────────┘
+
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║                    ❓ PROBLEMAS COMUNES                                  ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+❌ "No hay planes disponibles"
+   → Verifica que offering "default" esté marcado como "Current"
+   → Espera 1-2 minutos y recarga
+
+❌ "SDK not configured"
+   → API key incorrecta o no actualizada
+   → Reinicia app (no hot reload)
+
+❌ Precios no aparecen
+   → Verifica precio configurado en productos
+   → Productos deben estar en entitlement
+
+❌ No aparece badge "MEJOR VALOR"
+   → El identifier debe contener "annual" o "year"
+   → Ejemplo: wealthscope_yearly ✓
+
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║                        📚 DOCUMENTACIÓN                                  ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+• Guía completa: REVENUECAT_TEST_STORE_SETUP.md
+• Resumen planes: PLANES_SUSCRIPCION.md
+• Dashboard: https://app.revenuecat.com
+• Documentación: https://docs.revenuecat.com

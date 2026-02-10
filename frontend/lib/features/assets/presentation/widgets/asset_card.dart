@@ -1,19 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
 
 /// Asset Card Widget
-/// Reusable widget to display an asset in a list.
-///
-/// Displays:
-/// - Icon based on asset type
-/// - Asset name and symbol (if applicable)
-/// - Quantity with unit label
-/// - Total value
-/// - Percentage change (green/red based on positive/negative)
-///
-/// Tapping the card navigates to asset detail screen.
+/// Modern card design displaying asset information
 class AssetCard extends StatelessWidget {
   const AssetCard({
     super.key,
@@ -29,94 +21,176 @@ class AssetCard extends StatelessWidget {
     final isPositive = hasGainLoss && (asset.gainLossPercent ?? 0) >= 0;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
+        color: AppTheme.cardGrey,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.05),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: InkWell(
-        onTap: () => context.push('/assets/${asset.id}'),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          child: Row(
-            children: [
-              // Asset Type Icon - Circular like Trezor
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: _getTypeColor(theme, asset.type),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  _getTypeIcon(asset.type),
-                  color: Colors.white,
-                  size: 22,
-                ),
-              ),
-              const SizedBox(width: 14),
-
-              // Asset Information
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Asset Name - More prominent
-                    Text(
-                      asset.name,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => context.push('/assets/${asset.id}'),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                // Asset Icon with gradient
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        _getTypeColor(asset.type),
+                        _getTypeColor(asset.type).withOpacity(0.7),
+                      ],
                     ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: _getTypeColor(asset.type).withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    _getTypeIcon(asset.type),
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+
+                // Asset Information
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Asset Name
+                      Text(
+                        asset.name,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      // Quantity
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.account_balance_wallet_outlined,
+                            size: 14,
+                            color: AppTheme.textGrey,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${asset.quantity.toStringAsFixed(_getDecimalPlaces())} ${_getUnitLabel()}',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppTheme.textGrey,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Value Column
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    // Total Value
+                    Text(
+                      '${asset.currency.symbol}${_formatValue(asset.totalValue ?? asset.totalInvested)}',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    // Gain/Loss Badge
+                    if (hasGainLoss)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: (isPositive
+                                  ? AppTheme.emeraldAccent
+                                  : AppTheme.errorRed)
+                              .withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: (isPositive
+                                    ? AppTheme.emeraldAccent
+                                    : AppTheme.errorRed)
+                                .withOpacity(0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isPositive
+                                  ? Icons.arrow_upward_rounded
+                                  : Icons.arrow_downward_rounded,
+                              size: 12,
+                              color: isPositive
+                                  ? AppTheme.emeraldAccent
+                                  : AppTheme.errorRed,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${(asset.gainLossPercent ?? 0).abs().toStringAsFixed(1)}%',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: isPositive
+                                    ? AppTheme.emeraldAccent
+                                    : AppTheme.errorRed,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
-              ),
 
-              // Value and Performance
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Total Value - Large and prominent like Trezor
-                  Text(
-                    '${asset.currency.symbol}${_formatValue(asset.totalValue ?? asset.totalInvested)}',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 18,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  // Quantity - Secondary info like Trezor
-                  Text(
-                    '${asset.quantity.toStringAsFixed(_getDecimalPlaces())} ${_getUnitLabel()}',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.5),
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                const SizedBox(width: 4),
+                // Chevron
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: AppTheme.textGrey.withOpacity(0.5),
+                  size: 24,
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
-  }
-
-  /// Get display name with symbol if available
-  String _getDisplayName() {
-    final hasSymbol = asset.symbol.isNotEmpty;
-    if (hasSymbol &&
-        asset.type != AssetType.realEstate &&
-        asset.type != AssetType.gold) {
-      return '${asset.name} (${asset.symbol})';
-    }
-    return asset.name;
   }
 
   /// Get icon based on asset type
@@ -142,14 +216,14 @@ class AssetCard extends StatelessWidget {
   }
 
   /// Get color based on asset type
-  Color _getTypeColor(ThemeData theme, AssetType type) {
+  Color _getTypeColor(AssetType type) {
     switch (type) {
       case AssetType.stock:
-        return theme.colorScheme.primary;
+        return AppTheme.electricBlue;
       case AssetType.etf:
-        return theme.colorScheme.secondary;
+        return AppTheme.purpleAccent;
       case AssetType.bond:
-        return theme.colorScheme.tertiary;
+        return AppTheme.accentBlue;
       case AssetType.crypto:
         return const Color(0xFFF7931A); // Bitcoin orange
       case AssetType.realEstate:
@@ -159,7 +233,7 @@ class AssetCard extends StatelessWidget {
       case AssetType.cash:
         return const Color(0xFF00BCD4); // Cyan
       case AssetType.other:
-        return theme.colorScheme.surfaceContainerHighest;
+        return AppTheme.textGrey;
     }
   }
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:wealthscope_app/features/ai/presentation/widgets/ai_nexus_widget.dart';
 import 'package:wealthscope_app/shared/widgets/constellation_background.dart';
 
 import 'package:wealthscope_app/shared/widgets/custom_bottom_nav_bar.dart';
@@ -25,17 +24,15 @@ class MainShell extends StatelessWidget {
           particleCount: 80,
           interactive: true,
         ),
-        
+
         // Main Content Layer
         Scaffold(
-          backgroundColor: Colors.transparent, // Allow background to show through
-          extendBody: true, // Allow body to extend behind the bottom nav bar
+          backgroundColor:
+              Colors.transparent, // Allow background to show through
+          extendBody: false, // Body should not extend behind the bottom nav bar
           body: child,
           bottomNavigationBar: _MainBottomNavigationBar(),
         ),
-        
-        // AI Layer
-        const AiNexusWidget(),
       ],
     );
   }
@@ -46,16 +43,16 @@ class _MainBottomNavigationBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final location = GoRouterState.of(context).uri.path;
-    
+
     // Determine selected index based on current route
     int selectedIndex = 0;
     if (location.startsWith('/dashboard')) {
       selectedIndex = 0;
     } else if (location.startsWith('/assets')) {
       selectedIndex = 1;
-    } else if (location.startsWith('/ai-advisor') || 
-               location.startsWith('/ai-chat') || 
-               location.startsWith('/what-if')) {
+    } else if (location.startsWith('/ai-advisor') ||
+        location.startsWith('/ai-chat') ||
+        location.startsWith('/what-if')) {
       selectedIndex = 2;
     } else if (location.startsWith('/profile')) {
       selectedIndex = 3;

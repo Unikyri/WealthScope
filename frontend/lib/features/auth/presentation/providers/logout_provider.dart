@@ -15,9 +15,21 @@ class Logout extends _$Logout {
   /// Sign out the current user
   /// Clears Supabase session, tokens, and local cache
   Future<void> signOut() async {
-    state = await AsyncValue.guard(() async {
+    state = const AsyncValue.loading();
+
+    try {
       final authService = ref.read(authServiceProvider);
       await authService.signOut();
-    });
+
+      // Check if the provider is still mounted before updating state
+      if (!ref.mounted) return;
+
+      state = const AsyncValue.data(null);
+    } catch (error, stackTrace) {
+      // Check if the provider is still mounted before updating state
+      if (!ref.mounted) return;
+
+      state = AsyncValue.error(error, stackTrace);
+    }
   }
 }
