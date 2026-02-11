@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -20,12 +22,51 @@ import 'package:wealthscope_app/features/subscriptions/presentation/widgets/prem
 
 /// Dashboard Screen - Crypto Blue Pivot
 /// Matches HTML Reference structure
-class DashboardScreen extends ConsumerWidget {
+class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    print('🏠 [DASHBOARD_SCREEN] Build (Crypto Blue)');
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends ConsumerState<DashboardScreen>
+    with WidgetsBindingObserver {
+  static const _aiRefreshInterval = Duration(minutes: 8);
+  Timer? _refreshTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _refreshTimer = Timer.periodic(_aiRefreshInterval, (_) => _refreshAiData());
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // No-op: _refreshAiData checks lifecycle before refreshing
+  }
+
+  void _refreshAiData() {
+    if (!mounted) return;
+    final state = WidgetsBinding.instance.lifecycleState;
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      return;
+    }
+    ref.invalidate(dashboardPortfolioSummaryProvider);
+    ref.invalidate(dashboardPortfolioRiskProvider);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final summaryAsync = ref.watch(dashboardPortfolioSummaryProvider);
     final currentUserEmail = ref.watch(currentUserProvider)?.email;
@@ -37,6 +78,7 @@ class DashboardScreen extends ConsumerWidget {
         onRefresh: () async {
           await Future.wait([
             ref.refresh(dashboardPortfolioSummaryProvider.future),
+            ref.refresh(dashboardPortfolioRiskProvider.future),
             ref.refresh(allAssetsProvider.future),
           ]);
         },
