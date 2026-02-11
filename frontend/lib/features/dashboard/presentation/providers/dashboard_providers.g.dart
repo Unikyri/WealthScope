@@ -193,3 +193,53 @@ final class DashboardPortfolioRiskProvider extends $FunctionalProvider<
 
 String _$dashboardPortfolioRiskHash() =>
     r'49cfaa9c511f5cb24afc17c856466c633a2648e8';
+
+/// Personalized news for dashboard based on user portfolio.
+/// Fetches news for symbols in user assets, aggregates by portfolio weight,
+/// deduplicates, scores by relevance, and falls back to trending if empty.
+
+@ProviderFor(dashboardPersonalizedNews)
+final dashboardPersonalizedNewsProvider = DashboardPersonalizedNewsProvider._();
+
+/// Personalized news for dashboard based on user portfolio.
+/// Fetches news for symbols in user assets, aggregates by portfolio weight,
+/// deduplicates, scores by relevance, and falls back to trending if empty.
+
+final class DashboardPersonalizedNewsProvider extends $FunctionalProvider<
+        AsyncValue<List<PersonalizedNewsItem>>,
+        List<PersonalizedNewsItem>,
+        FutureOr<List<PersonalizedNewsItem>>>
+    with
+        $FutureModifier<List<PersonalizedNewsItem>>,
+        $FutureProvider<List<PersonalizedNewsItem>> {
+  /// Personalized news for dashboard based on user portfolio.
+  /// Fetches news for symbols in user assets, aggregates by portfolio weight,
+  /// deduplicates, scores by relevance, and falls back to trending if empty.
+  DashboardPersonalizedNewsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'dashboardPersonalizedNewsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$dashboardPersonalizedNewsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<PersonalizedNewsItem>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<PersonalizedNewsItem>> create(Ref ref) {
+    return dashboardPersonalizedNews(ref);
+  }
+}
+
+String _$dashboardPersonalizedNewsHash() =>
+    r'0b1c01f22175642940e438163450b04f4b8ea629';

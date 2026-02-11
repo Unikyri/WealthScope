@@ -33,6 +33,18 @@ class NewsRemoteDatasource {
     return _parseArticles(response);
   }
 
+  /// Fetch news for multiple symbols in a single request.
+  /// Uses GET /news?symbols=AAPL,TSLA,BTC
+  Future<List<NewsArticle>> getBySymbols(List<String> symbols,
+      {int limit = 15}) async {
+    if (symbols.isEmpty) return getTrending(limit: limit);
+    final response = await _dio.get(
+      '/news',
+      queryParameters: {'symbols': symbols.join(','), 'limit': limit},
+    );
+    return _parseArticles(response);
+  }
+
   /// Level 3: Fetch trending/general financial news.
   Future<List<NewsArticle>> getTrending({int limit = 5}) async {
     final response = await _dio.get(
