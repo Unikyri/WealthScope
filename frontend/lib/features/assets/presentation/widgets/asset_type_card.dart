@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/core/utils/asset_type_utils.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 
@@ -116,8 +117,11 @@ class AssetTypeSelectorCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppTheme.electricBlue, AppTheme.purpleAccent],
+                gradient: LinearGradient(
+                  colors: [
+                    AppTheme.electricBlue,
+                    AppTheme.purpleAccent,
+                  ],
                 ),
                 borderRadius: BorderRadius.circular(6),
               ),
