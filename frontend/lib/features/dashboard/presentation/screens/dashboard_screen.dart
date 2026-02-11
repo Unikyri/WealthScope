@@ -63,6 +63,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     }
     ref.invalidate(dashboardPortfolioSummaryProvider);
     ref.invalidate(dashboardPortfolioRiskProvider);
+    ref.invalidate(dashboardPersonalizedNewsProvider);
   }
 
   @override
@@ -79,6 +80,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           await Future.wait([
             ref.refresh(dashboardPortfolioSummaryProvider.future),
             ref.refresh(dashboardPortfolioRiskProvider.future),
+            ref.refresh(dashboardPersonalizedNewsProvider.future),
             ref.refresh(allAssetsProvider.future),
           ]);
         },
