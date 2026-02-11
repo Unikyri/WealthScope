@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
+import 'package:wealthscope_app/features/subscriptions/data/services/revenuecat_service.dart';
+import 'package:wealthscope_app/shared/widgets/price_freshness_indicator.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/asset_candle_chart.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/gemini_analysis_card.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/asset_detail_skeleton.dart';
@@ -167,6 +169,15 @@ class _AssetDetailScreenState extends ConsumerState<AssetDetailScreen> {
                               ],
                             ),
                           ).animate().fadeIn().scale(duration: 400.ms),
+                          
+                          if (asset.updatedAt != null || !ref.watch(featureGateProvider).isPremium) ...[
+                            const SizedBox(height: 8),
+                            PriceFreshnessIndicator(
+                              lastUpdated: asset.updatedAt,
+                              isScoutPlan: !ref.watch(featureGateProvider).isPremium,
+                              compact: true,
+                            ),
+                          ],
                           
                           const SizedBox(height: 12),
                           

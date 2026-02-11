@@ -17,6 +17,7 @@ import 'package:wealthscope_app/features/dashboard/presentation/widgets/enhanced
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/dashboard_skeleton.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/error_view.dart';
 import 'package:wealthscope_app/core/theme/app_theme.dart';
+import 'package:wealthscope_app/core/utils/greeting_utils.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
 import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/crypto_net_worth_hero.dart';
@@ -99,17 +100,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               centerTitle: false,
               title: Row(
                 children: [
-                  // User Avatar
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AppTheme.cardGrey,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white.withOpacity(0.1)),
-                      image: const DecorationImage(
-                        image: NetworkImage(
-                            'https://ui-avatars.com/api/?name=User&background=137FEC&color=fff'), // Placeholder
+                  // User Avatar (initial from name, no external URL)
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: AppTheme.electricBlue.withValues(alpha: 0.3),
+                    child: Text(
+                      userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
@@ -119,7 +118,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Good Morning',
+                        getTimeBasedGreeting(),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: AppTheme.textGrey,
                         ),
@@ -207,11 +206,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     delegate: SliverChildListDelegate([
                       // 1. Hero Sparkline Card (0ms)
                       wrapStagger(
-                        CryptoNetWorthHero(
-                          totalValue: summary.totalValue,
-                          change: summary.gainLoss,
-                          changePercent: summary.gainLossPercent,
-                        ),
+                        Builder(builder: (context) {
+                          final gate = ref.watch(featureGateProvider);
+                          return CryptoNetWorthHero(
+                            totalValue: summary.totalValue,
+                            change: summary.gainLoss,
+                            changePercent: summary.gainLossPercent,
+                            lastUpdated: summary.lastUpdated,
+                            isScoutPlan: !gate.isPremium,
+                          );
+                        }),
                         0,
                       ),
 
