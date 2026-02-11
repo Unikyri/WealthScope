@@ -8,7 +8,9 @@ import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/asset_candle_chart.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/gemini_analysis_card.dart';
+import 'package:wealthscope_app/features/assets/presentation/widgets/asset_detail_skeleton.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/asset_news_list.dart';
+import 'package:wealthscope_app/shared/widgets/asset_icon_resolver.dart';
 
 class AssetDetailScreen extends ConsumerStatefulWidget {
   final String assetId;
@@ -134,6 +136,20 @@ class _AssetDetailScreenState extends ConsumerState<AssetDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          // Hero icon (smooth transition from AssetCard/TopMover)
+                          HeroMode(
+                            enabled: !MediaQuery.of(context).disableAnimations,
+                            child: Hero(
+                              tag: 'asset-icon-${asset.id ?? widget.assetId}',
+                              child: AssetIconResolver(
+                                symbol: asset.symbol,
+                                assetType: asset.type,
+                                name: asset.name,
+                                size: 48,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
                           // Hero Price
                           Text(
                             '\$${_formatPrice(asset.currentPrice ?? asset.purchasePrice)}', // Fallback
@@ -381,7 +397,10 @@ class _AssetDetailScreenState extends ConsumerState<AssetDetailScreen> {
             ],
           );
         },
-        loading: () => const Scaffold(backgroundColor: AppTheme.backgroundDark, body: Center(child: CircularProgressIndicator())),
+        loading: () => const Scaffold(
+          backgroundColor: AppTheme.backgroundDark,
+          body: AssetDetailSkeleton(),
+        ),
         error: (e, _) => Scaffold(
           backgroundColor: AppTheme.backgroundDark,
           body: Center(child: Text('Error: $e', style: const TextStyle(color: Colors.white))),

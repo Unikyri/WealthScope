@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
@@ -35,6 +36,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     with WidgetsBindingObserver {
   static const _aiRefreshInterval = Duration(minutes: 8);
   Timer? _refreshTimer;
+  bool _hasAnimatedStaggered = false;
 
   @override
   void initState() {
@@ -180,23 +182,44 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             summaryAsync.when(
               data: (summary) {
                 final assetsAsync = ref.watch(allAssetsProvider);
+                final useStaggeredAnimation =
+                    !MediaQuery.of(context).disableAnimations &&
+                        !_hasAnimatedStaggered;
+
+                if (!_hasAnimatedStaggered) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) setState(() => _hasAnimatedStaggered = true);
+                  });
+                }
+
+                Widget wrapStagger(Widget child, int delayMs) {
+                  if (!useStaggeredAnimation) return child;
+                  return child
+                      .animate()
+                      .fadeIn(delay: delayMs.ms, duration: 250.ms)
+                      .slideY(begin: 0.05, end: 0);
+                }
 
                 return SliverPadding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
-                      // 1. Hero Sparkline Card
-                      CryptoNetWorthHero(
-                        totalValue: summary.totalValue,
-                        change: summary.gainLoss,
-                        changePercent: summary.gainLossPercent,
+                      // 1. Hero Sparkline Card (0ms)
+                      wrapStagger(
+                        CryptoNetWorthHero(
+                          totalValue: summary.totalValue,
+                          change: summary.gainLoss,
+                          changePercent: summary.gainLossPercent,
+                        ),
+                        0,
                       ),
 
                       const SizedBox(height: 16),
 
-                      // 2. AI Contextual Prompt Bar
-                      Builder(builder: (context) {
+                      // 2. AI Contextual Prompt Bar (75ms)
+                      wrapStagger(
+                        Builder(builder: (context) {
                         final assetsAsync = ref.watch(allAssetsProvider);
                         final riskAsync =
                             ref.watch(dashboardPortfolioRiskProvider);
@@ -238,36 +261,44 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                           },
                         );
                       }),
+                        75,
+                      ),
 
                       const SizedBox(height: 8),
 
-                      // 3. Asset Allocation Donut
+                      // 3. Asset Allocation Donut (150ms)
                       if (summary.breakdownByType.isNotEmpty) ...[
-                        EnhancedAllocationSection(
-                          allocations: summary.breakdownByType,
-                          totalValue: summary.totalValue,
+                        wrapStagger(
+                          EnhancedAllocationSection(
+                            allocations: summary.breakdownByType,
+                            totalValue: summary.totalValue,
+                          ),
+                          150,
                         ),
                         const SizedBox(height: 24),
                       ],
 
-                      // 4. AI-driven Sentiment & Risk Cards
-                      SizedBox(
-                        height: 220,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: AiSentimentCard(
-                                breakdownByType: summary.breakdownByType,
+                      // 4. AI-driven Sentiment & Risk Cards (225ms)
+                      wrapStagger(
+                        SizedBox(
+                          height: 220,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: AiSentimentCard(
+                                  breakdownByType: summary.breakdownByType,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: AiRiskLevelCard(
-                                breakdownByType: summary.breakdownByType,
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: AiRiskLevelCard(
+                                  breakdownByType: summary.breakdownByType,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
+                        225,
                       ),
 
                       // 4b. Risk concentration alert banner
@@ -297,27 +328,34 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
                       const SizedBox(height: 24),
 
-                      // 5. Top Movers
-                      const _SectionHeader(title: 'Top Movers'),
-                      const SizedBox(height: 12),
-                      assetsAsync.when(
-                        data: (assets) {
-                          if (assets.isEmpty) return const SizedBox.shrink();
+                      // 5. Top Movers (300ms)
+                      wrapStagger(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const _SectionHeader(title: 'Top Movers'),
+                            const SizedBox(height: 12),
+                            assetsAsync.when(
+                              data: (assets) {
+                                if (assets.isEmpty) return const SizedBox.shrink();
 
-                          // Show biggest holdings first as proxy for 'top movers'
-                          final sortedAssets = List<StockAsset>.from(assets)
-                            ..sort((a, b) => (b.totalValue ?? 0)
-                                .compareTo(a.totalValue ?? 0));
-                          final topAssets = sortedAssets.take(3).toList();
+                                final sortedAssets = List<StockAsset>.from(assets)
+                                  ..sort((a, b) => (b.totalValue ?? 0)
+                                      .compareTo(a.totalValue ?? 0));
+                                final topAssets = sortedAssets.take(3).toList();
 
-                          return Column(
-                            children: topAssets
-                                .map((asset) => _TopMoverItem(asset: asset))
-                                .toList(),
-                          );
-                        },
-                        loading: () => const SizedBox.shrink(),
-                        error: (_, __) => const SizedBox.shrink(),
+                                return Column(
+                                  children: topAssets
+                                      .map((asset) => _TopMoverItem(asset: asset))
+                                      .toList(),
+                                );
+                              },
+                              loading: () => const SizedBox.shrink(),
+                              error: (_, __) => const SizedBox.shrink(),
+                            ),
+                          ],
+                        ),
+                        300,
                       ),
 
                       const SizedBox(height: 24), // Bottom spacing
@@ -386,12 +424,20 @@ class _TopMoverItem extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Asset Icon (resolved by type and symbol)
-            AssetIconResolver(
-              symbol: asset.symbol,
-              assetType: asset.type,
-              name: asset.name,
-              size: 40,
+            // Asset Icon (Hero for smooth transition to detail)
+            HeroMode(
+              enabled: !MediaQuery.of(context).disableAnimations,
+              child: Hero(
+                tag: asset.id != null
+                    ? 'asset-icon-${asset.id}'
+                    : 'asset-icon-${asset.symbol}-${asset.name.hashCode}',
+                child: AssetIconResolver(
+                  symbol: asset.symbol,
+                  assetType: asset.type,
+                  name: asset.name,
+                  size: 40,
+                ),
+              ),
             ),
             const SizedBox(width: 12),
             // Name & Symbol
