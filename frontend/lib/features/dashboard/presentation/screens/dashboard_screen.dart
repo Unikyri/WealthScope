@@ -9,7 +9,8 @@ import 'package:wealthscope_app/shared/widgets/asset_icon_resolver.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/ai_risk_level_card.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/risk_alert_banner.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/ai_sentiment_card.dart';
-import 'package:wealthscope_app/features/dashboard/domain/prompt_generator.dart';
+import 'package:wealthscope_app/features/dashboard/domain/portfolio_prompt_analyzer.dart';
+import 'package:wealthscope_app/features/dashboard/domain/prompt_templates.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/ai_prompt_bar.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/enhanced_allocation_section_with_legend.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/dashboard_skeleton.dart';
@@ -197,25 +198,36 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       // 2. AI Contextual Prompt Bar
                       Builder(builder: (context) {
                         final assetsAsync = ref.watch(allAssetsProvider);
+                        final riskAsync =
+                            ref.watch(dashboardPortfolioRiskProvider);
+
                         final prompts = assetsAsync.when(
-                          data: (assets) => PromptGenerator.generate(
-                            assets: assets
-                                .map((a) => AssetInfo(
-                                      name: a.name,
-                                      symbol: a.symbol,
-                                      type: a.type.toApiString(),
-                                      totalValue: a.totalValue ?? 0,
-                                    ))
-                                .toList(),
-                            breakdown: summary.breakdownByType
-                                .map((b) => TypeBreakdown(
-                                      type: b.type,
-                                      percent: b.percent,
-                                    ))
-                                .toList(),
+                          data: (assets) => riskAsync.when(
+                            data: (risk) {
+                              final candidates =
+                                  PortfolioPromptAnalyzer.analyze(
+                                assets: assets
+                                    .map((a) => AssetInfo(
+                                          name: a.name,
+                                          symbol: a.symbol,
+                                          type: a.type.toApiString(),
+                                          totalValue: a.totalValue ?? 0,
+                                        ))
+                                    .toList(),
+                                breakdown: summary.breakdownByType,
+                                risk: risk,
+                              );
+                              return PortfolioPromptAnalyzer.selectPrompts(
+                                candidates,
+                                count: 6,
+                              );
+                            },
+                            loading: () => PromptTemplates.defaultPrompts,
+                            error: (_, __) =>
+                                PromptTemplates.defaultPrompts,
                           ),
-                          loading: () => PromptGenerator.defaultPrompts(),
-                          error: (_, __) => PromptGenerator.defaultPrompts(),
+                          loading: () => PromptTemplates.defaultPrompts,
+                          error: (_, __) => PromptTemplates.defaultPrompts,
                         );
 
                         return AiPromptBar(
