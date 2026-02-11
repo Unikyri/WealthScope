@@ -19,8 +19,23 @@ class SelectAssetTypeScreen extends ConsumerWidget {
     WidgetRef ref,
     AssetType type,
   ) async {
-    // Check asset limit for Scout users
     final isPremium = await ref.read(isPremiumProvider.future);
+
+    // Check premium asset type gating
+    if (type.isPremiumOnly && !isPremium) {
+      if (!context.mounted) return;
+      showUpgradePrompt(
+        context,
+        title: 'Premium Asset Type',
+        message:
+            '${type.displayName} is a Sentinel-exclusive asset type. '
+            'Upgrade to add premium assets to your portfolio.',
+        icon: Icons.workspace_premium,
+      );
+      return;
+    }
+
+    // Check asset limit for Scout users
     if (!isPremium) {
       final assets = await ref.read(allAssetsProvider.future);
       if (assets.length >= PlanLimits.scoutMaxAssets) {
@@ -49,6 +64,9 @@ class SelectAssetTypeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isPremiumAsync = ref.watch(isPremiumProvider);
+    final isPremium = isPremiumAsync.value ?? false;
+
     return Scaffold(
       backgroundColor: AppTheme.midnightBlue,
       appBar: AppBar(
@@ -124,6 +142,8 @@ class SelectAssetTypeScreen extends ConsumerWidget {
 
                     return AssetTypeSelectorCard(
                       type: assetType,
+                      isPremiumType: assetType.isPremiumOnly,
+                      isLocked: assetType.isPremiumOnly && !isPremium,
                       onTap: () =>
                           _onAssetTypeSelected(context, ref, assetType),
                     );

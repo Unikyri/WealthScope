@@ -58,22 +58,23 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
     final message = _messageController.text.trim();
     if (message.isEmpty) return;
 
-    // Check AI query limit for Scout users
+    // Check AI query limit for all plans
     final isPremium = await ref.read(isPremiumProvider.future);
-    if (!isPremium) {
-      final usage = await ref.read(usageTrackerProvider.future);
-      if (usage.aiQueriesUsedToday >= PlanLimits.scoutMaxAiQueriesPerDay) {
-        if (!mounted) return;
-        showUpgradePrompt(
-          context,
-          title: 'Daily AI Limit Reached',
-          message:
-              'Scout plan includes ${PlanLimits.scoutMaxAiQueriesPerDay} AI queries per day. '
-              'Queries reset at midnight.',
-          icon: Icons.psychology,
-        );
-        return;
-      }
+    final usage = await ref.read(usageTrackerProvider.future);
+    final maxQueries = PlanLimits.maxAiQueries(isPremium);
+
+    if (usage.aiQueriesUsedToday >= maxQueries) {
+      if (!mounted) return;
+      showUpgradePrompt(
+        context,
+        title: 'Daily AI Limit Reached',
+        message: isPremium
+            ? 'Sentinel plan includes $maxQueries AI queries per day. Queries reset at midnight.'
+            : 'Scout plan includes $maxQueries AI queries per day. '
+                'Upgrade to Sentinel for ${PlanLimits.sentinelMaxAiQueriesPerDay} daily queries.',
+        icon: Icons.psychology,
+      );
+      return;
     }
 
     _messageController.clear();
@@ -83,10 +84,8 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
       await ref.read(aiChatProvider.notifier).sendMessage(message);
       _scrollToBottom();
 
-      // Record AI query usage for Scout users
-      if (!isPremium) {
-        await ref.read(usageTrackerProvider.notifier).recordAiQuery();
-      }
+      // Record AI query usage for ALL plans
+      await ref.read(usageTrackerProvider.notifier).recordAiQuery();
     } catch (e) {
       // Show user-friendly error message
       if (mounted) {
@@ -387,18 +386,18 @@ class _MessageInputState extends State<_MessageInput> {
   }
 }
 
-/// Banner shown to Scout users indicating remaining daily AI queries.
+/// Banner shown to ALL users indicating remaining daily AI queries.
+/// Sentinel users see "Pro - Thinking Mode" indicator with their 50/day limit.
+/// Scout users see their 3/day limit with upgrade CTA when at limit.
 class _AiQueryLimitBanner extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isPremiumAsync = ref.watch(isPremiumProvider);
     final usageAsync = ref.watch(usageTrackerProvider);
 
-    final isPremium = isPremiumAsync.value ?? true;
-    if (isPremium) return const SizedBox.shrink();
-
+    final isPremium = isPremiumAsync.value ?? false;
     final used = usageAsync.value?.aiQueriesUsedToday ?? 0;
-    final max = PlanLimits.scoutMaxAiQueriesPerDay;
+    final max = PlanLimits.maxAiQueries(isPremium);
     final remaining = (max - used).clamp(0, max);
     final isAtLimit = remaining <= 0;
 
@@ -420,31 +419,58 @@ class _AiQueryLimitBanner extends ConsumerWidget {
       child: Row(
         children: [
           Icon(
-            isAtLimit ? Icons.warning_amber_rounded : Icons.auto_awesome,
+            isAtLimit
+                ? Icons.warning_amber_rounded
+                : isPremium
+                    ? Icons.auto_awesome
+                    : Icons.auto_awesome,
             size: 14,
             color: isAtLimit ? Colors.amber : AppTheme.electricBlue,
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(
-              isAtLimit
-                  ? 'Daily limit reached \u2022 Resets at midnight'
-                  : '$remaining/$max queries remaining today',
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: isAtLimit ? Colors.amber : AppTheme.textGrey,
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  if (isPremium && !isAtLimit) ...[
+                    TextSpan(
+                      text: 'Pro \u2022 Thinking Mode',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.electricBlue,
+                      ),
+                    ),
+                    TextSpan(
+                      text: ' \u2022 ',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: AppTheme.textGrey,
+                      ),
+                    ),
+                  ],
+                  TextSpan(
+                    text: isAtLimit
+                        ? 'Daily limit reached \u2022 Resets at midnight'
+                        : '$remaining/$max queries today',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: isAtLimit ? Colors.amber : AppTheme.textGrey,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          if (isAtLimit)
+          if (isAtLimit && !isPremium)
             GestureDetector(
               onTap: () => showUpgradePrompt(
                 context,
                 title: 'Daily AI Limit Reached',
                 message:
                     'Scout plan includes $max AI queries per day. '
-                    'Upgrade to Sentinel for ${ PlanLimits.sentinelMaxAiQueriesPerDay} daily queries.',
+                    'Upgrade to Sentinel for ${PlanLimits.sentinelMaxAiQueriesPerDay} daily queries.',
                 icon: Icons.psychology,
               ),
               child: Text(

@@ -201,6 +201,35 @@ class _WhatIfScreenState extends ConsumerState<WhatIfScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('What-If Simulator'),
+        actions: [
+          // Sentinel badge
+          Container(
+            margin: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [AppTheme.electricBlue, AppTheme.purpleAccent],
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.workspace_premium,
+                    size: 12, color: Colors.white),
+                const SizedBox(width: 4),
+                Text(
+                  'Sentinel',
+                  style: GoogleFonts.inter(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

@@ -49,6 +49,8 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
                     : _UploadOptionsView(
                         onImageSelected: (file) =>
                             setState(() => _selectedFile = file),
+                        onBulkSelected: (files) =>
+                            _processBulkDocuments(files),
                       ),
           ),
         ],
@@ -59,22 +61,23 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
   Future<void> _processDocument() async {
     if (_selectedFile == null) return;
 
-    // Check OCR scan limit for Scout users
+    // Check OCR scan limit for ALL plans
     final isPremium = await ref.read(isPremiumProvider.future);
-    if (!isPremium) {
-      final usage = await ref.read(usageTrackerProvider.future);
-      if (usage.ocrScansUsedThisMonth >= PlanLimits.scoutMaxOcrScansPerMonth) {
-        if (!mounted) return;
-        showUpgradePrompt(
-          context,
-          title: 'Monthly OCR Limit Reached',
-          message:
-              'Scout plan includes ${PlanLimits.scoutMaxOcrScansPerMonth} document scan per month. '
-              'Upgrade for ${PlanLimits.sentinelMaxOcrScansPerMonth} scans/month.',
-          icon: Icons.document_scanner,
-        );
-        return;
-      }
+    final usage = await ref.read(usageTrackerProvider.future);
+    final maxScans = PlanLimits.maxOcrScans(isPremium);
+
+    if (usage.ocrScansUsedThisMonth >= maxScans) {
+      if (!mounted) return;
+      showUpgradePrompt(
+        context,
+        title: 'Monthly OCR Limit Reached',
+        message: isPremium
+            ? 'Sentinel plan includes $maxScans document scans per month. Resets next month.'
+            : 'Scout plan includes $maxScans document scan per month. '
+                'Upgrade for ${PlanLimits.sentinelMaxOcrScansPerMonth} scans/month.',
+        icon: Icons.document_scanner,
+      );
+      return;
     }
 
     setState(() => _isProcessing = true);
@@ -83,10 +86,8 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
       final result =
           await ref.read(ocrProvider.notifier).processDocument(_selectedFile!);
 
-      // Record OCR scan usage for Scout users
-      if (!isPremium) {
-        await ref.read(usageTrackerProvider.notifier).recordOcrScan();
-      }
+      // Record OCR scan usage for ALL plans
+      await ref.read(usageTrackerProvider.notifier).recordOcrScan();
 
       if (mounted) {
         Navigator.of(context).push(
@@ -107,19 +108,80 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
       }
     }
   }
+
+  /// Process multiple documents sequentially (Sentinel bulk import)
+  Future<void> _processBulkDocuments(List<File> files) async {
+    if (files.isEmpty) return;
+
+    final isPremium = await ref.read(isPremiumProvider.future);
+    final usage = await ref.read(usageTrackerProvider.future);
+    final maxScans = PlanLimits.maxOcrScans(isPremium);
+    final remaining = maxScans - usage.ocrScansUsedThisMonth;
+
+    if (remaining <= 0) {
+      if (!mounted) return;
+      showUpgradePrompt(
+        context,
+        title: 'Monthly OCR Limit Reached',
+        message: 'You have used all $maxScans scans this month.',
+        icon: Icons.document_scanner,
+      );
+      return;
+    }
+
+    // Only process up to remaining scans
+    final filesToProcess = files.take(remaining).toList();
+
+    setState(() => _isProcessing = true);
+
+    int processed = 0;
+    for (final file in filesToProcess) {
+      if (!mounted) break;
+      processed++;
+
+      try {
+        await ref.read(ocrProvider.notifier).processDocument(file);
+        await ref.read(usageTrackerProvider.notifier).recordOcrScan();
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error processing file $processed: $e'),
+            ),
+          );
+        }
+      }
+    }
+
+    if (mounted) {
+      setState(() => _isProcessing = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Processed $processed/${filesToProcess.length} documents'),
+          backgroundColor: AppTheme.emeraldAccent,
+        ),
+      );
+    }
+  }
 }
 
 /// Upload Options View
-/// Displays three upload options: camera, gallery, and PDF
+/// Displays upload options: camera, gallery, PDF, and bulk import (Sentinel only)
 class _UploadOptionsView extends ConsumerWidget {
   final Function(File) onImageSelected;
+  final Function(List<File>)? onBulkSelected;
 
-  const _UploadOptionsView({required this.onImageSelected});
+  const _UploadOptionsView({
+    required this.onImageSelected,
+    this.onBulkSelected,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final pickerService = ref.read(documentPickerServiceProvider);
+    final isPremiumAsync = ref.watch(isPremiumProvider);
+    final isPremium = isPremiumAsync.value ?? false;
 
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -130,7 +192,7 @@ class _UploadOptionsView extends ConsumerWidget {
           Icon(
             Icons.document_scanner,
             size: 80,
-            color: theme.colorScheme.primary.withOpacity(0.5),
+            color: theme.colorScheme.primary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 24),
           Text(
@@ -142,7 +204,7 @@ class _UploadOptionsView extends ConsumerWidget {
           Text(
             'Upload a bank statement, brokerage report, or screenshot to automatically extract your assets.',
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
             textAlign: TextAlign.center,
           ),
@@ -170,19 +232,63 @@ class _UploadOptionsView extends ConsumerWidget {
             onTap: () => _pickPDF(context, pickerService),
           ),
 
+          // Bulk Import - Sentinel only
+          if (isPremium && onBulkSelected != null) ...[
+            const SizedBox(height: 16),
+            _UploadOption(
+              icon: Icons.file_copy,
+              title: 'Bulk Import',
+              subtitle: 'Select multiple documents at once',
+              onTap: () => _pickBulkDocuments(context, pickerService),
+            ),
+          ],
+
           const Spacer(),
 
           // Supported formats
           Text(
             'Supported formats: JPG, PNG, PDF (max 10MB)',
             style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
             textAlign: TextAlign.center,
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _pickBulkDocuments(
+    BuildContext context,
+    DocumentPickerService pickerService,
+  ) async {
+    final files = await pickerService.pickMultiplePDFs();
+    if (files.isEmpty) {
+      // Try images if no PDFs selected
+      if (context.mounted) {
+        final images = await pickerService.pickMultipleFromGallery(context);
+        if (images.isNotEmpty) {
+          final validFiles =
+              images.where((f) => pickerService.isFileSizeValid(f)).toList();
+          if (validFiles.isNotEmpty) {
+            onBulkSelected?.call(validFiles);
+          }
+        }
+      }
+      return;
+    }
+    final validFiles =
+        files.where((f) => pickerService.isFileSizeValid(f)).toList();
+    if (validFiles.isNotEmpty) {
+      onBulkSelected?.call(validFiles);
+    } else if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('All files exceed 10MB limit'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   Future<void> _pickFromCamera(
@@ -286,18 +392,17 @@ class _UploadOption extends StatelessWidget {
   }
 }
 
-/// Banner shown to Scout users indicating remaining monthly OCR scans.
+/// Banner shown to ALL users indicating remaining monthly OCR scans.
+/// Sentinel users see their 20/month limit. Scout users see their 1/month limit.
 class _OcrScanLimitBanner extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isPremiumAsync = ref.watch(isPremiumProvider);
     final usageAsync = ref.watch(usageTrackerProvider);
 
-    final isPremium = isPremiumAsync.value ?? true;
-    if (isPremium) return const SizedBox.shrink();
-
+    final isPremium = isPremiumAsync.value ?? false;
     final used = usageAsync.value?.ocrScansUsedThisMonth ?? 0;
-    final max = PlanLimits.scoutMaxOcrScansPerMonth;
+    final max = PlanLimits.maxOcrScans(isPremium);
     final remaining = (max - used).clamp(0, max);
     final isAtLimit = remaining <= 0;
 
@@ -336,7 +441,7 @@ class _OcrScanLimitBanner extends ConsumerWidget {
               ),
             ),
           ),
-          if (isAtLimit)
+          if (isAtLimit && !isPremium)
             GestureDetector(
               onTap: () => showUpgradePrompt(
                 context,

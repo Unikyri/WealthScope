@@ -43,6 +43,9 @@ enum AssetType {
     }
   }
   
+  /// Whether this asset type requires Sentinel (premium) plan.
+  bool get isPremiumOnly => this == AssetType.realEstate;
+
   /// Convert to API format (snake_case)
   String toApiString() {
     switch (this) {

@@ -18,6 +18,12 @@ class PlanLimits {
   static const int sentinelMaxOcrScansPerMonth = 20;
 
   // ---------------------------------------------------------------------------
+  // Premium-only asset types
+  // ---------------------------------------------------------------------------
+  /// Asset types that require Sentinel plan.
+  static const List<String> premiumAssetTypes = ['real_estate'];
+
+  // ---------------------------------------------------------------------------
   // Helpers
   // ---------------------------------------------------------------------------
 
