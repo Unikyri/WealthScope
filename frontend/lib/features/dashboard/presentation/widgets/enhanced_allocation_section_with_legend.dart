@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:wealthscope_app/core/theme/app_theme.dart';
+import 'package:wealthscope_app/core/utils/asset_type_utils.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/dashboard/domain/entities/portfolio_summary.dart';
 
@@ -166,21 +167,18 @@ class _EnhancedAllocationSectionState extends State<EnhancedAllocationSection> {
                         padding: const EdgeInsets.symmetric(vertical: 5.0),
                         child: Row(
                           children: [
-                            // Dot
+                            // Type icon (replaces dot for better clarity)
                             Container(
-                              width: 8,
-                              height: 8,
+                              width: 20,
+                              height: 20,
                               decoration: BoxDecoration(
-                                color: _getTypeColor(item.type),
+                                color: _getTypeColor(item.type).withValues(alpha: 0.2),
                                 shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color:
-                                        _getTypeColor(item.type).withValues(alpha: 0.5),
-                                    blurRadius: 4,
-                                    spreadRadius: 1,
-                                  ),
-                                ],
+                              ),
+                              child: Icon(
+                                _getTypeIcon(item.type),
+                                size: 12,
+                                color: _getTypeColor(item.type),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -274,18 +272,31 @@ class _EnhancedAllocationSectionState extends State<EnhancedAllocationSection> {
     );
   }
 
-  // Helper Methods for Colors and Labels
-   Color _getTypeColor(String typeString) {
+  // Helper Methods for Colors, Icons, and Labels
+  // Icons from AssetTypeUtils; colors kept distinct for pie chart contrast
+  IconData _getTypeIcon(String typeString) {
+    return AssetTypeUtils.getTypeIcon(_parseAssetType(typeString));
+  }
+
+  Color _getTypeColor(String typeString) {
     final type = _parseAssetType(typeString);
     switch (type) {
-      case AssetType.crypto: return AppTheme.electricBlue;
-      case AssetType.stock: return AppTheme.emeraldAccent;
-      case AssetType.realEstate: return Colors.purpleAccent;
-      case AssetType.cash: return AppTheme.textGrey;
-      case AssetType.etf: return Colors.amber;
-      case AssetType.gold: return Colors.orange;
-      case AssetType.bond: return Colors.teal;
-      default: return Colors.grey;
+      case AssetType.crypto:
+        return AppTheme.electricBlue;
+      case AssetType.stock:
+        return AppTheme.emeraldAccent;
+      case AssetType.realEstate:
+        return Colors.purpleAccent;
+      case AssetType.cash:
+        return AppTheme.textGrey;
+      case AssetType.etf:
+        return Colors.amber;
+      case AssetType.gold:
+        return Colors.orange;
+      case AssetType.bond:
+        return Colors.teal;
+      default:
+        return Colors.grey;
     }
   }
 
