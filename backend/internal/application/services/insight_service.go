@@ -176,6 +176,9 @@ func (s *InsightService) GenerateDailyBriefing(ctx context.Context, userID uuid.
 	actionItems := ai.ParseActionItems(content)
 	insight.SetActionItems(actionItems)
 
+	// Set related symbols from user portfolio (top gainers/losers)
+	insight.SetRelatedSymbols(s.symbolsFromAnalysis(analysis))
+
 	if err := s.insightRepo.Create(ctx, insight); err != nil {
 		s.logger.Error("failed to save daily briefing", zap.Error(err))
 		return nil, fmt.Errorf("failed to save briefing: %w", err)
@@ -259,6 +262,9 @@ func (s *InsightService) generateAlertInsight(ctx context.Context, userID uuid.U
 	category := entities.InsightCategoryRisk
 	insight := entities.NewAlert(userID, alert.Title, content, priority, category)
 
+	// Set related symbols from user portfolio
+	insight.SetRelatedSymbols(s.symbolsFromAnalysis(analysis))
+
 	if err := s.insightRepo.Create(ctx, insight); err != nil {
 		return nil, fmt.Errorf("failed to save alert: %w", err)
 	}
@@ -282,11 +288,40 @@ func (s *InsightService) generateRecommendation(ctx context.Context, userID uuid
 	actionItems := ai.ParseActionItems(content)
 	insight := entities.NewRecommendation(userID, "Portfolio Improvement Suggestions", content, actionItems)
 
+	// Set related symbols from user portfolio
+	insight.SetRelatedSymbols(s.symbolsFromAnalysis(analysis))
+
 	if err := s.insightRepo.Create(ctx, insight); err != nil {
 		return nil, fmt.Errorf("failed to save recommendation: %w", err)
 	}
 
 	return insight, nil
+}
+
+// symbolsFromAnalysis extracts unique symbols from top gainers and losers.
+func (s *InsightService) symbolsFromAnalysis(analysis *PortfolioAnalysis) []string {
+	if analysis == nil {
+		return nil
+	}
+	seen := make(map[string]struct{})
+	var symbols []string
+	for _, g := range analysis.TopGainers {
+		if g.Symbol != "" {
+			if _, ok := seen[g.Symbol]; !ok {
+				seen[g.Symbol] = struct{}{}
+				symbols = append(symbols, g.Symbol)
+			}
+		}
+	}
+	for _, l := range analysis.TopLosers {
+		if l.Symbol != "" {
+			if _, ok := seen[l.Symbol]; !ok {
+				seen[l.Symbol] = struct{}{}
+				symbols = append(symbols, l.Symbol)
+			}
+		}
+	}
+	return symbols
 }
 
 // shouldGenerateRecommendation determines if a recommendation should be generated.
