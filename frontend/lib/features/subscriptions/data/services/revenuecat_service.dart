@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wealthscope_app/core/constants/app_config.dart';
 
 /// RevenueCat Service - Handles all subscription logic for WealthScope.
 ///
@@ -223,8 +224,12 @@ final customerInfoProvider = FutureProvider<CustomerInfo?>((ref) async {
 
 /// Whether the current user has premium (Sentinel) access.
 ///
-/// NOTE: This provider will be enhanced in T-16.3.2 to support trial mode.
+/// When [AppConfig.isTrialMode] is `true`, this always returns `true`
+/// so all premium features are unlocked during development and demos.
 final isPremiumProvider = FutureProvider<bool>((ref) async {
+  // Trial mode bypasses RevenueCat check
+  if (AppConfig.isTrialMode) return true;
+
   final service = ref.watch(revenueCatServiceProvider);
   return await service.isPremium();
 });
