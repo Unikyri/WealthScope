@@ -312,7 +312,7 @@ class _AssetDetailScreenState extends ConsumerState<AssetDetailScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 16),
-                                AssetNewsList(symbol: asset.symbol),
+                                AssetNewsList(symbol: asset.symbol, assetType: asset.type),
                               ],
                             ),
                           ),
