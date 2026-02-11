@@ -19,7 +19,6 @@ import 'package:wealthscope_app/features/dashboard/presentation/screens/dashboar
 import 'package:wealthscope_app/features/news/presentation/screens/article_webview_screen.dart';
 import 'package:wealthscope_app/features/news/presentation/screens/news_screen.dart';
 import 'package:wealthscope_app/features/notifications/presentation/screens/notifications_screen.dart';
-import 'package:wealthscope_app/features/onboarding/presentation/screens/onboarding_cinematic.dart';
 import 'package:wealthscope_app/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:wealthscope_app/features/profile/presentation/screens/profile_screen.dart';
 import 'package:wealthscope_app/features/settings/presentation/screens/settings_screen.dart';
@@ -52,11 +51,6 @@ class AppRouter {
         path: '/onboarding',
         name: 'onboarding',
         builder: (context, state) => const OnboardingScreen(),
-      ),
-      GoRoute(
-        path: '/onboarding-cinematic',
-        name: 'onboarding-cinematic',
-        builder: (context, state) => const OnboardingCinematic(),
       ),
       GoRoute(
         path: '/login',

@@ -18,7 +18,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Define auth routes (public routes)
       final isAuthRoute = location == '/login' || 
                           location == '/register' ||
-                          location == '/splash';
+                          location == '/splash' ||
+                          location == '/onboarding';
       
       // If not authenticated and trying to access protected route
       if (!isAuthenticated && !isAuthRoute) {
