@@ -87,10 +87,18 @@ class AiRiskLevelCard extends ConsumerWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              // Asset class breakdown chips
-              if (breakdownByType.length >= 2) ...[
+              // Diversification Score: 100 - riskScore (100 = well diversified)
+              const SizedBox(height: 4),
+              Text(
+                _diversificationScoreText(risk),
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: AppTheme.textGrey,
+                    ),
+              ),
+              // Concentration bars by asset class
+              if (breakdownByType.isNotEmpty) ...[
                 const SizedBox(height: 6),
-                _AssetBreakdownChips(breakdownByType: breakdownByType),
+                _ConcentrationBars(breakdownByType: breakdownByType),
               ],
             ],
           ),
@@ -178,6 +186,13 @@ class AiRiskLevelCard extends ConsumerWidget {
       case RiskLevel.critical:
         return 'Critical';
     }
+  }
+
+  String _diversificationScoreText(PortfolioRisk risk) {
+    final score = 100 - risk.riskScore;
+    final label =
+        score <= 30 ? 'Low' : score <= 60 ? 'Medium' : 'High';
+    return 'Diversification: $score/100 ($label)';
   }
 
   String _riskSubtext(PortfolioRisk risk) {
@@ -279,111 +294,116 @@ class _RiskGauge extends StatelessWidget {
   }
 }
 
-/// Compact asset class breakdown chips shown below the card content.
-class _AssetBreakdownChips extends StatelessWidget {
+/// Concentration bars by asset class with color coding.
+/// Green <30%, yellow 30-60%, orange 60-80%, red >80%
+class _ConcentrationBars extends StatelessWidget {
   final List<AssetTypeBreakdown> breakdownByType;
 
-  const _AssetBreakdownChips({required this.breakdownByType});
+  const _ConcentrationBars({required this.breakdownByType});
 
   @override
   Widget build(BuildContext context) {
     final sorted = List<AssetTypeBreakdown>.from(breakdownByType)
       ..sort((a, b) => b.percent.compareTo(a.percent));
-    final visible = sorted.take(3).toList();
-    final remaining = sorted.length - 3;
+    final visible = sorted.take(5).toList();
 
-    return Wrap(
-      spacing: 6,
-      runSpacing: 4,
-      children: [
-        ...visible.map((item) => _Chip(
-              label: _typeLabel(item.type),
-              color: _typeColor(item.type),
-            )),
-        if (remaining > 0)
-          Text(
-            '+$remaining',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: AppTheme.textGrey,
-                  fontSize: 10,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: visible
+          .map((item) => Padding(
+                padding: const EdgeInsets.only(bottom: 2),
+                child: _ConcentrationBarRow(
+                  type: item.type,
+                  percent: item.percent,
                 ),
-          ),
-      ],
+              ))
+          .toList(),
     );
+  }
+}
+
+class _ConcentrationBarRow extends StatelessWidget {
+  final String type;
+  final double percent;
+
+  const _ConcentrationBarRow({
+    required this.type,
+    required this.percent,
+  });
+
+  Color _concentrationColor(double pct) {
+    if (pct < 30) return AppTheme.emeraldAccent;
+    if (pct < 60) return Colors.amber;
+    if (pct < 80) return Colors.orange;
+    return AppTheme.alertRed;
   }
 
   String _typeLabel(String typeString) {
-    final type = AssetType.fromString(typeString);
-    switch (type) {
+    final t = AssetType.fromString(typeString);
+    switch (t) {
       case AssetType.realEstate:
         return 'Real Est.';
       case AssetType.etf:
         return 'ETF';
       default:
-        return typeString[0].toUpperCase() + typeString.substring(1);
+        return typeString.isNotEmpty
+            ? typeString[0].toUpperCase() + typeString.substring(1)
+            : typeString;
     }
   }
-
-  Color _typeColor(String typeString) {
-    final type = AssetType.fromString(typeString);
-    switch (type) {
-      case AssetType.crypto:
-        return AppTheme.electricBlue;
-      case AssetType.stock:
-        return AppTheme.emeraldAccent;
-      case AssetType.realEstate:
-        return Colors.purpleAccent;
-      case AssetType.cash:
-        return AppTheme.textGrey;
-      case AssetType.etf:
-        return Colors.amber;
-      case AssetType.gold:
-        return Colors.orange;
-      case AssetType.bond:
-        return Colors.teal;
-      default:
-        return Colors.grey;
-    }
-  }
-}
-
-/// Small colored chip showing an asset type label.
-class _Chip extends StatelessWidget {
-  final String label;
-  final Color color;
-
-  const _Chip({required this.label, required this.color});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 5,
-            height: 5,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
+    final color = _concentrationColor(percent);
+    return Row(
+      children: [
+        SizedBox(
+          width: 52,
+          child: Text(
+            _typeLabel(type),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: AppTheme.textGrey,
+                  fontSize: 10,
+                ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: SizedBox(
+            height: 6,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(2),
+              child: LinearProgressIndicator(
+                value: (percent / 100).clamp(0.0, 1.0),
+                backgroundColor: Colors.white.withValues(alpha: 0.08),
+                valueColor: AlwaysStoppedAnimation<Color>(color),
+              ),
             ),
           ),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 9,
-              fontWeight: FontWeight.w600,
+        ),
+        const SizedBox(width: 6),
+        SizedBox(
+          width: 28,
+          child: Text(
+            '${percent.round()}%',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: color,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+        ),
+        if (percent >= 70)
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: Icon(
+              Icons.warning_amber_rounded,
+              size: 12,
+              color: percent >= 85 ? AppTheme.alertRed : Colors.amber,
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 }
