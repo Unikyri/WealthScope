@@ -92,6 +92,7 @@ dependencies:
   # Subscriptions & In-App Purchases
   purchases_flutter: ^9.8.0
   purchases_ui_flutter: ^9.8.0
+  shared_preferences: ^2.5.4
 
 dev_dependencies:
   flutter_test:

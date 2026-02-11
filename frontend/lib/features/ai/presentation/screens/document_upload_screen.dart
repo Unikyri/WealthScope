@@ -1,11 +1,16 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wealthscope_app/features/ai/domain/entities/ocr_result.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/ai/presentation/providers/ocr_provider.dart';
 import 'package:wealthscope_app/features/ai/presentation/screens/extracted_assets_screen.dart';
 import 'package:wealthscope_app/features/ai/presentation/services/document_picker_service.dart';
 import 'package:wealthscope_app/features/ai/presentation/widgets/processing_view.dart';
+import 'package:wealthscope_app/features/subscriptions/data/services/revenuecat_service.dart';
+import 'package:wealthscope_app/features/subscriptions/data/services/usage_tracker.dart';
+import 'package:wealthscope_app/features/subscriptions/domain/plan_limits.dart';
+import 'package:wealthscope_app/features/subscriptions/presentation/widgets/upgrade_prompt_dialog.dart';
 
 /// Document Upload Screen
 /// Main screen for uploading documents with multiple options (camera, gallery, PDF)
@@ -27,29 +32,61 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
       appBar: AppBar(
         title: const Text('Import from Document'),
       ),
-      body: _isProcessing
-          ? const ProcessingView()
-          : _selectedFile != null
-              ? _PreviewView(
-                  file: _selectedFile!,
-                  onRemove: () => setState(() => _selectedFile = null),
-                  onProcess: _processDocument,
-                )
-              : _UploadOptionsView(
-                  onImageSelected: (file) =>
-                      setState(() => _selectedFile = file),
-                ),
+      body: Column(
+        children: [
+          // OCR scan limit banner for Scout users
+          _OcrScanLimitBanner(),
+
+          Expanded(
+            child: _isProcessing
+                ? const ProcessingView()
+                : _selectedFile != null
+                    ? _PreviewView(
+                        file: _selectedFile!,
+                        onRemove: () => setState(() => _selectedFile = null),
+                        onProcess: _processDocument,
+                      )
+                    : _UploadOptionsView(
+                        onImageSelected: (file) =>
+                            setState(() => _selectedFile = file),
+                      ),
+          ),
+        ],
+      ),
     );
   }
 
   Future<void> _processDocument() async {
     if (_selectedFile == null) return;
 
+    // Check OCR scan limit for Scout users
+    final isPremium = await ref.read(isPremiumProvider.future);
+    if (!isPremium) {
+      final usage = await ref.read(usageTrackerProvider.future);
+      if (usage.ocrScansUsedThisMonth >= PlanLimits.scoutMaxOcrScansPerMonth) {
+        if (!mounted) return;
+        showUpgradePrompt(
+          context,
+          title: 'Monthly OCR Limit Reached',
+          message:
+              'Scout plan includes ${PlanLimits.scoutMaxOcrScansPerMonth} document scan per month. '
+              'Upgrade for ${PlanLimits.sentinelMaxOcrScansPerMonth} scans/month.',
+          icon: Icons.document_scanner,
+        );
+        return;
+      }
+    }
+
     setState(() => _isProcessing = true);
 
     try {
       final result =
           await ref.read(ocrProvider.notifier).processDocument(_selectedFile!);
+
+      // Record OCR scan usage for Scout users
+      if (!isPremium) {
+        await ref.read(usageTrackerProvider.notifier).recordOcrScan();
+      }
 
       if (mounted) {
         Navigator.of(context).push(
@@ -244,6 +281,81 @@ class _UploadOption extends StatelessWidget {
         subtitle: Text(subtitle),
         trailing: const Icon(Icons.chevron_right),
         onTap: onTap,
+      ),
+    );
+  }
+}
+
+/// Banner shown to Scout users indicating remaining monthly OCR scans.
+class _OcrScanLimitBanner extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isPremiumAsync = ref.watch(isPremiumProvider);
+    final usageAsync = ref.watch(usageTrackerProvider);
+
+    final isPremium = isPremiumAsync.value ?? true;
+    if (isPremium) return const SizedBox.shrink();
+
+    final used = usageAsync.value?.ocrScansUsedThisMonth ?? 0;
+    final max = PlanLimits.scoutMaxOcrScansPerMonth;
+    final remaining = (max - used).clamp(0, max);
+    final isAtLimit = remaining <= 0;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: isAtLimit
+            ? Colors.amber.withValues(alpha: 0.12)
+            : AppTheme.electricBlue.withValues(alpha: 0.08),
+        border: Border(
+          bottom: BorderSide(
+            color: isAtLimit
+                ? Colors.amber.withValues(alpha: 0.2)
+                : AppTheme.electricBlue.withValues(alpha: 0.1),
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            isAtLimit ? Icons.warning_amber_rounded : Icons.document_scanner,
+            size: 14,
+            color: isAtLimit ? Colors.amber : AppTheme.electricBlue,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              isAtLimit
+                  ? 'Monthly scan limit reached'
+                  : '$remaining/$max scans remaining this month',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: isAtLimit ? Colors.amber : AppTheme.textGrey,
+              ),
+            ),
+          ),
+          if (isAtLimit)
+            GestureDetector(
+              onTap: () => showUpgradePrompt(
+                context,
+                title: 'Monthly OCR Limit Reached',
+                message:
+                    'Scout plan includes $max document scan per month. '
+                    'Upgrade for ${PlanLimits.sentinelMaxOcrScansPerMonth} scans/month.',
+                icon: Icons.document_scanner,
+              ),
+              child: Text(
+                'Upgrade',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.electricBlue,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
