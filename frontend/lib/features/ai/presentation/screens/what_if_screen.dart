@@ -47,19 +47,11 @@ class _WhatIfScreenState extends ConsumerState<WhatIfScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isPremiumAsync = ref.watch(isPremiumProvider);
+    final gate = ref.watch(featureGateProvider);
+    final whatIfResult = gate.canUseWhatIf();
 
-    return isPremiumAsync.when(
-      data: (isPremium) {
-        if (!isPremium) return _buildUpgradeScreen(context);
-        return _buildWhatIfContent(context);
-      },
-      loading: () => Scaffold(
-        backgroundColor: AppTheme.midnightBlue,
-        body: const Center(child: CircularProgressIndicator()),
-      ),
-      error: (_, __) => _buildWhatIfContent(context),
-    );
+    if (!whatIfResult.allowed) return _buildUpgradeScreen(context);
+    return _buildWhatIfContent(context);
   }
 
   Widget _buildUpgradeScreen(BuildContext context) {
