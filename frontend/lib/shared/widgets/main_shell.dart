@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/shared/widgets/constellation_background.dart';
 
 import 'package:wealthscope_app/shared/widgets/custom_bottom_nav_bar.dart';
+import 'package:wealthscope_app/shared/widgets/speed_dial_fab.dart';
 
 /// MainShell wraps the main navigation structure of the app
 /// with a bottom navigation bar for protected routes
@@ -29,8 +30,11 @@ class MainShell extends StatelessWidget {
         Scaffold(
           backgroundColor:
               Colors.transparent, // Allow background to show through
-          extendBody: false, // Body should not extend behind the bottom nav bar
+          extendBody: true, // Body extends behind nav so FAB overlaps naturally
           body: child,
+          floatingActionButton: const SpeedDialFab(),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
           bottomNavigationBar: _MainBottomNavigationBar(),
         ),
       ],

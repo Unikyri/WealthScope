@@ -14,7 +14,6 @@ import 'package:wealthscope_app/features/dashboard/presentation/widgets/error_vi
 import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
 import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
-import 'package:wealthscope_app/shared/widgets/speed_dial_fab.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/crypto_net_worth_hero.dart';
 import 'package:wealthscope_app/features/subscriptions/presentation/widgets/premium_widgets.dart';
 
@@ -248,11 +247,6 @@ class DashboardScreen extends ConsumerWidget {
           ],
         ),
       ),
-      floatingActionButton: const Padding(
-        padding: EdgeInsets.only(bottom: 8.0),
-        child: SpeedDialFab(),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

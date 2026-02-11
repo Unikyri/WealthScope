@@ -1,9 +1,14 @@
-import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/core/theme/app_theme.dart';
 
+/// Center-docked Speed Dial FAB.
+///
+/// Designed to be used as `floatingActionButton` with
+/// `FloatingActionButtonLocation.centerDocked`. The main button is a 56x56
+/// circle; when tapped it opens an Overlay with a blurred backdrop and
+/// 4 option buttons expanding upward.
 class SpeedDialFab extends StatefulWidget {
   const SpeedDialFab({super.key});
 
@@ -14,48 +19,42 @@ class SpeedDialFab extends StatefulWidget {
 class _SpeedDialFabState extends State<SpeedDialFab>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  OverlayEntry? _overlayEntry;
   bool _isOpen = false;
 
-  // Define actions
+  // ---------------------------------------------------------------------------
+  // FAB actions (unchanged from original)
+  // ---------------------------------------------------------------------------
   final List<_SpeedDialOption> _options = [
     _SpeedDialOption(
       icon: Icons.add,
       label: 'Add Asset',
       color: AppTheme.electricBlue,
-      heroTag: 'speed_dial_add_asset',
-      onTap: (BuildContext context) {
-        context.push('/assets/select-type');
-      },
+      onTap: (BuildContext context) => context.push('/assets/select-type'),
     ),
     _SpeedDialOption(
       icon: Icons.upload_file,
       label: 'Import',
       color: AppTheme.emeraldAccent,
-      heroTag: 'speed_dial_import',
-      onTap: (BuildContext context) {
-        context.push('/document-upload');
-      },
+      onTap: (BuildContext context) => context.push('/document-upload'),
     ),
     _SpeedDialOption(
       icon: Icons.psychology,
       label: 'AI Advisor',
       color: const Color(0xFF9C27B0),
-      heroTag: 'speed_dial_ai_advisor',
-      onTap: (BuildContext context) {
-        context.push('/ai-chat');
-      },
+      onTap: (BuildContext context) => context.push('/ai-chat'),
     ),
     _SpeedDialOption(
       icon: Icons.science,
       label: 'What-If',
       color: const Color(0xFFFF9800),
-      heroTag: 'speed_dial_what_if',
-      onTap: (BuildContext context) {
-        context.push('/what-if');
-      },
+      onTap: (BuildContext context) => context.push('/what-if'),
     ),
   ];
 
+  // ---------------------------------------------------------------------------
+  // Lifecycle
+  // ---------------------------------------------------------------------------
   @override
   void initState() {
     super.initState();
@@ -67,80 +66,79 @@ class _SpeedDialFabState extends State<SpeedDialFab>
 
   @override
   void dispose() {
+    _removeOverlay();
     _controller.dispose();
     super.dispose();
   }
 
+  // ---------------------------------------------------------------------------
+  // Toggle open / close
+  // ---------------------------------------------------------------------------
   void _toggle() {
-    setState(() {
-      _isOpen = !_isOpen;
-      if (_isOpen) {
-        _controller.forward();
-      } else {
-        _controller.reverse();
-      }
-    });
+    if (_isOpen) {
+      _controller.reverse().then((_) {
+        _removeOverlay();
+      });
+      setState(() => _isOpen = false);
+    } else {
+      setState(() => _isOpen = true);
+      _showOverlay();
+      _controller.forward();
+    }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // Calculate total height needed
-    // 4 options * 64px spacing + 56px main FAB + 152px base offset
-    const totalHeight = 400.0;
-    const totalWidth = 200.0; // Account for labels
+  void _removeOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
 
-    final screenSize = MediaQuery.of(context).size;
+  void _showOverlay() {
+    final renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
 
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        // Backdrop difuminado cuando está abierto - cubre toda la pantalla
-        if (_isOpen)
-          Positioned(
-            left: -screenSize.width,
-            right: -totalWidth,
-            top: -screenSize.height,
-            bottom: -totalHeight,
-            child: GestureDetector(
-              onTap: _toggle,
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.75),
+    final fabPosition = renderBox.localToGlobal(Offset.zero);
+
+    _overlayEntry = OverlayEntry(
+      builder: (_) => AnimatedBuilder(
+        animation: _controller,
+        builder: (ctx, __) {
+          final progress = _controller.value;
+          const buttonSpacing = 60.0;
+          // Options start 16px above the top of the FAB
+          final baseY = fabPosition.dy - 16;
+
+          return Material(
+            color: Colors.transparent,
+            child: Stack(
+              children: [
+                // Full-screen backdrop with blur
+                Positioned.fill(
+                  child: GestureDetector(
+                    onTap: _toggle,
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(
+                        sigmaX: 8 * progress,
+                        sigmaY: 8 * progress,
+                      ),
+                      child: Container(
+                        color: Colors.black
+                            .withValues(alpha: 0.75 * progress),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ),
-        SizedBox(
-          width: totalWidth,
-          height: totalHeight,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              // Options stacked vertically
-              ..._options.reversed.toList().asMap().entries.map((entry) {
-                final index = entry.key;
-                final option = entry.value;
 
-                return AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, child) {
-                    final progress = _controller.value;
-                    // Main FAB is at bottom: 0 (relative to SizedBox)
-                    // FAB size: 56px
-                    // Gap between FAB and first button: 16px
-                    // Base offset: 56 (FAB height) + 16 (gap) = 72
-                    final fabSize = 56.0;
-                    final gap = 16.0;
-                    final baseOffset = fabSize + gap;
-                    // Each button needs space: 64px between buttons
-                    final buttonSpacing = 64.0;
+                // Options expanding upward from FAB
+                ..._options.reversed.toList().asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final option = entry.value;
 
-                    return Positioned(
-                      right: 0,
-                      bottom: baseOffset + (index * buttonSpacing) * progress,
+                  return Positioned(
+                    // Animate from baseY to final position
+                    top: baseY - ((index + 1) * buttonSpacing * progress),
+                    left: 0,
+                    right: 0,
+                    child: Center(
                       child: Transform.scale(
                         scale: progress,
                         child: Opacity(
@@ -149,7 +147,6 @@ class _SpeedDialFabState extends State<SpeedDialFab>
                             icon: option.icon,
                             label: option.label,
                             color: option.color,
-                            heroTag: option.heroTag,
                             onTap: () {
                               _toggle();
                               option.onTap?.call(context);
@@ -157,108 +154,104 @@ class _SpeedDialFabState extends State<SpeedDialFab>
                           ),
                         ),
                       ),
-                    );
-                  },
-                );
-              }),
-              // Main FAB
-              Positioned(
-                right: 0,
-                bottom: 0,
-                child: Material(
-                  elevation: _isOpen ? 8 : 6,
-                  shadowColor: AppTheme.electricBlue.withOpacity(0.5),
-                  shape: const CircleBorder(),
-                  color: Colors.transparent,
-                  child: Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: _isOpen
-                            ? [
-                                Colors.grey[800]!,
-                                Colors.grey[700]!,
-                              ]
-                            : [
-                                AppTheme.electricBlue,
-                                AppTheme.electricBlue.withOpacity(0.8),
-                              ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: _isOpen
-                              ? Colors.black.withOpacity(0.3)
-                              : AppTheme.electricBlue.withOpacity(0.4),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
                     ),
-                    child: InkWell(
-                      onTap: _toggle,
-                      customBorder: const CircleBorder(),
-                      child: Center(
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 200),
-                          transitionBuilder: (child, animation) {
-                            return RotationTransition(
-                              turns: Tween<double>(begin: 0.0, end: 0.125)
-                                  .animate(animation),
-                              child: child,
-                            );
-                          },
-                          child: Icon(
-                            _isOpen ? Icons.close : Icons.add,
-                            key: ValueKey<bool>(_isOpen),
-                            color: Colors.white,
-                            size: 28,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+                  );
+                }),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Build: just the 56x56 main FAB button
+  // ---------------------------------------------------------------------------
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _toggle,
+      child: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            colors: _isOpen
+                ? [Colors.grey[800]!, Colors.grey[700]!]
+                : [
+                    AppTheme.electricBlue,
+                    AppTheme.electricBlue.withValues(alpha: 0.8),
+                  ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: _isOpen
+                  ? Colors.black.withValues(alpha: 0.3)
+                  : AppTheme.electricBlue.withValues(alpha: 0.4),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Center(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            transitionBuilder: (child, animation) {
+              return RotationTransition(
+                turns:
+                    Tween<double>(begin: 0.0, end: 0.125).animate(animation),
+                child: child,
+              );
+            },
+            child: Icon(
+              _isOpen ? Icons.close : Icons.add,
+              key: ValueKey<bool>(_isOpen),
+              color: Colors.white,
+              size: 28,
+            ),
           ),
         ),
-      ],
+      ),
     );
   }
 }
 
+// -----------------------------------------------------------------------------
+// Data class for speed dial options
+// -----------------------------------------------------------------------------
 class _SpeedDialOption {
   final IconData icon;
   final String label;
   final Color color;
-  final String heroTag;
   final void Function(BuildContext)? onTap;
 
   const _SpeedDialOption({
     required this.icon,
     required this.label,
     required this.color,
-    required this.heroTag,
     this.onTap,
   });
 }
 
+// -----------------------------------------------------------------------------
+// Individual speed dial button (label + circle icon)
+// -----------------------------------------------------------------------------
 class _SpeedDialButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
-  final String heroTag;
   final VoidCallback onTap;
 
   const _SpeedDialButton({
     required this.icon,
     required this.label,
     required this.color,
-    required this.heroTag,
     required this.onTap,
   });
 
@@ -266,21 +259,20 @@ class _SpeedDialButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        // Label container
+        // Label pill
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           decoration: BoxDecoration(
             color: AppTheme.cardGrey,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: color.withOpacity(0.3),
+              color: color.withValues(alpha: 0.3),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -297,38 +289,32 @@ class _SpeedDialButton extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-        // Mini FAB
-        Material(
-          elevation: 6,
-          shadowColor: color.withOpacity(0.5),
-          shape: const CircleBorder(),
-          color: Colors.transparent,
+
+        // Circle icon button
+        GestureDetector(
+          onTap: onTap,
           child: Container(
-            width: 40,
-            height: 40,
+            width: 42,
+            height: 42,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(
                 colors: [
                   color,
-                  color.withOpacity(0.8),
+                  color.withValues(alpha: 0.8),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.4),
+                  color: color.withValues(alpha: 0.4),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),
               ],
             ),
-            child: InkWell(
-              onTap: onTap,
-              customBorder: const CircleBorder(),
-              child: Icon(icon, color: Colors.white, size: 20),
-            ),
+            child: Icon(icon, color: Colors.white, size: 20),
           ),
         ),
       ],

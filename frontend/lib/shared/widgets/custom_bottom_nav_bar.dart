@@ -16,21 +16,18 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
-
     return Container(
       decoration: BoxDecoration(
         color: AppTheme.cardGrey,
         border: Border(
           top: BorderSide(
-            color: AppTheme.electricBlue.withOpacity(0.3),
+            color: AppTheme.electricBlue.withValues(alpha: 0.3),
             width: 2,
           ),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.4),
+            color: Colors.black.withValues(alpha: 0.4),
             blurRadius: 12,
             offset: const Offset(0, -4),
           ),
@@ -40,9 +37,9 @@ class CustomBottomNavBar extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // Left side: HOME + ASSETS
               Expanded(
                 child: _NavBarItem(
                   customIconWidget: (color, size) => CustomHomeIcon(
@@ -62,6 +59,11 @@ class CustomBottomNavBar extends StatelessWidget {
                   onTap: () => onDestinationSelected(1),
                 ),
               ),
+
+              // Central gap for FAB
+              const SizedBox(width: 72),
+
+              // Right side: ADVISOR + SYSTEM
               Expanded(
                 child: _NavBarItem(
                   icon: CustomIcons.ai,
@@ -104,9 +106,8 @@ class _NavBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final color =
-        isSelected ? AppTheme.electricBlue : Colors.white.withOpacity(0.6);
+        isSelected ? AppTheme.electricBlue : Colors.white.withValues(alpha: 0.6);
 
     return InkWell(
       onTap: onTap,
@@ -122,12 +123,12 @@ class _NavBarItem extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppTheme.electricBlue.withOpacity(0.2)
+                    ? AppTheme.electricBlue.withValues(alpha: 0.2)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(16),
                 border: isSelected
                     ? Border.all(
-                        color: AppTheme.electricBlue.withOpacity(0.5),
+                        color: AppTheme.electricBlue.withValues(alpha: 0.5),
                         width: 1.5,
                       )
                     : null,
