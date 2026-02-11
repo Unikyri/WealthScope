@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:wealthscope_app/core/theme/custom_icons.dart';
+import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/providers/dashboard_providers.dart';
+import 'package:wealthscope_app/shared/widgets/asset_icon_resolver.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/ai_risk_level_card.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/ai_sentiment_card.dart';
+import 'package:wealthscope_app/features/dashboard/domain/prompt_generator.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/ai_prompt_bar.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/enhanced_allocation_section_with_legend.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/dashboard_skeleton.dart';
-import 'package:wealthscope_app/features/dashboard/presentation/widgets/empty_dashboard.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/error_view.dart';
 import 'package:wealthscope_app/core/theme/app_theme.dart';
-import 'package:wealthscope_app/features/dashboard/presentation/widgets/dashboard_news_section.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
 import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
-import 'package:wealthscope_app/shared/widgets/tech_card.dart';
 import 'package:wealthscope_app/shared/widgets/speed_dial_fab.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/crypto_net_worth_hero.dart';
 import 'package:wealthscope_app/features/subscriptions/presentation/widgets/premium_widgets.dart';
@@ -117,7 +118,42 @@ class DashboardScreen extends ConsumerWidget {
                         changePercent: summary.gainLossPercent,
                       ),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
+
+                      // 2. AI Contextual Prompt Bar
+                      Builder(builder: (context) {
+                        final assetsAsync = ref.watch(allAssetsProvider);
+                        final prompts = assetsAsync.when(
+                          data: (assets) => PromptGenerator.generate(
+                            assets: assets
+                                .map((a) => AssetInfo(
+                                      name: a.name,
+                                      symbol: a.symbol,
+                                      type: a.type.toApiString(),
+                                      totalValue: a.totalValue ?? 0,
+                                    ))
+                                .toList(),
+                            breakdown: summary.breakdownByType
+                                .map((b) => TypeBreakdown(
+                                      type: b.type,
+                                      percent: b.percent,
+                                    ))
+                                .toList(),
+                          ),
+                          loading: () => PromptGenerator.defaultPrompts(),
+                          error: (_, __) => PromptGenerator.defaultPrompts(),
+                        );
+
+                        return AiPromptBar(
+                          prompts: prompts,
+                          onPromptTap: (prompt) {
+                            context.push(
+                                '/ai-chat?prompt=${Uri.encodeComponent(prompt)}');
+                          },
+                        );
+                      }),
+
+                      const SizedBox(height: 8),
 
                       // 3. Asset Allocation Donut
                       if (summary.breakdownByType.isNotEmpty) ...[
@@ -128,8 +164,25 @@ class DashboardScreen extends ConsumerWidget {
                         const SizedBox(height: 24),
                       ],
 
-                      // 4. Intelligence Grid (Sentiment & Risk)
-                      const _IntelligenceGrid(),
+                      // 4. AI-driven Sentiment & Risk Cards
+                      SizedBox(
+                        height: 180,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: AiSentimentCard(
+                                breakdownByType: summary.breakdownByType,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: AiRiskLevelCard(
+                                breakdownByType: summary.breakdownByType,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
 
                       const SizedBox(height: 24),
 
@@ -140,9 +193,8 @@ class DashboardScreen extends ConsumerWidget {
                         data: (assets) {
                           if (assets.isEmpty) return const SizedBox.shrink();
 
-                          // Convert to local model or generic mock for UI if needed
-                          // Sorting rationale: Show biggest holdings first as proxy for 'top movers' for now
-                          final sortedAssets = List<dynamic>.from(assets)
+                          // Show biggest holdings first as proxy for 'top movers'
+                          final sortedAssets = List<StockAsset>.from(assets)
                             ..sort((a, b) => (b.totalValue ?? 0)
                                 .compareTo(a.totalValue ?? 0));
                           final topAssets = sortedAssets.take(3).toList();
@@ -200,160 +252,17 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-class _IntelligenceGrid extends StatelessWidget {
-  const _IntelligenceGrid();
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      childAspectRatio: 1.3,
-      children: const [
-        _GridCard(
-          icon: CustomIcons.trendingUp,
-          watermarkIcon: CustomIcons.trendingUp, // Rocket/Trending
-          iconColor: AppTheme.emeraldAccent,
-          label: 'Sentiment',
-          value: 'Bullish',
-          subtext: 'Market is hot',
-        ),
-        _GridCard(
-          icon: Icons.security,
-          watermarkIcon: Icons.security,
-          iconColor: Colors.amber,
-          label: 'Risk Level',
-          value: 'Medium',
-          subtext: 'Balanced Portfolio',
-        ),
-      ],
-    );
-  }
-}
-
-class _GridCard extends StatelessWidget {
-  final IconData icon;
-  final IconData watermarkIcon;
-  final Color iconColor;
-  final String label;
-  final String value;
-  final String subtext;
-
-  const _GridCard({
-    required this.icon,
-    required this.watermarkIcon,
-    required this.iconColor,
-    required this.label,
-    required this.value,
-    required this.subtext,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.cardGrey,
-        borderRadius: BorderRadius.circular(24), // Match new theme
-        border:
-            Border.all(color: Colors.white.withOpacity(0.02)), // Subtle border
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 12,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Stack(
-          children: [
-            // Watermark Icon
-            Positioned(
-              right: -10,
-              top: -10,
-              child: Transform.rotate(
-                angle: 0.2, // Slight tilt
-                child: Icon(
-                  watermarkIcon,
-                  size: 80,
-                  color: iconColor.withOpacity(0.07), // Very subtle
-                ),
-              ),
-            ),
-
-            // Content
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(icon, size: 18, color: iconColor),
-                      const SizedBox(width: 8),
-                      Text(
-                        label.toUpperCase(),
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: AppTheme.textGrey,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
-                            ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        value,
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Text(
-                            subtext,
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: iconColor,
-                                    ),
-                          ),
-                          const SizedBox(width: 4),
-                          Icon(CustomIcons.arrowRight,
-                              size: 10, color: iconColor),
-                        ],
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TopMoverItem extends ConsumerWidget {
-  final dynamic asset;
+class _TopMoverItem extends StatelessWidget {
+  final StockAsset asset;
 
   const _TopMoverItem({required this.asset});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // Mock change percentage for demo as it might not be in asset model
-    final mockChange = 5.2;
+    final changePercent = asset.gainLossPercent ?? 0.0;
+    final isPositive = changePercent >= 0;
+    final changeColor = AppTheme.getChangeColor(changePercent);
 
     return GestureDetector(
       onTap: () {
@@ -367,23 +276,19 @@ class _TopMoverItem extends ConsumerWidget {
         decoration: BoxDecoration(
           color: AppTheme.cardGrey,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         ),
         child: Row(
           children: [
-            // Icon
-            Container(
-              width: 40,
-              height: 40,
-              decoration: const BoxDecoration(
-                color: AppTheme.deepBlue,
-                shape: BoxShape.circle,
-              ),
-              child:
-                  const Icon(CustomIcons.assets, color: Colors.white, size: 20),
+            // Asset Icon (resolved by type and symbol)
+            AssetIconResolver(
+              symbol: asset.symbol,
+              assetType: asset.type,
+              name: asset.name,
+              size: 40,
             ),
             const SizedBox(width: 12),
-            // Name
+            // Name & Symbol
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -394,9 +299,11 @@ class _TopMoverItem extends ConsumerWidget {
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    asset.symbol ?? 'ASSET',
+                    asset.symbol.isNotEmpty ? asset.symbol : 'ASSET',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: AppTheme.textGrey,
                     ),
@@ -404,7 +311,7 @@ class _TopMoverItem extends ConsumerWidget {
                 ],
               ),
             ),
-            // Value
+            // Value & Change
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -416,16 +323,20 @@ class _TopMoverItem extends ConsumerWidget {
                   ),
                 ),
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '+$mockChange%',
+                      '${isPositive ? "+" : ""}${changePercent.toStringAsFixed(2)}%',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: AppTheme.emeraldAccent,
+                        color: changeColor,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const Icon(Icons.arrow_upward,
-                        size: 12, color: AppTheme.emeraldAccent),
+                    Icon(
+                      isPositive ? Icons.arrow_upward : Icons.arrow_downward,
+                      size: 12,
+                      color: changeColor,
+                    ),
                   ],
                 ),
               ],

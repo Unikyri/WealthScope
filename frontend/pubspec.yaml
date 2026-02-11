@@ -69,6 +69,9 @@ dependencies:
   flutter_staggered_animations: ^1.1.1
   flutter_markdown: ^0.7.4+1
 
+  # Cached Network Images
+  cached_network_image: ^3.4.1
+
   # Image Picker & File Selection
   image_picker: ^1.0.7
   file_picker: ^10.3.10

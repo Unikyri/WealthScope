@@ -5,7 +5,9 @@ import 'package:wealthscope_app/features/ai/presentation/widgets/chat_bubble.dar
 import 'package:wealthscope_app/features/ai/presentation/widgets/typing_indicator.dart';
 
 class AIChatScreen extends ConsumerStatefulWidget {
-  const AIChatScreen({super.key});
+  final String? initialPrompt;
+
+  const AIChatScreen({super.key, this.initialPrompt});
 
   @override
   ConsumerState<AIChatScreen> createState() => _AIChatScreenState();
@@ -15,6 +17,16 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-load the prompt into the text field so the user can review/edit
+    // before sending. Does NOT auto-send.
+    if (widget.initialPrompt != null && widget.initialPrompt!.isNotEmpty) {
+      _messageController.text = widget.initialPrompt!;
+    }
+  }
 
   @override
   void dispose() {

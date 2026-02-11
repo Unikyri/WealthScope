@@ -24,10 +24,8 @@ class EnhancedAllocationSection extends StatefulWidget {
 class _EnhancedAllocationSectionState extends State<EnhancedAllocationSection> {
   @override
   Widget build(BuildContext context) {
-    // Filter out very small segments for cleaner chart
-    final data = widget.allocations.where((e) => e.percent > 1).toList();
-    // Sort by percent desc
-    data.sort((a, b) => b.percent.compareTo(a.percent));
+    // Process allocations: group small segments into "Other"
+    final data = _processAllocations(widget.allocations);
 
     return Container(
       padding: const EdgeInsets.all(20),

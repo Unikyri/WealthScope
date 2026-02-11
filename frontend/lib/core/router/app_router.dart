@@ -147,7 +147,10 @@ class AppRouter {
           GoRoute(
             path: '/ai-chat',
             name: 'ai-chat',
-            builder: (context, state) => const AIChatScreen(),
+            builder: (context, state) {
+              final initialPrompt = state.uri.queryParameters['prompt'];
+              return AIChatScreen(initialPrompt: initialPrompt);
+            },
             routes: [
               GoRoute(
                 path: ':conversationId',
