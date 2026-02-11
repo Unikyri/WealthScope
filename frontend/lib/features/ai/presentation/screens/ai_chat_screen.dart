@@ -7,7 +7,6 @@ import 'package:wealthscope_app/features/ai/presentation/widgets/chat_bubble.dar
 import 'package:wealthscope_app/features/ai/presentation/widgets/typing_indicator.dart';
 import 'package:wealthscope_app/features/subscriptions/data/services/revenuecat_service.dart';
 import 'package:wealthscope_app/features/subscriptions/data/services/usage_tracker.dart';
-import 'package:wealthscope_app/features/subscriptions/domain/plan_limits.dart';
 import 'package:wealthscope_app/features/subscriptions/presentation/widgets/upgrade_prompt_dialog.dart';
 
 class AIChatScreen extends ConsumerStatefulWidget {
@@ -58,22 +57,12 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
     final message = _messageController.text.trim();
     if (message.isEmpty) return;
 
-    // Check AI query limit for all plans
-    final isPremium = await ref.read(isPremiumProvider.future);
-    final usage = await ref.read(usageTrackerProvider.future);
-    final maxQueries = PlanLimits.maxAiQueries(isPremium);
-
-    if (usage.aiQueriesUsedToday >= maxQueries) {
+    // Centralised feature gate check
+    final gate = ref.read(featureGateProvider);
+    final result = gate.canSendAiQuery();
+    if (!result.allowed) {
       if (!mounted) return;
-      showUpgradePrompt(
-        context,
-        title: 'Daily AI Limit Reached',
-        message: isPremium
-            ? 'Sentinel plan includes $maxQueries AI queries per day. Queries reset at midnight.'
-            : 'Scout plan includes $maxQueries AI queries per day. '
-                'Upgrade to Sentinel for ${PlanLimits.sentinelMaxAiQueriesPerDay} daily queries.',
-        icon: Icons.psychology,
-      );
+      showGatePrompt(context, result);
       return;
     }
 
@@ -392,13 +381,9 @@ class _MessageInputState extends State<_MessageInput> {
 class _AiQueryLimitBanner extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isPremiumAsync = ref.watch(isPremiumProvider);
-    final usageAsync = ref.watch(usageTrackerProvider);
-
-    final isPremium = isPremiumAsync.value ?? false;
-    final used = usageAsync.value?.aiQueriesUsedToday ?? 0;
-    final max = PlanLimits.maxAiQueries(isPremium);
-    final remaining = (max - used).clamp(0, max);
+    final gate = ref.watch(featureGateProvider);
+    final remaining = gate.aiQueriesRemaining;
+    final max = gate.maxAiQueries;
     final isAtLimit = remaining <= 0;
 
     return Container(
@@ -419,11 +404,7 @@ class _AiQueryLimitBanner extends ConsumerWidget {
       child: Row(
         children: [
           Icon(
-            isAtLimit
-                ? Icons.warning_amber_rounded
-                : isPremium
-                    ? Icons.auto_awesome
-                    : Icons.auto_awesome,
+            isAtLimit ? Icons.warning_amber_rounded : Icons.auto_awesome,
             size: 14,
             color: isAtLimit ? Colors.amber : AppTheme.electricBlue,
           ),
@@ -432,9 +413,9 @@ class _AiQueryLimitBanner extends ConsumerWidget {
             child: Text.rich(
               TextSpan(
                 children: [
-                  if (isPremium && !isAtLimit) ...[
+                  if (gate.isPremium && !isAtLimit) ...[
                     TextSpan(
-                      text: 'Pro \u2022 Thinking Mode',
+                      text: gate.aiModelLabel,
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
@@ -463,16 +444,12 @@ class _AiQueryLimitBanner extends ConsumerWidget {
               ),
             ),
           ),
-          if (isAtLimit && !isPremium)
+          if (isAtLimit && !gate.isPremium)
             GestureDetector(
-              onTap: () => showUpgradePrompt(
-                context,
-                title: 'Daily AI Limit Reached',
-                message:
-                    'Scout plan includes $max AI queries per day. '
-                    'Upgrade to Sentinel for ${PlanLimits.sentinelMaxAiQueriesPerDay} daily queries.',
-                icon: Icons.psychology,
-              ),
+              onTap: () {
+                final result = gate.canSendAiQuery();
+                showGatePrompt(context, result);
+              },
               child: Text(
                 'Upgrade',
                 style: GoogleFonts.inter(
