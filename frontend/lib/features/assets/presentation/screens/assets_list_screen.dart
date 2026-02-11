@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/core/theme/app_theme.dart';
+import 'package:wealthscope_app/core/utils/asset_type_utils.dart';
 import 'package:wealthscope_app/features/assets/data/providers/asset_repository_provider.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
@@ -400,18 +401,23 @@ class _AssetGroupHeader extends StatelessWidget {
       child: Row(
         children: [
           // Type Icon
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: _getTypeColor(type).withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              _getTypeIcon(type),
-              color: _getTypeColor(type),
-              size: 15,
-            ),
+          Builder(
+            builder: (context) {
+              final color = AssetTypeUtils.getTypeColor(type);
+              return Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  AssetTypeUtils.getTypeIcon(type),
+                  color: color,
+                  size: 15,
+                ),
+              );
+            },
           ),
           const SizedBox(width: 10),
           // Type Name + Count
@@ -437,48 +443,6 @@ class _AssetGroupHeader extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  IconData _getTypeIcon(AssetType type) {
-    switch (type) {
-      case AssetType.stock:
-        return Icons.show_chart;
-      case AssetType.etf:
-        return Icons.pie_chart;
-      case AssetType.bond:
-        return Icons.receipt_long;
-      case AssetType.crypto:
-        return Icons.currency_bitcoin;
-      case AssetType.realEstate:
-        return Icons.home;
-      case AssetType.gold:
-        return Icons.diamond;
-      case AssetType.cash:
-        return Icons.account_balance_wallet;
-      case AssetType.other:
-        return Icons.business;
-    }
-  }
-
-  Color _getTypeColor(AssetType type) {
-    switch (type) {
-      case AssetType.stock:
-        return AppTheme.electricBlue;
-      case AssetType.etf:
-        return AppTheme.purpleAccent;
-      case AssetType.bond:
-        return AppTheme.accentBlue;
-      case AssetType.crypto:
-        return const Color(0xFFF7931A);
-      case AssetType.realEstate:
-        return const Color(0xFF4CAF50);
-      case AssetType.gold:
-        return const Color(0xFFFFD700);
-      case AssetType.cash:
-        return const Color(0xFF00BCD4);
-      case AssetType.other:
-        return AppTheme.textGrey;
-    }
   }
 
   String _formatGroupValue(double value) {

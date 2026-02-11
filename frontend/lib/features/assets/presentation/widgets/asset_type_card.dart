@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wealthscope_app/core/theme/app_theme.dart';
+import 'package:wealthscope_app/core/utils/asset_type_utils.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 
 /// Rich visual card for selecting an asset type.
@@ -27,8 +27,8 @@ class AssetTypeSelectorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = getTypeColor(type);
-    final icon = getTypeIcon(type);
+    final color = AssetTypeUtils.getTypeColor(type);
+    final icon = AssetTypeUtils.getTypeIcon(type);
     final description = getTypeDescription(type);
 
     return Stack(
@@ -147,47 +147,8 @@ class AssetTypeSelectorCard extends StatelessWidget {
     );
   }
 
-  static IconData getTypeIcon(AssetType type) {
-    switch (type) {
-      case AssetType.stock:
-        return Icons.trending_up;
-      case AssetType.etf:
-        return Icons.pie_chart;
-      case AssetType.bond:
-        return Icons.receipt_long;
-      case AssetType.crypto:
-        return Icons.currency_bitcoin;
-      case AssetType.realEstate:
-        return Icons.home_rounded;
-      case AssetType.gold:
-        return Icons.diamond;
-      case AssetType.cash:
-        return Icons.account_balance_wallet;
-      case AssetType.other:
-        return Icons.category;
-    }
-  }
-
-  static Color getTypeColor(AssetType type) {
-    switch (type) {
-      case AssetType.stock:
-        return AppTheme.electricBlue;
-      case AssetType.etf:
-        return AppTheme.purpleAccent;
-      case AssetType.bond:
-        return const Color(0xFF4CAF50);
-      case AssetType.crypto:
-        return const Color(0xFFF7931A);
-      case AssetType.realEstate:
-        return const Color(0xFF009688);
-      case AssetType.gold:
-        return const Color(0xFFFFD700);
-      case AssetType.cash:
-        return const Color(0xFF00BCD4);
-      case AssetType.other:
-        return AppTheme.textGrey;
-    }
-  }
+  static IconData getTypeIcon(AssetType type) => AssetTypeUtils.getTypeIcon(type);
+  static Color getTypeColor(AssetType type) => AssetTypeUtils.getTypeColor(type);
 
   static String getTypeDescription(AssetType type) {
     switch (type) {

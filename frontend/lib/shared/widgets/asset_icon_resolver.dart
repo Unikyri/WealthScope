@@ -1,15 +1,19 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:wealthscope_app/core/theme/app_theme.dart';
+import 'package:wealthscope_app/core/utils/asset_type_utils.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 
 /// Resolves the correct icon/logo for a given asset based on its type and symbol.
 ///
 /// Resolution chain (with fallback):
-/// 1. Crypto symbol -> CoinGecko CDN image
-/// 2. Stock/ETF symbol -> Clearbit Logo API image
-/// 3. Known asset type -> Material icon with type-specific color
-/// 4. Fallback -> Colored circle with name initials
+/// 1. **Crypto symbol** -> CoinGecko CDN image (~15 symbols: BTC, ETH, SOL, etc.)
+/// 2. **Stock/ETF symbol** -> Clearbit Logo API via domain map (~85 symbols)
+/// 3. **Known asset type** -> Material icon from [AssetTypeUtils] with type-specific color
+/// 4. **Fallback** -> Colored circle with first 1-2 initials of asset name
+///
+/// Icon patterns follow industry conventions (Robinhood, Webull): company logos
+/// for stocks/ETFs, crypto logos for crypto, type icons for illiquid assets.
 class AssetIconResolver extends StatelessWidget {
   final String? symbol;
   final AssetType assetType;
@@ -64,6 +68,7 @@ class AssetIconResolver extends StatelessWidget {
 
   // ---------------------------------------------------------------------------
   // Stock symbol -> company domain for Clearbit Logo API (T-12.4.3)
+  // Extended coverage for popular symbols; fallback: type icon or initials
   // ---------------------------------------------------------------------------
   static const _symbolToDomain = <String, String>{
     'AAPL': 'apple.com',
@@ -101,57 +106,71 @@ class AssetIconResolver extends StatelessWidget {
     'SHOP': 'shopify.com',
     'ZM': 'zoom.us',
     'COIN': 'coinbase.com',
+    // Extended coverage (popular stocks & ETFs)
+    'SPY': 'ssga.com',
+    'QQQ': 'invesco.com',
+    'TGT': 'target.com',
+    'COST': 'costco.com',
+    'LULU': 'lululemon.com',
+    'ETSY': 'etsy.com',
+    'HD': 'homedepot.com',
+    'PG': 'pg.com',
+    'JNJ': 'jnj.com',
+    'XOM': 'exxonmobil.com',
+    'CVX': 'chevron.com',
+    'MRK': 'merck.com',
+    'ABBV': 'abbvie.com',
+    'TMO': 'thermofisher.com',
+    'UNH': 'unitedhealthgroup.com',
+    'LLY': 'lilly.com',
+    'AVGO': 'broadcom.com',
+    'WFC': 'wellsfargo.com',
+    'BAC': 'bankofamerica.com',
+    'GS': 'goldmansachs.com',
+    'MS': 'morganstanley.com',
+    'AXP': 'americanexpress.com',
+    'LOW': 'lowes.com',
+    'SBUX': 'starbucks.com',
+    'DE': 'deere.com',
+    'CAT': 'cat.com',
+    'HON': 'honeywell.com',
+    'GE': 'ge.com',
+    'F': 'ford.com',
+    'GM': 'gm.com',
+    'QCOM': 'qualcomm.com',
+    'TXN': 'ti.com',
+    'TSM': 'tsmc.com',
+    'ASML': 'asml.com',
+    'NOW': 'servicenow.com',
+    'SNOW': 'snowflake.com',
+    'MDB': 'mongodb.com',
+    'DDOG': 'datadoghq.com',
+    'CRWD': 'crowdstrike.com',
+    'PANW': 'paloaltonetworks.com',
+    'FTNT': 'fortinet.com',
+    'TEAM': 'atlassian.com',
+    'WDAY': 'workday.com',
+    'INTU': 'intuit.com',
+    'ADSK': 'autodesk.com',
+    'EBAY': 'ebay.com',
+    'ROKU': 'roku.com',
+    'PLTR': 'palantir.com',
+    'LYV': 'livenation.com',
+    'MAR': 'marriott.com',
+    'HLT': 'hilton.com',
+    'DAL': 'delta.com',
+    'UAL': 'united.com',
+    'LUV': 'southwest.com',
+    'RTX': 'rtx.com',
+    'LMT': 'lockheedmartin.com',
+    'NOC': 'northropgrumman.com',
+    'VOO': 'vanguard.com',
+    'VTI': 'vanguard.com',
+    'SCHW': 'schwab.com',
+    'BLK': 'blackrock.com',
+    'BX': 'blackstone.com',
+    'KKR': 'kkr.com',
   };
-
-  // ---------------------------------------------------------------------------
-  // Type-specific icon and color mappings
-  // ---------------------------------------------------------------------------
-  static const _bitcoinOrange = Color(0xFFF7931A);
-  static const _goldColor = Color(0xFFFFD700);
-  static const _realEstateGreen = Color(0xFF4CAF50);
-  static const _cashCyan = Color(0xFF00BCD4);
-
-  static IconData _getTypeIcon(AssetType type) {
-    switch (type) {
-      case AssetType.stock:
-        return Icons.show_chart;
-      case AssetType.etf:
-        return Icons.pie_chart;
-      case AssetType.bond:
-        return Icons.receipt_long;
-      case AssetType.crypto:
-        return Icons.currency_bitcoin;
-      case AssetType.realEstate:
-        return Icons.home;
-      case AssetType.gold:
-        return Icons.diamond;
-      case AssetType.cash:
-        return Icons.account_balance_wallet;
-      case AssetType.other:
-        return Icons.business;
-    }
-  }
-
-  static Color _getTypeColor(AssetType type) {
-    switch (type) {
-      case AssetType.stock:
-        return AppTheme.electricBlue;
-      case AssetType.etf:
-        return AppTheme.purpleAccent;
-      case AssetType.bond:
-        return AppTheme.accentBlue;
-      case AssetType.crypto:
-        return _bitcoinOrange;
-      case AssetType.realEstate:
-        return _realEstateGreen;
-      case AssetType.gold:
-        return _goldColor;
-      case AssetType.cash:
-        return _cashCyan;
-      case AssetType.other:
-        return AppTheme.textGrey;
-    }
-  }
 
   // ---------------------------------------------------------------------------
   // Build
@@ -215,7 +234,7 @@ class AssetIconResolver extends StatelessWidget {
 
   /// Builds a type-specific Material icon inside a colored circle.
   Widget _typeIcon() {
-    final color = _getTypeColor(assetType);
+    final color = AssetTypeUtils.getTypeColor(assetType);
     return Container(
       width: size,
       height: size,
@@ -224,7 +243,7 @@ class AssetIconResolver extends StatelessWidget {
         shape: BoxShape.circle,
       ),
       child: Icon(
-        _getTypeIcon(assetType),
+        AssetTypeUtils.getTypeIcon(assetType),
         color: color,
         size: size * 0.5,
       ),
