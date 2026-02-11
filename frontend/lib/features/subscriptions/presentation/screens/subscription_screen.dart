@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/subscriptions/data/services/revenuecat_service.dart';
+import 'package:wealthscope_app/features/subscriptions/presentation/widgets/subscription_skeleton.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 /// Subscription/Paywall Screen
@@ -34,7 +35,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
             }
             return _buildPaywallView(offeringsAsync);
           },
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => const SubscriptionSkeleton(),
           error: (_, __) => _buildPaywallView(offeringsAsync),
         ),
       ),

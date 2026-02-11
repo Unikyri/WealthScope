@@ -55,12 +55,20 @@ class AssetCard extends StatelessWidget {
             padding: const EdgeInsets.all(14),
             child: Row(
               children: [
-                // Asset Icon via AssetIconResolver
-                AssetIconResolver(
-                  symbol: asset.symbol,
-                  assetType: asset.type,
-                  name: asset.name,
-                  size: 44,
+                // Asset Icon via AssetIconResolver (Hero for smooth transition to detail)
+                HeroMode(
+                  enabled: !MediaQuery.of(context).disableAnimations,
+                  child: Hero(
+                    tag: asset.id != null
+                        ? 'asset-icon-${asset.id}'
+                        : 'asset-icon-${asset.symbol}-${asset.name.hashCode}',
+                    child: AssetIconResolver(
+                      symbol: asset.symbol,
+                      assetType: asset.type,
+                      name: asset.name,
+                      size: 44,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 14),
 
