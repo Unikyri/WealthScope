@@ -6,7 +6,6 @@ import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart'
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/asset_type_card.dart';
 import 'package:wealthscope_app/features/subscriptions/data/services/revenuecat_service.dart';
-import 'package:wealthscope_app/features/subscriptions/domain/plan_limits.dart';
 import 'package:wealthscope_app/features/subscriptions/presentation/widgets/upgrade_prompt_dialog.dart';
 
 /// Asset Type Selection Screen
@@ -19,37 +18,25 @@ class SelectAssetTypeScreen extends ConsumerWidget {
     WidgetRef ref,
     AssetType type,
   ) async {
-    final isPremium = await ref.read(isPremiumProvider.future);
+    final gate = ref.read(featureGateProvider);
 
     // Check premium asset type gating
-    if (type.isPremiumOnly && !isPremium) {
-      if (!context.mounted) return;
-      showUpgradePrompt(
-        context,
-        title: 'Premium Asset Type',
-        message:
-            '${type.displayName} is a Sentinel-exclusive asset type. '
-            'Upgrade to add premium assets to your portfolio.',
-        icon: Icons.workspace_premium,
-      );
-      return;
-    }
-
-    // Check asset limit for Scout users
-    if (!isPremium) {
-      final assets = await ref.read(allAssetsProvider.future);
-      if (assets.length >= PlanLimits.scoutMaxAssets) {
+    if (type.isPremiumOnly) {
+      final result = gate.canUsePremiumAssetType(type.toApiString());
+      if (!result.allowed) {
         if (!context.mounted) return;
-        showUpgradePrompt(
-          context,
-          title: 'Asset Limit Reached',
-          message:
-              'Scout plan allows up to ${PlanLimits.scoutMaxAssets} assets. '
-              'Upgrade to Sentinel for unlimited assets.',
-          icon: Icons.inventory_2_outlined,
-        );
+        showGatePrompt(context, result);
         return;
       }
+    }
+
+    // Check asset count limit
+    final assets = await ref.read(allAssetsProvider.future);
+    final result = gate.canAddAsset(assets.length);
+    if (!result.allowed) {
+      if (!context.mounted) return;
+      showGatePrompt(context, result);
+      return;
     }
 
     if (!context.mounted) return;
@@ -64,8 +51,8 @@ class SelectAssetTypeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isPremiumAsync = ref.watch(isPremiumProvider);
-    final isPremium = isPremiumAsync.value ?? false;
+    final gate = ref.watch(featureGateProvider);
+    final isPremium = gate.isPremium;
 
     return Scaffold(
       backgroundColor: AppTheme.midnightBlue,

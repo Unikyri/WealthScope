@@ -14,7 +14,6 @@ import 'package:wealthscope_app/features/assets/presentation/widgets/delete_asse
 import 'package:wealthscope_app/features/assets/presentation/widgets/empty_assets_view.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/error_view.dart';
 import 'package:wealthscope_app/features/subscriptions/data/services/revenuecat_service.dart';
-import 'package:wealthscope_app/features/subscriptions/domain/plan_limits.dart';
 
 /// Assets List Screen
 /// Main screen for displaying all user assets with filtering capabilities
@@ -27,7 +26,7 @@ class AssetsListScreen extends ConsumerWidget {
     final assetsAsync = ref.watch(searchedAssetsProvider);
     final selectedType = ref.watch(selectedAssetTypeProvider);
     final allAssets = ref.watch(allAssetsProvider);
-    final isPremiumAsync = ref.watch(isPremiumProvider);
+    final gate = ref.watch(featureGateProvider);
 
     return Scaffold(
       backgroundColor: AppTheme.midnightBlue,
@@ -74,11 +73,9 @@ class AssetsListScreen extends ConsumerWidget {
                             const SizedBox(height: 2),
                             allAssets.whenOrNull(
                                   data: (assets) {
-                                    final isPremium =
-                                        isPremiumAsync.value ?? false;
-                                    final countText = isPremium
+                                    final countText = gate.isPremium
                                         ? '${assets.length} assets \u2022 Unlimited'
-                                        : '${assets.length}/${PlanLimits.scoutMaxAssets} assets';
+                                        : '${assets.length}/${gate.maxAssets} assets';
                                     return Text(
                                       countText,
                                       style:

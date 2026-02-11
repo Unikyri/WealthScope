@@ -387,8 +387,8 @@ class _TopMoverItem extends StatelessWidget {
 class _PriceFreshnessChip extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isPremiumAsync = ref.watch(isPremiumProvider);
-    final isPremium = isPremiumAsync.value ?? false;
+    final gate = ref.watch(featureGateProvider);
+    final isPremium = gate.isPremium;
 
     final color = isPremium ? AppTheme.emeraldAccent : Colors.amber;
 

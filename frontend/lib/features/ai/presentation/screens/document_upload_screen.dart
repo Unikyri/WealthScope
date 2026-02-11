@@ -9,7 +9,6 @@ import 'package:wealthscope_app/features/ai/presentation/services/document_picke
 import 'package:wealthscope_app/features/ai/presentation/widgets/processing_view.dart';
 import 'package:wealthscope_app/features/subscriptions/data/services/revenuecat_service.dart';
 import 'package:wealthscope_app/features/subscriptions/data/services/usage_tracker.dart';
-import 'package:wealthscope_app/features/subscriptions/domain/plan_limits.dart';
 import 'package:wealthscope_app/features/subscriptions/presentation/widgets/upgrade_prompt_dialog.dart';
 
 /// Document Upload Screen
@@ -61,29 +60,19 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
   Future<void> _processDocument() async {
     if (_selectedFile == null) return;
 
-    // Check OCR scan limit for ALL plans
-    final isPremium = await ref.read(isPremiumProvider.future);
-    final usage = await ref.read(usageTrackerProvider.future);
-    final maxScans = PlanLimits.maxOcrScans(isPremium);
-
-    if (usage.ocrScansUsedThisMonth >= maxScans) {
+    // Centralised feature gate check
+    final gate = ref.read(featureGateProvider);
+    final result = gate.canScanDocument();
+    if (!result.allowed) {
       if (!mounted) return;
-      showUpgradePrompt(
-        context,
-        title: 'Monthly OCR Limit Reached',
-        message: isPremium
-            ? 'Sentinel plan includes $maxScans document scans per month. Resets next month.'
-            : 'Scout plan includes $maxScans document scan per month. '
-                'Upgrade for ${PlanLimits.sentinelMaxOcrScansPerMonth} scans/month.',
-        icon: Icons.document_scanner,
-      );
+      showGatePrompt(context, result);
       return;
     }
 
     setState(() => _isProcessing = true);
 
     try {
-      final result =
+      final ocrResult =
           await ref.read(ocrProvider.notifier).processDocument(_selectedFile!);
 
       // Record OCR scan usage for ALL plans
@@ -92,7 +81,7 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
       if (mounted) {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => ExtractedAssetsScreen(result: result),
+            builder: (context) => ExtractedAssetsScreen(result: ocrResult),
           ),
         );
       }
@@ -113,23 +102,17 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
   Future<void> _processBulkDocuments(List<File> files) async {
     if (files.isEmpty) return;
 
-    final isPremium = await ref.read(isPremiumProvider.future);
-    final usage = await ref.read(usageTrackerProvider.future);
-    final maxScans = PlanLimits.maxOcrScans(isPremium);
-    final remaining = maxScans - usage.ocrScansUsedThisMonth;
-
-    if (remaining <= 0) {
+    // Centralised feature gate check
+    final gate = ref.read(featureGateProvider);
+    final scanResult = gate.canScanDocument();
+    if (!scanResult.allowed) {
       if (!mounted) return;
-      showUpgradePrompt(
-        context,
-        title: 'Monthly OCR Limit Reached',
-        message: 'You have used all $maxScans scans this month.',
-        icon: Icons.document_scanner,
-      );
+      showGatePrompt(context, scanResult);
       return;
     }
 
     // Only process up to remaining scans
+    final remaining = gate.ocrScansRemaining;
     final filesToProcess = files.take(remaining).toList();
 
     setState(() => _isProcessing = true);
@@ -180,8 +163,8 @@ class _UploadOptionsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final pickerService = ref.read(documentPickerServiceProvider);
-    final isPremiumAsync = ref.watch(isPremiumProvider);
-    final isPremium = isPremiumAsync.value ?? false;
+    final gate = ref.watch(featureGateProvider);
+    final isPremium = gate.isPremium;
 
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -397,13 +380,9 @@ class _UploadOption extends StatelessWidget {
 class _OcrScanLimitBanner extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isPremiumAsync = ref.watch(isPremiumProvider);
-    final usageAsync = ref.watch(usageTrackerProvider);
-
-    final isPremium = isPremiumAsync.value ?? false;
-    final used = usageAsync.value?.ocrScansUsedThisMonth ?? 0;
-    final max = PlanLimits.maxOcrScans(isPremium);
-    final remaining = (max - used).clamp(0, max);
+    final gate = ref.watch(featureGateProvider);
+    final remaining = gate.ocrScansRemaining;
+    final max = gate.maxOcrScans;
     final isAtLimit = remaining <= 0;
 
     return Container(
@@ -441,16 +420,12 @@ class _OcrScanLimitBanner extends ConsumerWidget {
               ),
             ),
           ),
-          if (isAtLimit && !isPremium)
+          if (isAtLimit && !gate.isPremium)
             GestureDetector(
-              onTap: () => showUpgradePrompt(
-                context,
-                title: 'Monthly OCR Limit Reached',
-                message:
-                    'Scout plan includes $max document scan per month. '
-                    'Upgrade for ${PlanLimits.sentinelMaxOcrScansPerMonth} scans/month.',
-                icon: Icons.document_scanner,
-              ),
+              onTap: () {
+                final result = gate.canScanDocument();
+                showGatePrompt(context, result);
+              },
               child: Text(
                 'Upgrade',
                 style: GoogleFonts.inter(
