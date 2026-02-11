@@ -18,9 +18,9 @@ class AssetTypeSelectorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = _getTypeColor(type);
-    final icon = _getTypeIcon(type);
-    final description = _getTypeDescription(type);
+    final color = getTypeColor(type);
+    final icon = getTypeIcon(type);
+    final description = getTypeDescription(type);
 
     return Container(
       decoration: BoxDecoration(
@@ -95,7 +95,7 @@ class AssetTypeSelectorCard extends StatelessWidget {
     );
   }
 
-  static IconData _getTypeIcon(AssetType type) {
+  static IconData getTypeIcon(AssetType type) {
     switch (type) {
       case AssetType.stock:
         return Icons.trending_up;
@@ -116,7 +116,7 @@ class AssetTypeSelectorCard extends StatelessWidget {
     }
   }
 
-  static Color _getTypeColor(AssetType type) {
+  static Color getTypeColor(AssetType type) {
     switch (type) {
       case AssetType.stock:
         return AppTheme.electricBlue;
@@ -137,7 +137,7 @@ class AssetTypeSelectorCard extends StatelessWidget {
     }
   }
 
-  static String _getTypeDescription(AssetType type) {
+  static String getTypeDescription(AssetType type) {
     switch (type) {
       case AssetType.stock:
         return 'Company shares';
