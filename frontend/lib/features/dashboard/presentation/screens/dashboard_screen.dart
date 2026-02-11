@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:wealthscope_app/core/theme/custom_icons.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/providers/dashboard_providers.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/ai_risk_level_card.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/ai_sentiment_card.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/enhanced_allocation_section_with_legend.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/dashboard_skeleton.dart';
-import 'package:wealthscope_app/features/dashboard/presentation/widgets/empty_dashboard.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/error_view.dart';
 import 'package:wealthscope_app/core/theme/app_theme.dart';
-import 'package:wealthscope_app/features/dashboard/presentation/widgets/dashboard_news_section.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
 import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
-import 'package:wealthscope_app/shared/widgets/tech_card.dart';
 import 'package:wealthscope_app/shared/widgets/speed_dial_fab.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/crypto_net_worth_hero.dart';
 import 'package:wealthscope_app/features/subscriptions/presentation/widgets/premium_widgets.dart';
@@ -154,8 +152,25 @@ class DashboardScreen extends ConsumerWidget {
                         const SizedBox(height: 24),
                       ],
 
-                      // 4. Intelligence Grid (Sentiment & Risk)
-                      const _IntelligenceGrid(),
+                      // 4. AI-driven Sentiment & Risk Cards
+                      SizedBox(
+                        height: 180,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: AiSentimentCard(
+                                breakdownByType: summary.breakdownByType,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: AiRiskLevelCard(
+                                breakdownByType: summary.breakdownByType,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
 
                       const SizedBox(height: 24),
 
@@ -222,150 +237,6 @@ class _SectionHeader extends StatelessWidget {
               ),
         ),
       ],
-    );
-  }
-}
-
-class _IntelligenceGrid extends StatelessWidget {
-  const _IntelligenceGrid();
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      childAspectRatio: 1.3,
-      children: const [
-        _GridCard(
-          icon: CustomIcons.trendingUp,
-          watermarkIcon: CustomIcons.trendingUp, // Rocket/Trending
-          iconColor: AppTheme.emeraldAccent,
-          label: 'Sentiment',
-          value: 'Bullish',
-          subtext: 'Market is hot',
-        ),
-        _GridCard(
-          icon: Icons.security,
-          watermarkIcon: Icons.security,
-          iconColor: Colors.amber,
-          label: 'Risk Level',
-          value: 'Medium',
-          subtext: 'Balanced Portfolio',
-        ),
-      ],
-    );
-  }
-}
-
-class _GridCard extends StatelessWidget {
-  final IconData icon;
-  final IconData watermarkIcon;
-  final Color iconColor;
-  final String label;
-  final String value;
-  final String subtext;
-
-  const _GridCard({
-    required this.icon,
-    required this.watermarkIcon,
-    required this.iconColor,
-    required this.label,
-    required this.value,
-    required this.subtext,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.cardGrey,
-        borderRadius: BorderRadius.circular(24), // Match new theme
-        border:
-            Border.all(color: Colors.white.withOpacity(0.02)), // Subtle border
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 12,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Stack(
-          children: [
-            // Watermark Icon
-            Positioned(
-              right: -10,
-              top: -10,
-              child: Transform.rotate(
-                angle: 0.2, // Slight tilt
-                child: Icon(
-                  watermarkIcon,
-                  size: 80,
-                  color: iconColor.withOpacity(0.07), // Very subtle
-                ),
-              ),
-            ),
-
-            // Content
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(icon, size: 18, color: iconColor),
-                      const SizedBox(width: 8),
-                      Text(
-                        label.toUpperCase(),
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: AppTheme.textGrey,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
-                            ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        value,
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Text(
-                            subtext,
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: iconColor,
-                                    ),
-                          ),
-                          const SizedBox(width: 4),
-                          Icon(CustomIcons.arrowRight,
-                              size: 10, color: iconColor),
-                        ],
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

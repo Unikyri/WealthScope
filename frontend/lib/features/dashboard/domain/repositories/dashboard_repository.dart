@@ -1,4 +1,5 @@
 import 'package:wealthscope_app/core/errors/failures.dart';
+import 'package:wealthscope_app/features/dashboard/domain/entities/portfolio_risk.dart';
 import 'package:wealthscope_app/features/dashboard/domain/entities/portfolio_summary.dart';
 import 'package:fpdart/fpdart.dart';
 
@@ -7,4 +8,7 @@ import 'package:fpdart/fpdart.dart';
 abstract class DashboardRepository {
   /// Fetch portfolio summary for the current user
   Future<Either<Failure, PortfolioSummary>> getPortfolioSummary();
+
+  /// Fetch portfolio risk analysis for the current user
+  Future<Either<Failure, PortfolioRisk>> getPortfolioRisk();
 }
