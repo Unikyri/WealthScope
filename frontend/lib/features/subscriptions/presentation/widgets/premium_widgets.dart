@@ -6,7 +6,10 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/subscriptions/data/services/revenuecat_service.dart';
 
-/// Premium Badge Widget - Shows premium status and opens subscription screen
+/// Premium Badge Widget - Shows plan name (Scout / Sentinel) in the app bar.
+///
+/// Discreet chip that indicates the current plan. Tapping navigates to the
+/// subscription screen.
 class PremiumBadge extends ConsumerWidget {
   const PremiumBadge({super.key});
 
@@ -17,16 +20,17 @@ class PremiumBadge extends ConsumerWidget {
     return isPremiumAsync.when(
       data: (isPremium) {
         if (isPremium) {
-          return _buildPremiumBadge(context);
+          return _buildSentinelBadge(context);
         }
-        return _buildUpgradeBadge(context);
+        return _buildScoutBadge(context);
       },
       loading: () => const SizedBox.shrink(),
       error: (_, __) => const SizedBox.shrink(),
     );
   }
 
-  Widget _buildPremiumBadge(BuildContext context) {
+  /// Sentinel (premium) badge: electricBlue gradient, crown icon, white text.
+  Widget _buildSentinelBadge(BuildContext context) {
     return GestureDetector(
       onTap: () => context.push('/subscription'),
       child: Container(
@@ -35,13 +39,13 @@ class PremiumBadge extends ConsumerWidget {
           gradient: LinearGradient(
             colors: [
               AppTheme.electricBlue,
-              AppTheme.electricBlue.withOpacity(0.8),
+              AppTheme.electricBlue.withValues(alpha: 0.8),
             ],
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.electricBlue.withOpacity(0.3),
+              color: AppTheme.electricBlue.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -53,13 +57,13 @@ class PremiumBadge extends ConsumerWidget {
             Icon(
               PhosphorIconsFill.crownSimple,
               color: Colors.white,
-              size: 16,
+              size: 14,
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 5),
             Text(
-              'Premium',
+              'Sentinel',
               style: GoogleFonts.inter(
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -70,7 +74,8 @@ class PremiumBadge extends ConsumerWidget {
     );
   }
 
-  Widget _buildUpgradeBadge(BuildContext context) {
+  /// Scout (free) badge: subtle cardGrey chip, shield icon, muted text.
+  Widget _buildScoutBadge(BuildContext context) {
     return GestureDetector(
       onTap: () => context.push('/subscription'),
       child: Container(
@@ -79,7 +84,7 @@ class PremiumBadge extends ConsumerWidget {
           color: AppTheme.cardGrey,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: AppTheme.electricBlue.withOpacity(0.5),
+            color: Colors.white.withValues(alpha: 0.1),
             width: 1,
           ),
         ),
@@ -87,17 +92,17 @@ class PremiumBadge extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              PhosphorIconsRegular.crown,
-              color: AppTheme.electricBlue,
-              size: 16,
+              PhosphorIconsRegular.shieldCheck,
+              color: AppTheme.textGrey,
+              size: 14,
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 5),
             Text(
-              'Obtener Premium',
+              'Scout',
               style: GoogleFonts.inter(
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.electricBlue,
+                color: AppTheme.textGrey,
               ),
             ),
           ],
@@ -127,13 +132,13 @@ class PremiumFeatureLock extends ConsumerWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppTheme.electricBlue.withOpacity(0.2),
-            AppTheme.electricBlue.withOpacity(0.05),
+            AppTheme.electricBlue.withValues(alpha: 0.2),
+            AppTheme.electricBlue.withValues(alpha: 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppTheme.electricBlue.withOpacity(0.3),
+          color: AppTheme.electricBlue.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -168,7 +173,7 @@ class PremiumFeatureLock extends ConsumerWidget {
           ElevatedButton.icon(
             onPressed: () => context.push('/subscription'),
             icon: Icon(PhosphorIconsRegular.crownSimple),
-            label: const Text('Obtener Premium'),
+            label: const Text('Upgrade to Sentinel'),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.electricBlue,
               foregroundColor: Colors.white,
