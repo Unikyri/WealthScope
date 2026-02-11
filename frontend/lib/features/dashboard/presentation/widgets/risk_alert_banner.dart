@@ -46,19 +46,19 @@ List<RiskAlertBannerItem> computeConcentrationAlerts(
     final typeLabel = _formatTypeLabel(b.type);
     if (b.percent > 85) {
       items.add(RiskAlertBannerItem.critical(
-        'Riesgo critico: $typeLabel domina tu portfolio',
+        'Critical risk: $typeLabel dominates your portfolio',
         b.type,
       ));
     } else if (b.percent > 70) {
       items.add(RiskAlertBannerItem.warning(
-        'Alta concentracion en $typeLabel',
+        'High concentration in $typeLabel',
         b.type,
       ));
     }
   }
   if (riskScore > 70) {
     items.add(RiskAlertBannerItem.warning(
-      'Portfolio poco diversificado',
+      'Portfolio poorly diversified',
       null,
     ));
   }
@@ -88,10 +88,9 @@ class RiskAlertBanner extends StatelessWidget {
     final isCritical = topAlert.severity == RiskAlertBannerSeverity.critical;
     final bgColor = isCritical
         ? AppTheme.alertRed.withValues(alpha: 0.15)
-        : Colors.amber.withValues(alpha: 0.15);
-    final borderColor =
-        isCritical ? AppTheme.alertRed : Colors.amber;
-    final iconColor = isCritical ? AppTheme.alertRed : Colors.amber;
+        : AppTheme.electricBlue.withValues(alpha: 0.12);
+    final borderColor = isCritical ? AppTheme.alertRed : AppTheme.electricBlue;
+    final iconColor = isCritical ? AppTheme.alertRed : AppTheme.electricBlue;
 
     return Material(
       color: Colors.transparent,
