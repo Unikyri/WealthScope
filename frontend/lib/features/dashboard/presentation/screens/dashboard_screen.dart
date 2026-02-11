@@ -15,6 +15,7 @@ import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
 import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/crypto_net_worth_hero.dart';
+import 'package:wealthscope_app/features/subscriptions/data/services/revenuecat_service.dart';
 import 'package:wealthscope_app/features/subscriptions/presentation/widgets/premium_widgets.dart';
 
 /// Dashboard Screen - Crypto Blue Pivot
@@ -92,15 +93,18 @@ class DashboardScreen extends ConsumerWidget {
                   margin: const EdgeInsets.only(right: 8),
                   child: const PremiumBadge(),
                 ),
+                // Price freshness indicator
+                _PriceFreshnessChip(),
+                const SizedBox(width: 4),
                 // Sync Status
                 Container(
                   margin: const EdgeInsets.only(right: 12),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppTheme.cardGrey.withOpacity(0.5),
+                    color: AppTheme.cardGrey.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withOpacity(0.05)),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
                   ),
                   child: Row(
                     children: [
@@ -376,6 +380,44 @@ class _TopMoverItem extends StatelessWidget {
       return '\$${(value / 1000).toStringAsFixed(2)}K';
     }
     return '\$${value.toStringAsFixed(2)}';
+  }
+}
+
+/// Price freshness chip: DELAYED for Scout, LIVE for Sentinel.
+class _PriceFreshnessChip extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isPremiumAsync = ref.watch(isPremiumProvider);
+    final isPremium = isPremiumAsync.valueOrNull ?? false;
+
+    final color = isPremium ? AppTheme.emeraldAccent : Colors.amber;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isPremium ? Icons.flash_on : Icons.schedule,
+            size: 12,
+            color: color,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            isPremium ? 'LIVE' : 'DELAYED',
+            style: TextStyle(
+              fontSize: 9,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
