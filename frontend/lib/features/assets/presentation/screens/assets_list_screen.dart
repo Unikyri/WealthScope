@@ -77,7 +77,7 @@ class AssetsListScreen extends ConsumerWidget {
                                     final isPremium =
                                         isPremiumAsync.value ?? false;
                                     final countText = isPremium
-                                        ? '${assets.length} ${assets.length == 1 ? 'asset' : 'assets'} in portfolio'
+                                        ? '${assets.length} assets \u2022 Unlimited'
                                         : '${assets.length}/${PlanLimits.scoutMaxAssets} assets';
                                     return Text(
                                       countText,
