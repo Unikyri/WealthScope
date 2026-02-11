@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/ai/presentation/providers/ai_chat_provider.dart';
 import 'package:wealthscope_app/features/ai/presentation/widgets/chat_bubble.dart';
 import 'package:wealthscope_app/features/ai/presentation/widgets/typing_indicator.dart';
+import 'package:wealthscope_app/features/subscriptions/data/services/revenuecat_service.dart';
+import 'package:wealthscope_app/features/subscriptions/data/services/usage_tracker.dart';
+import 'package:wealthscope_app/features/subscriptions/domain/plan_limits.dart';
+import 'package:wealthscope_app/features/subscriptions/presentation/widgets/upgrade_prompt_dialog.dart';
 
 class AIChatScreen extends ConsumerStatefulWidget {
   final String? initialPrompt;
@@ -52,12 +58,35 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
     final message = _messageController.text.trim();
     if (message.isEmpty) return;
 
+    // Check AI query limit for Scout users
+    final isPremium = await ref.read(isPremiumProvider.future);
+    if (!isPremium) {
+      final usage = await ref.read(usageTrackerProvider.future);
+      if (usage.aiQueriesUsedToday >= PlanLimits.scoutMaxAiQueriesPerDay) {
+        if (!mounted) return;
+        showUpgradePrompt(
+          context,
+          title: 'Daily AI Limit Reached',
+          message:
+              'Scout plan includes ${PlanLimits.scoutMaxAiQueriesPerDay} AI queries per day. '
+              'Queries reset at midnight.',
+          icon: Icons.psychology,
+        );
+        return;
+      }
+    }
+
     _messageController.clear();
 
     // Send message via provider
     try {
       await ref.read(aiChatProvider.notifier).sendMessage(message);
       _scrollToBottom();
+
+      // Record AI query usage for Scout users
+      if (!isPremium) {
+        await ref.read(usageTrackerProvider.notifier).recordAiQuery();
+      }
     } catch (e) {
       // Show user-friendly error message
       if (mounted) {
@@ -98,6 +127,9 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
       ),
       body: Column(
         children: [
+          // Scout query limit banner
+          _AiQueryLimitBanner(),
+
           // Messages list
           Expanded(
             child: chatState.when(
@@ -350,6 +382,81 @@ class _MessageInputState extends State<_MessageInput> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Banner shown to Scout users indicating remaining daily AI queries.
+class _AiQueryLimitBanner extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isPremiumAsync = ref.watch(isPremiumProvider);
+    final usageAsync = ref.watch(usageTrackerProvider);
+
+    final isPremium = isPremiumAsync.valueOrNull ?? true;
+    if (isPremium) return const SizedBox.shrink();
+
+    final used = usageAsync.valueOrNull?.aiQueriesUsedToday ?? 0;
+    final max = PlanLimits.scoutMaxAiQueriesPerDay;
+    final remaining = (max - used).clamp(0, max);
+    final isAtLimit = remaining <= 0;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: isAtLimit
+            ? Colors.amber.withValues(alpha: 0.12)
+            : AppTheme.electricBlue.withValues(alpha: 0.08),
+        border: Border(
+          bottom: BorderSide(
+            color: isAtLimit
+                ? Colors.amber.withValues(alpha: 0.2)
+                : AppTheme.electricBlue.withValues(alpha: 0.1),
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            isAtLimit ? Icons.warning_amber_rounded : Icons.auto_awesome,
+            size: 14,
+            color: isAtLimit ? Colors.amber : AppTheme.electricBlue,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              isAtLimit
+                  ? 'Daily limit reached \u2022 Resets at midnight'
+                  : '$remaining/$max queries remaining today',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: isAtLimit ? Colors.amber : AppTheme.textGrey,
+              ),
+            ),
+          ),
+          if (isAtLimit)
+            GestureDetector(
+              onTap: () => showUpgradePrompt(
+                context,
+                title: 'Daily AI Limit Reached',
+                message:
+                    'Scout plan includes $max AI queries per day. '
+                    'Upgrade to Sentinel for ${ PlanLimits.sentinelMaxAiQueriesPerDay} daily queries.',
+                icon: Icons.psychology,
+              ),
+              child: Text(
+                'Upgrade',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.electricBlue,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
