@@ -5,6 +5,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wealthscope_app/core/constants/app_config.dart';
+import 'package:wealthscope_app/features/subscriptions/domain/models/user_plan.dart';
 
 /// RevenueCat Service - Handles all subscription logic for WealthScope.
 ///
@@ -238,4 +239,15 @@ final isPremiumProvider = FutureProvider<bool>((ref) async {
 final offeringsProvider = FutureProvider<Offerings?>((ref) async {
   final service = ref.watch(revenueCatServiceProvider);
   return await service.getOfferings();
+});
+
+/// The resolved [UserPlan] combining trial mode and RevenueCat state.
+///
+/// Use this when you need the full plan object (display name, tier label).
+/// Use [isPremiumProvider] when you only need a boolean check.
+final userPlanProvider = FutureProvider<UserPlan>((ref) async {
+  if (AppConfig.isTrialMode) return UserPlan.sentinel;
+
+  final isPremium = await ref.watch(isPremiumProvider.future);
+  return isPremium ? UserPlan.sentinel : UserPlan.scout;
 });

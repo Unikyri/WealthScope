@@ -648,6 +648,25 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
               ),
             ),
             const SizedBox(height: 24),
+            // Try native RevenueCat Paywall
+            ElevatedButton.icon(
+              onPressed: () async {
+                await ref
+                    .read(revenueCatServiceProvider)
+                    .presentPaywall();
+              },
+              icon: const Icon(Icons.storefront),
+              label: const Text('Open Paywall'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.electricBlue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
             ElevatedButton.icon(
               onPressed: () => context.pop(),
               icon: const Icon(Icons.arrow_back),
@@ -788,13 +807,8 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
     );
   }
 
+  /// Open RevenueCat Customer Center for subscription management.
   Future<void> _manageSubscription() async {
-    final url = await ref.read(revenueCatServiceProvider).getManagementURL();
-    
-    if (url != null) {
-      // Open URL using url_launcher
-      // await launchUrl(Uri.parse(url));
-      print('Management URL: $url');
-    }
+    await ref.read(revenueCatServiceProvider).presentCustomerCenter();
   }
 }

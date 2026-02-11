@@ -18,20 +18,27 @@ class PlanStatusCard extends ConsumerWidget {
     final isPremiumAsync = ref.watch(isPremiumProvider);
 
     return isPremiumAsync.when(
-      data: (isPremium) => _buildCard(context, isPremium),
+      data: (isPremium) => _buildCard(context, ref, isPremium),
       loading: () => _buildShimmer(),
-      error: (_, __) => _buildCard(context, false),
+      error: (_, __) => _buildCard(context, ref, false),
     );
   }
 
-  Widget _buildCard(BuildContext context, bool isPremium) {
+  Widget _buildCard(BuildContext context, WidgetRef ref, bool isPremium) {
     final planName = isPremium ? 'Sentinel' : 'Scout';
     final planSubtitle =
         isPremium ? 'Premium \u2022 Unlimited access' : 'Free plan \u2022 15 assets max';
     final ctaText = isPremium ? 'Manage' : 'See Plans';
 
     return GestureDetector(
-      onTap: () => context.push('/subscription'),
+      onTap: () {
+        if (isPremium) {
+          // Open Customer Center for subscription management
+          ref.read(revenueCatServiceProvider).presentCustomerCenter();
+        } else {
+          context.push('/subscription');
+        }
+      },
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
