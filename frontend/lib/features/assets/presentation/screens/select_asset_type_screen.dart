@@ -3,14 +3,42 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
+import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/asset_type_card.dart';
+import 'package:wealthscope_app/features/subscriptions/data/services/revenuecat_service.dart';
+import 'package:wealthscope_app/features/subscriptions/domain/plan_limits.dart';
+import 'package:wealthscope_app/features/subscriptions/presentation/widgets/upgrade_prompt_dialog.dart';
 
 /// Asset Type Selection Screen
 /// Step 1 of the Add Asset flow. Users select the type of asset they want to add.
 class SelectAssetTypeScreen extends ConsumerWidget {
   const SelectAssetTypeScreen({super.key});
 
-  void _onAssetTypeSelected(BuildContext context, AssetType type) {
+  Future<void> _onAssetTypeSelected(
+    BuildContext context,
+    WidgetRef ref,
+    AssetType type,
+  ) async {
+    // Check asset limit for Scout users
+    final isPremium = await ref.read(isPremiumProvider.future);
+    if (!isPremium) {
+      final assets = await ref.read(allAssetsProvider.future);
+      if (assets.length >= PlanLimits.scoutMaxAssets) {
+        if (!context.mounted) return;
+        showUpgradePrompt(
+          context,
+          title: 'Asset Limit Reached',
+          message:
+              'Scout plan allows up to ${PlanLimits.scoutMaxAssets} assets. '
+              'Upgrade to Sentinel for unlimited assets.',
+          icon: Icons.inventory_2_outlined,
+        );
+        return;
+      }
+    }
+
+    if (!context.mounted) return;
+
     // Navigate to specific form based on asset type
     if (type == AssetType.stock || type == AssetType.etf) {
       context.push('/assets/add-stock?type=${type.toApiString()}');
@@ -96,7 +124,8 @@ class SelectAssetTypeScreen extends ConsumerWidget {
 
                     return AssetTypeSelectorCard(
                       type: assetType,
-                      onTap: () => _onAssetTypeSelected(context, assetType),
+                      onTap: () =>
+                          _onAssetTypeSelected(context, ref, assetType),
                     );
                   },
                 ),

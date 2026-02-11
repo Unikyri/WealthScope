@@ -13,6 +13,8 @@ import 'package:wealthscope_app/features/assets/presentation/widgets/asset_type_
 import 'package:wealthscope_app/features/assets/presentation/widgets/delete_asset_dialog.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/empty_assets_view.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/error_view.dart';
+import 'package:wealthscope_app/features/subscriptions/data/services/revenuecat_service.dart';
+import 'package:wealthscope_app/features/subscriptions/domain/plan_limits.dart';
 
 /// Assets List Screen
 /// Main screen for displaying all user assets with filtering capabilities
@@ -25,6 +27,7 @@ class AssetsListScreen extends ConsumerWidget {
     final assetsAsync = ref.watch(searchedAssetsProvider);
     final selectedType = ref.watch(selectedAssetTypeProvider);
     final allAssets = ref.watch(allAssetsProvider);
+    final isPremiumAsync = ref.watch(isPremiumProvider);
 
     return Scaffold(
       backgroundColor: AppTheme.midnightBlue,
@@ -70,13 +73,21 @@ class AssetsListScreen extends ConsumerWidget {
                             ),
                             const SizedBox(height: 2),
                             allAssets.whenOrNull(
-                                  data: (assets) => Text(
-                                    '${assets.length} ${assets.length == 1 ? 'asset' : 'assets'} in portfolio',
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: AppTheme.textGrey,
-                                      fontSize: 12,
-                                    ),
-                                  ),
+                                  data: (assets) {
+                                    final isPremium =
+                                        isPremiumAsync.valueOrNull ?? false;
+                                    final countText = isPremium
+                                        ? '${assets.length} ${assets.length == 1 ? 'asset' : 'assets'} in portfolio'
+                                        : '${assets.length}/${PlanLimits.scoutMaxAssets} assets';
+                                    return Text(
+                                      countText,
+                                      style:
+                                          theme.textTheme.bodyMedium?.copyWith(
+                                        color: AppTheme.textGrey,
+                                        fontSize: 12,
+                                      ),
+                                    );
+                                  },
                                 ) ??
                                 const SizedBox.shrink(),
                           ],
