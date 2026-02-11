@@ -7,6 +7,7 @@ import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart
 import 'package:wealthscope_app/features/dashboard/presentation/providers/dashboard_providers.dart';
 import 'package:wealthscope_app/shared/widgets/asset_icon_resolver.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/ai_risk_level_card.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/risk_alert_banner.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/ai_sentiment_card.dart';
 import 'package:wealthscope_app/features/dashboard/domain/prompt_generator.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/ai_prompt_bar.dart';
@@ -239,7 +240,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
                       // 4. AI-driven Sentiment & Risk Cards
                       SizedBox(
-                        height: 180,
+                        height: 220,
                         child: Row(
                           children: [
                             Expanded(
@@ -255,6 +256,31 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                             ),
                           ],
                         ),
+                      ),
+
+                      // 4b. Risk concentration alert banner
+                      Builder(
+                        builder: (context) {
+                          final riskAsync =
+                              ref.watch(dashboardPortfolioRiskProvider);
+                          return riskAsync.when(
+                            data: (risk) {
+                              final alerts = computeConcentrationAlerts(
+                                summary.breakdownByType,
+                                risk.riskScore,
+                              );
+                              if (alerts.isEmpty) {
+                                return const SizedBox.shrink();
+                              }
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 16),
+                                child: RiskAlertBanner(alerts: alerts),
+                              );
+                            },
+                            loading: () => const SizedBox.shrink(),
+                            error: (_, __) => const SizedBox.shrink(),
+                          );
+                        },
                       ),
 
                       const SizedBox(height: 24),
