@@ -5,6 +5,8 @@ import 'package:wealthscope_app/core/theme/custom_icons.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/providers/dashboard_providers.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/ai_risk_level_card.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/ai_sentiment_card.dart';
+import 'package:wealthscope_app/features/dashboard/domain/prompt_generator.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/widgets/ai_prompt_bar.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/enhanced_allocation_section_with_legend.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/dashboard_skeleton.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/error_view.dart';
@@ -141,7 +143,42 @@ class DashboardScreen extends ConsumerWidget {
                         changePercent: summary.gainLossPercent,
                       ),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
+
+                      // 2. AI Contextual Prompt Bar
+                      Builder(builder: (context) {
+                        final assetsAsync = ref.watch(allAssetsProvider);
+                        final prompts = assetsAsync.when(
+                          data: (assets) => PromptGenerator.generate(
+                            assets: assets
+                                .map((a) => AssetInfo(
+                                      name: a.name,
+                                      symbol: a.symbol,
+                                      type: a.type.toApiString(),
+                                      totalValue: a.totalValue ?? 0,
+                                    ))
+                                .toList(),
+                            breakdown: summary.breakdownByType
+                                .map((b) => TypeBreakdown(
+                                      type: b.type,
+                                      percent: b.percent,
+                                    ))
+                                .toList(),
+                          ),
+                          loading: () => PromptGenerator.defaultPrompts(),
+                          error: (_, __) => PromptGenerator.defaultPrompts(),
+                        );
+
+                        return AiPromptBar(
+                          prompts: prompts,
+                          onPromptTap: (prompt) {
+                            context.push(
+                                '/ai-chat?prompt=${Uri.encodeComponent(prompt)}');
+                          },
+                        );
+                      }),
+
+                      const SizedBox(height: 8),
 
                       // 3. Asset Allocation Donut
                       if (summary.breakdownByType.isNotEmpty) ...[
