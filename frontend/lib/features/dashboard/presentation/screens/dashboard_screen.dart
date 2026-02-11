@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/providers/dashboard_providers.dart';
+import 'package:wealthscope_app/features/dashboard/presentation/providers/portfolio_history_provider.dart';
 import 'package:wealthscope_app/shared/widgets/asset_icon_resolver.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/ai_risk_level_card.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/risk_alert_banner.dart';
@@ -93,83 +94,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             // Top App Bar (Header)
+            // Structure: Row 1 = avatar + greeting/name; Row 2 = badges (avoids overlap)
             SliverAppBar(
               backgroundColor: theme.colorScheme.background.withOpacity(0.9),
               elevation: 0,
               pinned: true,
               centerTitle: false,
-              title: Row(
-                children: [
-                  // User Avatar (initial from name, no external URL)
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundColor: AppTheme.electricBlue.withValues(alpha: 0.3),
-                    child: Text(
-                      userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  // Greeting
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        getTimeBasedGreeting(),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: AppTheme.textGrey,
-                        ),
-                      ),
-                      Text(
-                        userName,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+              toolbarHeight: 112,
+              flexibleSpace: _DashboardHeader(userName: userName),
               actions: [
-                // Premium Badge
-                Container(
-                  margin: const EdgeInsets.only(right: 8),
-                  child: const PremiumBadge(),
-                ),
-                // Price freshness indicator
-                _PriceFreshnessChip(),
-                const SizedBox(width: 4),
-                // Sync Status
-                Container(
-                  margin: const EdgeInsets.only(right: 12),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppTheme.cardGrey.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.sync,
-                          size: 14, color: AppTheme.emeraldAccent),
-                      const SizedBox(width: 4),
-                      Text(
-                        'SYNCED',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: AppTheme.textGrey,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Notifications
                 IconButton(
                   icon: const Icon(Icons.notifications_outlined),
                   onPressed: () => context.push('/notifications'),
@@ -208,10 +141,26 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       wrapStagger(
                         Builder(builder: (context) {
                           final gate = ref.watch(featureGateProvider);
+                          // Use real history or synthetic sparkline when empty
+                          final historyAsync = ref.watch(
+                            portfolioHistoryProvider('1M'),
+                          );
+                          List<double> historyData = historyAsync
+                              .when(
+                                data: (list) => list.map((p) => p.value).toList(),
+                                loading: () => <double>[],
+                                error: (_, __) => <double>[],
+                              );
+                          if (historyData.isEmpty) {
+                            final prev = summary.totalValue *
+                                (1 - summary.gainLossPercent / 100);
+                            historyData = [prev, summary.totalValue];
+                          }
                           return CryptoNetWorthHero(
                             totalValue: summary.totalValue,
                             change: summary.gainLoss,
                             changePercent: summary.gainLossPercent,
+                            historyData: historyData,
                             lastUpdated: summary.lastUpdated,
                             isScoutPlan: !gate.isPremium,
                           );
@@ -283,24 +232,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       ],
 
                       // 4. AI-driven Sentiment & Risk Cards (225ms)
+                      // Stacked vertically for more space; fixed height removed to avoid overflow
                       wrapStagger(
-                        SizedBox(
-                          height: 220,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: AiSentimentCard(
-                                  breakdownByType: summary.breakdownByType,
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: AiRiskLevelCard(
-                                  breakdownByType: summary.breakdownByType,
-                                ),
-                              ),
-                            ],
-                          ),
+                        Column(
+                          children: [
+                            AiSentimentCard(
+                              breakdownByType: summary.breakdownByType,
+                            ),
+                            const SizedBox(height: 16),
+                            AiRiskLevelCard(
+                              breakdownByType: summary.breakdownByType,
+                            ),
+                          ],
                         ),
                         225,
                       ),
@@ -371,6 +314,101 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   const SliverFillRemaining(child: DashboardSkeleton()),
               error: (e, _) => SliverFillRemaining(
                   child: ErrorView(message: e.toString(), onRetry: () {})),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Header with avatar, greeting, name on row 1; badges on row 2 to avoid overlap.
+class _DashboardHeader extends ConsumerWidget {
+  const _DashboardHeader({required this.userName});
+
+  final String userName;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 8, 8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Row 1: Avatar + Greeting + Name
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  backgroundColor: AppTheme.electricBlue.withValues(alpha: 0.3),
+                  child: Text(
+                    userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        getTimeBasedGreeting(),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppTheme.textGrey,
+                        ),
+                      ),
+                      Text(
+                        userName,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            // Row 2: Badges (Premium, Live/Delayed, Synced)
+            Row(
+              children: [
+                const PremiumBadge(),
+                const SizedBox(width: 8),
+                _PriceFreshnessChip(),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.cardGrey.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.sync,
+                          size: 14, color: AppTheme.emeraldAccent),
+                      const SizedBox(width: 4),
+                      Text(
+                        'SYNCED',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: AppTheme.textGrey,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
         ),
