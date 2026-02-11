@@ -31,7 +31,7 @@ class DashboardScreen extends ConsumerWidget {
     final userName = currentUserEmail?.split('@').first.capitalize() ?? 'User';
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       body: RefreshIndicator(
         onRefresh: () async {
           await Future.wait([
@@ -44,7 +44,7 @@ class DashboardScreen extends ConsumerWidget {
           slivers: [
             // Top App Bar (Header)
             SliverAppBar(
-              backgroundColor: theme.colorScheme.background.withOpacity(0.9),
+              backgroundColor: theme.colorScheme.surface.withOpacity(0.9),
               elevation: 0,
               pinned: true,
               centerTitle: false,
@@ -89,34 +89,8 @@ class DashboardScreen extends ConsumerWidget {
               actions: [
                 // Premium Badge
                 Container(
-                  margin: const EdgeInsets.only(right: 8),
-                  child: const PremiumBadge(),
-                ),
-                // Sync Status
-                Container(
                   margin: const EdgeInsets.only(right: 12),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppTheme.cardGrey.withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withOpacity(0.05)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.sync,
-                          size: 14, color: AppTheme.emeraldAccent),
-                      const SizedBox(width: 4),
-                      Text(
-                        'SYNCED',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: AppTheme.textGrey,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
+                  child: const PremiumBadge(),
                 ),
                 // Notifications
                 IconButton(

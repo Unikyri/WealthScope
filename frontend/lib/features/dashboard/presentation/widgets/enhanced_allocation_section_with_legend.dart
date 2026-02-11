@@ -1,10 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/dashboard/domain/entities/portfolio_summary.dart';
-import 'package:wealthscope_app/core/currency/currency_extensions.dart';
 
 /// Enhanced Allocation Section - Crypto Blue Style
 /// Matches specific user request: Donut with Total in center, side-by-side legend.
@@ -24,8 +22,6 @@ class EnhancedAllocationSection extends StatefulWidget {
 }
 
 class _EnhancedAllocationSectionState extends State<EnhancedAllocationSection> {
-  int touchedIndex = -1;
-
   @override
   Widget build(BuildContext context) {
     // Filter out very small segments for cleaner chart
@@ -34,16 +30,33 @@ class _EnhancedAllocationSectionState extends State<EnhancedAllocationSection> {
     data.sort((a, b) => b.percent.compareTo(a.percent));
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.cardGrey,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.02)),
-         boxShadow: [
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppTheme.cardGrey,
+            AppTheme.cardGrey.withOpacity(0.95),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.08),
+          width: 1.5,
+        ),
+        boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 12,
-            offset: const Offset(0, 8),
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+            spreadRadius: -5,
+          ),
+          BoxShadow(
+            color: AppTheme.electricBlue.withOpacity(0.05),
+            blurRadius: 30,
+            offset: const Offset(0, 15),
+            spreadRadius: -10,
           ),
         ],
       ),
@@ -53,82 +66,130 @@ class _EnhancedAllocationSectionState extends State<EnhancedAllocationSection> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Asset Allocation',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppTheme.electricBlue.withOpacity(0.2),
+                          AppTheme.electricBlue.withOpacity(0.1),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.pie_chart_rounded,
+                      color: AppTheme.electricBlue,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Asset Allocation',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                  ),
+                ],
               ),
-              Text(
-                'View Details',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppTheme.electricBlue,
-                  fontWeight: FontWeight.bold,
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppTheme.electricBlue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: AppTheme.electricBlue.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  'View Details',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppTheme.electricBlue,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 11,
+                      ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 24),
-          
+          const SizedBox(height: 20),
+
           // Content Row
           Row(
             children: [
               // 1. Donut Chart (Left)
               Expanded(
-                flex: 4,
+                flex: 5,
                 child: SizedBox(
-                  height: 160,
+                  height: 200,
                   child: Stack(
                     children: [
                       PieChart(
                         PieChartData(
                           pieTouchData: PieTouchData(
-                            touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                              setState(() {
-                                if (!event.isInterestedForInteractions ||
-                                    pieTouchResponse == null ||
-                                    pieTouchResponse.touchedSection == null) {
-                                  touchedIndex = -1;
-                                  return;
-                                }
-                                touchedIndex = pieTouchResponse
-                                    .touchedSection!.touchedSectionIndex;
-                              });
-                            },
+                            enabled: false,
                           ),
                           borderData: FlBorderData(show: false),
-                          sectionsSpace: 0,
-                          centerSpaceRadius: 60, // Large center hole
+                          sectionsSpace: 3,
+                          centerSpaceRadius: 58,
                           sections: _buildSections(data),
                         ),
                       ),
                       // Center Text
                       Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Total',
-                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: AppTheme.textGrey,
-                              ),
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: RadialGradient(
+                              colors: [
+                                AppTheme.cardGrey,
+                                AppTheme.cardGrey.withOpacity(0.8),
+                              ],
                             ),
-                            Text(
-                              _formatCompactCurrency(widget.totalValue),
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Total',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall
+                                    ?.copyWith(
+                                      color: AppTheme.textGrey,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w500,
+                                      letterSpacing: 0.5,
+                                    ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 4),
+                              Text(
+                                _formatCompactCurrency(widget.totalValue),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-              
+
               const SizedBox(width: 24),
 
               // 2. Legend List (Right)
@@ -137,50 +198,55 @@ class _EnhancedAllocationSectionState extends State<EnhancedAllocationSection> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: data.take(4).map((item) {
-                     final index = data.indexOf(item);
-                     final isTouched = index == touchedIndex;
-                     
-                     return Padding(
-                       padding: const EdgeInsets.symmetric(vertical: 6.0),
-                       child: Row(
-                         children: [
-                           // Dot
-                           Container(
-                             width: 8,
-                             height: 8,
-                             decoration: BoxDecoration(
-                               color: _getTypeColor(item.type),
-                               shape: BoxShape.circle,
-                               boxShadow: [
-                                 BoxShadow(
-                                   color: _getTypeColor(item.type).withOpacity(0.5),
-                                   blurRadius: 4,
-                                   spreadRadius: 1,
-                                 ),
-                               ]
-                             ),
-                           ),
-                           const SizedBox(width: 12),
-                           // Name
-                           Text(
-                             _getTypeLabel(item.type),
-                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                               color: isTouched ? Colors.white : AppTheme.textGrey,
-                               fontWeight: isTouched ? FontWeight.bold : FontWeight.normal,
-                             ),
-                           ),
-                           const Spacer(),
-                           // Percent
-                           Text(
-                             '${item.percent.toStringAsFixed(0)}%',
-                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                               color: Colors.white,
-                               fontWeight: FontWeight.bold,
-                             ),
-                           ),
-                         ],
-                       ),
-                     );
+                    final index = data.indexOf(item);
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6.0),
+                      child: Row(
+                        children: [
+                          // Dot
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                                color: _getTypeColor(item.type),
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: _getTypeColor(item.type)
+                                        .withOpacity(0.5),
+                                    blurRadius: 4,
+                                    spreadRadius: 1,
+                                  ),
+                                ]),
+                          ),
+                          const SizedBox(width: 12),
+                          // Name
+                          Text(
+                            _getTypeLabel(item.type),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: AppTheme.textGrey,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                          ),
+                          const Spacer(),
+                          // Percent
+                          Text(
+                            '${item.percent.toStringAsFixed(0)}%',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                        ],
+                      ),
+                    );
                   }).toList(),
                 ),
               ),
@@ -195,60 +261,62 @@ class _EnhancedAllocationSectionState extends State<EnhancedAllocationSection> {
     return data.asMap().entries.map((entry) {
       final index = entry.key;
       final item = entry.value;
-      final isTouched = index == touchedIndex;
-      final radius = isTouched ? 25.0 : 20.0;
       final color = _getTypeColor(item.type);
 
       return PieChartSectionData(
         color: color,
         value: item.percent,
         title: '', // No title on chart
-        radius: radius,
-        badgeWidget: isTouched ? _buildBadge(item.percent) : null,
-        badgePositionPercentageOffset: 1.3,
+        radius: 30.0,
+        badgeWidget: null,
+        gradient: LinearGradient(
+          colors: [
+            color,
+            color.withOpacity(0.7),
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
         borderSide: BorderSide(
-          color: AppTheme.cardGrey, // Gap color matches bg
-          width: 4,
+          color: AppTheme.cardGrey,
+          width: 3,
         ),
       );
     }).toList();
   }
-  
-  Widget _buildBadge(double percent) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        '${percent.toStringAsFixed(0)}%',
-        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black),
-      ),
-    );
-  }
 
   // Helper Methods for Colors and Labels
-   Color _getTypeColor(String typeString) {
+  Color _getTypeColor(String typeString) {
     final type = _parseAssetType(typeString);
     switch (type) {
-      case AssetType.crypto: return AppTheme.electricBlue;
-      case AssetType.stock: return AppTheme.emeraldAccent;
-      case AssetType.realEstate: return Colors.purpleAccent;
-      case AssetType.cash: return AppTheme.textGrey;
-      case AssetType.etf: return Colors.amber;
-      case AssetType.gold: return Colors.orange;
-      case AssetType.bond: return Colors.teal;
-      default: return Colors.grey;
+      case AssetType.crypto:
+        return AppTheme.electricBlue;
+      case AssetType.stock:
+        return AppTheme.emeraldAccent;
+      case AssetType.realEstate:
+        return Colors.purpleAccent;
+      case AssetType.cash:
+        return AppTheme.textGrey;
+      case AssetType.etf:
+        return Colors.amber;
+      case AssetType.gold:
+        return Colors.orange;
+      case AssetType.bond:
+        return Colors.teal;
+      default:
+        return Colors.grey;
     }
   }
 
   String _getTypeLabel(String typeString) {
     final type = _parseAssetType(typeString);
     switch (type) {
-      case AssetType.realEstate: return 'Real Est.';
-      case AssetType.etf: return 'ETF';
-      default: return typeString[0].toUpperCase() + typeString.substring(1);
+      case AssetType.realEstate:
+        return 'Real Est.';
+      case AssetType.etf:
+        return 'ETF';
+      default:
+        return typeString[0].toUpperCase() + typeString.substring(1);
     }
   }
 
@@ -261,7 +329,8 @@ class _EnhancedAllocationSectionState extends State<EnhancedAllocationSection> {
   }
 
   String _formatCompactCurrency(double value) {
-    if (value >= 1000000000) return '\$${(value / 1000000000).toStringAsFixed(1)}B';
+    if (value >= 1000000000)
+      return '\$${(value / 1000000000).toStringAsFixed(1)}B';
     if (value >= 1000000) return '\$${(value / 1000000).toStringAsFixed(1)}M';
     if (value >= 1000) return '\$${(value / 1000).toStringAsFixed(1)}K';
     return '\$${value.toStringAsFixed(0)}';

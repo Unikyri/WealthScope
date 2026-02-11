@@ -35,4 +35,17 @@ class AppConfig {
 
   /// Check if running in development
   static bool get isDevelopment => environment == 'development';
+
+  /// RevenueCat Configuration
+  /// API Key for RevenueCat SDK (test/production)
+  static const String revenueCatApiKey = String.fromEnvironment(
+    'REVENUECAT_API_KEY',
+    defaultValue: 'test_qEYsVkHqhjptxyoZByVsdUSFRJf',
+  );
+
+  /// Premium Entitlement ID configured in RevenueCat Dashboard
+  static const String premiumEntitlementId = String.fromEnvironment(
+    'REVENUECAT_ENTITLEMENT_ID',
+    defaultValue: 'WeatherScope Pro',
+  );
 }

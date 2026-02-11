@@ -18,13 +18,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final List<OnboardingSlide> _slides = const [
     OnboardingSlide(
       title: 'Track Your Wealth',
-      subtitle: 'All your assets in one place. Stocks, crypto, real estate, and more.',
+      subtitle:
+          'All your assets in one place. Stocks, crypto, real estate, and more.',
       icon: Icons.account_balance_wallet,
       color: Colors.blue,
     ),
     OnboardingSlide(
       title: 'AI-Powered Insights',
-      subtitle: 'Get personalized financial advice from our intelligent assistant.',
+      subtitle:
+          'Get personalized financial advice from our intelligent assistant.',
       icon: Icons.smart_toy,
       color: Colors.purple,
     ),
@@ -87,13 +89,38 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Logo or app name
-                  Text(
-                    'WealthScope',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.primary,
-                    ),
+                  // Logo
+                  Row(
+                    children: [
+                      Container(
+                        width: 78,
+                        height: 78,
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: Image.asset(
+                          'assets/images/WealthScope.png',
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.account_balance_wallet,
+                              size: 56,
+                              color: colorScheme.primary,
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'WealthScope',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                    ],
                   ),
                   // Skip button
                   if (_currentPage < _slides.length - 1)
@@ -245,7 +272,7 @@ class _OnboardingPage extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             SizedBox(height: size.height * 0.08),
 
             // Title with fade-in animation
@@ -273,7 +300,7 @@ class _OnboardingPage extends StatelessWidget {
                 maxLines: 2,
               ),
             ),
-            
+
             const SizedBox(height: 20),
 
             // Subtitle with fade-in animation
@@ -301,7 +328,7 @@ class _OnboardingPage extends StatelessWidget {
                 maxLines: 3,
               ),
             ),
-            
+
             SizedBox(height: size.height * 0.05),
           ],
         ),

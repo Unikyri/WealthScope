@@ -30,7 +30,7 @@ class PremiumBadge extends ConsumerWidget {
     return GestureDetector(
       onTap: () => context.push('/subscription'),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -38,33 +38,19 @@ class PremiumBadge extends ConsumerWidget {
               AppTheme.electricBlue.withOpacity(0.8),
             ],
           ),
-          borderRadius: BorderRadius.circular(20),
+          shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppTheme.electricBlue.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: AppTheme.electricBlue.withOpacity(0.4),
+              blurRadius: 12,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              PhosphorIconsFill.crownSimple,
-              color: Colors.white,
-              size: 16,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              'Premium',
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ],
+        child: Icon(
+          PhosphorIconsFill.crownSimple,
+          color: Colors.white,
+          size: 20,
         ),
       ),
     );
@@ -74,33 +60,19 @@ class PremiumBadge extends ConsumerWidget {
     return GestureDetector(
       onTap: () => context.push('/subscription'),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: AppTheme.cardGrey,
-          borderRadius: BorderRadius.circular(20),
+          shape: BoxShape.circle,
           border: Border.all(
             color: AppTheme.electricBlue.withOpacity(0.5),
-            width: 1,
+            width: 2,
           ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              PhosphorIconsRegular.crown,
-              color: AppTheme.electricBlue,
-              size: 16,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              'Obtener Premium',
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.electricBlue,
-              ),
-            ),
-          ],
+        child: Icon(
+          PhosphorIconsRegular.crown,
+          color: AppTheme.electricBlue,
+          size: 20,
         ),
       ),
     );

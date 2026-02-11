@@ -3,51 +3,61 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wealthscope_app/core/constants/app_config.dart';
 
 /// RevenueCat Service - Handles all subscription logic
 class RevenueCatService {
-  static const String _testStoreApiKey = 'YOUR_TEST_STORE_API_KEY';
-  static const String _appleApiKey = 'YOUR_APPLE_API_KEY';
-  static const String _googleApiKey = 'YOUR_GOOGLE_API_KEY';
+  // API Key from environment variables (configured in .env)
+  static String get _apiKey => AppConfig.revenueCatApiKey;
   
-  static const String premiumEntitlementId = 'premium';
+  // Entitlement ID from environment variables (configured in .env)
+  static String get premiumEntitlementId => AppConfig.premiumEntitlementId;
 
   /// Initialize RevenueCat SDK
   Future<void> initialize({String? userId}) async {
     // RevenueCat doesn't fully support web, skip initialization on web
     if (kIsWeb) {
-      print('⚠️ RevenueCat not supported on web platform');
+      debugPrint('⚠️ RevenueCat not supported on web platform');
       return;
     }
     
+    // Enable debug logs for development
     await Purchases.setDebugLogsEnabled(true);
     
-    PurchasesConfiguration configuration;
-    
-    if (Platform.isIOS) {
-      // iOS configuration
-      configuration = PurchasesConfiguration(_appleApiKey);
-    } else if (Platform.isAndroid) {
-      // Android configuration
-      configuration = PurchasesConfiguration(_googleApiKey);
-    } else {
-      throw UnsupportedError('Platform not supported');
-    }
-
-    // Set user ID if provided (for PurchasesConfiguration)
-    // Note: appUserID should be set directly in PurchasesConfiguration constructor
-    await Purchases.configure(configuration);
-    
-    // If userId is provided, log in after configuration
-    if (userId != null) {
-      try {
-        await Purchases.logIn(userId);
-      } catch (e) {
-        print('⚠️ Could not log in user: $e');
+    try {
+      // Create configuration with API key
+      // For test mode, same key works for both iOS and Android
+      PurchasesConfiguration configuration;
+      
+      if (Platform.isIOS || Platform.isAndroid) {
+        // Create configuration with optional user ID
+        if (userId != null) {
+          configuration = PurchasesConfiguration(_apiKey)..appUserID = userId;
+        } else {
+          configuration = PurchasesConfiguration(_apiKey);
+        }
+      } else {
+        throw UnsupportedError('Platform not supported');
       }
+
+      // Configure RevenueCat
+      await Purchases.configure(configuration);
+      
+      // If userId is provided and wasn't set in configuration, log in after
+      if (userId != null) {
+        try {
+          await Purchases.logIn(userId);
+          debugPrint('✅ User logged in: $userId');
+        } catch (e) {
+          debugPrint('⚠️ Could not log in user: $e');
+        }
+      }
+      
+      debugPrint('✅ RevenueCat initialized successfully');
+    } catch (e) {
+      debugPrint('❌ Error initializing RevenueCat: $e');
+      rethrow;
     }
-    
-    print('✅ RevenueCat initialized successfully');
   }
 
   /// Get current customer info
@@ -56,21 +66,25 @@ class RevenueCatService {
       throw UnsupportedError('RevenueCat not supported on web');
     }
     try {
-      return await Purchases.getCustomerInfo();
+      final customerInfo = await Purchases.getCustomerInfo();
+      debugPrint('✅ Customer info retrieved successfully');
+      return customerInfo;
     } catch (e) {
-      print('❌ Error getting customer info: $e');
+      debugPrint('❌ Error getting customer info: $e');
       rethrow;
     }
   }
 
-  /// Check if user has premium subscription
+  /// Check if user has premium subscription (WeatherScope Pro)
   Future<bool> isPremium() async {
     try {
       final customerInfo = await getCustomerInfo();
-      final entitlement = customerInfo.entitlements.all[premiumEntitlementId];
-      return entitlement?.isActive ?? false;
+      final entitlement = customerInfo.entitlements.active[premiumEntitlementId];
+      final isActive = entitlement?.isActive ?? false;
+      debugPrint('Premium status: $isActive');
+      return isActive;
     } catch (e) {
-      print('❌ Error checking premium status: $e');
+      debugPrint('❌ Error checking premium status: $e');
       return false;
     }
   }
@@ -81,9 +95,27 @@ class RevenueCatService {
       return null;
     }
     try {
-      return await Purchases.getOfferings();
+      final offerings = await Purchases.getOfferings();
+      debugPrint('✅ Offerings retrieved: ${offerings.current?.identifier}');
+      return offerings;
     } catch (e) {
-      print('❌ Error getting offerings: $e');
+      debugPrint('❌ Error getting offerings: $e');
+      return null;
+    }
+  }
+
+  /// Get specific products by their identifiers
+  /// Product IDs: 'monthly', 'yearly', 'lifetime'
+  Future<List<StoreProduct>?> getProducts(List<String> productIds) async {
+    if (kIsWeb) {
+      return null;
+    }
+    try {
+      final products = await Purchases.getProducts(productIds);
+      debugPrint('✅ Products retrieved: ${products.length}');
+      return products;
+    } catch (e) {
+      debugPrint('❌ Error getting products: $e');
       return null;
     }
   }
@@ -92,21 +124,48 @@ class RevenueCatService {
   Future<CustomerInfo?> purchasePackage(Package package) async {
     try {
       final purchaseResult = await Purchases.purchasePackage(package);
-      print('✅ Purchase successful');
+      debugPrint('✅ Purchase successful: ${package.identifier}');
       return purchaseResult.customerInfo;
     } on PlatformException catch (e) {
       final errorCode = PurchasesErrorHelper.getErrorCode(e);
       
       if (errorCode == PurchasesErrorCode.purchaseCancelledError) {
-        print('ℹ️ User cancelled the purchase');
+        debugPrint('ℹ️ User cancelled the purchase');
       } else if (errorCode == PurchasesErrorCode.purchaseNotAllowedError) {
-        print('❌ User not allowed to purchase');
+        debugPrint('❌ User not allowed to purchase');
+      } else if (errorCode == PurchasesErrorCode.productAlreadyPurchasedError) {
+        debugPrint('ℹ️ Product already purchased');
       } else {
-        print('❌ Purchase error: $e');
+        debugPrint('❌ Purchase error: $errorCode - $e');
       }
       return null;
     } catch (e) {
-      print('❌ Unexpected purchase error: $e');
+      debugPrint('❌ Unexpected purchase error: $e');
+      return null;
+    }
+  }
+
+  /// Purchase a product directly by its StoreProduct
+  Future<CustomerInfo?> purchaseProduct(StoreProduct product) async {
+    try {
+      final purchaseResult = await Purchases.purchaseStoreProduct(product);
+      debugPrint('✅ Purchase successful: ${product.identifier}');
+      return purchaseResult.customerInfo;
+    } on PlatformException catch (e) {
+      final errorCode = PurchasesErrorHelper.getErrorCode(e);
+      
+      if (errorCode == PurchasesErrorCode.purchaseCancelledError) {
+        debugPrint('ℹ️ User cancelled the purchase');
+      } else if (errorCode == PurchasesErrorCode.purchaseNotAllowedError) {
+        debugPrint('❌ User not allowed to purchase');
+      } else if (errorCode == PurchasesErrorCode.productAlreadyPurchasedError) {
+        debugPrint('ℹ️ Product already purchased');
+      } else {
+        debugPrint('❌ Purchase error: $errorCode - $e');
+      }
+      return null;
+    } catch (e) {
+      debugPrint('❌ Unexpected purchase error: $e');
       return null;
     }
   }
@@ -115,34 +174,40 @@ class RevenueCatService {
   Future<CustomerInfo?> restorePurchases() async {
     try {
       final customerInfo = await Purchases.restorePurchases();
-      print('✅ Purchases restored');
+      debugPrint('✅ Purchases restored successfully');
       return customerInfo;
     } catch (e) {
-      print('❌ Error restoring purchases: $e');
+      debugPrint('❌ Error restoring purchases: $e');
       return null;
     }
   }
 
   /// Login with user ID
   Future<LogInResult?> login(String userId) async {
+    if (kIsWeb) {
+      return null;
+    }
     try {
       final result = await Purchases.logIn(userId);
-      print('✅ User logged in: $userId');
+      debugPrint('✅ User logged in: $userId');
       return result;
     } catch (e) {
-      print('❌ Error logging in: $e');
+      debugPrint('❌ Error logging in: $e');
       return null;
     }
   }
 
   /// Logout
   Future<CustomerInfo?> logout() async {
+    if (kIsWeb) {
+      return null;
+    }
     try {
       final customerInfo = await Purchases.logOut();
-      print('✅ User logged out');
+      debugPrint('✅ User logged out');
       return customerInfo;
     } catch (e) {
-      print('❌ Error logging out: $e');
+      debugPrint('❌ Error logging out: $e');
       return null;
     }
   }
@@ -151,10 +216,35 @@ class RevenueCatService {
   Future<String?> getManagementURL() async {
     try {
       final customerInfo = await getCustomerInfo();
-      return customerInfo.managementURL;
+      final url = customerInfo.managementURL;
+      debugPrint('Management URL: $url');
+      return url;
     } catch (e) {
-      print('❌ Error getting management URL: $e');
+      debugPrint('❌ Error getting management URL: $e');
       return null;
+    }
+  }
+
+  /// Check if a specific entitlement is active
+  Future<bool> hasEntitlement(String entitlementId) async {
+    try {
+      final customerInfo = await getCustomerInfo();
+      final entitlement = customerInfo.entitlements.active[entitlementId];
+      return entitlement?.isActive ?? false;
+    } catch (e) {
+      debugPrint('❌ Error checking entitlement: $e');
+      return false;
+    }
+  }
+
+  /// Get all active entitlements
+  Future<Map<String, EntitlementInfo>> getActiveEntitlements() async {
+    try {
+      final customerInfo = await getCustomerInfo();
+      return customerInfo.entitlements.active;
+    } catch (e) {
+      debugPrint('❌ Error getting active entitlements: $e');
+      return {};
     }
   }
 }

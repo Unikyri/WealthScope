@@ -397,7 +397,26 @@ class SettingsScreen extends ConsumerWidget {
       context: context,
       applicationName: 'WealthScope',
       applicationVersion: '1.0.0',
-      applicationIcon: const Icon(Icons.account_balance_wallet, size: 48),
+      applicationIcon: Container(
+        width: 64,
+        height: 64,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A2F47),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Image.asset(
+          'assets/images/WealthScope.png',
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            return const Icon(
+              Icons.account_balance_wallet,
+              size: 40,
+              color: Colors.blue,
+            );
+          },
+        ),
+      ),
       children: [
         const SizedBox(height: 16),
         const Text(

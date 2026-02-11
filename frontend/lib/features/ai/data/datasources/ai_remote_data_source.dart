@@ -31,6 +31,25 @@ class AIRemoteDataSource {
         throw Exception('La IA está tardando más de lo esperado. Esto puede deberse a una consulta compleja. Por favor, intenta nuevamente.');
       }
       
+      // Handle server errors (500) - usually backend/API issues
+      if (e.response?.statusCode == 500) {
+        if (e.response?.data != null && e.response!.data is Map) {
+          final errorData = e.response!.data as Map<String, dynamic>;
+          if (errorData.containsKey('error') && errorData['error'] is Map) {
+            final errorInfo = errorData['error'] as Map<String, dynamic>;
+            final errorMessage = errorInfo['message'] as String?;
+            
+            // Check if it's a Gemini API error
+            if (errorMessage?.toLowerCase().contains('gemini') ?? false) {
+              throw Exception(
+                'El servicio de IA está experimentando problemas técnicos. Por favor, intenta nuevamente en unos momentos.'
+              );
+            }
+          }
+        }
+        throw Exception('Error del servidor. El servicio no está disponible temporalmente. Intenta nuevamente.');
+      }
+      
       // Extract error message from API response
       if (e.response?.data != null && e.response!.data is Map) {
         final errorData = e.response!.data as Map<String, dynamic>;

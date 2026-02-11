@@ -289,7 +289,7 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
 
             // Currency Selector
             DropdownButtonFormField<Currency>(
-              value: selectedCurrency,
+              initialValue: selectedCurrency,
               decoration: const InputDecoration(
                 labelText: 'Currency',
                 border: OutlineInputBorder(),
@@ -312,7 +312,7 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
               }).toList(),
               onChanged: (currency) {
                 if (currency != null) {
-                  ref.read(selectedCurrencyProvider.notifier).state = currency;
+                  ref.read(selectedCurrencyProvider.notifier).setCurrency(currency);
                 }
               },
             ),

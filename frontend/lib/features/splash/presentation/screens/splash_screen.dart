@@ -70,15 +70,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     } catch (e) {
       // Handle any errors during session check
       debugPrint('Error checking auth status: $e');
-      
+
       if (!mounted) return;
-      
+
       // Show error state
       setState(() {
         _hasError = true;
         _errorMessage = _getErrorMessage(e);
       });
-      
+
       // Wait a bit and redirect to login anyway
       await Future.delayed(const Duration(seconds: 3));
       if (!mounted) return;
@@ -89,12 +89,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   /// Get user-friendly error message
   String _getErrorMessage(dynamic error) {
     final errorStr = error.toString().toLowerCase();
-    
-    if (errorStr.contains('not initialized') || 
-        errorStr.contains('supabase')) {
+
+    if (errorStr.contains('not initialized') || errorStr.contains('supabase')) {
       return 'Configuration Error\nCheck Supabase credentials';
-    } else if (errorStr.contains('network') || 
-               errorStr.contains('connection')) {
+    } else if (errorStr.contains('network') ||
+        errorStr.contains('connection')) {
       return 'Network Error\nCheck your internet connection';
     } else {
       return 'Unexpected Error\nRedirecting to login...';
@@ -113,20 +112,41 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Logo
-            Icon(
-              _hasError ? Icons.error_outline : Icons.account_balance_wallet,
-              size: 80,
-              color: _hasError ? colorScheme.error : colorScheme.primary,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'WealthScope',
-              style: theme.textTheme.headlineMedium?.copyWith(
-                color: colorScheme.primary,
-                fontWeight: FontWeight.bold,
+            if (_hasError)
+              Icon(
+                Icons.error_outline,
+                size: 100,
+                color: colorScheme.error,
+              )
+            else
+              Container(
+                width: 308,
+                height: 308,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(50),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colorScheme.primary.withOpacity(0.3),
+                      blurRadius: 60,
+                      spreadRadius: 12,
+                    ),
+                  ],
+                ),
+                child: Image.asset(
+                  'assets/images/WealthScope.png',
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(
+                      Icons.account_balance_wallet,
+                      size: 224,
+                      color: colorScheme.primary,
+                    );
+                  },
+                ),
               ),
-            ),
-            const SizedBox(height: 48),
+            const SizedBox(height: 60),
             // Loading indicator or error message
             if (_hasError)
               Padding(

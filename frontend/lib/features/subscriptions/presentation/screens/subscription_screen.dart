@@ -114,7 +114,14 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
     return offeringsAsync.when(
       data: (offerings) {
         if (offerings == null || offerings.current == null) {
-          return _buildNoOfferingsView();
+          return CustomScrollView(
+            slivers: [
+              _buildAppBar(isPremium: false),
+              SliverFillRemaining(
+                child: _buildNoOfferingsView(),
+              ),
+            ],
+          );
         }
 
         final packages = offerings.current!.availablePackages;
@@ -216,16 +223,26 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
           ],
         );
       },
-      loading: () => const SliverFillRemaining(
-        child: Center(child: CircularProgressIndicator()),
-      ),
-      error: (error, _) => SliverFillRemaining(
-        child: Center(
-          child: Text(
-            'Error al cargar planes: $error',
-            style: const TextStyle(color: Colors.red),
+      loading: () => CustomScrollView(
+        slivers: [
+          _buildAppBar(isPremium: false),
+          const SliverFillRemaining(
+            child: Center(child: CircularProgressIndicator()),
           ),
-        ),
+        ],
+      ),
+      error: (error, _) => CustomScrollView(
+        slivers: [
+          _buildAppBar(isPremium: false),
+          SliverFillRemaining(
+            child: Center(
+              child: Text(
+                'Error al cargar planes: $error',
+                style: const TextStyle(color: Colors.red),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

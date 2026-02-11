@@ -6,24 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="1149f820-81cc-4014-8cb1-e3a88cebafdf" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/analysis_options.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/analysis_options.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/lib/core/network/auth_interceptor.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/core/network/auth_interceptor.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/lib/features/ai/data/datasources/ai_remote_data_source.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/features/ai/data/datasources/ai_remote_data_source.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/lib/features/assets/presentation/screens/add_asset_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/features/assets/presentation/screens/add_asset_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/lib/features/assets/presentation/screens/assets_list_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/features/assets/presentation/screens/assets_list_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/lib/features/assets/presentation/widgets/asset_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/features/assets/presentation/widgets/asset_card.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/lib/features/auth/presentation/providers/logout_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/features/auth/presentation/providers/logout_provider.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/lib/features/auth/presentation/screens/login_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/features/auth/presentation/screens/login_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/lib/features/auth/presentation/widgets/logout_button.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/features/auth/presentation/widgets/logout_button.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/lib/features/dashboard/presentation/screens/dashboard_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/features/dashboard/presentation/screens/dashboard_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/lib/features/dashboard/presentation/widgets/ai_trigger_button.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/features/dashboard/presentation/widgets/ai_trigger_button.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/lib/features/dashboard/presentation/widgets/dashboard_skeleton.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/features/dashboard/presentation/widgets/dashboard_skeleton.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/lib/features/profile/presentation/screens/profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/features/profile/presentation/screens/profile_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/lib/features/scenarios/data/datasources/scenarios_remote_datasource.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/features/scenarios/data/datasources/scenarios_remote_datasource.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/lib/features/scenarios/presentation/providers/scenarios_providers.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/features/scenarios/presentation/providers/scenarios_providers.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/lib/shared/widgets/custom_bottom_nav_bar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/shared/widgets/custom_bottom_nav_bar.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/lib/shared/widgets/main_shell.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/shared/widgets/main_shell.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/lib/shared/widgets/speed_dial_fab.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/lib/shared/widgets/speed_dial_fab.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,7 +43,7 @@
     "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "develop",
+    "git-widget-placeholder": "revenua",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "last_opened_file_path": "C:/Users/JULHE/Documents/WealthScope/backend",
