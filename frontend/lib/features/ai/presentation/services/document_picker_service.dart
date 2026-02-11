@@ -96,6 +96,41 @@ class DocumentPickerService {
     return File(path);
   }
 
+  /// Pick multiple images from gallery (Sentinel bulk import)
+  Future<List<File>> pickMultipleFromGallery(BuildContext context) async {
+    if (!kIsWeb) {
+      final status = await Permission.photos.request();
+      if (status.isDenied) {
+        if (context.mounted) {
+          _showPermissionDeniedDialog(context, 'Photos');
+        }
+        return [];
+      }
+    }
+
+    final images = await _imagePicker.pickMultiImage(
+      maxWidth: 2000,
+      maxHeight: 2000,
+      imageQuality: 85,
+      limit: 10,
+    );
+
+    if (kIsWeb) return [];
+    return images.map((x) => File(x.path)).toList();
+  }
+
+  /// Pick multiple PDF files (Sentinel bulk import)
+  Future<List<File>> pickMultiplePDFs() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+      allowMultiple: true,
+    );
+
+    if (result == null) return [];
+    return result.paths.whereType<String>().map((p) => File(p)).toList();
+  }
+
   /// Validate file size
   bool isFileSizeValid(File file, {int maxSizeMB = 10}) {
     final sizeInBytes = file.lengthSync();
