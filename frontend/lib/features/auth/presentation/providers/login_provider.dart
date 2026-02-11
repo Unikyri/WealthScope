@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wealthscope_app/features/auth/data/providers/auth_service_provider.dart';
 import 'package:wealthscope_app/features/auth/data/providers/user_sync_service_provider.dart';
+import 'package:wealthscope_app/features/subscriptions/data/services/revenuecat_service.dart';
 
 part 'login_provider.g.dart';
 
@@ -93,11 +94,22 @@ class LoginNotifier extends _$LoginNotifier {
         try {
           final syncService = ref.read(userSyncServiceProvider);
           await syncService.syncUserWithBackend();
-          debugPrint('✅ User synced with backend after login');
+          debugPrint('Login: user synced with backend');
         } catch (syncError) {
           // Log sync error but don't fail login
-          // User can still use the app, sync can be retried later
-          debugPrint('⚠️ Backend sync failed: $syncError');
+          debugPrint('Login: backend sync failed: $syncError');
+        }
+        
+        // Sync RevenueCat identity with Supabase user ID
+        try {
+          final rcService = ref.read(revenueCatServiceProvider);
+          final userId = result.user?.id;
+          if (userId != null) {
+            await rcService.login(userId);
+            debugPrint('Login: RevenueCat identity synced');
+          }
+        } catch (rcError) {
+          debugPrint('Login: RevenueCat sync failed: $rcError');
         }
         
         // Check if provider is still mounted after async gap

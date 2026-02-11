@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:wealthscope_app/core/constants/app_config.dart';
 import 'package:wealthscope_app/shared/widgets/constellation_background.dart';
 
 import 'package:wealthscope_app/shared/widgets/custom_bottom_nav_bar.dart';
@@ -31,7 +32,27 @@ class MainShell extends StatelessWidget {
           backgroundColor:
               Colors.transparent, // Allow background to show through
           extendBody: true, // Body extends behind nav so FAB overlaps naturally
-          body: child,
+          body: Column(
+            children: [
+              // Trial mode banner – visible only in debug builds as a safety net
+              if (AppConfig.isTrialMode && AppConfig.isDebug)
+                Container(
+                  width: double.infinity,
+                  color: Colors.orange.withValues(alpha: 0.9),
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Text(
+                    'TRIAL MODE \u2013 Sentinel Access',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              Expanded(child: child),
+            ],
+          ),
           floatingActionButton: const SpeedDialFab(),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerDocked,
