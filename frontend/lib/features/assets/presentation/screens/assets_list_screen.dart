@@ -75,7 +75,7 @@ class AssetsListScreen extends ConsumerWidget {
                             allAssets.whenOrNull(
                                   data: (assets) {
                                     final isPremium =
-                                        isPremiumAsync.valueOrNull ?? false;
+                                        isPremiumAsync.value ?? false;
                                     final countText = isPremium
                                         ? '${assets.length} ${assets.length == 1 ? 'asset' : 'assets'} in portfolio'
                                         : '${assets.length}/${PlanLimits.scoutMaxAssets} assets';

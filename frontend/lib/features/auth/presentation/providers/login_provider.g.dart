@@ -44,7 +44,7 @@ final class LoginNotifierProvider
   }
 }
 
-String _$loginNotifierHash() => r'cc49040c6867ffd98d3c94e15eb1c2457fa15547';
+String _$loginNotifierHash() => r'fa2e679e3e9daf2d7feb40829e3719878db6fc8d';
 
 /// Provider for login form logic
 

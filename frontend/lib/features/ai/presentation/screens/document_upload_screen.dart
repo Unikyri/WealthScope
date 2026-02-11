@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wealthscope_app/core/theme/app_theme.dart';
-import 'package:wealthscope_app/features/ai/domain/entities/ocr_result.dart';
 import 'package:wealthscope_app/features/ai/presentation/providers/ocr_provider.dart';
 import 'package:wealthscope_app/features/ai/presentation/screens/extracted_assets_screen.dart';
 import 'package:wealthscope_app/features/ai/presentation/services/document_picker_service.dart';
@@ -294,10 +293,10 @@ class _OcrScanLimitBanner extends ConsumerWidget {
     final isPremiumAsync = ref.watch(isPremiumProvider);
     final usageAsync = ref.watch(usageTrackerProvider);
 
-    final isPremium = isPremiumAsync.valueOrNull ?? true;
+    final isPremium = isPremiumAsync.value ?? true;
     if (isPremium) return const SizedBox.shrink();
 
-    final used = usageAsync.valueOrNull?.ocrScansUsedThisMonth ?? 0;
+    final used = usageAsync.value?.ocrScansUsedThisMonth ?? 0;
     final max = PlanLimits.scoutMaxOcrScansPerMonth;
     final remaining = (max - used).clamp(0, max);
     final isAtLimit = remaining <= 0;

@@ -394,10 +394,10 @@ class _AiQueryLimitBanner extends ConsumerWidget {
     final isPremiumAsync = ref.watch(isPremiumProvider);
     final usageAsync = ref.watch(usageTrackerProvider);
 
-    final isPremium = isPremiumAsync.valueOrNull ?? true;
+    final isPremium = isPremiumAsync.value ?? true;
     if (isPremium) return const SizedBox.shrink();
 
-    final used = usageAsync.valueOrNull?.aiQueriesUsedToday ?? 0;
+    final used = usageAsync.value?.aiQueriesUsedToday ?? 0;
     final max = PlanLimits.scoutMaxAiQueriesPerDay;
     final remaining = (max - used).clamp(0, max);
     final isAtLimit = remaining <= 0;

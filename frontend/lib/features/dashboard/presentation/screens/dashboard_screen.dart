@@ -388,7 +388,7 @@ class _PriceFreshnessChip extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isPremiumAsync = ref.watch(isPremiumProvider);
-    final isPremium = isPremiumAsync.valueOrNull ?? false;
+    final isPremium = isPremiumAsync.value ?? false;
 
     final color = isPremium ? AppTheme.emeraldAccent : Colors.amber;
 
