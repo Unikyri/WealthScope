@@ -15,6 +15,12 @@ class UsageState {
     required this.ocrScansUsedThisMonth,
   });
 
+  /// Default empty state with zero usage.
+  static const UsageState empty = UsageState(
+    aiQueriesUsedToday: 0,
+    ocrScansUsedThisMonth: 0,
+  );
+
   UsageState copyWith({
     int? aiQueriesUsedToday,
     int? ocrScansUsedThisMonth,

@@ -4,7 +4,9 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wealthscope_app/core/constants/app_config.dart';
+import 'package:wealthscope_app/features/subscriptions/data/services/usage_tracker.dart';
 import 'package:wealthscope_app/features/subscriptions/domain/models/user_plan.dart';
+import 'package:wealthscope_app/features/subscriptions/domain/services/feature_gate_service.dart';
 
 /// RevenueCat Service - Handles all subscription logic for WealthScope.
 ///
@@ -249,4 +251,16 @@ final userPlanProvider = FutureProvider<UserPlan>((ref) async {
 
   final isPremium = await ref.watch(isPremiumProvider.future);
   return isPremium ? UserPlan.sentinel : UserPlan.scout;
+});
+
+/// Centralised feature gate service.
+///
+/// This is a **synchronous** [Provider] that watches the async premium &
+/// usage providers and exposes a ready-to-use [FeatureGateService].
+/// Screens can call `ref.watch(featureGateProvider).canSendAiQuery()` etc.
+/// without any `await`.
+final featureGateProvider = Provider<FeatureGateService>((ref) {
+  final isPremium = ref.watch(isPremiumProvider).value ?? false;
+  final usage = ref.watch(usageTrackerProvider).value ?? UsageState.empty;
+  return FeatureGateService(isPremium: isPremium, usage: usage);
 });
