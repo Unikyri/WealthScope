@@ -69,6 +69,9 @@ class FeatureGateService {
     );
   }
 
+  /// Maximum assets for the user's plan (-1 = unlimited).
+  int get maxAssets => PlanLimits.maxAssets(isPremium);
+
   // ---- AI Chat -------------------------------------------------------------
 
   /// Whether the user can send another AI query today.
