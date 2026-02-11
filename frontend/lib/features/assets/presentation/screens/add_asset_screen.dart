@@ -4,15 +4,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/core/utils/asset_validators.dart';
 import 'package:wealthscope_app/core/utils/snackbar_utils.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/currency.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/stock_form_provider.dart';
+import 'package:wealthscope_app/features/assets/presentation/widgets/symbol_search_field.dart';
+import 'package:wealthscope_app/features/assets/presentation/widgets/asset_type_card.dart';
 
 /// Generic Asset Form Screen
-/// Provides a form for adding assets (Real Estate, Gold, Bond, Crypto, Cash, Other)
+/// Step 2 of the Add Asset flow.
+/// Shows only the fields relevant for the selected asset type.
 class AddAssetScreen extends ConsumerStatefulWidget {
   final AssetType? assetType;
 
@@ -31,7 +35,6 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
   final _symbolController = TextEditingController();
   final _quantityController = TextEditingController();
   final _priceController = TextEditingController();
-  final _currentPriceController = TextEditingController();
   final _notesController = TextEditingController();
 
   DateTime? _selectedDate;
@@ -49,9 +52,52 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
     _symbolController.dispose();
     _quantityController.dispose();
     _priceController.dispose();
-    _currentPriceController.dispose();
     _notesController.dispose();
     super.dispose();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Visibility rules per asset type
+  // ---------------------------------------------------------------------------
+  bool get _showSymbol =>
+      _selectedType == AssetType.crypto ||
+      _selectedType == AssetType.bond ||
+      _selectedType == AssetType.other;
+
+  bool get _showQuantity => _selectedType != AssetType.realEstate;
+
+  bool get _showPrice => _selectedType != AssetType.cash;
+
+  bool get _showDate =>
+      _selectedType != AssetType.cash;
+
+  bool get _useSymbolSearch => _selectedType == AssetType.crypto;
+
+  // ---------------------------------------------------------------------------
+  // Dynamic labels
+  // ---------------------------------------------------------------------------
+  String get _quantityLabel {
+    switch (_selectedType) {
+      case AssetType.cash:
+        return 'Amount';
+      case AssetType.gold:
+        return 'Weight (oz)';
+      case AssetType.other:
+        return 'Units';
+      default:
+        return 'Quantity';
+    }
+  }
+
+  String get _priceLabel {
+    switch (_selectedType) {
+      case AssetType.realEstate:
+        return 'Estimated Value';
+      case AssetType.gold:
+        return 'Price per Ounce';
+      default:
+        return 'Purchase Price';
+    }
   }
 
   String get _title {
@@ -73,10 +119,11 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Submit
+  // ---------------------------------------------------------------------------
   Future<void> _handleSubmit() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
     final userId = Supabase.instance.client.auth.currentUser?.id;
     if (userId == null) {
@@ -88,16 +135,23 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
 
     final currency = ref.read(selectedCurrencyProvider);
 
+    // For types without quantity (realEstate) use 1 as default
+    final quantity = _showQuantity && _quantityController.text.isNotEmpty
+        ? double.parse(_quantityController.text)
+        : 1.0;
+
+    // For cash, price = quantity (amount), and purchase price = 1
+    final purchasePrice = _showPrice && _priceController.text.isNotEmpty
+        ? double.parse(_priceController.text)
+        : 1.0;
+
     final asset = StockAsset(
       userId: userId,
       type: _selectedType,
       name: _nameController.text.trim(),
       symbol: _symbolController.text.trim(),
-      quantity: double.parse(_quantityController.text),
-      purchasePrice: double.parse(_priceController.text),
-      currentPrice: _currentPriceController.text.isNotEmpty
-          ? double.parse(_currentPriceController.text)
-          : null,
+      quantity: quantity,
+      purchasePrice: purchasePrice,
       purchaseDate: _selectedDate,
       currency: currency,
       notes: _notesController.text.trim().isEmpty
@@ -128,172 +182,198 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
       initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.dark().copyWith(
+            colorScheme: const ColorScheme.dark(
+              primary: AppTheme.electricBlue,
+              surface: AppTheme.cardGrey,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (picked != null) {
-      setState(() {
-        _selectedDate = picked;
-      });
+      setState(() => _selectedDate = picked);
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Build
+  // ---------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final formState = ref.watch(stockFormProvider);
     final selectedCurrency = ref.watch(selectedCurrencyProvider);
+    final typeColor = AssetTypeSelectorCard.getTypeColor(_selectedType);
 
     return Scaffold(
+      backgroundColor: AppTheme.midnightBlue,
       appBar: AppBar(
-        title: Text(_title),
+        backgroundColor: AppTheme.midnightBlue,
+        elevation: 0,
+        title: Text(
+          _title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+            fontSize: 20,
+          ),
+        ),
         centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Form(
         key: _formKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           children: [
-            // Asset Type Badge
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    _getAssetIcon(_selectedType),
-                    size: 20,
-                    color: theme.colorScheme.onPrimaryContainer,
+            // Step indicator + type badge row
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.electricBlue.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    _selectedType.label,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.colorScheme.onPrimaryContainer,
-                      fontWeight: FontWeight.bold,
+                  child: const Text(
+                    'Step 2 of 2',
+                    style: TextStyle(
+                      color: AppTheme.electricBlue,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: typeColor.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        AssetTypeSelectorCard.getTypeIcon(_selectedType),
+                        color: typeColor,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        _selectedType.label,
+                        style: TextStyle(
+                          color: typeColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
-            // Name Field
-            TextFormField(
+            // ----- Name Field (always visible) -----
+            _buildFormField(
               controller: _nameController,
-              decoration: InputDecoration(
-                labelText: _getNameLabel(_selectedType),
-                hintText: _getNameHint(_selectedType),
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.label),
-              ),
+              label: _getNameLabel(_selectedType),
+              hint: _getNameHint(_selectedType),
+              icon: Icons.label_outline,
               textCapitalization: TextCapitalization.words,
               validator: AssetValidators.validateName,
             ),
-            const SizedBox(height: 16),
 
-            // Symbol Field (optional for most types)
-            if (_selectedType != AssetType.realEstate &&
-                _selectedType != AssetType.cash)
-              TextFormField(
+            // ----- Symbol Field (type-dependent) -----
+            if (_showSymbol && _useSymbolSearch) ...[
+              const SizedBox(height: 16),
+              SymbolSearchField(
+                assetType: _selectedType,
                 controller: _symbolController,
-                decoration: InputDecoration(
-                  labelText: 'Symbol (Optional)',
-                  hintText: _getSymbolHint(_selectedType),
-                  border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.tag),
-                ),
+                label: 'Symbol',
+                onSymbolSelected: (symbol) {
+                  _symbolController.text = symbol.symbol;
+                  if (_nameController.text.isEmpty) {
+                    _nameController.text = symbol.name;
+                  }
+                },
+              ),
+            ] else if (_showSymbol) ...[
+              const SizedBox(height: 16),
+              _buildFormField(
+                controller: _symbolController,
+                label: 'Symbol (Optional)',
+                hint: _getSymbolHint(_selectedType),
+                icon: Icons.tag,
                 textCapitalization: TextCapitalization.characters,
               ),
-            if (_selectedType != AssetType.realEstate &&
-                _selectedType != AssetType.cash)
+            ],
+
+            // ----- Quantity Field (type-dependent) -----
+            if (_showQuantity) ...[
               const SizedBox(height: 16),
-
-            // Quantity Field
-            TextFormField(
-              controller: _quantityController,
-              decoration: InputDecoration(
-                labelText: _getQuantityLabel(_selectedType),
-                hintText: 'Enter quantity',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.numbers),
+              _buildFormField(
+                controller: _quantityController,
+                label: _quantityLabel,
+                hint: 'Enter $_quantityLabel'.toLowerCase(),
+                icon: Icons.numbers,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,4}')),
+                ],
+                validator: AssetValidators.validateQuantity,
               ),
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,4}')),
-              ],
-              validator: AssetValidators.validateQuantity,
-            ),
-            const SizedBox(height: 16),
+            ],
 
-            // Purchase Price Field
-            TextFormField(
-              controller: _priceController,
-              decoration: InputDecoration(
-                labelText: _getPriceLabel(_selectedType),
-                hintText: 'Enter purchase price',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.attach_money),
+            // ----- Purchase Price / Estimated Value (type-dependent) -----
+            if (_showPrice) ...[
+              const SizedBox(height: 16),
+              _buildFormField(
+                controller: _priceController,
+                label: _priceLabel,
+                hint: 'Enter ${_priceLabel.toLowerCase()}',
+                icon: Icons.attach_money,
                 suffixText: selectedCurrency.code,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                ],
+                validator: AssetValidators.validatePrice,
               ),
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-              ],
-              validator: AssetValidators.validatePrice,
-            ),
-            const SizedBox(height: 16),
+            ],
 
-            // Current Price Field (optional)
-            TextFormField(
-              controller: _currentPriceController,
-              decoration: InputDecoration(
-                labelText: 'Current Price (Optional)',
-                hintText: 'Enter current market price',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.trending_up),
-                suffixText: selectedCurrency.code,
-              ),
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-              ],
-            ),
+            // ----- Currency Selector (always visible) -----
             const SizedBox(height: 16),
-
-            // Purchase Date Field
-            InkWell(
-              onTap: _selectDate,
-              child: InputDecorator(
-                decoration: const InputDecoration(
-                  labelText: 'Purchase Date (Optional)',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.calendar_today),
-                ),
-                child: Text(
-                  _selectedDate != null
-                      ? DateFormat('MMM dd, yyyy').format(_selectedDate!)
-                      : 'Select date',
-                  style: theme.textTheme.bodyLarge,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Currency Selector
             DropdownButtonFormField<Currency>(
-              value: selectedCurrency,
-              decoration: const InputDecoration(
+              initialValue: selectedCurrency,
+              dropdownColor: AppTheme.cardGrey,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
                 labelText: 'Currency',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.money),
+                labelStyle: TextStyle(color: AppTheme.textGrey),
+                filled: true,
+                fillColor: AppTheme.cardGrey,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppTheme.electricBlue),
+                ),
+                prefixIcon: Icon(Icons.money, color: AppTheme.textGrey),
               ),
               items: Currency.values.map((currency) {
                 return DropdownMenuItem(
@@ -302,78 +382,178 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
                     children: [
                       Text(
                         currency.symbol,
-                        style: const TextStyle(fontSize: 18),
+                        style: const TextStyle(fontSize: 18, color: Colors.white),
                       ),
                       const SizedBox(width: 8),
-                      Text('${currency.code} - ${currency.name}'),
+                      Text(
+                        '${currency.code} - ${currency.name}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
                     ],
                   ),
                 );
               }).toList(),
               onChanged: (currency) {
                 if (currency != null) {
-                  ref.read(selectedCurrencyProvider.notifier).state = currency;
+                  ref.read(selectedCurrencyProvider.notifier).setCurrency(currency);
                 }
               },
             ),
-            const SizedBox(height: 16),
 
-            // Notes Field
-            TextFormField(
-              controller: _notesController,
-              decoration: const InputDecoration(
-                labelText: 'Notes (Optional)',
-                hintText: 'Add any additional notes',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.note),
+            // ----- Purchase Date (type-dependent) -----
+            if (_showDate) ...[
+              const SizedBox(height: 16),
+              InkWell(
+                onTap: _selectDate,
+                borderRadius: BorderRadius.circular(12),
+                child: InputDecorator(
+                  decoration: InputDecoration(
+                    labelText: 'Purchase Date (Optional)',
+                    labelStyle: TextStyle(color: AppTheme.textGrey),
+                    filled: true,
+                    fillColor: AppTheme.cardGrey,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.1)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.1)),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.calendar_today,
+                      color: AppTheme.textGrey,
+                    ),
+                    suffixIcon: _selectedDate != null
+                        ? IconButton(
+                            icon: Icon(Icons.clear, color: AppTheme.textGrey),
+                            onPressed: () =>
+                                setState(() => _selectedDate = null),
+                          )
+                        : null,
+                  ),
+                  child: Text(
+                    _selectedDate != null
+                        ? DateFormat('MMM dd, yyyy').format(_selectedDate!)
+                        : 'Select date',
+                    style: TextStyle(
+                      color: _selectedDate != null
+                          ? Colors.white
+                          : AppTheme.textGrey,
+                    ),
+                  ),
+                ),
               ),
+            ],
+
+            // ----- Notes (always visible) -----
+            const SizedBox(height: 16),
+            _buildFormField(
+              controller: _notesController,
+              label: 'Notes (Optional)',
+              hint: 'Add any additional notes',
+              icon: Icons.note_outlined,
               maxLines: 3,
               textCapitalization: TextCapitalization.sentences,
             ),
             const SizedBox(height: 32),
 
             // Submit Button
-            FilledButton(
-              onPressed: formState.isLoading ? null : _handleSubmit,
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+            SizedBox(
+              height: 52,
+              child: ElevatedButton(
+                onPressed: formState.isLoading ? null : _handleSubmit,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.electricBlue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  elevation: 0,
+                ),
+                child: formState.isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        'Add ${_selectedType.label}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
               ),
-              child: formState.isLoading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(
-                      'Add ${_selectedType.label}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
             ),
+            const SizedBox(height: 24),
           ],
         ),
       ),
     );
   }
 
-  IconData _getAssetIcon(AssetType type) {
-    switch (type) {
-      case AssetType.realEstate:
-        return Icons.home;
-      case AssetType.gold:
-        return Icons.diamond;
-      case AssetType.bond:
-        return Icons.account_balance;
-      case AssetType.crypto:
-        return Icons.currency_bitcoin;
-      case AssetType.cash:
-        return Icons.account_balance_wallet;
-      case AssetType.other:
-        return Icons.category;
-      default:
-        return Icons.attach_money;
-    }
+  // ---------------------------------------------------------------------------
+  // Reusable dark-themed text form field
+  // ---------------------------------------------------------------------------
+  Widget _buildFormField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    TextCapitalization textCapitalization = TextCapitalization.none,
+    TextInputType? keyboardType,
+    List<TextInputFormatter>? inputFormatters,
+    String? Function(String?)? validator,
+    String? suffixText,
+    int maxLines = 1,
+  }) {
+    return TextFormField(
+      controller: controller,
+      style: const TextStyle(color: Colors.white),
+      textCapitalization: textCapitalization,
+      keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
+      validator: validator,
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        labelStyle: TextStyle(color: AppTheme.textGrey),
+        hintStyle: TextStyle(color: AppTheme.textGrey.withValues(alpha: 0.5)),
+        prefixIcon: Icon(icon, color: AppTheme.textGrey, size: 20),
+        suffixText: suffixText,
+        suffixStyle: TextStyle(color: AppTheme.textGrey),
+        filled: true,
+        fillColor: AppTheme.cardGrey,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppTheme.electricBlue),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppTheme.errorRed),
+        ),
+      ),
+    );
   }
 
+  // ---------------------------------------------------------------------------
+  // Label helpers
+  // ---------------------------------------------------------------------------
   String _getNameLabel(AssetType type) {
     switch (type) {
       case AssetType.realEstate:
@@ -414,40 +594,12 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
 
   String _getSymbolHint(AssetType type) {
     switch (type) {
-      case AssetType.crypto:
-        return 'e.g., BTC';
       case AssetType.bond:
         return 'e.g., ISIN code';
       case AssetType.gold:
         return 'e.g., XAU';
       default:
         return 'Enter symbol';
-    }
-  }
-
-  String _getQuantityLabel(AssetType type) {
-    switch (type) {
-      case AssetType.realEstate:
-        return 'Property Units';
-      case AssetType.gold:
-        return 'Weight (oz)';
-      case AssetType.cash:
-        return 'Amount';
-      default:
-        return 'Quantity';
-    }
-  }
-
-  String _getPriceLabel(AssetType type) {
-    switch (type) {
-      case AssetType.realEstate:
-        return 'Purchase Price per Unit';
-      case AssetType.gold:
-        return 'Price per Ounce';
-      case AssetType.cash:
-        return 'Initial Amount (use 1 for quantity)';
-      default:
-        return 'Purchase Price';
     }
   }
 }
