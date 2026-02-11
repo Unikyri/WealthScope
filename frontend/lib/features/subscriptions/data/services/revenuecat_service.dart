@@ -2,169 +2,216 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// RevenueCat Service - Handles all subscription logic
+/// RevenueCat Service - Handles all subscription logic for WealthScope.
+///
+/// Uses the modern PurchasesConfiguration API and PurchaseParams.
+/// Provides native Paywall and Customer Center via purchases_ui_flutter.
 class RevenueCatService {
-  static const String _testStoreApiKey = 'YOUR_TEST_STORE_API_KEY';
-  static const String _appleApiKey = 'YOUR_APPLE_API_KEY';
-  static const String _googleApiKey = 'YOUR_GOOGLE_API_KEY';
-  
-  static const String premiumEntitlementId = 'premium';
+  // ---------------------------------------------------------------------------
+  // Configuration
+  // ---------------------------------------------------------------------------
 
-  /// Initialize RevenueCat SDK
+  /// RevenueCat API key (test mode for Daikyri's Company)
+  static const String _apiKey = 'test_cvHzhXqGThHnlDkpmKyEhQXbrrj';
+
+  /// Entitlement ID configured in RevenueCat dashboard
+  static const String entitlementId = "Daikyri's Company Pro";
+
+  // ---------------------------------------------------------------------------
+  // Initialization
+  // ---------------------------------------------------------------------------
+
+  /// Initialize RevenueCat SDK with modern PurchasesConfiguration.
+  ///
+  /// - Sets debug logging in non-production builds.
+  /// - Configures automatic in-app message display.
+  /// - Optionally logs in the user if [userId] is provided.
   Future<void> initialize({String? userId}) async {
-    // RevenueCat doesn't fully support web, skip initialization on web
+    // RevenueCat does not support web
     if (kIsWeb) {
-      print('⚠️ RevenueCat not supported on web platform');
+      debugPrint('RevenueCat: web platform not supported, skipping init');
       return;
     }
-    
-    await Purchases.setDebugLogsEnabled(true);
-    
-    PurchasesConfiguration configuration;
-    
-    if (Platform.isIOS) {
-      // iOS configuration
-      configuration = PurchasesConfiguration(_appleApiKey);
-    } else if (Platform.isAndroid) {
-      // Android configuration
-      configuration = PurchasesConfiguration(_googleApiKey);
-    } else {
-      throw UnsupportedError('Platform not supported');
-    }
 
-    // Set user ID if provided (for PurchasesConfiguration)
-    // Note: appUserID should be set directly in PurchasesConfiguration constructor
-    await Purchases.configure(configuration);
-    
-    // If userId is provided, log in after configuration
-    if (userId != null) {
-      try {
-        await Purchases.logIn(userId);
-      } catch (e) {
-        print('⚠️ Could not log in user: $e');
-      }
-    }
-    
-    print('✅ RevenueCat initialized successfully');
+    // Enable debug logging for development
+    await Purchases.setLogLevel(LogLevel.debug);
+
+    final config = PurchasesConfiguration(_apiKey)
+      ..appUserID = userId
+      ..purchasesAreCompletedBy = const PurchasesAreCompletedByRevenueCat()
+      ..shouldShowInAppMessagesAutomatically = true;
+
+    await Purchases.configure(config);
+
+    debugPrint('RevenueCat: initialized successfully');
   }
 
-  /// Get current customer info
+  // ---------------------------------------------------------------------------
+  // Customer Info & Entitlement Checks
+  // ---------------------------------------------------------------------------
+
+  /// Get current customer info from RevenueCat (cached by default).
   Future<CustomerInfo> getCustomerInfo() async {
     if (kIsWeb) {
       throw UnsupportedError('RevenueCat not supported on web');
     }
-    try {
-      return await Purchases.getCustomerInfo();
-    } catch (e) {
-      print('❌ Error getting customer info: $e');
-      rethrow;
-    }
+    return await Purchases.getCustomerInfo();
   }
 
-  /// Check if user has premium subscription
+  /// Check if the user has the premium entitlement active.
   Future<bool> isPremium() async {
     try {
-      final customerInfo = await getCustomerInfo();
-      final entitlement = customerInfo.entitlements.all[premiumEntitlementId];
-      return entitlement?.isActive ?? false;
+      final info = await getCustomerInfo();
+      return info.entitlements.active.containsKey(entitlementId);
     } catch (e) {
-      print('❌ Error checking premium status: $e');
+      debugPrint('RevenueCat: error checking premium status: $e');
       return false;
     }
   }
 
-  /// Get available offerings
+  // ---------------------------------------------------------------------------
+  // Offerings & Purchases
+  // ---------------------------------------------------------------------------
+
+  /// Get available offerings from RevenueCat.
   Future<Offerings?> getOfferings() async {
-    if (kIsWeb) {
-      return null;
-    }
+    if (kIsWeb) return null;
     try {
       return await Purchases.getOfferings();
     } catch (e) {
-      print('❌ Error getting offerings: $e');
+      debugPrint('RevenueCat: error getting offerings: $e');
       return null;
     }
   }
 
-  /// Purchase a package
+  /// Purchase a package using the modern PurchaseParams API.
+  ///
+  /// Returns [CustomerInfo] on success, `null` on cancellation.
+  /// Throws on unexpected errors.
   Future<CustomerInfo?> purchasePackage(Package package) async {
     try {
-      final purchaseResult = await Purchases.purchasePackage(package);
-      print('✅ Purchase successful');
-      return purchaseResult.customerInfo;
+      final params = PurchaseParams.package(package);
+      final result = await Purchases.purchase(params);
+      debugPrint('RevenueCat: purchase successful');
+      return result.customerInfo;
     } on PlatformException catch (e) {
       final errorCode = PurchasesErrorHelper.getErrorCode(e);
-      
+
       if (errorCode == PurchasesErrorCode.purchaseCancelledError) {
-        print('ℹ️ User cancelled the purchase');
+        debugPrint('RevenueCat: user cancelled purchase');
+        return null;
       } else if (errorCode == PurchasesErrorCode.purchaseNotAllowedError) {
-        print('❌ User not allowed to purchase');
-      } else {
-        print('❌ Purchase error: $e');
+        debugPrint('RevenueCat: purchase not allowed');
+        return null;
       }
-      return null;
-    } catch (e) {
-      print('❌ Unexpected purchase error: $e');
-      return null;
+      debugPrint('RevenueCat: purchase error: $e');
+      rethrow;
     }
   }
 
-  /// Restore purchases
+  /// Restore previous purchases.
   Future<CustomerInfo?> restorePurchases() async {
     try {
-      final customerInfo = await Purchases.restorePurchases();
-      print('✅ Purchases restored');
-      return customerInfo;
+      final info = await Purchases.restorePurchases();
+      debugPrint('RevenueCat: purchases restored');
+      return info;
     } catch (e) {
-      print('❌ Error restoring purchases: $e');
+      debugPrint('RevenueCat: error restoring purchases: $e');
       return null;
     }
   }
 
-  /// Login with user ID
+  // ---------------------------------------------------------------------------
+  // User Identity
+  // ---------------------------------------------------------------------------
+
+  /// Log in a user with their Supabase user ID.
   Future<LogInResult?> login(String userId) async {
     try {
       final result = await Purchases.logIn(userId);
-      print('✅ User logged in: $userId');
+      debugPrint('RevenueCat: user logged in: $userId');
       return result;
     } catch (e) {
-      print('❌ Error logging in: $e');
+      debugPrint('RevenueCat: error logging in: $e');
       return null;
     }
   }
 
-  /// Logout
+  /// Log out the current user (reverts to anonymous).
   Future<CustomerInfo?> logout() async {
     try {
-      final customerInfo = await Purchases.logOut();
-      print('✅ User logged out');
-      return customerInfo;
+      final info = await Purchases.logOut();
+      debugPrint('RevenueCat: user logged out');
+      return info;
     } catch (e) {
-      print('❌ Error logging out: $e');
+      debugPrint('RevenueCat: error logging out: $e');
       return null;
     }
   }
 
-  /// Get management URL for subscriptions
+  // ---------------------------------------------------------------------------
+  // Native Paywall & Customer Center (purchases_ui_flutter)
+  // ---------------------------------------------------------------------------
+
+  /// Present the native RevenueCat Paywall.
+  Future<void> presentPaywall() async {
+    if (kIsWeb) return;
+    try {
+      await RevenueCatUI.presentPaywall();
+    } catch (e) {
+      debugPrint('RevenueCat: error presenting paywall: $e');
+    }
+  }
+
+  /// Present the native Paywall only if the user does NOT have the entitlement.
+  Future<void> presentPaywallIfNeeded() async {
+    if (kIsWeb) return;
+    try {
+      await RevenueCatUI.presentPaywallIfNeeded(entitlementId);
+    } catch (e) {
+      debugPrint('RevenueCat: error presenting paywall if needed: $e');
+    }
+  }
+
+  /// Present the RevenueCat Customer Center for subscription management.
+  Future<void> presentCustomerCenter() async {
+    if (kIsWeb) return;
+    try {
+      await RevenueCatUI.presentCustomerCenter();
+    } catch (e) {
+      debugPrint('RevenueCat: error presenting customer center: $e');
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Subscription Management URL
+  // ---------------------------------------------------------------------------
+
+  /// Get the store-specific management URL for the user's subscription.
   Future<String?> getManagementURL() async {
     try {
-      final customerInfo = await getCustomerInfo();
-      return customerInfo.managementURL;
+      final info = await getCustomerInfo();
+      return info.managementURL;
     } catch (e) {
-      print('❌ Error getting management URL: $e');
+      debugPrint('RevenueCat: error getting management URL: $e');
       return null;
     }
   }
 }
 
-/// Provider for RevenueCat service
+// =============================================================================
+// Riverpod Providers
+// =============================================================================
+
+/// Singleton service instance.
 final revenueCatServiceProvider = Provider<RevenueCatService>((ref) {
   return RevenueCatService();
 });
 
-/// Provider for customer info
+/// Current customer info (async, cached by RevenueCat SDK).
 final customerInfoProvider = FutureProvider<CustomerInfo?>((ref) async {
   final service = ref.watch(revenueCatServiceProvider);
   try {
@@ -174,13 +221,15 @@ final customerInfoProvider = FutureProvider<CustomerInfo?>((ref) async {
   }
 });
 
-/// Provider to check if user is premium
+/// Whether the current user has premium (Sentinel) access.
+///
+/// NOTE: This provider will be enhanced in T-16.3.2 to support trial mode.
 final isPremiumProvider = FutureProvider<bool>((ref) async {
   final service = ref.watch(revenueCatServiceProvider);
   return await service.isPremium();
 });
 
-/// Provider for available offerings
+/// Available offerings from RevenueCat.
 final offeringsProvider = FutureProvider<Offerings?>((ref) async {
   final service = ref.watch(revenueCatServiceProvider);
   return await service.getOfferings();
