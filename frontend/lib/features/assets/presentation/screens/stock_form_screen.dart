@@ -288,7 +288,7 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
 
             // Currency Dropdown
             DropdownButtonFormField<Currency>(
-              value: selectedCurrency,
+              initialValue: selectedCurrency,
               dropdownColor: AppTheme.cardGrey,
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
