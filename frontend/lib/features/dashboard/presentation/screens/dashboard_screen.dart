@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:wealthscope_app/core/theme/custom_icons.dart';
+import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/providers/dashboard_providers.dart';
+import 'package:wealthscope_app/shared/widgets/asset_icon_resolver.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/ai_risk_level_card.dart';
 import 'package:wealthscope_app/features/dashboard/presentation/widgets/ai_sentiment_card.dart';
 import 'package:wealthscope_app/features/dashboard/domain/prompt_generator.dart';
@@ -218,9 +219,8 @@ class DashboardScreen extends ConsumerWidget {
                         data: (assets) {
                           if (assets.isEmpty) return const SizedBox.shrink();
 
-                          // Convert to local model or generic mock for UI if needed
-                          // Sorting rationale: Show biggest holdings first as proxy for 'top movers' for now
-                          final sortedAssets = List<dynamic>.from(assets)
+                          // Show biggest holdings first as proxy for 'top movers'
+                          final sortedAssets = List<StockAsset>.from(assets)
                             ..sort((a, b) => (b.totalValue ?? 0)
                                 .compareTo(a.totalValue ?? 0));
                           final topAssets = sortedAssets.take(3).toList();
@@ -278,16 +278,17 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-class _TopMoverItem extends ConsumerWidget {
-  final dynamic asset;
+class _TopMoverItem extends StatelessWidget {
+  final StockAsset asset;
 
   const _TopMoverItem({required this.asset});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // Mock change percentage for demo as it might not be in asset model
-    final mockChange = 5.2;
+    final changePercent = asset.gainLossPercent ?? 0.0;
+    final isPositive = changePercent >= 0;
+    final changeColor = AppTheme.getChangeColor(changePercent);
 
     return GestureDetector(
       onTap: () {
@@ -301,23 +302,19 @@ class _TopMoverItem extends ConsumerWidget {
         decoration: BoxDecoration(
           color: AppTheme.cardGrey,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         ),
         child: Row(
           children: [
-            // Icon
-            Container(
-              width: 40,
-              height: 40,
-              decoration: const BoxDecoration(
-                color: AppTheme.deepBlue,
-                shape: BoxShape.circle,
-              ),
-              child:
-                  const Icon(CustomIcons.assets, color: Colors.white, size: 20),
+            // Asset Icon (resolved by type and symbol)
+            AssetIconResolver(
+              symbol: asset.symbol,
+              assetType: asset.type,
+              name: asset.name,
+              size: 40,
             ),
             const SizedBox(width: 12),
-            // Name
+            // Name & Symbol
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -328,9 +325,11 @@ class _TopMoverItem extends ConsumerWidget {
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    asset.symbol ?? 'ASSET',
+                    asset.symbol.isNotEmpty ? asset.symbol : 'ASSET',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: AppTheme.textGrey,
                     ),
@@ -338,7 +337,7 @@ class _TopMoverItem extends ConsumerWidget {
                 ],
               ),
             ),
-            // Value
+            // Value & Change
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -350,16 +349,20 @@ class _TopMoverItem extends ConsumerWidget {
                   ),
                 ),
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '+$mockChange%',
+                      '${isPositive ? "+" : ""}${changePercent.toStringAsFixed(2)}%',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: AppTheme.emeraldAccent,
+                        color: changeColor,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const Icon(Icons.arrow_upward,
-                        size: 12, color: AppTheme.emeraldAccent),
+                    Icon(
+                      isPositive ? Icons.arrow_upward : Icons.arrow_downward,
+                      size: 12,
+                      color: changeColor,
+                    ),
                   ],
                 ),
               ],
