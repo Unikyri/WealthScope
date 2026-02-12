@@ -112,6 +112,19 @@ class AssetCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      // Row 4: Current price per unit (when available)
+                      if (asset.currentPrice != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          'Now: ${asset.currency.symbol}${_formatCompact(asset.currentPrice!)}/unit',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: AppTheme.textGrey.withValues(alpha: 0.7),
+                            fontSize: 11,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ],
                   ),
                 ),

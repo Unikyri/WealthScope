@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:wealthscope_app/core/utils/asset_validators.dart';
+import 'package:wealthscope_app/features/assets/presentation/providers/asset_form_submission_provider.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/real_estate_form_provider.dart';
 
 /// Real Estate Form Screen
@@ -31,6 +32,14 @@ class _RealEstateFormScreenState extends ConsumerState<RealEstateFormScreen> {
     _addressController.dispose();
     _areaController.dispose();
     super.dispose();
+  }
+
+  void _clearForm() {
+    _nameController.clear();
+    _valueController.clear();
+    _addressController.clear();
+    _areaController.clear();
+    ref.read(realEstateFormProvider.notifier).reset();
   }
 
   Future<void> _selectDate() async {
@@ -62,6 +71,8 @@ class _RealEstateFormScreenState extends ConsumerState<RealEstateFormScreen> {
             backgroundColor: Colors.green,
           ),
         );
+        _clearForm();
+        ref.read(assetFormSubmissionProvider.notifier).reset();
         Navigator.of(context).pop();
       }
     }
