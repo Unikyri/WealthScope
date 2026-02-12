@@ -11,7 +11,7 @@ AssetDto _$AssetDtoFromJson(Map<String, dynamic> json) => AssetDto(
       userId: json['user_id'] as String?,
       type: json['type'] as String,
       name: json['name'] as String,
-      coreData: json['core_data'] as Map<String, dynamic>,
+      coreData: json['core_data'] as Map<String, dynamic>?,
       extendedData: json['extended_data'] as Map<String, dynamic>? ?? const {},
       totalCost: (json['total_cost'] as num?)?.toDouble(),
       totalValue: (json['total_value'] as num?)?.toDouble(),
