@@ -81,8 +81,8 @@ class CreateAssetRequest {
         if (purchaseDate != null) coreData['trade_date'] = purchaseDate;
         break;
       case AssetType.realEstate:
-        coreData['purchase_price'] = purchasePrice;
-        // Address etc come from metadata
+        coreData['quantity'] = 1.0;
+        if (purchasePrice != null) coreData['purchase_price'] = purchasePrice; // Address etc come from metadata
         break;
       case AssetType.cash:
         coreData['balance'] = quantity;

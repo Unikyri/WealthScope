@@ -33,10 +33,10 @@ class AssetDto {
   final String name;
 
   @JsonKey(name: 'core_data')
-  final Map<String, dynamic> coreData;
+  final Map<String, dynamic>? coreData;
 
   @JsonKey(name: 'extended_data')
-  final Map<String, dynamic> extendedData;
+  final Map<String, dynamic>? extendedData;
   
   @JsonKey(name: 'total_cost')
   final double? totalCost;
@@ -62,11 +62,12 @@ class AssetDto {
 
   /// Helper getter for symbol to support search filtering
   String? get symbol {
-    if (coreData.containsKey('ticker')) return coreData['ticker']?.toString();
-    if (coreData.containsKey('symbol')) return coreData['symbol']?.toString();
-    if (coreData.containsKey('cusip')) return coreData['cusip']?.toString();
-    if (coreData.containsKey('isin')) return coreData['isin']?.toString();
-    if (coreData.containsKey('currency')) return coreData['currency']?.toString();
+    final data = coreData ?? {};
+    if (data.containsKey('ticker')) return data['ticker']?.toString();
+    if (data.containsKey('symbol')) return data['symbol']?.toString();
+    if (data.containsKey('cusip')) return data['cusip']?.toString();
+    if (data.containsKey('isin')) return data['isin']?.toString();
+    if (data.containsKey('currency')) return data['currency']?.toString();
     return null;
   }
 
@@ -82,16 +83,20 @@ class AssetDto {
     String currencyCode = 'USD';
     String? notes;
     
+    // Safe access to coreData
+    final cData = coreData ?? {};
+    final eData = extendedData ?? {};
+
     // Helper to safely get double
     double getDouble(String key) {
-      final val = coreData[key];
+      final val = cData[key];
       if (val is num) return val.toDouble();
       if (val is String) return double.tryParse(val) ?? 0.0;
       return 0.0;
     }
 
     // Helper to safely get string
-    String getString(String key) => coreData[key]?.toString() ?? '';
+    String getString(String key) => cData[key]?.toString() ?? '';
 
     switch (assetType) {
       case AssetType.stock:
@@ -139,27 +144,27 @@ class AssetDto {
     }
 
     // Common optional fields in core_data
-    if (coreData.containsKey('currency')) {
+    if (cData.containsKey('currency')) {
       currencyCode = getString('currency');
     }
-    if (coreData.containsKey('notes')) {
+    if (cData.containsKey('notes')) {
       notes = getString('notes');
     }
-    if (coreData.containsKey('purchase_date') && purchaseDateStr == null) {
+    if (cData.containsKey('purchase_date') && purchaseDateStr == null) {
       purchaseDateStr = getString('purchase_date');
     }
 
     // Current price from extended_data
     double? currentPrice;
-    if (extendedData.containsKey('current_price')) {
-      final val = extendedData['current_price'];
+    if (eData.containsKey('current_price')) {
+      final val = eData['current_price'];
       if (val is num) currentPrice = val.toDouble();
     }
 
     // Merge core and extended data for metadata
     final metadata = <String, dynamic>{
-      ...coreData,
-      ...extendedData,
+      ...cData,
+      ...eData,
     };
 
     return StockAsset(
