@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:wealthscope_app/core/constants/app_config.dart';
 import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/subscriptions/data/services/revenuecat_service.dart';
 import 'package:wealthscope_app/features/subscriptions/presentation/widgets/subscription_skeleton.dart';
@@ -50,59 +51,64 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
         SliverPadding(
           padding: const EdgeInsets.all(24.0),
           sliver: SliverFillRemaining(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(32),
-                  decoration: BoxDecoration(
-                    color: AppTheme.electricBlue.withOpacity(0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    PhosphorIconsFill.crownSimple,
-                    size: 80,
-                    color: AppTheme.electricBlue,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                Text(
-                  '¡Eres Premium!',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Disfruta de todas las funciones premium de WealthScope',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    color: AppTheme.textGrey,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 48),
-                _buildPremiumFeaturesList(),
-                const SizedBox(height: 48),
-                ElevatedButton(
-                  onPressed: _manageSubscription,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.cardGrey,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 48,
-                      vertical: 16,
+            hasScrollBody: false,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(32),
+                    decoration: BoxDecoration(
+                      color: AppTheme.electricBlue.withOpacity(0.2),
+                      shape: BoxShape.circle,
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                    child: Icon(
+                      PhosphorIconsFill.crownSimple,
+                      size: 80,
+                      color: AppTheme.electricBlue,
                     ),
                   ),
-                  child: const Text('Administrar Suscripción'),
-                ),
-              ],
+                  const SizedBox(height: 32),
+                  Text(
+                    '¡Eres Premium!',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Disfruta de todas las funciones premium de WealthScope',
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      color: AppTheme.textGrey,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 48),
+                  _buildPremiumFeaturesList(),
+                  const SizedBox(height: 48),
+                  ElevatedButton(
+                    onPressed: _manageSubscription,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.cardGrey,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 48,
+                        vertical: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text('Administrar Suscripción'),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -198,9 +204,30 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                         ),
                       ),
                     ),
-                    
+                    if (AppConfig.isDebug) ...[
+                      const SizedBox(height: 8),
+                      TextButton.icon(
+                        onPressed: () {
+                          ref.read(debugTrialActiveProvider.notifier).state = true;
+                          ref.invalidate(isPremiumProvider);
+                          if (context.mounted) context.pop();
+                        },
+                        icon: Icon(
+                          PhosphorIconsFill.flask,
+                          size: 18,
+                          color: Colors.amber,
+                        ),
+                        label: Text(
+                          'Modo Trial (sin pagar)',
+                          style: TextStyle(
+                            color: Colors.amber,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 8),
-                    
                     // Terms
                     Text(
                       'Al suscribirte, aceptas nuestros Términos y Condiciones',
@@ -667,6 +694,32 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                 ),
               ),
             ),
+            if (AppConfig.isDebug) ...[
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                onPressed: () {
+                  ref.read(debugTrialActiveProvider.notifier).state = true;
+                  ref.invalidate(isPremiumProvider);
+                  if (context.mounted) context.pop();
+                },
+                icon: Icon(PhosphorIconsFill.flask, color: Colors.amber),
+                label: Text(
+                  'Modo Trial (sin pagar)',
+                  style: TextStyle(
+                    color: Colors.amber,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.amber.withOpacity(0.2),
+                  foregroundColor: Colors.amber,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 12),
             ElevatedButton.icon(
               onPressed: () => context.pop(),
