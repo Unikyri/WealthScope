@@ -28,12 +28,8 @@ class AssetTypeUtils {
         return Icons.currency_bitcoin;
       case AssetType.realEstate:
         return Icons.home;
-      case AssetType.gold:
-        return Icons.diamond;
       case AssetType.cash:
         return Icons.account_balance_wallet;
-      case AssetType.other:
-        return Icons.business;
       case AssetType.custom:
         return Icons.category;
       case AssetType.liability:
@@ -54,12 +50,8 @@ class AssetTypeUtils {
         return _bitcoinOrange;
       case AssetType.realEstate:
         return _realEstateGreen;
-      case AssetType.gold:
-        return _goldColor;
       case AssetType.cash:
         return _cashCyan;
-      case AssetType.other:
-        return AppTheme.textGrey;
       case AssetType.custom:
         return AppTheme.textGrey;
       case AssetType.liability:

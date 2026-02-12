@@ -149,12 +149,12 @@ class _AllocationPieChartState extends State<AllocationPieChart> {
         return 'Crypto';
       case AssetType.realEstate:
         return 'Real Estate';
-      case AssetType.gold:
-        return 'Gold';
       case AssetType.cash:
         return 'Cash';
-      case AssetType.other:
-        return 'Other';
+      case AssetType.custom:
+        return 'Custom';
+      case AssetType.liability:
+        return 'Liability';
     }
   }
 
@@ -174,12 +174,12 @@ class _AllocationPieChartState extends State<AllocationPieChart> {
         return Colors.orange;
       case AssetType.realEstate:
         return Colors.green;
-      case AssetType.gold:
-        return Colors.amber;
       case AssetType.cash:
         return Colors.cyan;
-      case AssetType.other:
+      case AssetType.custom:
         return Colors.grey;
+      case AssetType.liability:
+        return Colors.redAccent;
     }
   }
 
@@ -188,7 +188,7 @@ class _AllocationPieChartState extends State<AllocationPieChart> {
     try {
       return AssetType.fromString(typeString);
     } catch (e) {
-      return AssetType.other;
+      return AssetType.custom;
     }
   }
 }

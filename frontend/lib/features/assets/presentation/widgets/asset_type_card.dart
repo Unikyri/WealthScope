@@ -174,12 +174,8 @@ class AssetTypeSelectorCard extends StatelessWidget {
         return 'Cryptocurrencies';
       case AssetType.realEstate:
         return 'Properties';
-      case AssetType.gold:
-        return 'Precious metals';
       case AssetType.cash:
         return 'Savings & deposits';
-      case AssetType.other:
-        return 'Other assets';
       case AssetType.custom:
         return 'Custom assets';
       case AssetType.liability:

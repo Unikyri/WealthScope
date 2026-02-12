@@ -54,8 +54,6 @@ class AssetMetadataSection extends StatelessWidget {
         return _buildStockMetadata(theme);
       case AssetType.realEstate:
         return _buildRealEstateMetadata(theme);
-      case AssetType.gold:
-        return _buildGoldMetadata(theme);
       case AssetType.crypto:
         return _buildCryptoMetadata(theme);
       case AssetType.bond:
@@ -171,48 +169,7 @@ class AssetMetadataSection extends StatelessWidget {
     );
   }
 
-  Widget _buildGoldMetadata(ThemeData theme) {
-    final metadata = GoldMetadata.fromJson(asset.metadata);
-    
-    return Column(
-      children: [
-        if (metadata.form != null)
-          _MetadataRow(
-            label: 'Form',
-            value: metadata.form!,
-            icon: Icons.diamond,
-            theme: theme,
-          ),
-        if (metadata.form != null && metadata.purity != null)
-          const SizedBox(height: 16),
-        if (metadata.purity != null)
-          _MetadataRow(
-            label: 'Purity',
-            value: '${(metadata.purity! * 100).toStringAsFixed(1)}%',
-            icon: Icons.verified,
-            theme: theme,
-          ),
-        if (metadata.purity != null && metadata.weightOz != null)
-          const SizedBox(height: 16),
-        if (metadata.weightOz != null)
-          _MetadataRow(
-            label: 'Weight',
-            value: '${metadata.weightOz!.toStringAsFixed(2)} oz',
-            icon: Icons.scale,
-            theme: theme,
-          ),
-        if (metadata.weightOz != null && metadata.storageLocation != null)
-          const SizedBox(height: 16),
-        if (metadata.storageLocation != null)
-          _MetadataRow(
-            label: 'Storage Location',
-            value: metadata.storageLocation!,
-            icon: Icons.warehouse,
-            theme: theme,
-          ),
-      ],
-    );
-  }
+
 
   Widget _buildCryptoMetadata(ThemeData theme) {
     final metadata = CryptoMetadata.fromJson(asset.metadata);

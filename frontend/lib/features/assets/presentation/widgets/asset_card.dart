@@ -222,12 +222,8 @@ class AssetCard extends StatelessWidget {
         return 'bonds';
       case AssetType.realEstate:
         return 'properties';
-      case AssetType.gold:
-        return 'oz';
       case AssetType.cash:
         return asset.currency.code;
-      case AssetType.other:
-        return 'units';
       case AssetType.custom:
         return 'units';
       case AssetType.liability:
@@ -240,14 +236,11 @@ class AssetCard extends StatelessWidget {
     switch (asset.type) {
       case AssetType.crypto:
         return 8;
-      case AssetType.gold:
-        return 3;
       case AssetType.stock:
       case AssetType.etf:
       case AssetType.bond:
       case AssetType.realEstate:
       case AssetType.cash:
-      case AssetType.other:
       case AssetType.custom:
       case AssetType.liability:
         return asset.quantity % 1 == 0 ? 0 : 2;

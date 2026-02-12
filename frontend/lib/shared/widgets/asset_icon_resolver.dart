@@ -199,7 +199,7 @@ class AssetIconResolver extends StatelessWidget {
     }
 
     // 3. Known type without specific logo -> type icon
-    if (assetType != AssetType.other || upperSymbol.isEmpty) {
+    if (upperSymbol.isEmpty) {
       return _typeIcon();
     }
 

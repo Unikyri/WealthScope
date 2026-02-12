@@ -19,13 +19,8 @@ class AssetRepositoryImpl implements AssetRepository {
   @override
   Future<StockAsset> addAsset(StockAsset asset) async {
     try {
-      // Inject category for 'custom' mapped types (Gold/Other)
-      final metadata = Map<String, dynamic>.from(asset.metadata);
-      if (asset.type == AssetType.gold) {
-        metadata['category'] = 'Gold';
-      } else if (asset.type == AssetType.other) {
-        metadata['category'] = 'Other';
-      }
+      // Inject category for 'custom' mapped types if needed, or rely on frontend form to set metadata
+      // The obsolete Gold/Other checks are removed.
 
       // Convert domain entity to create request DTO
       final request = CreateAssetRequest(
@@ -114,13 +109,8 @@ class AssetRepositoryImpl implements AssetRepository {
         throw const ValidationFailure('Asset ID is required for update');
       }
       
-      // Inject category for 'custom' mapped types (Gold/Other)
-      final metadata = Map<String, dynamic>.from(asset.metadata);
-      if (asset.type == AssetType.gold) {
-        metadata['category'] = 'Gold';
-      } else if (asset.type == AssetType.other) {
-        metadata['category'] = 'Other';
-      }
+      // Inject category for 'custom' mapped types if needed, or rely on frontend form to set metadata
+      // The obsolete Gold/Other checks are removed.
 
       // Convert domain entity to update request DTO
       final request = UpdateAssetRequest(
@@ -134,7 +124,7 @@ class AssetRepositoryImpl implements AssetRepository {
         purchaseDate: asset.purchaseDate != null
             ? DateFormat('yyyy-MM-dd').format(asset.purchaseDate!)
             : null,
-        metadata: metadata.isNotEmpty ? metadata : null,
+        metadata: asset.metadata.isNotEmpty ? asset.metadata : null,
         notes: asset.notes,
       );
       

@@ -120,13 +120,12 @@ class AssetDto {
         purchasePrice = getDouble('purchase_price');
         // Address is in core_data but not mapped to symbol/qty
         break;
-      case AssetType.gold:
       case AssetType.custom:
-      case AssetType.other:
-        // These map to 'custom' in backend, check core_data for specific variations if needed
+      case AssetType.liability:
+        // These map to 'custom' or specific liability logic
         symbol = getString('symbol');
         quantity = getDouble('quantity');
-        if (quantity == 0) quantity = 1.0; // Default to 1 if missing
+        if (quantity == 0) quantity = 1.0; 
         purchasePrice = getDouble('purchase_price');
         break;
       case AssetType.cash:

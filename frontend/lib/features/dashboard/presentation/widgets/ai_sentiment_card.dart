@@ -295,10 +295,12 @@ class _AssetBreakdownChips extends StatelessWidget {
         return AppTheme.textGrey;
       case AssetType.etf:
         return Colors.amber;
-      case AssetType.gold:
-        return Colors.orange;
       case AssetType.bond:
         return Colors.teal;
+      case AssetType.liability:
+        return AppTheme.alertRed;
+      case AssetType.custom:
+        return Colors.grey;
       default:
         return Colors.grey;
     }

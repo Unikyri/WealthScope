@@ -44,7 +44,7 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
   @override
   void initState() {
     super.initState();
-    _selectedType = widget.assetType ?? AssetType.other;
+    _selectedType = widget.assetType ?? AssetType.custom;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(stockFormProvider.notifier).reset();
       ref.read(assetFormSubmissionProvider.notifier).reset();
@@ -67,7 +67,7 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
   bool get _showSymbol =>
       _selectedType == AssetType.crypto ||
       _selectedType == AssetType.bond ||
-      _selectedType == AssetType.other;
+      _selectedType == AssetType.custom;
 
   bool get _showQuantity => _selectedType != AssetType.realEstate;
 
@@ -85,9 +85,7 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
     switch (_selectedType) {
       case AssetType.cash:
         return 'Amount';
-      case AssetType.gold:
-        return 'Weight (oz)';
-      case AssetType.other:
+      case AssetType.custom:
         return 'Units';
       default:
         return 'Quantity';
@@ -98,8 +96,6 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
     switch (_selectedType) {
       case AssetType.realEstate:
         return 'Estimated Value';
-      case AssetType.gold:
-        return 'Price per Ounce';
       default:
         return 'Purchase Price';
     }
@@ -109,16 +105,16 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
     switch (_selectedType) {
       case AssetType.realEstate:
         return 'New Real Estate';
-      case AssetType.gold:
-        return 'New Gold';
       case AssetType.bond:
         return 'New Bond';
       case AssetType.crypto:
         return 'New Cryptocurrency';
       case AssetType.cash:
         return 'New Cash';
-      case AssetType.other:
-        return 'New Asset';
+      case AssetType.custom:
+        return 'New Custom Asset';
+      case AssetType.liability:
+        return 'New Liability';
       default:
         return 'New Asset';
     }
@@ -575,16 +571,16 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
     switch (type) {
       case AssetType.realEstate:
         return 'Property Name';
-      case AssetType.gold:
-        return 'Gold Product Name';
       case AssetType.bond:
         return 'Bond Name';
       case AssetType.crypto:
         return 'Cryptocurrency Name';
       case AssetType.cash:
         return 'Account Name';
-      case AssetType.other:
+      case AssetType.custom:
         return 'Asset Name';
+      case AssetType.liability:
+        return 'Liability Name';
       default:
         return 'Asset Name';
     }
@@ -594,16 +590,16 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
     switch (type) {
       case AssetType.realEstate:
         return 'e.g., Downtown Apartment';
-      case AssetType.gold:
-        return 'e.g., Gold Bullion';
       case AssetType.bond:
         return 'e.g., US Treasury Bond';
       case AssetType.crypto:
         return 'e.g., Bitcoin';
       case AssetType.cash:
         return 'e.g., Savings Account';
-      case AssetType.other:
+      case AssetType.custom:
         return 'e.g., Collectible Art';
+      case AssetType.liability:
+        return 'e.g., Mortgage';
       default:
         return 'Enter name';
     }
@@ -613,8 +609,6 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
     switch (type) {
       case AssetType.bond:
         return 'e.g., ISIN code';
-      case AssetType.gold:
-        return 'e.g., XAU';
       default:
         return 'Enter symbol';
     }
