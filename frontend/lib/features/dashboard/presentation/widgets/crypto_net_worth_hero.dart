@@ -202,7 +202,9 @@ class _SimpleSparkline extends StatelessWidget {
   Widget build(BuildContext context) {
     if (data.isEmpty) return const SizedBox.shrink();
 
-    return LineChart(
+    return Semantics(
+      excludeSemantics: true,
+      child: LineChart(
       LineChartData(
         gridData: const FlGridData(show: false),
         titlesData: const FlTitlesData(show: false),
@@ -234,6 +236,6 @@ class _SimpleSparkline extends StatelessWidget {
         ],
         lineTouchData: const LineTouchData(enabled: false), // Static background
       ),
-    );
+    ));
   }
 }

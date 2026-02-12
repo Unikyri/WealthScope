@@ -6,8 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:wealthscope_app/app/app.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 void main() {
   testWidgets('WealthScope app smoke test', (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({});
     // Build our app wrapped in ProviderScope
     await tester.pumpWidget(
       const ProviderScope(

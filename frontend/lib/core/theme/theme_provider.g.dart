@@ -8,12 +8,18 @@ part of 'theme_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Theme provider - WealthScope is dark-mode only.
+/// Kept as a provider for potential future extensibility.
 
 @ProviderFor(ThemeMode)
 final themeModeProvider = ThemeModeProvider._();
 
+/// Theme provider - WealthScope is dark-mode only.
+/// Kept as a provider for potential future extensibility.
 final class ThemeModeProvider
     extends $NotifierProvider<ThemeMode, ThemeModeOption> {
+  /// Theme provider - WealthScope is dark-mode only.
+  /// Kept as a provider for potential future extensibility.
   ThemeModeProvider._()
       : super(
           from: null,
@@ -41,7 +47,10 @@ final class ThemeModeProvider
   }
 }
 
-String _$themeModeHash() => r'f1c635b31f00160ba4d92d8f50b10ea61382463b';
+String _$themeModeHash() => r'5a1ffe7ef0b500d6b1cb6a9e988cb58ac305210e';
+
+/// Theme provider - WealthScope is dark-mode only.
+/// Kept as a provider for potential future extensibility.
 
 abstract class _$ThemeMode extends $Notifier<ThemeModeOption> {
   ThemeModeOption build();

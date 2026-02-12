@@ -180,6 +180,10 @@ class AssetTypeSelectorCard extends StatelessWidget {
         return 'Savings & deposits';
       case AssetType.other:
         return 'Other assets';
+      case AssetType.custom:
+        return 'Custom assets';
+      case AssetType.liability:
+        return 'Debts & Liabilities';
     }
   }
 }

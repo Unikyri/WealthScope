@@ -130,6 +130,10 @@ class AssetDetailHeader extends StatelessWidget {
         return Icons.account_balance_wallet;
       case AssetType.other:
         return Icons.category;
+      case AssetType.custom:
+        return Icons.widgets;
+      case AssetType.liability:
+        return Icons.money_off; 
     }
   }
 

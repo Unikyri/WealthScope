@@ -34,6 +34,10 @@ class AssetTypeUtils {
         return Icons.account_balance_wallet;
       case AssetType.other:
         return Icons.business;
+      case AssetType.custom:
+        return Icons.category;
+      case AssetType.liability:
+        return Icons.money_off; 
     }
   }
 
@@ -56,6 +60,10 @@ class AssetTypeUtils {
         return _cashCyan;
       case AssetType.other:
         return AppTheme.textGrey;
+      case AssetType.custom:
+        return AppTheme.textGrey;
+      case AssetType.liability:
+        return AppTheme.errorRed;
     }
   }
 }

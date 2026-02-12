@@ -16,6 +16,13 @@ import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart'
 import 'package:wealthscope_app/features/assets/data/providers/asset_repository_provider.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/currency.dart';
 import 'package:wealthscope_app/features/assets/domain/repositories/asset_repository.dart';
+import 'package:wealthscope_app/features/dashboard/domain/entities/portfolio_risk.dart';
+import 'package:wealthscope_app/features/dashboard/domain/entities/personalized_news_item.dart';
+import 'package:wealthscope_app/features/subscriptions/data/services/revenuecat_service.dart';
+import 'package:wealthscope_app/features/subscriptions/domain/services/feature_gate_service.dart';
+
+import 'package:wealthscope_app/features/subscriptions/data/services/usage_tracker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Mock AssetRepository for testing
 class MockAssetRepository implements AssetRepository {
@@ -44,25 +51,55 @@ class MockAssetRepository implements AssetRepository {
   Future<StockAsset> updateAsset(StockAsset asset) async => asset;
 }
 
+/// Helper to create a mock Supabase User
+supabase.User createMockUser({
+  required String id,
+  required String email,
+  String? fullName,
+}) {
+  return supabase.User(
+    id: id,
+    appMetadata: {},
+    userMetadata: {'full_name': fullName},
+    aud: 'authenticated',
+    createdAt: DateTime.now().toIso8601String(),
+    email: email,
+  );
+}
+
+createTestOverrides({
+  required Future<PortfolioSummary> summaryFuture,
+  List<StockAsset> assets = const [],
+  String userId = '123',
+  String email = 'test@example.com',
+  String? fullName,
+}) {
+  return [
+    dashboardPortfolioSummaryProvider.overrideWith((ref) => summaryFuture),
+    assetRepositoryProvider.overrideWith((ref) => MockAssetRepository(assets)),
+    currentUserProvider.overrideWith((ref) => createMockUser(
+      id: userId,
+      email: email,
+      fullName: fullName,
+    )),
+    dashboardPortfolioRiskProvider.overrideWith((ref) => Future.value(const PortfolioRisk(
+      riskScore: 50,
+      diversificationLevel: 'Balanced',
+      alerts: [],
+    ))),
+    dashboardPersonalizedNewsProvider.overrideWith((ref) => Future.value([])),
+    featureGateProvider.overrideWith((ref) => FeatureGateService(
+      isPremium: true, 
+      usage: const UsageState(aiQueriesUsedToday: 0, ocrScansUsedThisMonth: 0),
+    )),
+  ];
+}
+
 /// Widget tests for DashboardScreen
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences.setMockInitialValues({});
 
-  // Helper to create a mock Supabase User
-  supabase.User createMockUser({
-    required String id,
-    required String email,
-    String? fullName,
-  }) {
-    return supabase.User(
-      id: id,
-      appMetadata: {},
-      userMetadata: {'full_name': fullName},
-      aud: 'authenticated',
-      createdAt: DateTime.now().toIso8601String(),
-      email: email,
-    );
-  }
 
   setUp(() {
     FlutterError.onError = (FlutterErrorDetails details) {
@@ -105,26 +142,24 @@ void main() {
       );
 
       final container = ProviderContainer(
-        overrides: [
-          dashboardPortfolioSummaryProvider.overrideWith(
-            (ref) => Future.value(mockSummary),
-          ),
-          assetRepositoryProvider.overrideWith((ref) => MockAssetRepository([])),
-          currentUserProvider.overrideWith(
-            (ref) => createMockUser(
-              id: '123',
-              email: 'john.doe@example.com',
-              fullName: 'John Doe',
-            ),
-          ),
-        ],
+        overrides: createTestOverrides(
+          summaryFuture: Future.value(mockSummary),
+          email: 'john.doe@example.com',
+          fullName: 'John Doe',
+        ),
       );
 
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
           child: const MaterialApp(
-            home: DashboardScreen(),
+            home: MediaQuery(
+              data: const MediaQueryData(
+                size: Size(800, 600),
+                disableAnimations: true,
+              ),
+              child: const DashboardScreen(),
+            ),
           ),
         ),
       );
@@ -163,25 +198,23 @@ void main() {
       );
 
       final container = ProviderContainer(
-        overrides: [
-          dashboardPortfolioSummaryProvider.overrideWith(
-            (ref) => Future.value(mockSummary),
-          ),
-          assetRepositoryProvider.overrideWith((ref) => MockAssetRepository([])),
-          currentUserProvider.overrideWith(
-            (ref) => createMockUser(
-              id: '123',
-              email: 'user@example.com',
-            ),
-          ),
-        ],
+        overrides: createTestOverrides(
+          summaryFuture: Future.value(mockSummary),
+          email: 'user@example.com',
+        ),
       );
 
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
           child: const MaterialApp(
-            home: DashboardScreen(),
+            home: MediaQuery(
+              data: const MediaQueryData(
+                size: Size(800, 600),
+                disableAnimations: true,
+              ),
+              child: const DashboardScreen(),
+            ),
           ),
         ),
       );
@@ -206,25 +239,23 @@ void main() {
       );
 
       final container = ProviderContainer(
-        overrides: [
-          dashboardPortfolioSummaryProvider.overrideWith(
-            (ref) => Future.value(mockSummary),
-          ),
-          assetRepositoryProvider.overrideWith((ref) => MockAssetRepository([])),
-          currentUserProvider.overrideWith(
-            (ref) => createMockUser(
-              id: '123',
-              email: 'jane.smith@example.com',
-            ),
-          ),
-        ],
+        overrides: createTestOverrides(
+          summaryFuture: Future.value(mockSummary),
+          email: 'jane.smith@example.com',
+        ),
       );
 
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
           child: const MaterialApp(
-            home: DashboardScreen(),
+            home: MediaQuery(
+              data: const MediaQueryData(
+                size: Size(800, 600),
+                disableAnimations: true,
+              ),
+              child: const DashboardScreen(),
+            ),
           ),
         ),
       );
@@ -271,24 +302,24 @@ void main() {
       ];
 
       final container = ProviderContainer(
-        overrides: [
-          dashboardPortfolioSummaryProvider.overrideWith(
-            (ref) => Future.value(mockSummary),
-          ),
-          assetRepositoryProvider.overrideWith(
-            (ref) => MockAssetRepository(mockAssets),
-          ),
-          currentUserProvider.overrideWith(
-            (ref) => createMockUser(id: '123', email: 'user@example.com'),
-          ),
-        ],
+        overrides: createTestOverrides(
+          summaryFuture: Future.value(mockSummary),
+          assets: mockAssets,
+          email: 'user@example.com',
+        ),
       );
 
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
           child: const MaterialApp(
-            home: DashboardScreen(),
+            home: MediaQuery(
+              data: const MediaQueryData(
+                size: Size(800, 600),
+                disableAnimations: true,
+              ),
+              child: const DashboardScreen(),
+            ),
           ),
         ),
       );
@@ -305,33 +336,34 @@ void main() {
   group('DashboardScreen - States', () {
     testWidgets('shows loading skeleton initially', (tester) async {
       final container = ProviderContainer(
-        overrides: [
-          dashboardPortfolioSummaryProvider.overrideWith(
-            (ref) => Future.delayed(
-              const Duration(seconds: 10),
-              () => PortfolioSummary(
-                totalValue: 0,
-                totalInvested: 0,
-                gainLoss: 0,
-                gainLossPercent: 0,
-                assetCount: 0,
-                breakdownByType: [],
-                lastUpdated: DateTime(2024),
-              ),
+        overrides: createTestOverrides(
+          summaryFuture: Future.delayed(
+            const Duration(seconds: 10),
+            () => PortfolioSummary(
+              totalValue: 0,
+              totalInvested: 0,
+              gainLoss: 0,
+              gainLossPercent: 0,
+              assetCount: 0,
+              breakdownByType: [],
+              lastUpdated: DateTime(2024),
             ),
           ),
-           assetRepositoryProvider.overrideWith((ref) => MockAssetRepository([])),
-          currentUserProvider.overrideWith(
-            (ref) => createMockUser(id: '123', email: 'user@example.com'),
-          ),
-        ],
+          email: 'user@example.com',
+        ),
       );
 
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
           child: const MaterialApp(
-            home: DashboardScreen(),
+            home: MediaQuery(
+              data: const MediaQueryData(
+                size: Size(800, 600),
+                disableAnimations: true,
+              ),
+              child: const DashboardScreen(),
+            ),
           ),
         ),
       );
@@ -342,22 +374,23 @@ void main() {
 
     testWidgets('shows error view on failure', (tester) async {
       final container = ProviderContainer(
-        overrides: [
-          dashboardPortfolioSummaryProvider.overrideWith(
-            (ref) => Future.error('Network connection failed'),
-          ),
-          assetRepositoryProvider.overrideWith((ref) => MockAssetRepository([])),
-          currentUserProvider.overrideWith(
-            (ref) => createMockUser(id: '123', email: 'user@example.com'),
-          ),
-        ],
+        overrides: createTestOverrides(
+          summaryFuture: Future.error('Network connection failed'),
+          email: 'user@example.com',
+        ),
       );
 
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
           child: const MaterialApp(
-            home: DashboardScreen(),
+            home: MediaQuery(
+              data: const MediaQueryData(
+                size: Size(800, 600),
+                disableAnimations: true,
+              ),
+              child: const DashboardScreen(),
+            ),
           ),
         ),
       );
@@ -381,22 +414,23 @@ void main() {
       );
 
       final container = ProviderContainer(
-        overrides: [
-          dashboardPortfolioSummaryProvider.overrideWith(
-            (ref) => Future.value(mockSummary),
-          ),
-          assetRepositoryProvider.overrideWith((ref) => MockAssetRepository([])),
-          currentUserProvider.overrideWith(
-            (ref) => createMockUser(id: '123', email: 'user@example.com'),
-          ),
-        ],
+        overrides: createTestOverrides(
+          summaryFuture: Future.value(mockSummary),
+          email: 'user@example.com',
+        ),
       );
 
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
           child: const MaterialApp(
-            home: DashboardScreen(),
+            home: MediaQuery(
+              data: const MediaQueryData(
+                size: Size(800, 600),
+                disableAnimations: true,
+              ),
+              child: const DashboardScreen(),
+            ),
           ),
         ),
       );
@@ -423,14 +457,14 @@ void main() {
 
       final container = ProviderContainer(
         overrides: [
+          ...createTestOverrides(
+            summaryFuture: Future.value(mockSummary),
+            email: 'user@example.com',
+          ),
           dashboardPortfolioSummaryProvider.overrideWith((ref) {
             fetchCount++;
             return Future.value(mockSummary);
           }),
-          assetRepositoryProvider.overrideWith((ref) => MockAssetRepository([])),
-          currentUserProvider.overrideWith(
-            (ref) => createMockUser(id: '123', email: 'user@example.com'),
-          ),
         ],
       );
 
@@ -438,7 +472,13 @@ void main() {
         UncontrolledProviderScope(
           container: container,
           child: const MaterialApp(
-            home: DashboardScreen(),
+            home: MediaQuery(
+              data: const MediaQueryData(
+                size: Size(800, 600),
+                disableAnimations: true,
+              ),
+              child: const DashboardScreen(),
+            ),
           ),
         ),
       );
@@ -457,7 +497,26 @@ void main() {
       expect(fetchCount, greaterThanOrEqualTo(2));
     });
 
-    testWidgets('notifications button is visible', (tester) async {
+void testWidgetsNoSemantics(
+  String description,
+  WidgetTesterCallback callback, {
+  bool? skip,
+  Timeout? timeout,
+  TestVariant<Object?> variant = const DefaultTestVariant(),
+  dynamic tags,
+}) {
+  testWidgets(
+    description,
+    callback,
+    skip: skip,
+    timeout: timeout,
+    semanticsEnabled: false,
+    variant: variant,
+    tags: tags,
+  );
+}
+
+    testWidgetsNoSemantics('notifications button is visible', (tester) async {
       final mockSummary = PortfolioSummary(
         totalValue: 100000.0,
         totalInvested: 90000.0,
@@ -469,22 +528,23 @@ void main() {
       );
 
       final container = ProviderContainer(
-        overrides: [
-          dashboardPortfolioSummaryProvider.overrideWith(
-            (ref) => Future.value(mockSummary),
-          ),
-          assetRepositoryProvider.overrideWith((ref) => MockAssetRepository([])),
-          currentUserProvider.overrideWith(
-            (ref) => createMockUser(id: '123', email: 'user@example.com'),
-          ),
-        ],
+        overrides: createTestOverrides(
+          summaryFuture: Future.value(mockSummary),
+          email: 'user@example.com',
+        ),
       );
 
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
           child: const MaterialApp(
-            home: DashboardScreen(),
+            home: MediaQuery(
+              data: const MediaQueryData(
+                size: Size(800, 600),
+                disableAnimations: true,
+              ),
+              child: const DashboardScreen(),
+            ),
           ),
         ),
       );

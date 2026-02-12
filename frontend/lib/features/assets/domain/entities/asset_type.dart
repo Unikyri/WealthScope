@@ -9,6 +9,8 @@ enum AssetType {
   realEstate('Real Estate', 'Real Estate'),
   gold('Gold', 'Gold'),
   cash('Cash', 'Cash'),
+  custom('Custom', 'Custom Asset'),
+  liability('Liability', 'Liability'),
   other('Other', 'Other');
 
   const AssetType(this.label, this.displayName);
@@ -37,6 +39,10 @@ enum AssetType {
         return AssetType.gold;
       case 'cash':
         return AssetType.cash;
+      case 'custom':
+        return AssetType.custom;
+      case 'liability':
+        return AssetType.liability;
       case 'other':
       default:
         return AssetType.other;
@@ -60,12 +66,22 @@ enum AssetType {
         return 'crypto';
       case AssetType.realEstate:
         return 'real_estate';
-      case AssetType.gold:
-        return 'gold';
+
       case AssetType.cash:
         return 'cash';
+      case AssetType.custom:
+        return 'custom';
+      case AssetType.liability:
+        return 'liability';
+      // Map legacy frontend types to 'custom' on backend if needed, 
+      // but for now keeping 'other' as 'other' since backend valid_types has 'custom' but not 'other'?
+      // Wait, backend validation list says: AssetTypeCustom... but also AssetTypeOther was removed?
+      // Checking backend file again: var ValidAssetTypes = []AssetType{... AssetTypeCustom, AssetTypeLiability}
+      // So 'other' and 'gold' should map to 'custom'.
+      case AssetType.gold:
+        return 'custom'; // Gold is now a custom asset category
       case AssetType.other:
-        return 'other';
+        return 'custom'; // Other is now a custom asset category
     }
   }
 }
