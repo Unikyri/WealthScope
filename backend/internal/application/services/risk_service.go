@@ -70,7 +70,7 @@ func (s *RiskService) AnalyzePortfolio(assets []entities.Asset) PortfolioRisk {
 func (s *RiskService) checkSectorConcentration(assets []entities.Asset, totalValue float64) []RiskAlert {
 	sectorValues := make(map[string]float64)
 	for i := range assets {
-		sector := getMetadataString(assets[i].Metadata, "sector")
+		sector := getMetadataString(assets[i].ExtendedData, "sector")
 		if sector == "" {
 			sector = "Other"
 		}
@@ -145,12 +145,12 @@ func (s *RiskService) checkGeographicConcentration(assets []entities.Asset, tota
 
 func (s *RiskService) getAssetRegion(asset entities.Asset) string {
 	// Prefer explicit country
-	country := getMetadataString(asset.Metadata, "country")
+	country := getMetadataString(asset.ExtendedData, "country")
 	if country != "" {
 		return country
 	}
 
-	exchange := strings.ToUpper(getMetadataString(asset.Metadata, "exchange"))
+	exchange := strings.ToUpper(getMetadataString(asset.ExtendedData, "exchange"))
 	switch exchange {
 	case "NASDAQ", "NYSE", "AMEX":
 		return "United States"
@@ -164,7 +164,7 @@ func (s *RiskService) getAssetRegion(asset entities.Asset) string {
 func (s *RiskService) maxSectorPercent(assets []entities.Asset, totalValue float64) float64 {
 	sectorValues := make(map[string]float64)
 	for i := range assets {
-		sector := getMetadataString(assets[i].Metadata, "sector")
+		sector := getMetadataString(assets[i].ExtendedData, "sector")
 		if sector == "" {
 			sector = "Other"
 		}

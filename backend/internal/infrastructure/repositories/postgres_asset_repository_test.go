@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -12,6 +13,16 @@ import (
 	domainRepo "github.com/Unikyri/WealthScope/backend/internal/domain/repositories"
 )
 
+// newTestAsset creates a test asset with JSONB core_data containing quantity, purchase_price, and currency.
+func newTestAsset(userID uuid.UUID, assetType entities.AssetType, name string, qty, price float64, currency string) *entities.Asset {
+	coreData, _ := json.Marshal(map[string]interface{}{
+		"quantity":       qty,
+		"purchase_price": price,
+		"currency":       currency,
+	})
+	return entities.NewAsset(userID, assetType, name, coreData, nil)
+}
+
 func TestPostgresAssetRepository_CRUD(t *testing.T) {
 	db := openTestGormDB(t)
 	tx := beginTx(t, db)
@@ -21,9 +32,8 @@ func TestPostgresAssetRepository_CRUD(t *testing.T) {
 
 	userID := uuid.New()
 	ensureUserExists(t, tx, userID)
-	asset := entities.NewAsset(userID, entities.AssetTypeStock, "Apple Inc.", 10, 150, "USD")
-	symbol := "AAPL"
-	asset.SetSymbol(symbol)
+	asset := newTestAsset(userID, entities.AssetTypeStock, "Apple Inc.", 10, 150, "USD")
+	asset.SetSymbol("AAPL")
 
 	// Create
 	require.NoError(t, repo.Create(ctx, asset))
@@ -34,11 +44,18 @@ func TestPostgresAssetRepository_CRUD(t *testing.T) {
 	require.Equal(t, asset.ID, got.ID)
 	require.Equal(t, userID, got.UserID)
 	require.Equal(t, "Apple Inc.", got.Name)
-	require.NotNil(t, got.Symbol)
-	require.Equal(t, symbol, *got.Symbol)
+	require.Equal(t, "AAPL", got.Symbol())
 
-	// Update
-	asset.Update("Apple Updated", 12, 155, "USD")
+	// Update name via core data
+	asset.Name = "Apple Updated"
+	coreData, _ := json.Marshal(map[string]interface{}{
+		"quantity":       12,
+		"purchase_price": 155,
+		"currency":       "USD",
+		"ticker":         "AAPL",
+	})
+	asset.SetCoreData(coreData)
+
 	nowBefore := time.Now().UTC().Add(-1 * time.Second)
 	require.NoError(t, repo.Update(ctx, asset))
 
@@ -71,10 +88,10 @@ func TestPostgresAssetRepository_FindByUserID_FiltersAndPagination(t *testing.T)
 
 	// Seed assets (3 stocks, 1 crypto)
 	for i := 0; i < 3; i++ {
-		a := entities.NewAsset(userID, entities.AssetTypeStock, "Stock", 1, 100, "USD")
+		a := newTestAsset(userID, entities.AssetTypeStock, "Stock", 1, 100, "USD")
 		require.NoError(t, repo.Create(ctx, a))
 	}
-	crypto := entities.NewAsset(userID, entities.AssetTypeCrypto, "BTC", 1, 20000, "USD")
+	crypto := newTestAsset(userID, entities.AssetTypeCrypto, "BTC", 1, 20000, "USD")
 	require.NoError(t, repo.Create(ctx, crypto))
 
 	// Filter by type
@@ -103,13 +120,14 @@ func TestPostgresAssetRepository_GetPortfolioSummary_UsesCurrentOrPurchasePrice(
 	userID := uuid.New()
 	ensureUserExists(t, tx, userID)
 
-	// Asset with current_price
-	a1 := entities.NewAsset(userID, entities.AssetTypeStock, "A", 10, 100, "USD") // invested 1000
-	a1.SetCurrentPrice(120)                                                       // value 1200
+	// Asset with current_price in extended_data
+	a1 := newTestAsset(userID, entities.AssetTypeStock, "A", 10, 100, "USD") // invested 1000
+	extData, _ := json.Marshal(map[string]interface{}{"current_price": 120})
+	a1.SetExtendedData(extData) // value 1200
 	require.NoError(t, repo.Create(ctx, a1))
 
 	// Asset without current_price (fallback to purchase_price)
-	a2 := entities.NewAsset(userID, entities.AssetTypeETF, "B", 5, 200, "USD") // invested/value 1000
+	a2 := newTestAsset(userID, entities.AssetTypeETF, "B", 5, 200, "USD") // invested/value 1000
 	require.NoError(t, repo.Create(ctx, a2))
 
 	summary, err := repo.GetPortfolioSummary(ctx, userID)
@@ -132,16 +150,17 @@ func TestPostgresAssetRepository_AggregationsAndHelpers(t *testing.T) {
 	ensureUserExists(t, tx, userID)
 
 	// Seed 2 listed assets with symbol and 1 non-listed
-	a1 := entities.NewAsset(userID, entities.AssetTypeStock, "A", 1, 100, "USD")
+	a1 := newTestAsset(userID, entities.AssetTypeStock, "A", 1, 100, "USD")
 	a1.SetSymbol("AAPL")
-	a1.SetCurrentPrice(120)
+	extData, _ := json.Marshal(map[string]interface{}{"current_price": 120})
+	a1.SetExtendedData(extData)
 	require.NoError(t, repo.Create(ctx, a1))
 
-	a2 := entities.NewAsset(userID, entities.AssetTypeETF, "B", 2, 50, "USD")
+	a2 := newTestAsset(userID, entities.AssetTypeETF, "B", 2, 50, "USD")
 	a2.SetSymbol("SPY")
 	require.NoError(t, repo.Create(ctx, a2))
 
-	a3 := entities.NewAsset(userID, entities.AssetTypeCash, "Cash", 1, 10, "USD")
+	a3 := newTestAsset(userID, entities.AssetTypeCash, "Cash", 1, 10, "USD")
 	require.NoError(t, repo.Create(ctx, a3))
 
 	// CountByUserID
@@ -149,7 +168,7 @@ func TestPostgresAssetRepository_AggregationsAndHelpers(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, int64(3), cnt)
 
-	// GetTotalValueByUserID (uses COALESCE current_price,purchase_price)
+	// GetTotalValueByUserID (uses COALESCE current_price, purchase_price)
 	total, err := repo.GetTotalValueByUserID(ctx, userID)
 	require.NoError(t, err)
 	// a1: 1*120, a2: 2*50, a3: 1*10
@@ -170,8 +189,12 @@ func TestPostgresAssetRepository_AggregationsAndHelpers(t *testing.T) {
 	after, err := repo.FindBySymbol(ctx, userID, "SPY")
 	require.NoError(t, err)
 	require.Len(t, after, 1)
-	require.NotNil(t, after[0].CurrentPrice)
-	require.InEpsilon(t, 60.0, *after[0].CurrentPrice, 0.0001)
+	// Verify current_price is in extended_data
+	extMap, extErr := after[0].GetExtendedDataMap()
+	require.NoError(t, extErr)
+	cp, ok := extMap["current_price"].(float64)
+	require.True(t, ok, "current_price should be float64")
+	require.InEpsilon(t, 60.0, cp, 0.0001)
 
 	// ListUserIDsWithListedAssets
 	userIDs, err := repo.ListUserIDsWithListedAssets(ctx)

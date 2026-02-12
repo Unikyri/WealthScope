@@ -9,10 +9,12 @@ import (
 type AssetCategory string
 
 const (
-	CategoryEquity AssetCategory = "equity"
-	CategoryCrypto AssetCategory = "crypto"
-	CategoryForex  AssetCategory = "forex"
-	CategoryMetal  AssetCategory = "metal"
+	CategoryEquity     AssetCategory = "equity"
+	CategoryCrypto     AssetCategory = "crypto"
+	CategoryForex      AssetCategory = "forex"
+	CategoryMetal      AssetCategory = "metal"
+	CategoryBond       AssetCategory = "bond"
+	CategoryRealEstate AssetCategory = "real_estate"
 )
 
 // Quote is the domain DTO for a price snapshot of a symbol.

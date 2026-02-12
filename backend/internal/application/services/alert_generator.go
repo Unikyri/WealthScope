@@ -131,8 +131,8 @@ func (g *AlertGenerator) generatePriceAlerts(assets []entities.Asset) []Portfoli
 		}
 
 		name := asset.Name
-		if asset.Symbol != nil && *asset.Symbol != "" {
-			name = *asset.Symbol
+		if sym := asset.Symbol(); sym != "" {
+			name = sym
 		}
 
 		var severity AlertSeverity
@@ -203,8 +203,8 @@ func (g *AlertGenerator) generateConcentrationAlerts(
 		}
 
 		name := asset.Name
-		if asset.Symbol != nil && *asset.Symbol != "" {
-			name = *asset.Symbol
+		if sym := asset.Symbol(); sym != "" {
+			name = sym
 		}
 
 		var severity AlertSeverity

@@ -56,6 +56,10 @@ func (s *Server) Run() {
 	// Setup scenario services for what-if simulations
 	scenarioEngine, historicalAnalyzer := s.setupScenarioServices(geminiClient)
 
+	// Setup market data registry and new API clients for autofill
+	registry, fredClient, rentcastClient := s.setupMarketDataProvidersV2()
+	autofillSvc := appsvc.NewAutofillService(registry, fredClient, rentcastClient)
+
 	// Create router with dependencies
 	r := router.NewRouter(router.RouterDeps{
 		Config:             s.cfg,
@@ -66,6 +70,7 @@ func (s *Server) Run() {
 		DocumentProcessor:  documentProcessor,
 		ScenarioEngine:     scenarioEngine,
 		HistoricalAnalyzer: historicalAnalyzer,
+		AutofillService:    autofillSvc,
 	})
 
 	// Configure multipart memory limit for file uploads (10MB)
@@ -304,6 +309,56 @@ func (s *Server) setupMarketDataProviders() domainsvc.MarketDataClient {
 	}
 
 	return registry
+}
+
+// setupMarketDataProvidersV2 extends the base market data providers with FRED and RentCast,
+// returning the raw registry and standalone clients for the AutofillService.
+func (s *Server) setupMarketDataProvidersV2() (*marketdata.ProviderRegistry, *marketdata.FREDClient, *marketdata.RentCastClient) {
+	baseClient := s.setupMarketDataProviders()
+	registry, _ := baseClient.(*marketdata.ProviderRegistry)
+
+	var fredClient *marketdata.FREDClient
+	var rentcastClient *marketdata.RentCastClient
+
+	// Initialize QuotaManager for APIs with strict monthly limits
+	var quotaMgr *marketdata.QuotaManager
+	if s.db != nil {
+		quotaLimits := map[string]int{}
+		if s.cfg.MarketData.RentCastMonthlyQuota > 0 {
+			quotaLimits["rentcast"] = s.cfg.MarketData.RentCastMonthlyQuota
+		} else {
+			quotaLimits["rentcast"] = 45 // default free tier
+		}
+		quotaMgr = marketdata.NewQuotaManager(s.db.DB, quotaLimits)
+		s.logger.Info("Initialized QuotaManager", zap.Any("limits", quotaLimits))
+	}
+
+	// ==================== BOND/RATES PROVIDER (FRED) ====================
+	if s.cfg.MarketData.FREDEnabled && s.cfg.MarketData.FREDAPIKey != "" {
+		fredRateLimit := s.cfg.MarketData.FREDRateLimit
+		if fredRateLimit <= 0 {
+			fredRateLimit = 60
+		}
+		fredLimiter := marketdata.NewRateLimiter(fredRateLimit, time.Minute)
+		fredClient = marketdata.NewFREDClient(s.cfg.MarketData.FREDAPIKey, fredLimiter, quotaMgr)
+		s.logger.Info("Initialized FRED client",
+			zap.Int("rate_limit_per_min", fredRateLimit))
+	}
+
+	// ==================== REAL ESTATE PROVIDER (RentCast) ====================
+	if s.cfg.MarketData.RentCastEnabled && s.cfg.MarketData.RentCastAPIKey != "" {
+		rcRateLimit := s.cfg.MarketData.RentCastRateLimit
+		if rcRateLimit <= 0 {
+			rcRateLimit = 1
+		}
+		rcLimiter := marketdata.NewRateLimiter(rcRateLimit, time.Minute)
+		rentcastClient = marketdata.NewRentCastClient(s.cfg.MarketData.RentCastAPIKey, rcLimiter, quotaMgr)
+		s.logger.Info("Initialized RentCast client",
+			zap.Int("rate_limit_per_min", rcRateLimit),
+			zap.Int("monthly_quota", s.cfg.MarketData.RentCastMonthlyQuota))
+	}
+
+	return registry, fredClient, rentcastClient
 }
 
 // setupNewsProviders configures news providers with rate limiting and fallback.

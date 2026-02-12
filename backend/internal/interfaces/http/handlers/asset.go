@@ -1,452 +1,431 @@
 package handlers
 
 import (
-	"encoding/json"
 	"errors"
-	"strconv"
-	"time"
+	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
+	"github.com/Unikyri/WealthScope/backend/internal/application/services"
 	"github.com/Unikyri/WealthScope/backend/internal/application/usecases"
 	"github.com/Unikyri/WealthScope/backend/internal/domain/entities"
-	infraRepo "github.com/Unikyri/WealthScope/backend/internal/infrastructure/repositories"
-	"github.com/Unikyri/WealthScope/backend/internal/interfaces/http/middleware"
-	"github.com/Unikyri/WealthScope/backend/pkg/response"
 )
 
-// AssetHandler handles asset-related endpoints
+// AssetHandler handles HTTP requests for asset operations
 type AssetHandler struct {
-	createAssetUC *usecases.CreateAssetUseCase
-	getAssetUC    *usecases.GetAssetUseCase
-	listAssetsUC  *usecases.ListAssetsUseCase
-	updateAssetUC *usecases.UpdateAssetUseCase
-	deleteAssetUC *usecases.DeleteAssetUseCase
+	useCases    *usecases.AssetUseCases
+	autofillSvc *services.AutofillService
 }
 
 // NewAssetHandler creates a new AssetHandler
-func NewAssetHandler(
-	createUC *usecases.CreateAssetUseCase,
-	getUC *usecases.GetAssetUseCase,
-	listUC *usecases.ListAssetsUseCase,
-	updateUC *usecases.UpdateAssetUseCase,
-	deleteUC *usecases.DeleteAssetUseCase,
-) *AssetHandler {
+func NewAssetHandler(uc *usecases.AssetUseCases, autofillSvc *services.AutofillService) *AssetHandler {
 	return &AssetHandler{
-		createAssetUC: createUC,
-		getAssetUC:    getUC,
-		listAssetsUC:  listUC,
-		updateAssetUC: updateUC,
-		deleteAssetUC: deleteUC,
+		useCases:    uc,
+		autofillSvc: autofillSvc,
 	}
 }
 
-// ====================================
-// Request/Response DTOs
-// ====================================
+// --- Request/Response DTOs ---
 
-// CreateAssetRequest represents the request body for creating an asset
+// CreateAssetRequest represents the request body for creating an asset (v2 - JSONB)
 type CreateAssetRequest struct {
-	Metadata      map[string]interface{} `json:"metadata,omitempty"`
-	Symbol        *string                `json:"symbol,omitempty" binding:"omitempty,max=20"`
-	CurrentPrice  *float64               `json:"current_price,omitempty" binding:"omitempty,gte=0"`
-	PurchaseDate  *string                `json:"purchase_date,omitempty"`
-	Notes         *string                `json:"notes,omitempty" binding:"omitempty,max=1000"`
-	Type          string                 `json:"type" binding:"required,oneof=stock etf bond crypto real_estate gold cash other"`
-	Name          string                 `json:"name" binding:"required,min=1,max=255"`
-	Currency      string                 `json:"currency,omitempty" binding:"omitempty,len=3"`
-	Quantity      float64                `json:"quantity" binding:"required,gt=0"`
-	PurchasePrice float64                `json:"purchase_price" binding:"required,gte=0"`
+	CoreData     map[string]interface{} `json:"core_data" binding:"required"`
+	ExtendedData map[string]interface{} `json:"extended_data,omitempty"`
+	Type         string                 `json:"type" binding:"required"`
+	Name         string                 `json:"name" binding:"required"`
 }
 
 // UpdateAssetRequest represents the request body for updating an asset
 type UpdateAssetRequest struct {
-	Metadata      map[string]interface{} `json:"metadata,omitempty"`
-	Type          *string                `json:"type,omitempty" binding:"omitempty,oneof=stock etf bond crypto real_estate gold cash other"`
-	Name          *string                `json:"name,omitempty" binding:"omitempty,min=1,max=255"`
-	Symbol        *string                `json:"symbol,omitempty" binding:"omitempty,max=20"`
-	Quantity      *float64               `json:"quantity,omitempty" binding:"omitempty,gt=0"`
-	PurchasePrice *float64               `json:"purchase_price,omitempty" binding:"omitempty,gte=0"`
-	CurrentPrice  *float64               `json:"current_price,omitempty" binding:"omitempty,gte=0"`
-	Currency      *string                `json:"currency,omitempty" binding:"omitempty,len=3"`
-	PurchaseDate  *string                `json:"purchase_date,omitempty"`
-	Notes         *string                `json:"notes,omitempty" binding:"omitempty,max=1000"`
+	CoreData     map[string]interface{} `json:"core_data,omitempty"`
+	ExtendedData map[string]interface{} `json:"extended_data,omitempty"`
+	Type         *string                `json:"type,omitempty"`
+	Name         *string                `json:"name,omitempty"`
 }
 
-// AssetResponse represents an asset in API responses
+// AutofillRequest represents the request body for auto-filling asset data
+type AutofillRequest struct {
+	CoreData map[string]interface{} `json:"core_data" binding:"required"`
+	Type     string                 `json:"type" binding:"required"`
+}
+
+// AssetResponse represents the response for a single asset
+//
+//nolint:govet // fieldalignment: keep logical field grouping for readability
 type AssetResponse struct {
-	Metadata        map[string]interface{} `json:"metadata,omitempty"`
-	Symbol          *string                `json:"symbol,omitempty"`
-	CurrentPrice    *float64               `json:"current_price,omitempty"`
-	PurchaseDate    *string                `json:"purchase_date,omitempty"`
-	Notes           *string                `json:"notes,omitempty"`
+	CoreData        map[string]interface{} `json:"core_data"`
+	ExtendedData    map[string]interface{} `json:"extended_data,omitempty"`
 	GainLoss        *float64               `json:"gain_loss,omitempty"`
 	GainLossPercent *float64               `json:"gain_loss_percent,omitempty"`
-	ID              string                 `json:"id"`
 	Type            string                 `json:"type"`
 	Name            string                 `json:"name"`
-	Currency        string                 `json:"currency"`
+	ID              string                 `json:"id"`
 	CreatedAt       string                 `json:"created_at"`
 	UpdatedAt       string                 `json:"updated_at"`
-	Quantity        float64                `json:"quantity"`
-	PurchasePrice   float64                `json:"purchase_price"`
 	TotalValue      float64                `json:"total_value"`
 	TotalCost       float64                `json:"total_cost"`
+}
+
+// AutofillResponse represents the response for auto-fill
+type AutofillResponse struct {
+	ExtendedData map[string]interface{} `json:"extended_data"`
+	APISources   []string               `json:"api_sources,omitempty"`
 }
 
 // ListAssetsResponse represents the response for listing assets
 type ListAssetsResponse struct {
 	Assets     []AssetResponse `json:"assets"`
-	Pagination PaginationInfo  `json:"pagination"`
+	TotalCount int64           `json:"total_count"`
+	Page       int             `json:"page"`
+	PerPage    int             `json:"per_page"`
+	TotalPages int             `json:"total_pages"`
 }
 
-// PaginationInfo represents pagination metadata
-type PaginationInfo struct {
-	TotalCount int64 `json:"total_count"`
-	Page       int   `json:"page"`
-	PerPage    int   `json:"per_page"`
-	TotalPages int   `json:"total_pages"`
+// --- Helper functions ---
+
+// toAssetResponse converts an entity.Asset to AssetResponse
+func toAssetResponse(asset *entities.Asset) AssetResponse {
+	coreData, _ := asset.GetCoreDataMap()
+	extendedData, _ := asset.GetExtendedDataMap()
+
+	resp := AssetResponse{
+		ID:              asset.ID.String(),
+		Type:            string(asset.Type),
+		Name:            asset.Name,
+		CoreData:        coreData,
+		ExtendedData:    extendedData,
+		TotalValue:      asset.TotalValue(),
+		TotalCost:       asset.TotalCost(),
+		GainLoss:        asset.GainLoss(),
+		GainLossPercent: asset.GainLossPercent(),
+		CreatedAt:       asset.CreatedAt.Format("2006-01-02T15:04:05Z"),
+		UpdatedAt:       asset.UpdatedAt.Format("2006-01-02T15:04:05Z"),
+	}
+	return resp
 }
 
-// ====================================
-// Handlers
-// ====================================
+// getUserIDFromContext extracts the user ID from the gin context (set by auth middleware)
+func getUserIDFromContext(c *gin.Context) (uuid.UUID, error) {
+	userIDStr, exists := c.Get("userID")
+	if !exists {
+		return uuid.Nil, errors.New("user ID not found in context")
+	}
 
-// Create handles POST /api/v1/assets
+	switch v := userIDStr.(type) {
+	case string:
+		return uuid.Parse(v)
+	case uuid.UUID:
+		return v, nil
+	default:
+		return uuid.Nil, errors.New("invalid user ID type")
+	}
+}
+
+// --- Handler methods ---
+
+// Create handles creating a new asset
 // @Summary Create a new asset
-// @Description Creates a new investment asset for the authenticated user
 // @Tags assets
 // @Accept json
 // @Produce json
-// @Param request body CreateAssetRequest true "Asset data"
-// @Success 201 {object} response.Response{data=AssetResponse}
-// @Failure 400 {object} response.Response
-// @Failure 401 {object} response.Response
-// @Failure 500 {object} response.Response
-// @Security BearerAuth
+// @Param body body CreateAssetRequest true "Asset data"
+// @Success 201 {object} AssetResponse
 // @Router /api/v1/assets [post]
 func (h *AssetHandler) Create(c *gin.Context) {
-	userID, ok := middleware.GetUserID(c)
-	if !ok {
-		response.Unauthorized(c, "User not authenticated")
+	userID, err := getUserIDFromContext(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
 	var req CreateAssetRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.BadRequest(c, "Invalid request: "+err.Error())
+	if bindErr := c.ShouldBindJSON(&req); bindErr != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body: " + bindErr.Error()})
 		return
 	}
 
-	// Parse purchase date if provided
-	var purchaseDate *time.Time
-	if req.PurchaseDate != nil {
-		parsed, parseErr := time.Parse("2006-01-02", *req.PurchaseDate)
-		if parseErr != nil {
-			response.BadRequest(c, "Invalid purchase_date format. Use YYYY-MM-DD")
-			return
-		}
-		purchaseDate = &parsed
-	}
-
-	// Build use case input
-	input := usecases.CreateAssetInput{
-		UserID:        userID,
-		Type:          req.Type,
-		Name:          req.Name,
-		Symbol:        req.Symbol,
-		Quantity:      req.Quantity,
-		PurchasePrice: req.PurchasePrice,
-		CurrentPrice:  req.CurrentPrice,
-		Currency:      req.Currency,
-		PurchaseDate:  purchaseDate,
-		Metadata:      req.Metadata,
-		Notes:         req.Notes,
-	}
-
-	asset, err := h.createAssetUC.Execute(c.Request.Context(), input)
+	output, err := h.useCases.CreateAsset(c.Request.Context(), usecases.CreateAssetInput{
+		UserID:       userID,
+		Type:         req.Type,
+		Name:         req.Name,
+		CoreData:     req.CoreData,
+		ExtendedData: req.ExtendedData,
+	})
 	if err != nil {
 		handleAssetError(c, err)
 		return
 	}
 
-	response.Created(c, toAssetResponse(asset))
+	c.JSON(http.StatusCreated, toAssetResponse(output.Asset))
 }
 
-// List handles GET /api/v1/assets
-// @Summary List user's assets
-// @Description Returns a paginated list of assets for the authenticated user
+// List handles listing all assets for the authenticated user
+// @Summary List assets
 // @Tags assets
 // @Produce json
-// @Param type query string false "Filter by asset type"
+// @Param type query string false "Filter by type"
 // @Param symbol query string false "Filter by symbol"
 // @Param currency query string false "Filter by currency"
-// @Param page query int false "Page number (default: 1)"
-// @Param per_page query int false "Items per page (default: 20, max: 100)"
-// @Success 200 {object} response.Response{data=ListAssetsResponse}
-// @Failure 401 {object} response.Response
-// @Failure 500 {object} response.Response
-// @Security BearerAuth
+// @Param page query int false "Page number" default(1)
+// @Param per_page query int false "Items per page" default(20)
+// @Success 200 {object} ListAssetsResponse
 // @Router /api/v1/assets [get]
 func (h *AssetHandler) List(c *gin.Context) {
-	userID, ok := middleware.GetUserID(c)
-	if !ok {
-		response.Unauthorized(c, "User not authenticated")
+	userID, err := getUserIDFromContext(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
-	// Parse query parameters
-	var typeFilter, symbolFilter, currencyFilter *string
-	if t := c.Query("type"); t != "" {
-		typeFilter = &t
-	}
-	if s := c.Query("symbol"); s != "" {
-		symbolFilter = &s
-	}
-	if cur := c.Query("currency"); cur != "" {
-		currencyFilter = &cur
-	}
-
-	page := 1
-	if p := c.Query("page"); p != "" {
-		if parsed, err := strconv.Atoi(p); err == nil && parsed > 0 {
-			page = parsed
-		}
-	}
-
-	perPage := 20
-	if pp := c.Query("per_page"); pp != "" {
-		if parsed, err := strconv.Atoi(pp); err == nil && parsed > 0 && parsed <= 100 {
-			perPage = parsed
-		}
-	}
-
 	input := usecases.ListAssetsInput{
-		UserID:   userID,
-		Type:     typeFilter,
-		Symbol:   symbolFilter,
-		Currency: currencyFilter,
-		Page:     page,
-		PerPage:  perPage,
+		UserID: userID,
 	}
 
-	output, err := h.listAssetsUC.Execute(c.Request.Context(), input)
+	// Parse optional filters
+	if typeStr := c.Query("type"); typeStr != "" {
+		input.Type = &typeStr
+	}
+	if symbol := c.Query("symbol"); symbol != "" {
+		input.Symbol = &symbol
+	}
+	if currency := c.Query("currency"); currency != "" {
+		input.Currency = &currency
+	}
+
+	// Parse pagination
+	if page := c.Query("page"); page != "" {
+		var p int
+		if _, parseErr := parseIntFromString(page, &p); parseErr == nil && p > 0 {
+			input.Page = p
+		}
+	}
+	if perPage := c.Query("per_page"); perPage != "" {
+		var pp int
+		if _, parseErr := parseIntFromString(perPage, &pp); parseErr == nil && pp > 0 {
+			input.PerPage = pp
+		}
+	}
+
+	output, err := h.useCases.ListAssets(c.Request.Context(), input)
 	if err != nil {
-		response.InternalError(c, "Failed to list assets")
+		handleAssetError(c, err)
 		return
 	}
 
 	// Convert to response
 	assetResponses := make([]AssetResponse, len(output.Assets))
-	for i, asset := range output.Assets {
-		assetResponses[i] = toAssetResponse(&asset)
+	for i := range output.Assets {
+		assetResponses[i] = toAssetResponse(&output.Assets[i])
 	}
 
-	listResponse := ListAssetsResponse{
-		Assets: assetResponses,
-		Pagination: PaginationInfo{
-			TotalCount: output.TotalCount,
-			Page:       output.Page,
-			PerPage:    output.PerPage,
-			TotalPages: output.TotalPages,
-		},
-	}
-
-	response.Success(c, listResponse)
+	c.JSON(http.StatusOK, ListAssetsResponse{
+		Assets:     assetResponses,
+		TotalCount: output.TotalCount,
+		Page:       output.Page,
+		PerPage:    output.PerPage,
+		TotalPages: output.TotalPages,
+	})
 }
 
-// GetByID handles GET /api/v1/assets/:id
+// GetByID handles getting a single asset by ID
 // @Summary Get asset by ID
-// @Description Returns a specific asset by its ID
 // @Tags assets
 // @Produce json
 // @Param id path string true "Asset ID"
-// @Success 200 {object} response.Response{data=AssetResponse}
-// @Failure 400 {object} response.Response
-// @Failure 401 {object} response.Response
-// @Failure 404 {object} response.Response
-// @Security BearerAuth
+// @Success 200 {object} AssetResponse
 // @Router /api/v1/assets/{id} [get]
 func (h *AssetHandler) GetByID(c *gin.Context) {
-	userID, ok := middleware.GetUserID(c)
-	if !ok {
-		response.Unauthorized(c, "User not authenticated")
+	userID, err := getUserIDFromContext(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
 	assetID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		response.BadRequest(c, "Invalid asset ID format")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid asset ID"})
 		return
 	}
 
-	asset, err := h.getAssetUC.Execute(c.Request.Context(), assetID, userID)
+	output, err := h.useCases.GetAsset(c.Request.Context(), usecases.GetAssetInput{
+		AssetID: assetID,
+		UserID:  userID,
+	})
 	if err != nil {
 		handleAssetError(c, err)
 		return
 	}
 
-	response.Success(c, toAssetResponse(asset))
+	c.JSON(http.StatusOK, toAssetResponse(output.Asset))
 }
 
-// Update handles PUT /api/v1/assets/:id
+// Update handles updating an existing asset
 // @Summary Update an asset
-// @Description Updates an existing asset
 // @Tags assets
 // @Accept json
 // @Produce json
 // @Param id path string true "Asset ID"
-// @Param request body UpdateAssetRequest true "Updated asset data"
-// @Success 200 {object} response.Response{data=AssetResponse}
-// @Failure 400 {object} response.Response
-// @Failure 401 {object} response.Response
-// @Failure 404 {object} response.Response
-// @Security BearerAuth
+// @Param body body UpdateAssetRequest true "Update data"
+// @Success 200 {object} AssetResponse
 // @Router /api/v1/assets/{id} [put]
 func (h *AssetHandler) Update(c *gin.Context) {
-	userID, ok := middleware.GetUserID(c)
-	if !ok {
-		response.Unauthorized(c, "User not authenticated")
+	userID, err := getUserIDFromContext(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
 	assetID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		response.BadRequest(c, "Invalid asset ID format")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid asset ID"})
 		return
 	}
 
 	var req UpdateAssetRequest
 	if bindErr := c.ShouldBindJSON(&req); bindErr != nil {
-		response.BadRequest(c, "Invalid request: "+bindErr.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body: " + bindErr.Error()})
 		return
 	}
 
-	// Parse purchase date if provided
-	var purchaseDate *time.Time
-	if req.PurchaseDate != nil {
-		parsed, parseErr := time.Parse("2006-01-02", *req.PurchaseDate)
-		if parseErr != nil {
-			response.BadRequest(c, "Invalid purchase_date format. Use YYYY-MM-DD")
-			return
-		}
-		purchaseDate = &parsed
-	}
-
-	input := usecases.UpdateAssetInput{
-		AssetID:       assetID,
-		UserID:        userID,
-		Type:          req.Type,
-		Name:          req.Name,
-		Symbol:        req.Symbol,
-		Quantity:      req.Quantity,
-		PurchasePrice: req.PurchasePrice,
-		CurrentPrice:  req.CurrentPrice,
-		Currency:      req.Currency,
-		PurchaseDate:  purchaseDate,
-		Metadata:      req.Metadata,
-		Notes:         req.Notes,
-	}
-
-	asset, err := h.updateAssetUC.Execute(c.Request.Context(), input)
+	output, err := h.useCases.UpdateAsset(c.Request.Context(), usecases.UpdateAssetInput{
+		AssetID:      assetID,
+		UserID:       userID,
+		Type:         req.Type,
+		Name:         req.Name,
+		CoreData:     req.CoreData,
+		ExtendedData: req.ExtendedData,
+	})
 	if err != nil {
 		handleAssetError(c, err)
 		return
 	}
 
-	response.Success(c, toAssetResponse(asset))
+	c.JSON(http.StatusOK, toAssetResponse(output.Asset))
 }
 
-// Delete handles DELETE /api/v1/assets/:id
+// Delete handles deleting an asset
 // @Summary Delete an asset
-// @Description Deletes an asset by its ID
 // @Tags assets
-// @Produce json
 // @Param id path string true "Asset ID"
-// @Success 200 {object} response.Response
-// @Failure 400 {object} response.Response
-// @Failure 401 {object} response.Response
-// @Failure 404 {object} response.Response
-// @Security BearerAuth
+// @Success 204
 // @Router /api/v1/assets/{id} [delete]
 func (h *AssetHandler) Delete(c *gin.Context) {
-	userID, ok := middleware.GetUserID(c)
-	if !ok {
-		response.Unauthorized(c, "User not authenticated")
+	userID, err := getUserIDFromContext(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
 	assetID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		response.BadRequest(c, "Invalid asset ID format")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid asset ID"})
 		return
 	}
 
-	if err := h.deleteAssetUC.Execute(c.Request.Context(), assetID, userID); err != nil {
+	err = h.useCases.DeleteAsset(c.Request.Context(), usecases.DeleteAssetInput{
+		AssetID: assetID,
+		UserID:  userID,
+	})
+	if err != nil {
 		handleAssetError(c, err)
 		return
 	}
 
-	response.Success(c, map[string]string{"message": "Asset deleted successfully"})
+	c.JSON(http.StatusNoContent, nil)
 }
 
-// ====================================
-// Helper Functions
-// ====================================
-
-// toAssetResponse converts an Asset entity to AssetResponse DTO
-func toAssetResponse(asset *entities.Asset) AssetResponse {
-	resp := AssetResponse{
-		ID:              asset.ID.String(),
-		Type:            string(asset.Type),
-		Name:            asset.Name,
-		Symbol:          asset.Symbol,
-		Quantity:        asset.Quantity,
-		PurchasePrice:   asset.PurchasePrice,
-		CurrentPrice:    asset.CurrentPrice,
-		Currency:        asset.Currency,
-		Notes:           asset.Notes,
-		TotalValue:      asset.TotalValue(),
-		TotalCost:       asset.TotalCost(),
-		GainLoss:        asset.GainLoss(),
-		GainLossPercent: asset.GainLossPercent(),
-		CreatedAt:       asset.CreatedAt.Format(time.RFC3339),
-		UpdatedAt:       asset.UpdatedAt.Format(time.RFC3339),
+// Autofill handles auto-filling asset extended data from market APIs
+// @Summary Auto-fill asset data
+// @Tags assets
+// @Accept json
+// @Produce json
+// @Param body body AutofillRequest true "Asset type and core data"
+// @Success 200 {object} AutofillResponse
+// @Router /api/v1/assets/autofill [post]
+func (h *AssetHandler) Autofill(c *gin.Context) {
+	_, err := getUserIDFromContext(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
 	}
 
-	if asset.PurchaseDate != nil {
-		date := asset.PurchaseDate.Format("2006-01-02")
-		resp.PurchaseDate = &date
+	var req AutofillRequest
+	if bindErr := c.ShouldBindJSON(&req); bindErr != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body: " + bindErr.Error()})
+		return
 	}
 
-	// Parse metadata if available
-	if len(asset.Metadata) > 2 {
-		var metadata map[string]interface{}
-		if err := json.Unmarshal(asset.Metadata, &metadata); err == nil {
-			resp.Metadata = metadata
-		}
+	assetType := entities.AssetType(req.Type)
+	if !assetType.IsValid() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid asset type: " + req.Type})
+		return
 	}
 
-	return resp
+	if h.autofillSvc == nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "autofill service not available"})
+		return
+	}
+
+	extendedData, apiSources, err := h.autofillSvc.Fill(c.Request.Context(), assetType, req.CoreData)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":         "autofill partially failed",
+			"extended_data": extendedData,
+			"api_sources":   apiSources,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, AutofillResponse{
+		ExtendedData: extendedData,
+		APISources:   apiSources,
+	})
 }
 
-// handleAssetError handles asset-related errors and sends appropriate responses
+// GetSchemas returns the form schemas for all asset types
+// @Summary Get asset form schemas
+// @Tags assets
+// @Produce json
+// @Success 200 {array} entities.AssetFormSchema
+// @Router /api/v1/assets/schemas [get]
+func (h *AssetHandler) GetSchemas(c *gin.Context) {
+	schemas := entities.AllFormSchemas()
+	c.JSON(http.StatusOK, gin.H{"schemas": schemas})
+}
+
+// --- Error handling ---
+
 func handleAssetError(c *gin.Context, err error) {
 	switch {
-	case errors.Is(err, usecases.ErrAssetNotFound) || errors.Is(err, infraRepo.ErrAssetNotFound):
-		response.NotFound(c, "Asset not found")
 	case errors.Is(err, usecases.ErrInvalidAssetType):
-		response.BadRequest(c, "Invalid asset type")
-	case errors.Is(err, usecases.ErrInvalidQuantity):
-		response.BadRequest(c, "Quantity must be greater than 0")
-	case errors.Is(err, usecases.ErrInvalidPrice):
-		response.BadRequest(c, "Price must be non-negative")
-	case errors.Is(err, usecases.ErrAssetNameRequired):
-		response.BadRequest(c, "Asset name is required")
-	case errors.Is(err, usecases.ErrUnauthorizedAccess):
-		response.Forbidden(c, "You don't have access to this asset")
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	case errors.Is(err, usecases.ErrAssetNotFound):
+		c.JSON(http.StatusNotFound, gin.H{"error": "asset not found"})
+	case errors.Is(err, usecases.ErrUnauthorized):
+		c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
+	case errors.Is(err, usecases.ErrMissingRequiredData):
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	default:
-		response.InternalError(c, "An error occurred while processing your request")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 	}
+}
+
+// parseIntFromString is a helper to parse an int from a string
+func parseIntFromString(s string, out *int) (int, error) { //nolint:unparam // kept for API clarity
+	var val int
+	_, err := strings.NewReader(s).Read([]byte{})
+	if err != nil {
+		return 0, err
+	}
+	// Simple parsing
+	for _, c := range s {
+		if c < '0' || c > '9' {
+			return 0, errors.New("invalid integer")
+		}
+		val = val*10 + int(c-'0')
+	}
+	*out = val
+	return val, nil
 }

@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"database/sql"
 	"encoding/json"
 	"time"
 
@@ -11,23 +10,19 @@ import (
 	"github.com/Unikyri/WealthScope/backend/internal/domain/entities"
 )
 
-// AssetModel is the GORM model for the assets table
+// AssetModel is the GORM model for the assets table (v2 - JSONB architecture)
+//
+//nolint:govet // fieldalignment: GORM model field order kept for clarity
 type AssetModel struct {
-	CreatedAt     time.Time       `gorm:"column:created_at;autoCreateTime"`
-	UpdatedAt     time.Time       `gorm:"column:updated_at;autoUpdateTime"`
-	DeletedAt     gorm.DeletedAt  `gorm:"index"`
-	PurchaseDate  sql.NullTime    `gorm:"column:purchase_date"`
-	Currency      string          `gorm:"default:USD"`
-	Type          string          `gorm:"type:asset_type;not null"`
-	Name          string          `gorm:"not null"`
-	Metadata      json.RawMessage `gorm:"type:jsonb;default:'{}'"`
-	Symbol        sql.NullString  `gorm:"column:symbol"`
-	Notes         sql.NullString  `gorm:"column:notes"`
-	CurrentPrice  sql.NullFloat64 `gorm:"type:decimal(20,2);column:current_price"`
-	Quantity      float64         `gorm:"type:decimal(20,8);not null"`
-	PurchasePrice float64         `gorm:"type:decimal(20,2);not null;column:purchase_price"`
-	ID            uuid.UUID       `gorm:"type:uuid;primaryKey"`
-	UserID        uuid.UUID       `gorm:"type:uuid;not null;index"`
+	DeletedAt    gorm.DeletedAt  `gorm:"index"`
+	CoreData     json.RawMessage `gorm:"type:jsonb;default:'{}';column:core_data"`
+	ExtendedData json.RawMessage `gorm:"type:jsonb;default:'{}';column:extended_data"`
+	ID           uuid.UUID       `gorm:"type:uuid;primaryKey"`
+	UserID       uuid.UUID       `gorm:"type:uuid;not null;index"`
+	CreatedAt    time.Time       `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt    time.Time       `gorm:"column:updated_at;autoUpdateTime"`
+	Type         string          `gorm:"type:asset_type;not null"`
+	Name         string          `gorm:"not null"`
 }
 
 // TableName returns the table name for GORM
@@ -37,64 +32,36 @@ func (AssetModel) TableName() string {
 
 // ToEntity converts AssetModel to domain Asset entity
 func (m *AssetModel) ToEntity() *entities.Asset {
-	asset := &entities.Asset{
-		ID:            m.ID,
-		UserID:        m.UserID,
-		Type:          entities.AssetType(m.Type),
-		Name:          m.Name,
-		Quantity:      m.Quantity,
-		PurchasePrice: m.PurchasePrice,
-		Currency:      m.Currency,
-		Metadata:      m.Metadata,
-		CreatedAt:     m.CreatedAt,
-		UpdatedAt:     m.UpdatedAt,
+	return &entities.Asset{
+		ID:           m.ID,
+		UserID:       m.UserID,
+		Type:         entities.AssetType(m.Type),
+		Name:         m.Name,
+		CoreData:     m.CoreData,
+		ExtendedData: m.ExtendedData,
+		CreatedAt:    m.CreatedAt,
+		UpdatedAt:    m.UpdatedAt,
 	}
-
-	// Handle nullable fields
-	if m.Symbol.Valid {
-		asset.Symbol = &m.Symbol.String
-	}
-	if m.CurrentPrice.Valid {
-		asset.CurrentPrice = &m.CurrentPrice.Float64
-	}
-	if m.PurchaseDate.Valid {
-		asset.PurchaseDate = &m.PurchaseDate.Time
-	}
-	if m.Notes.Valid {
-		asset.Notes = &m.Notes.String
-	}
-
-	return asset
 }
 
 // FromAssetEntity creates an AssetModel from a domain Asset entity
 func FromAssetEntity(asset *entities.Asset) *AssetModel {
-	model := &AssetModel{
-		ID:            asset.ID,
-		UserID:        asset.UserID,
-		Type:          string(asset.Type),
-		Name:          asset.Name,
-		Quantity:      asset.Quantity,
-		PurchasePrice: asset.PurchasePrice,
-		Currency:      asset.Currency,
-		Metadata:      asset.Metadata,
-		CreatedAt:     asset.CreatedAt,
-		UpdatedAt:     asset.UpdatedAt,
+	coreData := asset.CoreData
+	if coreData == nil {
+		coreData = json.RawMessage("{}")
 	}
-
-	// Handle nullable fields
-	if asset.Symbol != nil {
-		model.Symbol = sql.NullString{String: *asset.Symbol, Valid: true}
+	extendedData := asset.ExtendedData
+	if extendedData == nil {
+		extendedData = json.RawMessage("{}")
 	}
-	if asset.CurrentPrice != nil {
-		model.CurrentPrice = sql.NullFloat64{Float64: *asset.CurrentPrice, Valid: true}
+	return &AssetModel{
+		ID:           asset.ID,
+		UserID:       asset.UserID,
+		Type:         string(asset.Type),
+		Name:         asset.Name,
+		CoreData:     coreData,
+		ExtendedData: extendedData,
+		CreatedAt:    asset.CreatedAt,
+		UpdatedAt:    asset.UpdatedAt,
 	}
-	if asset.PurchaseDate != nil {
-		model.PurchaseDate = sql.NullTime{Time: *asset.PurchaseDate, Valid: true}
-	}
-	if asset.Notes != nil {
-		model.Notes = sql.NullString{String: *asset.Notes, Valid: true}
-	}
-
-	return model
 }

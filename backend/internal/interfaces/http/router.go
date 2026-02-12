@@ -34,6 +34,7 @@ type RouterDeps struct {
 	HealthScorer        *services.HealthScorer
 	CorrelationDetector *services.CorrelationDetector
 	AlertGenerator      *services.AlertGenerator
+	AutofillService     *services.AutofillService
 	GeminiClient        interface {
 		GenerateWithThinking(ctx context.Context, prompt, systemPrompt string, thinkingLevel int) (string, error)
 	}
@@ -69,21 +70,14 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 
 	// Initialize use cases
 	var syncUserUseCase *usecases.SyncUserUseCase
-	var createAssetUC *usecases.CreateAssetUseCase
-	var getAssetUC *usecases.GetAssetUseCase
-	var listAssetsUC *usecases.ListAssetsUseCase
-	var updateAssetUC *usecases.UpdateAssetUseCase
-	var deleteAssetUC *usecases.DeleteAssetUseCase
-
 	if userRepo != nil {
 		syncUserUseCase = usecases.NewSyncUserUseCase(userRepo)
 	}
+
+	// Initialize asset use cases (consolidated)
+	var assetUC *usecases.AssetUseCases
 	if assetRepo != nil {
-		createAssetUC = usecases.NewCreateAssetUseCase(assetRepo)
-		getAssetUC = usecases.NewGetAssetUseCase(assetRepo)
-		listAssetsUC = usecases.NewListAssetsUseCase(assetRepo)
-		updateAssetUC = usecases.NewUpdateAssetUseCase(assetRepo)
-		deleteAssetUC = usecases.NewDeleteAssetUseCase(assetRepo)
+		assetUC = usecases.NewAssetUseCases(assetRepo)
 	}
 
 	// Initialize portfolio use cases
@@ -101,13 +95,7 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 	// Initialize handlers
 	healthHandler := handlers.NewHealthHandler(deps.DB)
 	authHandler := handlers.NewAuthHandler(syncUserUseCase)
-	assetHandler := handlers.NewAssetHandler(
-		createAssetUC,
-		getAssetUC,
-		listAssetsUC,
-		updateAssetUC,
-		deleteAssetUC,
-	)
+	assetHandler := handlers.NewAssetHandler(assetUC, deps.AutofillService)
 	portfolioHandler := handlers.NewPortfolioHandler(getPortfolioSummaryUC, getPortfolioRiskUC)
 
 	// Initialize news handler
@@ -181,6 +169,8 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 		{
 			assets.POST("", assetHandler.Create)
 			assets.GET("", assetHandler.List)
+			assets.POST("/autofill", assetHandler.Autofill)
+			assets.GET("/schemas", assetHandler.GetSchemas)
 			assets.GET("/:id", assetHandler.GetByID)
 			assets.PUT("/:id", assetHandler.Update)
 			assets.DELETE("/:id", assetHandler.Delete)

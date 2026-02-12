@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -13,183 +14,162 @@ import (
 	"github.com/Unikyri/WealthScope/backend/internal/domain/repositories"
 )
 
-// Common errors for asset operations
+// Common errors
 var (
-	ErrInvalidAssetType   = errors.New("invalid asset type")
-	ErrInvalidQuantity    = errors.New("quantity must be greater than 0")
-	ErrInvalidPrice       = errors.New("price must be non-negative")
-	ErrAssetNameRequired  = errors.New("asset name is required")
-	ErrAssetNotFound      = errors.New("asset not found")
-	ErrUnauthorizedAccess = errors.New("unauthorized access to asset")
+	ErrInvalidAssetType    = errors.New("invalid asset type")
+	ErrAssetNotFound       = errors.New("asset not found")
+	ErrUnauthorized        = errors.New("unauthorized access to asset")
+	ErrMissingRequiredData = errors.New("missing required core_data fields")
 )
 
-// ====================================
-// Create Asset Use Case
-// ====================================
-
-// CreateAssetInput represents the input for creating an asset
+// CreateAssetInput contains the data needed to create a new asset (v2 - JSONB)
 type CreateAssetInput struct {
-	Metadata      map[string]interface{}
-	PurchaseDate  *time.Time
-	Symbol        *string
-	CurrentPrice  *float64
-	Notes         *string
-	Type          string
-	Name          string
-	Currency      string
-	Quantity      float64
-	PurchasePrice float64
-	UserID        uuid.UUID
+	CoreData     map[string]interface{} `json:"core_data"`
+	ExtendedData map[string]interface{} `json:"extended_data,omitempty"`
+	Type         string                 `json:"type"`
+	Name         string                 `json:"name"`
+	UserID       uuid.UUID              `json:"-"`
 }
 
-// CreateAssetUseCase handles creating a new asset
-type CreateAssetUseCase struct {
-	assetRepo repositories.AssetRepository
+// CreateAssetOutput contains the result of creating an asset
+type CreateAssetOutput struct {
+	Asset *entities.Asset `json:"asset"`
 }
 
-// NewCreateAssetUseCase creates a new CreateAssetUseCase
-func NewCreateAssetUseCase(assetRepo repositories.AssetRepository) *CreateAssetUseCase {
-	return &CreateAssetUseCase{assetRepo: assetRepo}
+// GetAssetInput contains the data needed to get an asset
+type GetAssetInput struct {
+	AssetID uuid.UUID `json:"asset_id"`
+	UserID  uuid.UUID `json:"-"`
 }
 
-// Execute creates a new asset for the user
-func (uc *CreateAssetUseCase) Execute(ctx context.Context, input CreateAssetInput) (*entities.Asset, error) {
+// GetAssetOutput contains the result of getting an asset
+type GetAssetOutput struct {
+	Asset *entities.Asset `json:"asset"`
+}
+
+// ListAssetsInput contains the data needed to list assets
+type ListAssetsInput struct {
+	Type     *string   `json:"type,omitempty"`
+	Symbol   *string   `json:"symbol,omitempty"`
+	Currency *string   `json:"currency,omitempty"`
+	UserID   uuid.UUID `json:"-"`
+	Page     int       `json:"page,omitempty"`
+	PerPage  int       `json:"per_page,omitempty"`
+}
+
+// ListAssetsOutput contains the result of listing assets
+type ListAssetsOutput struct {
+	Assets     []entities.Asset `json:"assets"`
+	TotalCount int64            `json:"total_count"`
+	Page       int              `json:"page"`
+	PerPage    int              `json:"per_page"`
+	TotalPages int              `json:"total_pages"`
+}
+
+// UpdateAssetInput contains the data needed to update an asset
+type UpdateAssetInput struct {
+	CoreData     map[string]interface{} `json:"core_data,omitempty"`
+	ExtendedData map[string]interface{} `json:"extended_data,omitempty"`
+	Type         *string                `json:"type,omitempty"`
+	Name         *string                `json:"name,omitempty"`
+	AssetID      uuid.UUID              `json:"asset_id"`
+	UserID       uuid.UUID              `json:"-"`
+}
+
+// UpdateAssetOutput contains the result of updating an asset
+type UpdateAssetOutput struct {
+	Asset *entities.Asset `json:"asset"`
+}
+
+// DeleteAssetInput contains the data needed to delete an asset
+type DeleteAssetInput struct {
+	AssetID uuid.UUID `json:"asset_id"`
+	UserID  uuid.UUID `json:"-"`
+}
+
+// AssetUseCases handles business logic for assets
+type AssetUseCases struct {
+	repo repositories.AssetRepository
+}
+
+// NewAssetUseCases creates a new AssetUseCases
+func NewAssetUseCases(repo repositories.AssetRepository) *AssetUseCases {
+	return &AssetUseCases{repo: repo}
+}
+
+// CreateAsset validates and creates a new asset
+func (uc *AssetUseCases) CreateAsset(ctx context.Context, input CreateAssetInput) (*CreateAssetOutput, error) {
 	// Validate asset type
-	assetType := entities.AssetType(input.Type)
+	assetType := entities.AssetType(strings.TrimSpace(input.Type))
 	if !assetType.IsValid() {
-		return nil, ErrInvalidAssetType
+		return nil, fmt.Errorf("%w: %s", ErrInvalidAssetType, input.Type)
 	}
 
-	// Validate required fields
-	if input.Name == "" {
-		return nil, ErrAssetNameRequired
-	}
-	if input.Quantity <= 0 {
-		return nil, ErrInvalidQuantity
-	}
-	if input.PurchasePrice < 0 {
-		return nil, ErrInvalidPrice
+	// Validate name
+	name := strings.TrimSpace(input.Name)
+	if name == "" {
+		return nil, fmt.Errorf("asset name is required")
 	}
 
-	// Set default currency
-	currency := input.Currency
-	if currency == "" {
-		currency = "USD"
+	// Validate required core_data fields
+	if input.CoreData == nil {
+		input.CoreData = make(map[string]interface{})
+	}
+	missingFields := entities.ValidateCoreData(assetType, input.CoreData)
+	if len(missingFields) > 0 {
+		return nil, fmt.Errorf("%w: %s", ErrMissingRequiredData, strings.Join(missingFields, ", "))
 	}
 
-	// Create asset entity
-	asset := entities.NewAsset(
-		input.UserID,
-		assetType,
-		input.Name,
-		input.Quantity,
-		input.PurchasePrice,
-		currency,
-	)
+	// Serialize core_data
+	coreDataJSON, err := json.Marshal(input.CoreData)
+	if err != nil {
+		return nil, fmt.Errorf("failed to serialize core_data: %w", err)
+	}
 
-	// Set optional fields
-	if input.Symbol != nil {
-		asset.SetSymbol(*input.Symbol)
-	}
-	if input.CurrentPrice != nil {
-		asset.SetCurrentPrice(*input.CurrentPrice)
-	}
-	if input.PurchaseDate != nil {
-		asset.SetPurchaseDate(*input.PurchaseDate)
-	}
-	if input.Notes != nil {
-		asset.SetNotes(*input.Notes)
-	}
-	if input.Metadata != nil {
-		metadataJSON, err := json.Marshal(input.Metadata)
+	// Serialize extended_data
+	var extendedDataJSON json.RawMessage
+	if input.ExtendedData != nil {
+		extendedDataJSON, err = json.Marshal(input.ExtendedData)
 		if err != nil {
-			return nil, fmt.Errorf("failed to marshal metadata: %w", err)
+			return nil, fmt.Errorf("failed to serialize extended_data: %w", err)
 		}
-		asset.SetMetadata(metadataJSON)
+	} else {
+		extendedDataJSON = json.RawMessage("{}")
 	}
 
-	// Save to repository
-	if err := uc.assetRepo.Create(ctx, asset); err != nil {
+	asset := entities.NewAsset(input.UserID, assetType, name, coreDataJSON, extendedDataJSON)
+
+	if err := uc.repo.Create(ctx, asset); err != nil {
 		return nil, fmt.Errorf("failed to create asset: %w", err)
 	}
 
-	return asset, nil
+	return &CreateAssetOutput{Asset: asset}, nil
 }
 
-// ====================================
-// Get Asset Use Case
-// ====================================
-
-// GetAssetUseCase handles retrieving a single asset
-type GetAssetUseCase struct {
-	assetRepo repositories.AssetRepository
-}
-
-// NewGetAssetUseCase creates a new GetAssetUseCase
-func NewGetAssetUseCase(assetRepo repositories.AssetRepository) *GetAssetUseCase {
-	return &GetAssetUseCase{assetRepo: assetRepo}
-}
-
-// Execute retrieves an asset by ID for the specified user
-func (uc *GetAssetUseCase) Execute(ctx context.Context, assetID, userID uuid.UUID) (*entities.Asset, error) {
-	asset, err := uc.assetRepo.FindByID(ctx, assetID, userID)
+// GetAsset retrieves an asset by ID with ownership check
+func (uc *AssetUseCases) GetAsset(ctx context.Context, input GetAssetInput) (*GetAssetOutput, error) {
+	asset, err := uc.repo.FindByID(ctx, input.AssetID, input.UserID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get asset: %w", err)
+		return nil, fmt.Errorf("%w", ErrAssetNotFound)
 	}
-	return asset, nil
+	return &GetAssetOutput{Asset: asset}, nil
 }
 
-// ====================================
-// List Assets Use Case
-// ====================================
-
-// ListAssetsInput represents the input for listing assets
-type ListAssetsInput struct {
-	Type     *string
-	Symbol   *string
-	Currency *string
-	UserID   uuid.UUID
-	Page     int
-	PerPage  int
-}
-
-// ListAssetsOutput represents the output of listing assets
-type ListAssetsOutput struct {
-	Assets     []entities.Asset
-	TotalCount int64
-	Page       int
-	PerPage    int
-	TotalPages int
-}
-
-// ListAssetsUseCase handles listing user's assets
-type ListAssetsUseCase struct {
-	assetRepo repositories.AssetRepository
-}
-
-// NewListAssetsUseCase creates a new ListAssetsUseCase
-func NewListAssetsUseCase(assetRepo repositories.AssetRepository) *ListAssetsUseCase {
-	return &ListAssetsUseCase{assetRepo: assetRepo}
-}
-
-// Execute retrieves a paginated list of assets for the user
-func (uc *ListAssetsUseCase) Execute(ctx context.Context, input ListAssetsInput) (*ListAssetsOutput, error) {
+// ListAssets retrieves all assets for a user with optional filters and pagination
+func (uc *AssetUseCases) ListAssets(ctx context.Context, input ListAssetsInput) (*ListAssetsOutput, error) {
 	// Build filters
 	var filters *repositories.AssetFilters
 	if input.Type != nil || input.Symbol != nil || input.Currency != nil {
 		filters = &repositories.AssetFilters{}
 		if input.Type != nil {
 			assetType := entities.AssetType(*input.Type)
-			if assetType.IsValid() {
-				filters.Type = &assetType
+			if !assetType.IsValid() {
+				return nil, fmt.Errorf("%w: %s", ErrInvalidAssetType, *input.Type)
 			}
+			filters.Type = &assetType
 		}
-		if input.Symbol != nil {
-			filters.Symbol = input.Symbol
-		}
-		if input.Currency != nil {
-			filters.Currency = input.Currency
-		}
+		filters.Symbol = input.Symbol
+		filters.Currency = input.Currency
 	}
 
 	// Build pagination
@@ -198,7 +178,7 @@ func (uc *ListAssetsUseCase) Execute(ctx context.Context, input ListAssetsInput)
 		PerPage: input.PerPage,
 	}
 
-	result, err := uc.assetRepo.FindByUserID(ctx, input.UserID, filters, pagination)
+	result, err := uc.repo.FindByUserID(ctx, input.UserID, filters, pagination)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list assets: %w", err)
 	}
@@ -212,121 +192,91 @@ func (uc *ListAssetsUseCase) Execute(ctx context.Context, input ListAssetsInput)
 	}, nil
 }
 
-// ====================================
-// Update Asset Use Case
-// ====================================
-
-// UpdateAssetInput represents the input for updating an asset
-type UpdateAssetInput struct {
-	Metadata      map[string]interface{}
-	PurchaseDate  *time.Time
-	Type          *string
-	Name          *string
-	Symbol        *string
-	Quantity      *float64
-	PurchasePrice *float64
-	CurrentPrice  *float64
-	Currency      *string
-	Notes         *string
-	AssetID       uuid.UUID
-	UserID        uuid.UUID
-}
-
-// UpdateAssetUseCase handles updating an existing asset
-type UpdateAssetUseCase struct {
-	assetRepo repositories.AssetRepository
-}
-
-// NewUpdateAssetUseCase creates a new UpdateAssetUseCase
-func NewUpdateAssetUseCase(assetRepo repositories.AssetRepository) *UpdateAssetUseCase {
-	return &UpdateAssetUseCase{assetRepo: assetRepo}
-}
-
-// Execute updates an asset for the specified user
-func (uc *UpdateAssetUseCase) Execute(ctx context.Context, input UpdateAssetInput) (*entities.Asset, error) {
-	// Get existing asset (also validates ownership)
-	asset, err := uc.assetRepo.FindByID(ctx, input.AssetID, input.UserID)
+// UpdateAsset updates an existing asset with ownership check
+func (uc *AssetUseCases) UpdateAsset(ctx context.Context, input UpdateAssetInput) (*UpdateAssetOutput, error) {
+	// Find existing asset
+	existing, err := uc.repo.FindByID(ctx, input.AssetID, input.UserID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to find asset: %w", err)
+		return nil, fmt.Errorf("%w", ErrAssetNotFound)
 	}
 
-	// Update fields if provided
+	// Update type if provided
 	if input.Type != nil {
 		assetType := entities.AssetType(*input.Type)
 		if !assetType.IsValid() {
-			return nil, ErrInvalidAssetType
+			return nil, fmt.Errorf("%w: %s", ErrInvalidAssetType, *input.Type)
 		}
-		asset.Type = assetType
+		existing.Type = assetType
 	}
+
+	// Update name if provided
 	if input.Name != nil {
-		if *input.Name == "" {
-			return nil, ErrAssetNameRequired
+		name := strings.TrimSpace(*input.Name)
+		if name != "" {
+			existing.Name = name
 		}
-		asset.Name = *input.Name
 	}
-	if input.Symbol != nil {
-		asset.SetSymbol(*input.Symbol)
-	}
-	if input.Quantity != nil {
-		if *input.Quantity <= 0 {
-			return nil, ErrInvalidQuantity
-		}
-		asset.Quantity = *input.Quantity
-	}
-	if input.PurchasePrice != nil {
-		if *input.PurchasePrice < 0 {
-			return nil, ErrInvalidPrice
-		}
-		asset.PurchasePrice = *input.PurchasePrice
-	}
-	if input.CurrentPrice != nil {
-		asset.SetCurrentPrice(*input.CurrentPrice)
-	}
-	if input.Currency != nil {
-		asset.Currency = *input.Currency
-	}
-	if input.PurchaseDate != nil {
-		asset.SetPurchaseDate(*input.PurchaseDate)
-	}
-	if input.Notes != nil {
-		asset.SetNotes(*input.Notes)
-	}
-	if input.Metadata != nil {
-		metadataJSON, err := json.Marshal(input.Metadata)
+
+	// Update core_data if provided (merge with existing)
+	if input.CoreData != nil {
+		existingCoreData, err := existing.GetCoreDataMap()
 		if err != nil {
-			return nil, fmt.Errorf("failed to marshal metadata: %w", err)
+			existingCoreData = make(map[string]interface{})
 		}
-		asset.SetMetadata(metadataJSON)
+		for k, v := range input.CoreData {
+			if v == nil {
+				delete(existingCoreData, k)
+			} else {
+				existingCoreData[k] = v
+			}
+		}
+		coreDataJSON, err := json.Marshal(existingCoreData)
+		if err != nil {
+			return nil, fmt.Errorf("failed to serialize core_data: %w", err)
+		}
+		existing.SetCoreData(coreDataJSON)
 	}
 
-	asset.UpdatedAt = time.Now().UTC()
+	// Update extended_data if provided (merge with existing)
+	if input.ExtendedData != nil {
+		existingExtData, err := existing.GetExtendedDataMap()
+		if err != nil {
+			existingExtData = make(map[string]interface{})
+		}
+		for k, v := range input.ExtendedData {
+			if v == nil {
+				delete(existingExtData, k)
+			} else {
+				existingExtData[k] = v
+			}
+		}
+		extDataJSON, err := json.Marshal(existingExtData)
+		if err != nil {
+			return nil, fmt.Errorf("failed to serialize extended_data: %w", err)
+		}
+		existing.SetExtendedData(extDataJSON)
+	}
 
-	// Save changes
-	if err := uc.assetRepo.Update(ctx, asset); err != nil {
+	existing.UpdatedAt = time.Now().UTC()
+
+	if err := uc.repo.Update(ctx, existing); err != nil {
 		return nil, fmt.Errorf("failed to update asset: %w", err)
 	}
 
-	return asset, nil
+	return &UpdateAssetOutput{Asset: existing}, nil
 }
 
-// ====================================
-// Delete Asset Use Case
-// ====================================
+// DeleteAsset deletes an asset with ownership check
+func (uc *AssetUseCases) DeleteAsset(ctx context.Context, input DeleteAssetInput) error {
+	// Verify asset exists and belongs to user
+	_, err := uc.repo.FindByID(ctx, input.AssetID, input.UserID)
+	if err != nil {
+		return fmt.Errorf("%w", ErrAssetNotFound)
+	}
 
-// DeleteAssetUseCase handles deleting an asset
-type DeleteAssetUseCase struct {
-	assetRepo repositories.AssetRepository
-}
-
-// NewDeleteAssetUseCase creates a new DeleteAssetUseCase
-func NewDeleteAssetUseCase(assetRepo repositories.AssetRepository) *DeleteAssetUseCase {
-	return &DeleteAssetUseCase{assetRepo: assetRepo}
-}
-
-// Execute deletes an asset for the specified user
-func (uc *DeleteAssetUseCase) Execute(ctx context.Context, assetID, userID uuid.UUID) error {
-	if err := uc.assetRepo.Delete(ctx, assetID, userID); err != nil {
+	if err := uc.repo.Delete(ctx, input.AssetID, input.UserID); err != nil {
 		return fmt.Errorf("failed to delete asset: %w", err)
 	}
+
 	return nil
 }
