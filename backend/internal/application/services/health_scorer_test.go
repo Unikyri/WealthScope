@@ -1,6 +1,7 @@
 package services
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -8,6 +9,39 @@ import (
 
 	"github.com/Unikyri/WealthScope/backend/internal/domain/entities"
 )
+
+// makeAsset creates a test asset with JSONB core_data for use in health scorer tests.
+func makeAsset(assetType entities.AssetType, qty, price float64) entities.Asset {
+	coreData, _ := json.Marshal(map[string]interface{}{
+		"quantity":       qty,
+		"purchase_price": price,
+	})
+	return *entities.NewAsset(
+		[16]byte{}, // zero UUID for tests
+		assetType,
+		string(assetType),
+		coreData,
+		nil,
+	)
+}
+
+// makeAssetWithCurrentPrice creates a test asset with current_price in extended_data.
+func makeAssetWithCurrentPrice(assetType entities.AssetType, qty, purchasePrice, currentPrice float64) entities.Asset {
+	coreData, _ := json.Marshal(map[string]interface{}{
+		"quantity":       qty,
+		"purchase_price": purchasePrice,
+	})
+	extData, _ := json.Marshal(map[string]interface{}{
+		"current_price": currentPrice,
+	})
+	return *entities.NewAsset(
+		[16]byte{},
+		assetType,
+		string(assetType),
+		coreData,
+		extData,
+	)
+}
 
 func TestHealthScorer_Calculate_EmptyPortfolio(t *testing.T) {
 	scorer := NewHealthScorer(zap.NewNop())
@@ -23,11 +57,11 @@ func TestHealthScorer_Calculate_DiversifiedPortfolio(t *testing.T) {
 
 	// Create a well-diversified portfolio
 	assets := []entities.Asset{
-		{Type: entities.AssetTypeStock, Quantity: 10, PurchasePrice: 100},
-		{Type: entities.AssetTypeBond, Quantity: 5, PurchasePrice: 200},
-		{Type: entities.AssetTypeETF, Quantity: 8, PurchasePrice: 150},
-		{Type: entities.AssetTypeCrypto, Quantity: 2, PurchasePrice: 500},
-		{Type: entities.AssetTypeGold, Quantity: 3, PurchasePrice: 300},
+		makeAsset(entities.AssetTypeStock, 10, 100),
+		makeAsset(entities.AssetTypeBond, 5, 200),
+		makeAsset(entities.AssetTypeETF, 8, 150),
+		makeAsset(entities.AssetTypeCrypto, 2, 500),
+		makeAsset(entities.AssetTypeCash, 3, 300),
 	}
 
 	score := scorer.Calculate(assets)
@@ -42,8 +76,8 @@ func TestHealthScorer_Calculate_SingleAssetType(t *testing.T) {
 
 	// Single asset type = poor diversification
 	assets := []entities.Asset{
-		{Type: entities.AssetTypeStock, Quantity: 100, PurchasePrice: 50},
-		{Type: entities.AssetTypeStock, Quantity: 200, PurchasePrice: 30},
+		makeAsset(entities.AssetTypeStock, 100, 50),
+		makeAsset(entities.AssetTypeStock, 200, 30),
 	}
 
 	score := scorer.Calculate(assets)
@@ -58,8 +92,8 @@ func TestHealthScorer_Calculate_HighRiskPortfolio(t *testing.T) {
 
 	// All crypto = high risk
 	assets := []entities.Asset{
-		{Type: entities.AssetTypeCrypto, Quantity: 10, PurchasePrice: 1000},
-		{Type: entities.AssetTypeCrypto, Quantity: 5, PurchasePrice: 2000},
+		makeAsset(entities.AssetTypeCrypto, 10, 1000),
+		makeAsset(entities.AssetTypeCrypto, 5, 2000),
 	}
 
 	score := scorer.Calculate(assets)
@@ -73,9 +107,9 @@ func TestHealthScorer_Calculate_ConservativePortfolio(t *testing.T) {
 
 	// All bonds and cash = conservative
 	assets := []entities.Asset{
-		{Type: entities.AssetTypeBond, Quantity: 10, PurchasePrice: 100},
-		{Type: entities.AssetTypeCash, Quantity: 1, PurchasePrice: 5000},
-		{Type: entities.AssetTypeGold, Quantity: 2, PurchasePrice: 1000},
+		makeAsset(entities.AssetTypeBond, 10, 100),
+		makeAsset(entities.AssetTypeCash, 1, 5000),
+		makeAsset(entities.AssetTypeCustom, 2, 1000),
 	}
 
 	score := scorer.Calculate(assets)
@@ -87,10 +121,9 @@ func TestHealthScorer_Calculate_ConservativePortfolio(t *testing.T) {
 func TestHealthScorer_Calculate_PositivePerformance(t *testing.T) {
 	scorer := NewHealthScorer(zap.NewNop())
 
-	// Assets with gains
-	currentPrice := 120.0 // 20% gain
+	// Assets with gains (20% gain)
 	assets := []entities.Asset{
-		{Type: entities.AssetTypeStock, Quantity: 10, PurchasePrice: 100, CurrentPrice: &currentPrice},
+		makeAssetWithCurrentPrice(entities.AssetTypeStock, 10, 100, 120),
 	}
 
 	score := scorer.Calculate(assets)
@@ -102,10 +135,9 @@ func TestHealthScorer_Calculate_PositivePerformance(t *testing.T) {
 func TestHealthScorer_Calculate_NegativePerformance(t *testing.T) {
 	scorer := NewHealthScorer(zap.NewNop())
 
-	// Assets with losses
-	currentPrice := 80.0 // 20% loss
+	// Assets with losses (20% loss)
 	assets := []entities.Asset{
-		{Type: entities.AssetTypeStock, Quantity: 10, PurchasePrice: 100, CurrentPrice: &currentPrice},
+		makeAssetWithCurrentPrice(entities.AssetTypeStock, 10, 100, 80),
 	}
 
 	score := scorer.Calculate(assets)
@@ -119,7 +151,7 @@ func TestHealthScorer_GeneratesSuggestions(t *testing.T) {
 
 	// Poorly diversified, high risk portfolio
 	assets := []entities.Asset{
-		{Type: entities.AssetTypeCrypto, Quantity: 100, PurchasePrice: 500},
+		makeAsset(entities.AssetTypeCrypto, 100, 500),
 	}
 
 	score := scorer.Calculate(assets)
