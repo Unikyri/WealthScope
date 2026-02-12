@@ -200,21 +200,10 @@ class _SpeedDialFabState extends State<SpeedDialFab>
           ],
         ),
         child: Center(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
-            transitionBuilder: (child, animation) {
-              return RotationTransition(
-                turns:
-                    Tween<double>(begin: 0.0, end: 0.125).animate(animation),
-                child: child,
-              );
-            },
-            child: Icon(
-              _isOpen ? Icons.close : Icons.add,
-              key: ValueKey<bool>(_isOpen),
-              color: Colors.white,
-              size: 28,
-            ),
+          child: Icon(
+            Icons.add,
+            color: Colors.white,
+            size: 28,
           ),
         ),
       ),

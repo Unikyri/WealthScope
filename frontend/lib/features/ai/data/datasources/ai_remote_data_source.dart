@@ -28,7 +28,7 @@ class AIRemoteDataSource {
       // Handle timeout errors specifically
       if (e.type == DioExceptionType.sendTimeout || 
           e.type == DioExceptionType.receiveTimeout) {
-        throw Exception('La IA está tardando más de lo esperado. Esto puede deberse a una consulta compleja. Por favor, intenta nuevamente.');
+        throw Exception('AI is taking longer than expected. This may be due to a complex query. Please try again.');
       }
       
       // Extract error message from API response

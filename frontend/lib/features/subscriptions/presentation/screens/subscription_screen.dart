@@ -72,7 +72,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                   ),
                   const SizedBox(height: 32),
                   Text(
-                    '¡Eres Premium!',
+                    'You are Premium!',
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -82,7 +82,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Disfruta de todas las funciones premium de WealthScope',
+                    'Enjoy all premium WealthScope features',
                     style: GoogleFonts.inter(
                       fontSize: 16,
                       color: AppTheme.textGrey,
@@ -105,7 +105,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    child: const Text('Administrar Suscripción'),
+                    child: const Text('Manage Subscription'),
                   ),
                 ],
               ),
@@ -153,7 +153,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                     
                     // Packages
                     Text(
-                      'Elige tu plan',
+                      'Choose your plan',
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -192,7 +192,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                                 ),
                               )
                             : const Text(
-                                'Continuar',
+                                'Continue',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -206,7 +206,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                     TextButton(
                       onPressed: _restorePurchases,
                       child: Text(
-                        'Restaurar Compras',
+                        'Restore Purchases',
                         style: TextStyle(
                           color: AppTheme.textGrey,
                           fontSize: 14,
@@ -227,7 +227,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                           color: Colors.amber,
                         ),
                         label: Text(
-                          'Modo Trial (sin pagar)',
+                          'Trial Mode (no payment)',
                           style: TextStyle(
                             color: Colors.amber,
                             fontWeight: FontWeight.bold,
@@ -239,7 +239,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                     const SizedBox(height: 8),
                     // Terms
                     Text(
-                      'Al suscribirte, aceptas nuestros Términos y Condiciones',
+                      'By subscribing you accept our Terms and Conditions',
                       style: TextStyle(
                         color: AppTheme.textGrey,
                         fontSize: 12,
@@ -277,7 +277,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
         onPressed: () => context.pop(),
       ),
       title: Text(
-        isPremium ? 'Premium' : 'Obtén Premium',
+        isPremium ? 'Premium' : 'Get Premium',
         style: GoogleFonts.plusJakartaSans(
           fontSize: 20,
           fontWeight: FontWeight.bold,
@@ -323,7 +323,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Desbloquea todo el potencial de tu portafolio',
+            'Unlock your portfolio\'s full potential',
             style: GoogleFonts.inter(
               fontSize: 14,
               color: AppTheme.textGrey,
@@ -339,28 +339,28 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
     final features = [
       {
         'icon': PhosphorIconsRegular.sparkle,
-        'title': 'Análisis AI Ilimitado',
-        'description': 'Consultas sin límite con nuestro asesor financiero IA',
+        'title': 'Unlimited AI Analysis',
+        'description': 'Unlimited queries with our AI financial advisor',
       },
       {
         'icon': PhosphorIconsRegular.chartLineUp,
-        'title': 'Simulaciones What-If Avanzadas',
-        'description': 'Simula escenarios complejos y en cadena',
+        'title': 'Advanced What-If Simulations',
+        'description': 'Simulate complex and chained scenarios',
       },
       {
         'icon': PhosphorIconsRegular.bell,
-        'title': 'Alertas Personalizadas',
-        'description': 'Recibe notificaciones sobre cambios importantes',
+        'title': 'Personalized Alerts',
+        'description': 'Get notified about important changes',
       },
       {
         'icon': PhosphorIconsRegular.newspaper,
-        'title': 'Noticias Premium',
-        'description': 'Acceso a análisis y noticias exclusivas',
+        'title': 'Premium News',
+        'description': 'Access to exclusive analysis and news',
       },
       {
         'icon': PhosphorIconsRegular.cloudArrowUp,
-        'title': 'Sincronización en la Nube',
-        'description': 'Accede a tu portafolio desde cualquier dispositivo',
+        'title': 'Cloud Sync',
+        'description': 'Access your portfolio from any device',
       },
     ];
 
@@ -497,7 +497,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
-                            'Ahorra 83%',
+                            'Save 83%',
                             style: GoogleFonts.inter(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
@@ -574,7 +574,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'MEJOR VALOR',
+                      'BEST VALUE',
                       style: GoogleFonts.inter(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
@@ -612,7 +612,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Configura tus planes',
+              'Set up your plans',
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -621,7 +621,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'No hay planes de suscripción disponibles aún.',
+              'No subscription plans available yet.',
               style: GoogleFonts.inter(
                 fontSize: 16,
                 color: AppTheme.textGrey,
@@ -650,7 +650,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Próximos pasos:',
+                        'Next steps:',
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -660,16 +660,16 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  _buildSetupStep('1', 'Ve a RevenueCat Dashboard'),
+                  _buildSetupStep('1', 'Go to RevenueCat Dashboard'),
                   const SizedBox(height: 8),
-                  _buildSetupStep('2', 'Crea productos en Test Store'),
+                  _buildSetupStep('2', 'Create products in Test Store'),
                   const SizedBox(height: 8),
-                  _buildSetupStep('3', 'Configura el entitlement "premium"'),
+                  _buildSetupStep('3', 'Configure entitlement "premium"'),
                   const SizedBox(height: 8),
-                  _buildSetupStep('4', 'Crea el offering "default"'),
+                  _buildSetupStep('4', 'Create offering "default"'),
                   const SizedBox(height: 16),
                   Text(
-                    '📖 Ver guía: REVENUECAT_TEST_STORE_SETUP.md',
+                    '📖 See guide: REVENUECAT_TEST_STORE_SETUP.md',
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: AppTheme.textGrey,
@@ -728,7 +728,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
             ElevatedButton.icon(
               onPressed: () => context.pop(),
               icon: const Icon(Icons.arrow_back),
-              label: const Text('Volver'),
+              label: const Text('Back'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.cardGrey,
                 foregroundColor: Colors.white,
@@ -769,7 +769,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('¡Suscripción activada exitosamente!'),
+            content: Text('Subscription activated successfully!'),
             backgroundColor: Colors.green,
           ),
         );

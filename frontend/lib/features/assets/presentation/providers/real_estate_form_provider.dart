@@ -90,11 +90,11 @@ class RealEstateFormState {
     }
 
     if (address.trim().isEmpty) {
-      errors['address'] = 'La dirección es requerida';
+      errors['address'] = 'Address is required';
     }
 
     if (area != null && area! <= 0) {
-      errors['area'] = 'El área debe ser mayor a 0';
+      errors['area'] = 'Area must be greater than 0';
     }
 
     if (purchaseDate != null && purchaseDate!.isAfter(DateTime.now())) {

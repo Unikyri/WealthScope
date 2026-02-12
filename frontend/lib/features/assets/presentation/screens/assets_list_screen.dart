@@ -24,7 +24,7 @@ class AssetsListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final assetsAsync = ref.watch(searchedAssetsProvider);
+    final assetsAsync = ref.watch(filteredAssetsProvider);
     final selectedType = ref.watch(selectedAssetTypeProvider);
     final allAssets = ref.watch(allAssetsProvider);
     final gate = ref.watch(featureGateProvider);
@@ -113,22 +113,6 @@ class AssetsListScreen extends ConsumerWidget {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      // Search IconButton
-                      Container(
-                        decoration: BoxDecoration(
-                          color: AppTheme.cardGrey,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.search_rounded),
-                          color: Colors.white,
-                          onPressed: () {
-                            // TODO: Implement search functionality
-                          },
-                          tooltip: 'Search',
                         ),
                       ),
                     ],
