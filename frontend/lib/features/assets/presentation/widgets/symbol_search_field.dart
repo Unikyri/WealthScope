@@ -16,6 +16,7 @@ class SymbolSearchField extends StatefulWidget {
     this.controller,
     this.initialValue,
     this.label = 'Symbol',
+    this.searchByCompanyName = false,
     this.validator,
     super.key,
   });
@@ -25,6 +26,7 @@ class SymbolSearchField extends StatefulWidget {
   final TextEditingController? controller;
   final String? initialValue;
   final String label;
+  final bool searchByCompanyName;
   final String? Function(String?)? validator;
 
   @override
@@ -63,10 +65,15 @@ class _SymbolSearchFieldState extends State<SymbolSearchField> {
 
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 300), () {
-      final results = SymbolSearchDatasource.instance.search(query, widget.assetType);
+      List<SymbolInfo> results;
+      if (query.trim().isEmpty) {
+        results = SymbolSearchDatasource.instance.getAll(widget.assetType).take(15).toList();
+      } else {
+        results = SymbolSearchDatasource.instance.search(query, widget.assetType);
+      }
       setState(() => _results = results);
 
-      if (results.isNotEmpty && query.isNotEmpty) {
+      if (results.isNotEmpty) {
         _showOverlay();
       } else {
         _removeOverlay();
@@ -75,7 +82,7 @@ class _SymbolSearchFieldState extends State<SymbolSearchField> {
   }
 
   void _onSymbolTapped(SymbolInfo symbol) {
-    _controller.text = symbol.symbol;
+    _controller.text = widget.searchByCompanyName ? symbol.name : symbol.symbol;
     widget.onSymbolSelected(symbol);
     _removeOverlay();
   }
@@ -196,8 +203,9 @@ class _SymbolSearchFieldState extends State<SymbolSearchField> {
       link: _layerLink,
       child: Focus(
         onFocusChange: (hasFocus) {
-          if (!hasFocus) {
-            // Delay to allow tap on dropdown items
+          if (hasFocus && _hasCatalog && _controller.text.isEmpty) {
+            _onTextChanged('');
+          } else if (!hasFocus) {
             Future.delayed(const Duration(milliseconds: 200), () {
               if (mounted && _isDropdownOpen) _removeOverlay();
             });
@@ -207,12 +215,14 @@ class _SymbolSearchFieldState extends State<SymbolSearchField> {
           controller: _controller,
           onChanged: _onTextChanged,
           validator: widget.validator,
-          textCapitalization: TextCapitalization.characters,
+          textCapitalization: widget.searchByCompanyName ? TextCapitalization.words : TextCapitalization.characters,
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             labelText: widget.label,
             labelStyle: TextStyle(color: AppTheme.textGrey),
-            hintText: _hasCatalog ? 'Search by symbol or name...' : 'Enter symbol',
+            hintText: _hasCatalog
+                ? (widget.searchByCompanyName ? 'Search by company name...' : 'Search by symbol or name...')
+                : 'Enter symbol',
             hintStyle: TextStyle(
               color: AppTheme.textGrey.withValues(alpha: 0.5),
               fontSize: 13,

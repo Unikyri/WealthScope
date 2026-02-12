@@ -47,7 +47,7 @@ class ScenariosRemoteDataSource {
       // Handle timeout errors specifically
       if (e.type == DioExceptionType.sendTimeout || 
           e.type == DioExceptionType.receiveTimeout) {
-        throw Exception('La simulación está tardando más de lo esperado. Esto puede deberse a la complejidad del escenario. Por favor, intenta nuevamente.');
+        throw Exception('Simulation is taking longer than expected. This may be due to scenario complexity. Please try again.');
       }
       
       // Extract error message from API response
@@ -61,7 +61,7 @@ class ScenariosRemoteDataSource {
           }
         }
       }
-      throw Exception('Error en simulación: ${e.message}');
+      throw Exception('Simulation error: ${e.message}');
     }
   }
 
@@ -131,7 +131,7 @@ class ScenariosRemoteDataSource {
           }
         }
       }
-      throw Exception('Error en simulación en cadena: ${e.message}');
+      throw Exception('Chained simulation error: ${e.message}');
     }
   }
 }

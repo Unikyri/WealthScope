@@ -68,15 +68,6 @@ class SettingsScreen extends ConsumerWidget {
           _buildSectionHeader(context, 'App Settings'),
           _buildSettingsTile(
             context,
-            icon: Icons.language,
-            title: 'Language',
-            subtitle: 'English',
-            onTap: () {
-              // TODO: Navigate to language settings
-            },
-          ),
-          _buildSettingsTile(
-            context,
             icon: Icons.attach_money,
             title: 'Currency',
             subtitle: currentCurrencyAsync.when(

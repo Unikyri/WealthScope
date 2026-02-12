@@ -10,6 +10,7 @@ import 'package:wealthscope_app/core/utils/snackbar_utils.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/currency.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
+import 'package:wealthscope_app/features/assets/presentation/providers/asset_form_submission_provider.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/stock_form_provider.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/symbol_search_field.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/asset_type_card.dart';
@@ -58,6 +59,8 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
   String get _title => _isStock ? 'New Stock' : 'New ETF';
 
   Future<void> _handleSubmit() async {
+    final formState = ref.read(stockFormProvider);
+    if (formState.isLoading) return;
     if (!_formKey.currentState!.validate()) return;
 
     final userId = Supabase.instance.client.auth.currentUser?.id;
@@ -105,10 +108,24 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
     } else if (state.savedAsset != null) {
       SnackbarUtils.showSuccess(
         context,
-        '${_isStock ? 'Stock' : 'ETF'} added successfully',
+        'Asset added successfully',
       );
-      context.pop();
+      _clearForm();
+      ref.read(stockFormProvider.notifier).reset();
+      ref.read(assetFormSubmissionProvider.notifier).reset();
+      if (mounted) context.pop();
     }
+  }
+
+  void _clearForm() {
+    _symbolController.clear();
+    _nameController.clear();
+    _quantityController.clear();
+    _priceController.clear();
+    _exchangeController.clear();
+    _sectorController.clear();
+    _notesController.clear();
+    setState(() => _selectedDate = null);
   }
 
   Future<void> _selectDate() async {
@@ -214,36 +231,33 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Symbol Field with Autocomplete
+            // Company Name field - primary selector, auto-fills symbol, exchange, sector
             SymbolSearchField(
               assetType: widget.type,
-              controller: _symbolController,
-              label: 'Symbol',
-              validator: (value) =>
-                  AssetValidators.validateSymbol(value, required: true),
+              controller: _nameController,
+              label: _isStock ? 'Company Name' : 'Fund Name',
+              searchByCompanyName: true,
+              validator: AssetValidators.validateName,
               onSymbolSelected: (symbol) {
                 setState(() {
+                  _nameController.text = symbol.name;
                   _symbolController.text = symbol.symbol;
-                  if (_nameController.text.isEmpty) {
-                    _nameController.text = symbol.name;
-                  }
-                  if (_exchangeController.text.isEmpty &&
-                      symbol.exchange != null) {
-                    _exchangeController.text = symbol.exchange!;
-                  }
+                  _exchangeController.text = symbol.exchange ?? '';
+                  _sectorController.text = symbol.sector ?? '';
                 });
               },
             ),
             const SizedBox(height: 16),
 
-            // Name Field
+            // Symbol field - auto-filled when company selected, editable for manual override
             _buildFormField(
-              controller: _nameController,
-              label: _isStock ? 'Company Name' : 'Fund Name',
-              hint: _isStock ? 'Enter company name' : 'Enter fund name',
-              icon: Icons.business,
-              textCapitalization: TextCapitalization.words,
-              validator: AssetValidators.validateName,
+              controller: _symbolController,
+              label: 'Symbol',
+              hint: 'Auto-filled when selected above',
+              icon: Icons.tag,
+              textCapitalization: TextCapitalization.characters,
+              validator: (value) =>
+                  AssetValidators.validateSymbol(value, required: true),
             ),
             const SizedBox(height: 16),
 

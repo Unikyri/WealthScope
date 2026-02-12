@@ -25,10 +25,10 @@ class PlanStatusCard extends ConsumerWidget {
   }
 
   Widget _buildCard(BuildContext context, WidgetRef ref, bool isPremium) {
-    final planName = isPremium ? 'Premium' : 'Plan Gratuito';
+    final planName = isPremium ? 'Premium' : 'Free Plan';
     final planSubtitle =
-        isPremium ? 'Acceso ilimitado' : '15 activos máx. \u2022 Actualización al cerrar';
-    final ctaText = isPremium ? 'Administrar' : 'Obtener Premium';
+        isPremium ? 'Unlimited access' : '15 assets max \u2022 Update at close';
+    final ctaText = isPremium ? 'Manage' : 'Get Premium';
 
     return GestureDetector(
       onTap: () {

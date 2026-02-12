@@ -20,17 +20,7 @@ class SelectAssetTypeScreen extends ConsumerWidget {
   ) async {
     final gate = ref.read(featureGateProvider);
 
-    // Check premium asset type gating
-    if (type.isPremiumOnly) {
-      final result = gate.canUsePremiumAssetType(type.toApiString());
-      if (!result.allowed) {
-        if (!context.mounted) return;
-        showGatePrompt(context, result);
-        return;
-      }
-    }
-
-    // Check asset count limit
+    // Check asset count limit only (all asset types available for free)
     final assets = await ref.read(allAssetsProvider.future);
     final result = gate.canAddAsset(assets.length);
     if (!result.allowed) {
@@ -51,9 +41,6 @@ class SelectAssetTypeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gate = ref.watch(featureGateProvider);
-    final isPremium = gate.isPremium;
-
     return Scaffold(
       backgroundColor: AppTheme.midnightBlue,
       appBar: AppBar(
@@ -121,7 +108,7 @@ class SelectAssetTypeScreen extends ConsumerWidget {
                     crossAxisCount: 2,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: 0.95,
+                    childAspectRatio: 1.0,
                   ),
                   itemCount: AssetType.values.length,
                   itemBuilder: (context, index) {
@@ -129,8 +116,8 @@ class SelectAssetTypeScreen extends ConsumerWidget {
 
                     return AssetTypeSelectorCard(
                       type: assetType,
-                      isPremiumType: assetType.isPremiumOnly,
-                      isLocked: assetType.isPremiumOnly && !isPremium,
+                      isPremiumType: false,
+                      isLocked: false,
                       onTap: () =>
                           _onAssetTypeSelected(context, ref, assetType),
                     );

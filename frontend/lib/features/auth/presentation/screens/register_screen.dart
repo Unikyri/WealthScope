@@ -143,7 +143,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     decoration: InputDecoration(
                       labelText: 'Password',
-                      hintText: 'Mínimo 8 caracteres',
+                      hintText: 'Minimum 8 characters',
                       prefixIcon: Icon(
                         Icons.lock_outline,
                         color: theme.colorScheme.primary,

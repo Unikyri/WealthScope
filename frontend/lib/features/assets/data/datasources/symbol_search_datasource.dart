@@ -7,12 +7,14 @@ class SymbolInfo {
     required this.name,
     required this.type,
     this.exchange,
+    this.sector,
   });
 
   final String symbol;
   final String name;
   final AssetType type;
   final String? exchange;
+  final String? sector;
 }
 
 /// Local datasource for symbol search.
@@ -74,26 +76,31 @@ class SymbolSearchDatasource {
     }
   }
 
+  /// Get full catalog for type (for Company Name dropdown when query empty).
+  List<SymbolInfo> getAll(AssetType type) {
+    return _getCatalog(type);
+  }
+
   // ---------------------------------------------------------------------------
-  // Stock Catalog (~50 popular symbols)
+  // Stock Catalog (~50 popular symbols with sector where known)
   // ---------------------------------------------------------------------------
   static const _stocks = <SymbolInfo>[
-    SymbolInfo(symbol: 'AAPL', name: 'Apple Inc.', type: AssetType.stock, exchange: 'NASDAQ'),
-    SymbolInfo(symbol: 'MSFT', name: 'Microsoft Corporation', type: AssetType.stock, exchange: 'NASDAQ'),
-    SymbolInfo(symbol: 'GOOGL', name: 'Alphabet Inc.', type: AssetType.stock, exchange: 'NASDAQ'),
-    SymbolInfo(symbol: 'AMZN', name: 'Amazon.com Inc.', type: AssetType.stock, exchange: 'NASDAQ'),
-    SymbolInfo(symbol: 'NVDA', name: 'NVIDIA Corporation', type: AssetType.stock, exchange: 'NASDAQ'),
-    SymbolInfo(symbol: 'META', name: 'Meta Platforms Inc.', type: AssetType.stock, exchange: 'NASDAQ'),
-    SymbolInfo(symbol: 'TSLA', name: 'Tesla Inc.', type: AssetType.stock, exchange: 'NASDAQ'),
-    SymbolInfo(symbol: 'BRK.B', name: 'Berkshire Hathaway', type: AssetType.stock, exchange: 'NYSE'),
-    SymbolInfo(symbol: 'JPM', name: 'JPMorgan Chase & Co.', type: AssetType.stock, exchange: 'NYSE'),
-    SymbolInfo(symbol: 'V', name: 'Visa Inc.', type: AssetType.stock, exchange: 'NYSE'),
-    SymbolInfo(symbol: 'JNJ', name: 'Johnson & Johnson', type: AssetType.stock, exchange: 'NYSE'),
-    SymbolInfo(symbol: 'WMT', name: 'Walmart Inc.', type: AssetType.stock, exchange: 'NYSE'),
-    SymbolInfo(symbol: 'MA', name: 'Mastercard Inc.', type: AssetType.stock, exchange: 'NYSE'),
-    SymbolInfo(symbol: 'PG', name: 'Procter & Gamble', type: AssetType.stock, exchange: 'NYSE'),
-    SymbolInfo(symbol: 'UNH', name: 'UnitedHealth Group', type: AssetType.stock, exchange: 'NYSE'),
-    SymbolInfo(symbol: 'HD', name: 'Home Depot Inc.', type: AssetType.stock, exchange: 'NYSE'),
+    SymbolInfo(symbol: 'AAPL', name: 'Apple Inc.', type: AssetType.stock, exchange: 'NASDAQ', sector: 'Technology'),
+    SymbolInfo(symbol: 'MSFT', name: 'Microsoft Corporation', type: AssetType.stock, exchange: 'NASDAQ', sector: 'Technology'),
+    SymbolInfo(symbol: 'GOOGL', name: 'Alphabet Inc.', type: AssetType.stock, exchange: 'NASDAQ', sector: 'Technology'),
+    SymbolInfo(symbol: 'AMZN', name: 'Amazon.com Inc.', type: AssetType.stock, exchange: 'NASDAQ', sector: 'Consumer Cyclical'),
+    SymbolInfo(symbol: 'NVDA', name: 'NVIDIA Corporation', type: AssetType.stock, exchange: 'NASDAQ', sector: 'Technology'),
+    SymbolInfo(symbol: 'META', name: 'Meta Platforms Inc.', type: AssetType.stock, exchange: 'NASDAQ', sector: 'Technology'),
+    SymbolInfo(symbol: 'TSLA', name: 'Tesla Inc.', type: AssetType.stock, exchange: 'NASDAQ', sector: 'Consumer Cyclical'),
+    SymbolInfo(symbol: 'BRK.B', name: 'Berkshire Hathaway', type: AssetType.stock, exchange: 'NYSE', sector: 'Financial'),
+    SymbolInfo(symbol: 'JPM', name: 'JPMorgan Chase & Co.', type: AssetType.stock, exchange: 'NYSE', sector: 'Financial'),
+    SymbolInfo(symbol: 'V', name: 'Visa Inc.', type: AssetType.stock, exchange: 'NYSE', sector: 'Financial'),
+    SymbolInfo(symbol: 'JNJ', name: 'Johnson & Johnson', type: AssetType.stock, exchange: 'NYSE', sector: 'Healthcare'),
+    SymbolInfo(symbol: 'WMT', name: 'Walmart Inc.', type: AssetType.stock, exchange: 'NYSE', sector: 'Consumer Defensive'),
+    SymbolInfo(symbol: 'MA', name: 'Mastercard Inc.', type: AssetType.stock, exchange: 'NYSE', sector: 'Financial'),
+    SymbolInfo(symbol: 'PG', name: 'Procter & Gamble', type: AssetType.stock, exchange: 'NYSE', sector: 'Consumer Defensive'),
+    SymbolInfo(symbol: 'UNH', name: 'UnitedHealth Group', type: AssetType.stock, exchange: 'NYSE', sector: 'Healthcare'),
+    SymbolInfo(symbol: 'HD', name: 'Home Depot Inc.', type: AssetType.stock, exchange: 'NYSE', sector: 'Consumer Cyclical'),
     SymbolInfo(symbol: 'DIS', name: 'Walt Disney Company', type: AssetType.stock, exchange: 'NYSE'),
     SymbolInfo(symbol: 'PYPL', name: 'PayPal Holdings', type: AssetType.stock, exchange: 'NASDAQ'),
     SymbolInfo(symbol: 'ADBE', name: 'Adobe Inc.', type: AssetType.stock, exchange: 'NASDAQ'),

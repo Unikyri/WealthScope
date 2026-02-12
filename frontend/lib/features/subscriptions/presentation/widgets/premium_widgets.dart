@@ -112,7 +112,7 @@ class PremiumBadge extends ConsumerWidget {
             ),
             const SizedBox(width: 6),
             Text(
-              'Obtener Premium',
+              'Get Premium',
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
