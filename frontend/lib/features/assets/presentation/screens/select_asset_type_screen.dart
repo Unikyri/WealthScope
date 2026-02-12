@@ -101,25 +101,22 @@ class SelectAssetTypeScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
 
-              // Asset type grid
+              // Asset type list
               Expanded(
-                child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 1.0,
-                  ),
+                child: ListView.separated(
                   itemCount: AssetType.values.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final assetType = AssetType.values[index];
-
-                    return AssetTypeSelectorCard(
-                      type: assetType,
-                      isPremiumType: false,
-                      isLocked: false,
-                      onTap: () =>
-                          _onAssetTypeSelected(context, ref, assetType),
+                    return SizedBox(
+                      height: 88,
+                      child: AssetTypeSelectorCard(
+                        type: assetType,
+                        isPremiumType: false,
+                        isLocked: false,
+                        onTap: () =>
+                            _onAssetTypeSelected(context, ref, assetType),
+                      ),
                     );
                   },
                 ),

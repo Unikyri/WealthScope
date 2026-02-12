@@ -8,7 +8,7 @@ import 'package:wealthscope_app/shared/widgets/speed_dial_fab.dart';
 
 /// MainShell wraps the main navigation structure of the app
 /// with a bottom navigation bar for protected routes.
-/// Hides FAB on /ai-chat to avoid overlapping the message input.
+/// Shows FAB only on /dashboard and /assets; hidden on all other routes.
 class MainShell extends ConsumerWidget {
   final Widget child;
 
@@ -20,7 +20,7 @@ class MainShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final path = GoRouterState.of(context).uri.path;
-    final hideFab = path.startsWith('/ai-chat');
+    final showFab = path == '/dashboard' || path == '/assets';
 
     return Stack(
       children: [
@@ -37,7 +37,7 @@ class MainShell extends ConsumerWidget {
           extendBody: true, // Body extends behind nav so FAB overlaps naturally
           body: child,
           floatingActionButton:
-              hideFab ? null : const SpeedDialFab(),
+              showFab ? const SpeedDialFab() : null,
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerDocked,
           bottomNavigationBar: _MainBottomNavigationBar(),

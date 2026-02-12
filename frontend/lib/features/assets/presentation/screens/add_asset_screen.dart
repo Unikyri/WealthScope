@@ -10,6 +10,7 @@ import 'package:wealthscope_app/core/utils/snackbar_utils.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/currency.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
+import 'package:wealthscope_app/features/assets/presentation/providers/asset_form_submission_provider.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/stock_form_provider.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/symbol_search_field.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/asset_type_card.dart';
@@ -44,6 +45,10 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
   void initState() {
     super.initState();
     _selectedType = widget.assetType ?? AssetType.other;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(stockFormProvider.notifier).reset();
+      ref.read(assetFormSubmissionProvider.notifier).reset();
+    });
   }
 
   @override
@@ -172,8 +177,20 @@ class _AddAssetScreenState extends ConsumerState<AddAssetScreen> {
         context,
         '${_selectedType.label} added successfully',
       );
+      _clearForm();
       context.go('/assets');
     }
+  }
+
+  void _clearForm() {
+    _nameController.clear();
+    _symbolController.clear();
+    _quantityController.clear();
+    _priceController.clear();
+    _notesController.clear();
+    setState(() => _selectedDate = null);
+    ref.read(stockFormProvider.notifier).reset();
+    ref.read(assetFormSubmissionProvider.notifier).reset();
   }
 
   Future<void> _selectDate() async {

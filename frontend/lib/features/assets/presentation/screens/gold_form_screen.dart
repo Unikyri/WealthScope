@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:wealthscope_app/core/utils/asset_validators.dart';
+import 'package:wealthscope_app/features/assets/presentation/providers/asset_form_submission_provider.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/gold_form_provider.dart';
 
 /// Gold & Precious Metals Form Screen
@@ -28,6 +29,13 @@ class _GoldFormScreenState extends ConsumerState<GoldFormScreen> {
     _weightController.dispose();
     _purchasePriceController.dispose();
     super.dispose();
+  }
+
+  void _clearForm() {
+    _nameController.clear();
+    _weightController.clear();
+    _purchasePriceController.clear();
+    ref.read(goldFormProvider.notifier).reset();
   }
 
   Future<void> _selectDate() async {
@@ -58,6 +66,8 @@ class _GoldFormScreenState extends ConsumerState<GoldFormScreen> {
             backgroundColor: Colors.green,
           ),
         );
+        _clearForm();
+        ref.read(assetFormSubmissionProvider.notifier).reset();
         Navigator.of(context).pop();
       }
     }

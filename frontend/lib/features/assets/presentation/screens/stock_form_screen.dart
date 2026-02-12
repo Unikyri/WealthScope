@@ -43,6 +43,15 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
   DateTime? _selectedDate;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(stockFormProvider.notifier).reset();
+      ref.read(assetFormSubmissionProvider.notifier).reset();
+    });
+  }
+
+  @override
   void dispose() {
     _symbolController.dispose();
     _nameController.dispose();
