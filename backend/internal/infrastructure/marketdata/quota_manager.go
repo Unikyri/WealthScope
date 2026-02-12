@@ -13,16 +13,16 @@ import (
 // QuotaManager tracks monthly API request counts per provider and enforces limits.
 // It persists counts to the api_quotas table in PostgreSQL.
 type QuotaManager struct {
-	mu     sync.RWMutex
 	db     *gorm.DB
-	limits map[string]int // provider_name -> max requests per month
 	cache  map[string]*quotaEntry
+	limits map[string]int // provider_name -> max requests per month
+	mu     sync.RWMutex
 }
 
 type quotaEntry struct {
+	MonthYear string
 	Count     int
 	MaxCount  int
-	MonthYear string
 }
 
 // APIQuotaModel is the GORM model for the api_quotas table

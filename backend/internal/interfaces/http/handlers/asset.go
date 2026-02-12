@@ -52,9 +52,13 @@ type AutofillRequest struct {
 }
 
 // AssetResponse represents the response for a single asset
+//
+//nolint:govet // fieldalignment: keep logical field grouping for readability
 type AssetResponse struct {
 	CoreData        map[string]interface{} `json:"core_data"`
 	ExtendedData    map[string]interface{} `json:"extended_data,omitempty"`
+	GainLoss        *float64               `json:"gain_loss,omitempty"`
+	GainLossPercent *float64               `json:"gain_loss_percent,omitempty"`
 	Type            string                 `json:"type"`
 	Name            string                 `json:"name"`
 	ID              string                 `json:"id"`
@@ -62,8 +66,6 @@ type AssetResponse struct {
 	UpdatedAt       string                 `json:"updated_at"`
 	TotalValue      float64                `json:"total_value"`
 	TotalCost       float64                `json:"total_cost"`
-	GainLoss        *float64               `json:"gain_loss,omitempty"`
-	GainLossPercent *float64               `json:"gain_loss_percent,omitempty"`
 }
 
 // AutofillResponse represents the response for auto-fill
@@ -139,8 +141,8 @@ func (h *AssetHandler) Create(c *gin.Context) {
 	}
 
 	var req CreateAssetRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body: " + err.Error()})
+	if bindErr := c.ShouldBindJSON(&req); bindErr != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body: " + bindErr.Error()})
 		return
 	}
 
@@ -195,13 +197,13 @@ func (h *AssetHandler) List(c *gin.Context) {
 	// Parse pagination
 	if page := c.Query("page"); page != "" {
 		var p int
-		if _, err := parseIntFromString(page, &p); err == nil && p > 0 {
+		if _, parseErr := parseIntFromString(page, &p); parseErr == nil && p > 0 {
 			input.Page = p
 		}
 	}
 	if perPage := c.Query("per_page"); perPage != "" {
 		var pp int
-		if _, err := parseIntFromString(perPage, &pp); err == nil && pp > 0 {
+		if _, parseErr := parseIntFromString(perPage, &pp); parseErr == nil && pp > 0 {
 			input.PerPage = pp
 		}
 	}
@@ -282,8 +284,8 @@ func (h *AssetHandler) Update(c *gin.Context) {
 	}
 
 	var req UpdateAssetRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body: " + err.Error()})
+	if bindErr := c.ShouldBindJSON(&req); bindErr != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body: " + bindErr.Error()})
 		return
 	}
 
@@ -350,8 +352,8 @@ func (h *AssetHandler) Autofill(c *gin.Context) {
 	}
 
 	var req AutofillRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body: " + err.Error()})
+	if bindErr := c.ShouldBindJSON(&req); bindErr != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body: " + bindErr.Error()})
 		return
 	}
 
@@ -411,7 +413,7 @@ func handleAssetError(c *gin.Context, err error) {
 }
 
 // parseIntFromString is a helper to parse an int from a string
-func parseIntFromString(s string, out *int) (int, error) {
+func parseIntFromString(s string, out *int) (int, error) { //nolint:unparam // kept for API clarity
 	var val int
 	_, err := strings.NewReader(s).Read([]byte{})
 	if err != nil {

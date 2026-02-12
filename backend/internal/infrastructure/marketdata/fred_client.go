@@ -15,11 +15,11 @@ import (
 // FREDClient implements MarketDataClient for the FRED API.
 // Used for bond yields, interest rate benchmarks, and treasury data.
 type FREDClient struct {
-	apiKey      string
-	baseURL     string
 	httpClient  *http.Client
 	rateLimiter *RateLimiter
 	quota       *QuotaManager
+	apiKey      string
+	baseURL     string
 }
 
 // NewFREDClient creates a new FRED API client

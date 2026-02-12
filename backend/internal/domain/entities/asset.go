@@ -46,15 +46,17 @@ func (t AssetType) IsValid() bool {
 // Asset represents an investment asset owned by a user.
 // Uses a flexible JSONB architecture: CoreData holds user-submitted manual fields,
 // ExtendedData holds auto-filled fields from market data APIs.
+//
+//nolint:govet // fieldalignment: keep logical field grouping for readability
 type Asset struct {
-	CreatedAt    time.Time       `json:"created_at"`
-	UpdatedAt    time.Time       `json:"updated_at"`
 	CoreData     json.RawMessage `json:"core_data"`
 	ExtendedData json.RawMessage `json:"extended_data,omitempty"`
-	Type         AssetType       `json:"type"`
-	Name         string          `json:"name"`
 	ID           uuid.UUID       `json:"id"`
 	UserID       uuid.UUID       `json:"user_id"`
+	CreatedAt    time.Time       `json:"created_at"`
+	UpdatedAt    time.Time       `json:"updated_at"`
+	Name         string          `json:"name"`
+	Type         AssetType       `json:"type"`
 }
 
 // NewAsset creates a new Asset with required fields

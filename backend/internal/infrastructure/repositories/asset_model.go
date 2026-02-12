@@ -11,16 +11,18 @@ import (
 )
 
 // AssetModel is the GORM model for the assets table (v2 - JSONB architecture)
+//
+//nolint:govet // fieldalignment: GORM model field order kept for clarity
 type AssetModel struct {
-	CreatedAt    time.Time       `gorm:"column:created_at;autoCreateTime"`
-	UpdatedAt    time.Time       `gorm:"column:updated_at;autoUpdateTime"`
 	DeletedAt    gorm.DeletedAt  `gorm:"index"`
 	CoreData     json.RawMessage `gorm:"type:jsonb;default:'{}';column:core_data"`
 	ExtendedData json.RawMessage `gorm:"type:jsonb;default:'{}';column:extended_data"`
-	Type         string          `gorm:"type:asset_type;not null"`
-	Name         string          `gorm:"not null"`
 	ID           uuid.UUID       `gorm:"type:uuid;primaryKey"`
 	UserID       uuid.UUID       `gorm:"type:uuid;not null;index"`
+	CreatedAt    time.Time       `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt    time.Time       `gorm:"column:updated_at;autoUpdateTime"`
+	Type         string          `gorm:"type:asset_type;not null"`
+	Name         string          `gorm:"not null"`
 }
 
 // TableName returns the table name for GORM

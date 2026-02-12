@@ -17,11 +17,11 @@ import (
 // IMPORTANT: RentCast has a hard limit of 45 requests/month on the free tier.
 // All calls MUST go through the QuotaManager.
 type RentCastClient struct {
-	apiKey      string
-	baseURL     string
 	httpClient  *http.Client
 	rateLimiter *RateLimiter
 	quota       *QuotaManager
+	apiKey      string
+	baseURL     string
 }
 
 // NewRentCastClient creates a new RentCast API client

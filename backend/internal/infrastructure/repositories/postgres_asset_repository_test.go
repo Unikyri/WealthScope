@@ -192,7 +192,9 @@ func TestPostgresAssetRepository_AggregationsAndHelpers(t *testing.T) {
 	// Verify current_price is in extended_data
 	extMap, extErr := after[0].GetExtendedDataMap()
 	require.NoError(t, extErr)
-	require.InEpsilon(t, 60.0, extMap["current_price"].(float64), 0.0001)
+	cp, ok := extMap["current_price"].(float64)
+	require.True(t, ok, "current_price should be float64")
+	require.InEpsilon(t, 60.0, cp, 0.0001)
 
 	// ListUserIDsWithListedAssets
 	userIDs, err := repo.ListUserIDsWithListedAssets(ctx)
