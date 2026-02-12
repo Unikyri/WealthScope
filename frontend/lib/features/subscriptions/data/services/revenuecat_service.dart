@@ -216,7 +216,14 @@ final revenueCatServiceProvider = Provider<RevenueCatService>((ref) {
 
 /// Debug-only: when true, user has premium access without RevenueCat.
 /// Set via "Modo Trial" button on subscription screen in debug builds.
-final debugTrialActiveProvider = StateProvider<bool>((ref) => false);
+/// Uses NotifierProvider (StateProvider was removed in Riverpod 3).
+class _DebugTrialNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+}
+
+final debugTrialActiveProvider =
+    NotifierProvider<_DebugTrialNotifier, bool>(_DebugTrialNotifier.new);
 
 /// Current customer info (async, cached by RevenueCat SDK).
 final customerInfoProvider = FutureProvider<CustomerInfo?>((ref) async {
