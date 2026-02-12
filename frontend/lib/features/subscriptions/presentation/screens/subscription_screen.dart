@@ -124,7 +124,16 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
           return _buildNoOfferingsView();
         }
 
-        final packages = offerings.current!.availablePackages;
+        final allPackages = offerings.current!.availablePackages;
+        // Exclude Lifetime plan - we don't support it
+        final packages = allPackages
+            .where((p) =>
+                !p.identifier.toLowerCase().contains('lifetime'))
+            .toList();
+
+        if (packages.isEmpty) {
+          return _buildNoOfferingsView();
+        }
         
         return CustomScrollView(
           slivers: [
@@ -352,11 +361,6 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
         'icon': PhosphorIconsRegular.cloudArrowUp,
         'title': 'Sincronización en la Nube',
         'description': 'Accede a tu portafolio desde cualquier dispositivo',
-      },
-      {
-        'icon': PhosphorIconsRegular.shieldCheck,
-        'title': 'Soporte Prioritario',
-        'description': 'Atención preferencial y respuesta rápida',
       },
     ];
 

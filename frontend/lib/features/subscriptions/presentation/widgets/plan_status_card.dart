@@ -25,10 +25,10 @@ class PlanStatusCard extends ConsumerWidget {
   }
 
   Widget _buildCard(BuildContext context, WidgetRef ref, bool isPremium) {
-    final planName = isPremium ? 'Sentinel' : 'Scout';
+    final planName = isPremium ? 'Premium' : 'Plan Gratuito';
     final planSubtitle =
-        isPremium ? 'Premium \u2022 Unlimited access' : 'Free plan \u2022 15 assets max';
-    final ctaText = isPremium ? 'Manage' : 'See Plans';
+        isPremium ? 'Acceso ilimitado' : '15 activos máx. \u2022 Actualización al cerrar';
+    final ctaText = isPremium ? 'Administrar' : 'Obtener Premium';
 
     return GestureDetector(
       onTap: () {
@@ -42,21 +42,32 @@ class PlanStatusCard extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppTheme.cardGrey,
+          color: isPremium
+              ? AppTheme.cardGrey
+              : AppTheme.cardGrey,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isPremium
                 ? AppTheme.electricBlue.withValues(alpha: 0.25)
-                : Colors.white.withValues(alpha: 0.06),
-            width: 1,
+                : AppTheme.electricBlue.withValues(alpha: 0.4),
+            width: isPremium ? 1 : 1.5,
           ),
+          boxShadow: isPremium
+              ? null
+              : [
+                  BoxShadow(
+                    color: AppTheme.electricBlue.withValues(alpha: 0.15),
+                    blurRadius: 12,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
         ),
         child: Row(
           children: [
             // Plan icon
             Container(
-              width: 44,
-              height: 44,
+              width: 48,
+              height: 48,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: isPremium
@@ -68,15 +79,21 @@ class PlanStatusCard extends ConsumerWidget {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       )
-                    : null,
-                color: isPremium ? null : Colors.white.withValues(alpha: 0.06),
+                    : LinearGradient(
+                        colors: [
+                          AppTheme.electricBlue.withValues(alpha: 0.2),
+                          AppTheme.electricBlue.withValues(alpha: 0.08),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
               ),
               child: Icon(
                 isPremium
                     ? PhosphorIconsFill.crownSimple
-                    : PhosphorIconsRegular.shieldCheck,
-                color: isPremium ? AppTheme.electricBlue : AppTheme.textGrey,
-                size: 22,
+                    : PhosphorIconsRegular.crownSimple,
+                color: AppTheme.electricBlue,
+                size: 24,
               ),
             ),
             const SizedBox(width: 14),
@@ -87,9 +104,9 @@ class PlanStatusCard extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'WealthScope $planName',
+                    planName,
                     style: GoogleFonts.plusJakartaSans(
-                      fontSize: 15,
+                      fontSize: 17,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
                     ),
@@ -107,14 +124,33 @@ class PlanStatusCard extends ConsumerWidget {
               ),
             ),
 
-            // CTA
+            // CTA - prominent button for free users
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
+                gradient: isPremium
+                    ? null
+                    : LinearGradient(
+                        colors: [
+                          AppTheme.electricBlue,
+                          AppTheme.electricBlue.withValues(alpha: 0.85),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                 color: isPremium
                     ? AppTheme.electricBlue.withValues(alpha: 0.12)
-                    : Colors.white.withValues(alpha: 0.06),
-                borderRadius: BorderRadius.circular(20),
+                    : null,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: isPremium
+                    ? null
+                    : [
+                        BoxShadow(
+                          color: AppTheme.electricBlue.withValues(alpha: 0.35),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -122,16 +158,16 @@ class PlanStatusCard extends ConsumerWidget {
                   Text(
                     ctaText,
                     style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: isPremium ? AppTheme.electricBlue : AppTheme.textGrey,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: isPremium ? AppTheme.electricBlue : Colors.white,
                     ),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 6),
                   Icon(
-                    Icons.chevron_right_rounded,
-                    size: 16,
-                    color: isPremium ? AppTheme.electricBlue : AppTheme.textGrey,
+                    Icons.arrow_forward_rounded,
+                    size: 18,
+                    color: isPremium ? AppTheme.electricBlue : Colors.white,
                   ),
                 ],
               ),
