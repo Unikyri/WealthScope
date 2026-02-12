@@ -214,6 +214,10 @@ final revenueCatServiceProvider = Provider<RevenueCatService>((ref) {
   return RevenueCatService();
 });
 
+/// Debug-only: when true, user has premium access without RevenueCat.
+/// Set via "Modo Trial" button on subscription screen in debug builds.
+final debugTrialActiveProvider = StateProvider<bool>((ref) => false);
+
 /// Current customer info (async, cached by RevenueCat SDK).
 final customerInfoProvider = FutureProvider<CustomerInfo?>((ref) async {
   final service = ref.watch(revenueCatServiceProvider);
@@ -226,9 +230,13 @@ final customerInfoProvider = FutureProvider<CustomerInfo?>((ref) async {
 
 /// Whether the current user has premium (Sentinel) access.
 ///
-/// When [AppConfig.isTrialMode] is `true`, this always returns `true`
-/// so all premium features are unlocked during development and demos.
+/// In debug: only [debugTrialActiveProvider] (ignores RevenueCat for consistent
+/// free-at-startup testing). Use the "Modo Trial" button to activate premium.
+/// When [AppConfig.isTrialMode] is `true`, always returns `true`.
+/// Otherwise checks RevenueCat.
 final isPremiumProvider = FutureProvider<bool>((ref) async {
+  // Debug: only debugTrialActiveProvider so all accounts start free
+  if (AppConfig.isDebug) return ref.watch(debugTrialActiveProvider);
   // Trial mode bypasses RevenueCat check
   if (AppConfig.isTrialMode) return true;
 
@@ -247,6 +255,7 @@ final offeringsProvider = FutureProvider<Offerings?>((ref) async {
 /// Use this when you need the full plan object (display name, tier label).
 /// Use [isPremiumProvider] when you only need a boolean check.
 final userPlanProvider = FutureProvider<UserPlan>((ref) async {
+  if (AppConfig.isDebug && ref.watch(debugTrialActiveProvider)) return UserPlan.sentinel;
   if (AppConfig.isTrialMode) return UserPlan.sentinel;
 
   final isPremium = await ref.watch(isPremiumProvider.future);
