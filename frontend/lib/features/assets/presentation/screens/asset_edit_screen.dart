@@ -29,6 +29,7 @@ class AssetEditScreen extends ConsumerStatefulWidget {
 class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
   final _formKey = GlobalKey<FormState>();
   
+  final Map<AssetType, IconData> _assetTypeIcons = {
     AssetType.stock: Icons.trending_up,
     AssetType.etf: Icons.pie_chart,
     AssetType.bond: Icons.account_balance,
@@ -77,9 +78,7 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
     _exchangeController = TextEditingController();
     _sectorController = TextEditingController();
     _industryController = TextEditingController();
-    _exchangeController = TextEditingController();
-    _sectorController = TextEditingController();
-    _industryController = TextEditingController();
+
     _addressController = TextEditingController();
     _areaController = TextEditingController();
   }
@@ -133,14 +132,13 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
     _symbolController.dispose();
     _nameController.dispose();
     _quantityController.dispose();
-    _priceController.dispose();    _currentPriceController.dispose();    _currentPriceController.dispose();
+    _priceController.dispose();
+    _currentPriceController.dispose();
     _notesController.dispose();
     _exchangeController.dispose();
     _sectorController.dispose();
     _industryController.dispose();
-    _exchangeController.dispose();
-    _sectorController.dispose();
-    _industryController.dispose();
+
     _addressController.dispose();
     _areaController.dispose();
     super.dispose();

@@ -304,6 +304,7 @@ class _EnhancedAllocationSectionState extends State<EnhancedAllocationSection> {
 
   String _getTypeLabel(String typeString) {
     final type = _parseAssetType(typeString);
+    switch (type) {
       case AssetType.realEstate: return 'Real Est.';
       case AssetType.etf: return 'ETF';
       case AssetType.liability: return 'Liability';

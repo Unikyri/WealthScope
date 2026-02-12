@@ -34,7 +34,7 @@ class AssetRepositoryImpl implements AssetRepository {
         purchaseDate: asset.purchaseDate != null 
             ? DateFormat('yyyy-MM-dd').format(asset.purchaseDate!)
             : null,
-        metadata: metadata.isNotEmpty ? metadata : null,
+        metadata: asset.metadata.isNotEmpty ? asset.metadata : null,
         notes: asset.notes,
       );
       
