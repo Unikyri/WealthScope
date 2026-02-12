@@ -53,7 +53,7 @@ final class PortfolioHistoryProvider extends $AsyncNotifierProvider<
   }
 }
 
-String _$portfolioHistoryHash() => r'01429bd7c5145350832938d709f4a27d5a02f9a0';
+String _$portfolioHistoryHash() => r'e8717fcb2c9c14d5c54a55ede6e954bd34802fd3';
 
 /// Provider for portfolio history data
 

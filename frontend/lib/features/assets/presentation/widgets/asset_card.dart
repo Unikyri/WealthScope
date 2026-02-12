@@ -228,6 +228,10 @@ class AssetCard extends StatelessWidget {
         return asset.currency.code;
       case AssetType.other:
         return 'units';
+      case AssetType.custom:
+        return 'units';
+      case AssetType.liability:
+        return 'items';
     }
   }
 
@@ -244,6 +248,8 @@ class AssetCard extends StatelessWidget {
       case AssetType.realEstate:
       case AssetType.cash:
       case AssetType.other:
+      case AssetType.custom:
+      case AssetType.liability:
         return asset.quantity % 1 == 0 ? 0 : 2;
     }
   }

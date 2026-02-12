@@ -6,6 +6,7 @@ import 'package:wealthscope_app/features/assets/data/models/asset_dto.dart';
 import 'package:wealthscope_app/features/assets/data/models/create_asset_request.dart';
 import 'package:wealthscope_app/features/assets/data/models/update_asset_request.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
+import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/assets/domain/repositories/asset_repository.dart';
 
 /// Asset Repository Implementation
@@ -18,6 +19,14 @@ class AssetRepositoryImpl implements AssetRepository {
   @override
   Future<StockAsset> addAsset(StockAsset asset) async {
     try {
+      // Inject category for 'custom' mapped types (Gold/Other)
+      final metadata = Map<String, dynamic>.from(asset.metadata);
+      if (asset.type == AssetType.gold) {
+        metadata['category'] = 'Gold';
+      } else if (asset.type == AssetType.other) {
+        metadata['category'] = 'Other';
+      }
+
       // Convert domain entity to create request DTO
       final request = CreateAssetRequest(
         type: asset.type.toApiString(),
@@ -30,7 +39,7 @@ class AssetRepositoryImpl implements AssetRepository {
         purchaseDate: asset.purchaseDate != null 
             ? DateFormat('yyyy-MM-dd').format(asset.purchaseDate!)
             : null,
-        metadata: asset.metadata.isNotEmpty ? asset.metadata : null,
+        metadata: metadata.isNotEmpty ? metadata : null,
         notes: asset.notes,
       );
       
@@ -105,6 +114,14 @@ class AssetRepositoryImpl implements AssetRepository {
         throw const ValidationFailure('Asset ID is required for update');
       }
       
+      // Inject category for 'custom' mapped types (Gold/Other)
+      final metadata = Map<String, dynamic>.from(asset.metadata);
+      if (asset.type == AssetType.gold) {
+        metadata['category'] = 'Gold';
+      } else if (asset.type == AssetType.other) {
+        metadata['category'] = 'Other';
+      }
+
       // Convert domain entity to update request DTO
       final request = UpdateAssetRequest(
         type: asset.type.toApiString(),
@@ -117,7 +134,7 @@ class AssetRepositoryImpl implements AssetRepository {
         purchaseDate: asset.purchaseDate != null
             ? DateFormat('yyyy-MM-dd').format(asset.purchaseDate!)
             : null,
-        metadata: asset.metadata.isNotEmpty ? asset.metadata : null,
+        metadata: metadata.isNotEmpty ? metadata : null,
         notes: asset.notes,
       );
       

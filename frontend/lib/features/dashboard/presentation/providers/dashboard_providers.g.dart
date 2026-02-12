@@ -242,4 +242,4 @@ final class DashboardPersonalizedNewsProvider extends $FunctionalProvider<
 }
 
 String _$dashboardPersonalizedNewsHash() =>
-    r'0b1c01f22175642940e438163450b04f4b8ea629';
+    r'0f4d4971dc2c1d2b3f88263732750bd96e247351';
