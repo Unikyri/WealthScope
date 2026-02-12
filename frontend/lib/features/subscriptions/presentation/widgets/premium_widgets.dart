@@ -74,35 +74,49 @@ class PremiumBadge extends ConsumerWidget {
     );
   }
 
-  /// Scout (free) badge: subtle cardGrey chip, shield icon, muted text.
+  /// Free plan badge: prominent upgrade CTA with crown icon.
   Widget _buildScoutBadge(BuildContext context) {
     return GestureDetector(
       onTap: () => context.push('/subscription'),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: AppTheme.cardGrey,
-          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            colors: [
+              AppTheme.electricBlue.withValues(alpha: 0.3),
+              AppTheme.electricBlue.withValues(alpha: 0.15),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.1),
+            color: AppTheme.electricBlue.withValues(alpha: 0.5),
             width: 1,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.electricBlue.withValues(alpha: 0.2),
+              blurRadius: 6,
+              offset: const Offset(0, 1),
+            ),
+          ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              PhosphorIconsRegular.shieldCheck,
-              color: AppTheme.textGrey,
-              size: 14,
+              PhosphorIconsRegular.crownSimple,
+              color: AppTheme.electricBlue,
+              size: 16,
             ),
-            const SizedBox(width: 5),
+            const SizedBox(width: 6),
             Text(
-              'Scout',
+              'Obtener Premium',
               style: GoogleFonts.inter(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.textGrey,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.electricBlue,
               ),
             ),
           ],
