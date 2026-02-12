@@ -190,14 +190,21 @@ func (e *ScenarioEngine) simulateSell(
 		return entities.PortfolioState{}, nil, nil, fmt.Errorf("asset not found: %w", findErr)
 	}
 
-	if params.Quantity > asset.Quantity {
-		warnings = append(warnings, fmt.Sprintf("Selling more than owned: %.4f > %.4f", params.Quantity, asset.Quantity))
+	// Extract values from JSONB core_data/extended_data
+	coreMap, _ := asset.GetCoreDataMap()
+	extMap, _ := asset.GetExtendedDataMap()
+
+	assetQty := toFloat64(coreMap["quantity"])
+	assetPurchasePrice := toFloat64(coreMap["purchase_price"])
+
+	if params.Quantity > assetQty {
+		warnings = append(warnings, fmt.Sprintf("Selling more than owned: %.4f > %.4f", params.Quantity, assetQty))
 	}
 
 	// Use current price if available, otherwise purchase price
-	price := asset.PurchasePrice
-	if asset.CurrentPrice != nil {
-		price = *asset.CurrentPrice
+	price := assetPurchasePrice
+	if cp := toFloat64(extMap["current_price"]); cp > 0 {
+		price = cp
 	}
 
 	// Use provided price if specified
@@ -206,7 +213,7 @@ func (e *ScenarioEngine) simulateSell(
 	}
 
 	saleAmount := params.Quantity * price
-	costBasis := params.Quantity * asset.PurchasePrice
+	costBasis := params.Quantity * assetPurchasePrice
 
 	newTotalValue := current.TotalValue - saleAmount
 	newTotalInvested := current.TotalInvested - costBasis
@@ -223,7 +230,7 @@ func (e *ScenarioEngine) simulateSell(
 	}
 
 	// Adjust asset count if selling all
-	if params.Quantity >= asset.Quantity {
+	if params.Quantity >= assetQty {
 		projected.AssetCount--
 	}
 
@@ -477,6 +484,23 @@ func absFloat(x float64) float64 {
 		return -x
 	}
 	return x
+}
+
+// toFloat64 safely converts an interface{} (from JSON unmarshal) to float64.
+func toFloat64(v interface{}) float64 {
+	if v == nil {
+		return 0
+	}
+	switch val := v.(type) {
+	case float64:
+		return val
+	case int:
+		return float64(val)
+	case int64:
+		return float64(val)
+	default:
+		return 0
+	}
 }
 
 // GetTemplates returns the list of predefined scenario templates

@@ -187,7 +187,7 @@ func (dp *DocumentProcessor) validateAndNormalizeAsset(asset *dto.ExtractedAsset
 		dp.logger.Debug("invalid asset type, defaulting to 'other'",
 			zap.String("original_type", asset.Type),
 			zap.String("asset_name", asset.Name))
-		asset.Type = string(entities.AssetTypeOther)
+		asset.Type = string(entities.AssetTypeCustom)
 	}
 
 	// Validate quantity
@@ -248,20 +248,25 @@ func (dp *DocumentProcessor) CreateAssetsFromOCR(
 			return nil, fmt.Errorf("invalid asset '%s': %w", ext.Name, err)
 		}
 
-		// Create the asset entity
+		// Build core_data from the confirmed asset fields
+		coreData := map[string]interface{}{
+			"quantity":       ext.Quantity,
+			"purchase_price": ext.PurchasePrice,
+			"currency":       ext.Currency,
+		}
+		if ext.Symbol != nil && *ext.Symbol != "" {
+			coreData["ticker"] = *ext.Symbol
+		}
+		coreDataBytes, _ := json.Marshal(coreData)
+
+		// Create the asset entity with JSONB core_data
 		asset := entities.NewAsset(
 			userID,
 			entities.AssetType(ext.Type),
 			ext.Name,
-			ext.Quantity,
-			ext.PurchasePrice,
-			ext.Currency,
+			coreDataBytes,
+			nil,
 		)
-
-		// Set symbol if provided
-		if ext.Symbol != nil && *ext.Symbol != "" {
-			asset.SetSymbol(*ext.Symbol)
-		}
 
 		// Add OCR source metadata
 		metadata := map[string]interface{}{

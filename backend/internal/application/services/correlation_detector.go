@@ -70,8 +70,8 @@ func (d *CorrelationDetector) detectTypeCorrelations(assets []entities.Asset) []
 	for _, asset := range assets {
 		typeCounts[asset.Type]++
 		symbol := asset.Name
-		if asset.Symbol != nil && *asset.Symbol != "" {
-			symbol = *asset.Symbol
+		if sym := asset.Symbol(); sym != "" {
+			symbol = sym
 		}
 		typeSymbols[asset.Type] = append(typeSymbols[asset.Type], symbol)
 	}
@@ -129,8 +129,8 @@ func (d *CorrelationDetector) detectSymbolCorrelations(assets []entities.Asset) 
 	// Create symbol set for quick lookup
 	symbolSet := make(map[string]bool)
 	for _, asset := range assets {
-		if asset.Symbol != nil && *asset.Symbol != "" {
-			symbolSet[*asset.Symbol] = true
+		if sym := asset.Symbol(); sym != "" {
+			symbolSet[sym] = true
 		}
 	}
 

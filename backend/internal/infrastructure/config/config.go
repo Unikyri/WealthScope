@@ -49,6 +49,8 @@ type MarketDataConfig struct {
 	FinnhubAPIKey         string
 	AlphaVantageAPIKey    string
 	CoinGeckoAPIKey       string
+	FREDAPIKey            string
+	RentCastAPIKey        string
 	FrankfurterRateLimit  int
 	AlphaVantageRateLimit int
 	YahooRateLimit        int
@@ -58,6 +60,9 @@ type MarketDataConfig struct {
 	MetalsAPIRateLimit    int
 	BinanceRateLimit      int
 	ExchangeRateRateLimit int
+	FREDRateLimit         int
+	RentCastRateLimit     int
+	RentCastMonthlyQuota  int
 	FinnhubEnabled        bool
 	YahooFinanceEnabled   bool
 	ExchangeRateEnabled   bool
@@ -66,6 +71,8 @@ type MarketDataConfig struct {
 	MetalsAPIEnabled      bool
 	BinanceEnabled        bool
 	CoinGeckoEnabled      bool
+	FREDEnabled           bool
+	RentCastEnabled       bool
 }
 
 // NewsConfig holds news provider configuration
@@ -145,6 +152,13 @@ func Load() *Config {
 	viper.SetDefault("MARKETDATA_METALS_API_KEY", "")         // required for metals
 	viper.SetDefault("MARKETDATA_METALS_API_ENABLED", false)  // disabled by default (requires API key)
 	viper.SetDefault("MARKETDATA_METALS_API_RATE_LIMIT", 2)   // very conservative for 50/month free tier
+	viper.SetDefault("MARKETDATA_FRED_API_KEY", "")           // required for bond yields
+	viper.SetDefault("MARKETDATA_FRED_ENABLED", false)        // disabled by default (requires API key)
+	viper.SetDefault("MARKETDATA_FRED_RATE_LIMIT", 60)        // 120 req/min free tier
+	viper.SetDefault("MARKETDATA_RENTCAST_API_KEY", "")       // required for real estate data
+	viper.SetDefault("MARKETDATA_RENTCAST_ENABLED", false)    // disabled by default (requires API key)
+	viper.SetDefault("MARKETDATA_RENTCAST_RATE_LIMIT", 1)     // very conservative
+	viper.SetDefault("MARKETDATA_RENTCAST_MONTHLY_QUOTA", 45) // hard limit on free tier
 	viper.SetDefault("MARKETDATA_CACHE_TTL_SECONDS", 60)      // 1 minute cache
 	viper.SetDefault("NEWS_NEWSDATA_API_KEY", "")             // required for news
 	viper.SetDefault("NEWS_NEWSDATA_ENABLED", true)           // enable news by default
@@ -201,6 +215,13 @@ func Load() *Config {
 			MetalsAPIKey:          viper.GetString("MARKETDATA_METALS_API_KEY"),
 			MetalsAPIEnabled:      viper.GetBool("MARKETDATA_METALS_API_ENABLED"),
 			MetalsAPIRateLimit:    viper.GetInt("MARKETDATA_METALS_API_RATE_LIMIT"),
+			FREDAPIKey:            viper.GetString("MARKETDATA_FRED_API_KEY"),
+			FREDEnabled:           viper.GetBool("MARKETDATA_FRED_ENABLED"),
+			FREDRateLimit:         viper.GetInt("MARKETDATA_FRED_RATE_LIMIT"),
+			RentCastAPIKey:        viper.GetString("MARKETDATA_RENTCAST_API_KEY"),
+			RentCastEnabled:       viper.GetBool("MARKETDATA_RENTCAST_ENABLED"),
+			RentCastRateLimit:     viper.GetInt("MARKETDATA_RENTCAST_RATE_LIMIT"),
+			RentCastMonthlyQuota:  viper.GetInt("MARKETDATA_RENTCAST_MONTHLY_QUOTA"),
 			CacheTTLSeconds:       viper.GetInt("MARKETDATA_CACHE_TTL_SECONDS"),
 		},
 		News: NewsConfig{

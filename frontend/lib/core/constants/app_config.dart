@@ -10,10 +10,9 @@ class AppConfig {
   /// Trial mode: when active the user has full Sentinel (premium) access.
   ///
   /// **IMPORTANT**: Set to `false` for release/production builds.
-  /// During development and demos this should be `true` so all premium
-  /// features can be exercised without a real subscription.
+  /// In debug, use the "Entrar a Trial" button on the subscription screen instead.
   /// In production, trials are controlled via RevenueCat trial periods.
-  static const bool isTrialMode = true;
+  static const bool isTrialMode = false;
 
   /// Whether the app is running in a debug (assert-enabled) build.
   static bool get isDebug {
