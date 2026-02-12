@@ -13,9 +13,9 @@ class NewsCategoryMapper {
     AssetType.crypto: ['cryptocurrency', 'blockchain', 'bitcoin'],
     AssetType.bond: ['bonds', 'fixed income', 'interest rates', 'treasury'],
     AssetType.realEstate: ['real estate', 'housing market', 'property'],
-    AssetType.gold: ['gold', 'precious metals', 'commodities'],
     AssetType.cash: ['savings', 'interest rates', 'banking'],
-    AssetType.other: ['financial markets', 'investing'],
+    AssetType.custom: ['financial markets', 'investing'],
+    AssetType.liability: ['debt', 'loans', 'credit'],
   };
 
   /// Get the primary keyword for API search (Level 2 fallback).

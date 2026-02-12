@@ -291,10 +291,12 @@ class _EnhancedAllocationSectionState extends State<EnhancedAllocationSection> {
         return AppTheme.textGrey;
       case AssetType.etf:
         return Colors.amber;
-      case AssetType.gold:
-        return Colors.orange;
       case AssetType.bond:
         return Colors.teal;
+      case AssetType.liability:
+        return AppTheme.alertRed;
+      case AssetType.custom:
+        return Colors.grey;
       default:
         return Colors.grey;
     }
@@ -302,9 +304,13 @@ class _EnhancedAllocationSectionState extends State<EnhancedAllocationSection> {
 
   String _getTypeLabel(String typeString) {
     final type = _parseAssetType(typeString);
-    switch (type) {
       case AssetType.realEstate: return 'Real Est.';
       case AssetType.etf: return 'ETF';
+      case AssetType.liability: return 'Liability';
+      case AssetType.custom:
+        // If the original string was 'other' (from aggregation), show 'Others'
+        if (typeString == 'other') return 'Others';
+        return 'Custom';
       default: return typeString[0].toUpperCase() + typeString.substring(1);
     }
   }
@@ -313,7 +319,7 @@ class _EnhancedAllocationSectionState extends State<EnhancedAllocationSection> {
     try {
       return AssetType.fromString(typeString);
     } catch (e) {
-      return AssetType.other;
+      return AssetType.custom;
     }
   }
 
