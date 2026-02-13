@@ -258,6 +258,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                               final alerts = computeConcentrationAlerts(
                                 summary.breakdownByType,
                                 risk.riskScore,
+                                risk.diversificationLevel,
                               );
                               if (alerts.isEmpty) {
                                 return const SizedBox.shrink();
