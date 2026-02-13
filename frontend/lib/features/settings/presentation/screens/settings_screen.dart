@@ -378,7 +378,7 @@ class SettingsScreen extends ConsumerWidget {
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
-              await ref.read(logoutProvider.future);
+              await ref.read(logoutProvider.notifier).signOut();
               if (context.mounted) {
                 context.go('/login');
               }

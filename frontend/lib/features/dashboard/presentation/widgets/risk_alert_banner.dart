@@ -36,10 +36,11 @@ class RiskAlertBannerItem {
       );
 }
 
-/// Computes concentration alerts from breakdown and risk score.
+/// Computes concentration alerts from breakdown and diversification level.
 List<RiskAlertBannerItem> computeConcentrationAlerts(
   List<AssetTypeBreakdown> breakdown,
   int riskScore,
+  String diversificationLevel,
 ) {
   final items = <RiskAlertBannerItem>[];
   for (final b in breakdown) {
@@ -56,7 +57,7 @@ List<RiskAlertBannerItem> computeConcentrationAlerts(
       ));
     }
   }
-  if (riskScore > 70) {
+  if (diversificationLevel.toLowerCase() == 'poor') {
     items.add(RiskAlertBannerItem.warning(
       'Portfolio poorly diversified',
       null,

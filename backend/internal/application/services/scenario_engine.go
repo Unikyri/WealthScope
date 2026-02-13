@@ -79,11 +79,23 @@ func (e *ScenarioEngine) Simulate(ctx context.Context, req entities.ScenarioRequ
 		return nil, err
 	}
 
+	// Generate AI analysis for the simulation result
+	aiAnalysis := ""
+	if e.aiClient != nil {
+		analysis, aiErr := e.explainSimulation(ctx, req, currentState, projectedState, changes, warnings)
+		if aiErr != nil {
+			e.logger.Warn("failed to generate AI analysis for simulation", zap.Error(aiErr))
+		} else {
+			aiAnalysis = analysis
+		}
+	}
+
 	return &entities.ScenarioResult{
 		CurrentState:   currentState,
 		ProjectedState: projectedState,
 		Changes:        changes,
 		Warnings:       warnings,
+		AIAnalysis:     aiAnalysis,
 	}, nil
 }
 
@@ -710,5 +722,48 @@ Do NOT use markdown headers or bullet points. Just a paragraph.`
 	systemPrompt := "You are WealthScope AI, a financial assistant explaining simulation results."
 
 	// Use ThinkingBalanced (2) for reasonable reasoning depth without excessive latency
+	return e.aiClient.GenerateWithThinking(ctx, prompt, systemPrompt, ai.ThinkingBalanced)
+}
+
+// explainSimulation generates an AI explanation for a single simulation
+func (e *ScenarioEngine) explainSimulation(
+	ctx context.Context,
+	req entities.ScenarioRequest,
+	current, projected entities.PortfolioState,
+	changes []entities.ChangeDetail,
+	warnings []string,
+) (string, error) {
+	prompt := fmt.Sprintf(`Explain this portfolio simulation as if you are a financial advisor.
+
+Scenario Type: %s
+Parameters: %+v
+
+Current State: Value $%.2f, Invested $%.2f
+Projected State: Value $%.2f, Invested $%.2f
+
+Changes:
+`, req.Type, req.Parameters, current.TotalValue, current.TotalInvested, projected.TotalValue, projected.TotalInvested)
+
+	for _, change := range changes {
+		prompt += fmt.Sprintf("- %s (Diff: $%.2f)\n", change.Description, change.Difference)
+	}
+
+	if len(warnings) > 0 {
+		prompt += "\nWarnings:\n"
+		for _, w := range warnings {
+			prompt += fmt.Sprintf("- %s\n", w)
+		}
+	}
+
+	prompt += `
+Provide a concise analysis (2-3 sentences) covering:
+1. What this scenario does to the portfolio.
+2. The impact on total value, allocation, or risk.
+3. A brief recommendation or consideration.
+
+Do NOT use markdown headers or bullet points. Just a paragraph.`
+
+	systemPrompt := "You are WealthScope AI, a financial assistant explaining simulation results."
+
 	return e.aiClient.GenerateWithThinking(ctx, prompt, systemPrompt, ai.ThinkingBalanced)
 }
