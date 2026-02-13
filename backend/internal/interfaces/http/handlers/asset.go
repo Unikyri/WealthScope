@@ -11,6 +11,7 @@ import (
 	"github.com/Unikyri/WealthScope/backend/internal/application/services"
 	"github.com/Unikyri/WealthScope/backend/internal/application/usecases"
 	"github.com/Unikyri/WealthScope/backend/internal/domain/entities"
+	"github.com/Unikyri/WealthScope/backend/internal/interfaces/http/middleware"
 	"github.com/Unikyri/WealthScope/backend/pkg/response"
 )
 
@@ -107,23 +108,6 @@ func toAssetResponse(asset *entities.Asset) AssetResponse {
 	return resp
 }
 
-// getUserIDFromContext extracts the user ID from the gin context (set by auth middleware)
-func getUserIDFromContext(c *gin.Context) (uuid.UUID, error) {
-	userIDStr, exists := c.Get("userID")
-	if !exists {
-		return uuid.Nil, errors.New("user ID not found in context")
-	}
-
-	switch v := userIDStr.(type) {
-	case string:
-		return uuid.Parse(v)
-	case uuid.UUID:
-		return v, nil
-	default:
-		return uuid.Nil, errors.New("invalid user ID type")
-	}
-}
-
 // --- Handler methods ---
 
 // Create handles creating a new asset
@@ -135,8 +119,8 @@ func getUserIDFromContext(c *gin.Context) (uuid.UUID, error) {
 // @Success 201 {object} AssetResponse
 // @Router /api/v1/assets [post]
 func (h *AssetHandler) Create(c *gin.Context) {
-	userID, err := getUserIDFromContext(c)
-	if err != nil {
+	userID, ok := middleware.GetUserID(c)
+	if !ok {
 		response.Unauthorized(c, "unauthorized")
 		return
 	}
@@ -174,8 +158,8 @@ func (h *AssetHandler) Create(c *gin.Context) {
 // @Success 200 {object} ListAssetsResponse
 // @Router /api/v1/assets [get]
 func (h *AssetHandler) List(c *gin.Context) {
-	userID, err := getUserIDFromContext(c)
-	if err != nil {
+	userID, ok := middleware.GetUserID(c)
+	if !ok {
 		response.Unauthorized(c, "unauthorized")
 		return
 	}
@@ -238,8 +222,8 @@ func (h *AssetHandler) List(c *gin.Context) {
 // @Success 200 {object} AssetResponse
 // @Router /api/v1/assets/{id} [get]
 func (h *AssetHandler) GetByID(c *gin.Context) {
-	userID, err := getUserIDFromContext(c)
-	if err != nil {
+	userID, ok := middleware.GetUserID(c)
+	if !ok {
 		response.Unauthorized(c, "unauthorized")
 		return
 	}
@@ -272,8 +256,8 @@ func (h *AssetHandler) GetByID(c *gin.Context) {
 // @Success 200 {object} AssetResponse
 // @Router /api/v1/assets/{id} [put]
 func (h *AssetHandler) Update(c *gin.Context) {
-	userID, err := getUserIDFromContext(c)
-	if err != nil {
+	userID, ok := middleware.GetUserID(c)
+	if !ok {
 		response.Unauthorized(c, "unauthorized")
 		return
 	}
@@ -313,8 +297,8 @@ func (h *AssetHandler) Update(c *gin.Context) {
 // @Success 204
 // @Router /api/v1/assets/{id} [delete]
 func (h *AssetHandler) Delete(c *gin.Context) {
-	userID, err := getUserIDFromContext(c)
-	if err != nil {
+	userID, ok := middleware.GetUserID(c)
+	if !ok {
 		response.Unauthorized(c, "unauthorized")
 		return
 	}
@@ -346,8 +330,8 @@ func (h *AssetHandler) Delete(c *gin.Context) {
 // @Success 200 {object} AutofillResponse
 // @Router /api/v1/assets/autofill [post]
 func (h *AssetHandler) Autofill(c *gin.Context) {
-	_, err := getUserIDFromContext(c)
-	if err != nil {
+	_, ok := middleware.GetUserID(c)
+	if !ok {
 		response.Unauthorized(c, "unauthorized")
 		return
 	}
