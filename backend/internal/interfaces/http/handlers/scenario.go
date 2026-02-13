@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -119,8 +121,10 @@ func (h *ScenarioHandler) Simulate(c *gin.Context) {
 		return
 	}
 
-	// Run simulation
-	result, err := h.scenarioEngine.Simulate(c.Request.Context(), scenarioReq)
+	// Run simulation with extended timeout (AI analysis may take time)
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 90*time.Second)
+	defer cancel()
+	result, err := h.scenarioEngine.Simulate(ctx, scenarioReq)
 	if err != nil {
 		response.InternalError(c, "Simulation failed: "+err.Error())
 		return
@@ -191,8 +195,10 @@ func (h *ScenarioHandler) SimulateChain(c *gin.Context) {
 		}
 	}
 
-	// Run simulation chain
-	result, err := h.scenarioEngine.SimulateChain(c.Request.Context(), req)
+	// Run simulation chain with extended timeout
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 90*time.Second)
+	defer cancel()
+	result, err := h.scenarioEngine.SimulateChain(ctx, req)
 	if err != nil {
 		response.InternalError(c, "Simulation chain failed: "+err.Error())
 		return
