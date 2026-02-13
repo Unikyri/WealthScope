@@ -114,6 +114,11 @@ func Load() *Config {
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
+	// Bind alternative env var names for news APIs (Railway uses NEWSDATA_API_KEY,
+	// code uses NEWS_NEWSDATA_API_KEY). BindEnv accepts both formats.
+	_ = viper.BindEnv("NEWS_NEWSDATA_API_KEY", "NEWS_NEWSDATA_API_KEY", "NEWSDATA_API_KEY")
+	_ = viper.BindEnv("NEWS_MARKETAUX_API_KEY", "NEWS_MARKETAUX_API_KEY", "MARKETAUX_API_KEY")
+
 	viper.SetConfigFile(".env")
 	viper.AddConfigPath(".")
 	viper.SetConfigType("env")

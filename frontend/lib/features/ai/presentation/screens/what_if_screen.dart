@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/scenarios/presentation/providers/scenarios_providers.dart';
 import 'package:wealthscope_app/features/scenarios/domain/entities/scenario_entity.dart';
+import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
 import 'package:wealthscope_app/features/subscriptions/data/services/revenuecat_service.dart';
 
 enum ScenarioType {
@@ -486,7 +487,7 @@ class _MarketMoveParams extends StatelessWidget {
   }
 }
 
-class _BuySellParams extends StatelessWidget {
+class _BuySellParams extends ConsumerWidget {
   final bool isBuy;
   final String? selectedAssetId;
   final double quantity;
@@ -506,26 +507,32 @@ class _BuySellParams extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final assetsAsync = ref.watch(allAssetsProvider);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Asset selection
-        DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            labelText: 'Select Asset',
-            border: const OutlineInputBorder(),
-            prefixIcon: const Icon(Icons.search),
+        assetsAsync.when(
+          loading: () => const LinearProgressIndicator(),
+          error: (e, _) => Text('Failed to load assets: $e'),
+          data: (assets) => DropdownButtonFormField<String>(
+            decoration: InputDecoration(
+              labelText: 'Select Asset',
+              border: const OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.search),
+            ),
+            value: selectedAssetId,
+            items: assets.map((asset) {
+              final label = asset.symbol.isNotEmpty
+                  ? '${asset.name} (${asset.symbol})'
+                  : asset.name;
+              return DropdownMenuItem(value: asset.id, child: Text(label));
+            }).toList(),
+            onChanged: onAssetChanged,
+            validator: (value) => value == null ? 'Please select an asset' : null,
           ),
-          value: selectedAssetId,
-          items: const [
-            // TODO: Load from actual portfolio assets
-            DropdownMenuItem(value: '1', child: Text('Apple Inc. (AAPL)')),
-            DropdownMenuItem(value: '2', child: Text('Gold (XAU)')),
-            DropdownMenuItem(value: '3', child: Text('Bitcoin (BTC)')),
-          ],
-          onChanged: onAssetChanged,
-          validator: (value) => value == null ? 'Please select an asset' : null,
         ),
         const SizedBox(height: 16),
 
