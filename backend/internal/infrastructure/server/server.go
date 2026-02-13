@@ -153,15 +153,13 @@ func (s *Server) runPriceUpdateLoop() {
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 
-	// NOTE: We intentionally do not run immediately on startup to avoid
-	// expensive work during deployments; first run happens after interval.
-	for range ticker.C {
+	runPriceUpdate := func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
 		userIDs, err := assetRepo.ListUserIDsWithListedAssets(ctx)
 		if err != nil {
 			s.logger.Error("Failed to list users for price job", zap.Error(err))
-			cancel()
-			continue
+			return
 		}
 
 		for _, userID := range userIDs {
@@ -170,7 +168,14 @@ func (s *Server) runPriceUpdateLoop() {
 				s.logger.Warn("Price job failed for user", zap.String("user_id", userID.String()), zap.Error(err))
 			}
 		}
-		cancel()
+	}
+
+	// Run immediately on startup so market data is available right away
+	s.logger.Info("Running initial price update on startup")
+	runPriceUpdate()
+
+	for range ticker.C {
+		runPriceUpdate()
 	}
 }
 
