@@ -80,8 +80,8 @@ func (s *Server) Run() {
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%s", s.cfg.Server.Port),
 		Handler:      r,
-		ReadTimeout:  15 * time.Second,
-		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  30 * time.Second,
+		WriteTimeout: 120 * time.Second,
 		IdleTimeout:  60 * time.Second,
 	}
 

@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -79,12 +80,14 @@ func (e *ScenarioEngine) Simulate(ctx context.Context, req entities.ScenarioRequ
 		return nil, err
 	}
 
-	// Generate AI analysis for the simulation result
+	// Generate AI analysis for the simulation result (with timeout to avoid blocking)
 	aiAnalysis := ""
 	if e.aiClient != nil {
-		analysis, aiErr := e.explainSimulation(ctx, req, currentState, projectedState, changes, warnings)
+		aiCtx, aiCancel := context.WithTimeout(ctx, 30*time.Second)
+		analysis, aiErr := e.explainSimulation(aiCtx, req, currentState, projectedState, changes, warnings)
+		aiCancel()
 		if aiErr != nil {
-			e.logger.Warn("failed to generate AI analysis for simulation", zap.Error(aiErr))
+			e.logger.Warn("AI analysis timed out or failed", zap.Error(aiErr))
 		} else {
 			aiAnalysis = analysis
 		}
