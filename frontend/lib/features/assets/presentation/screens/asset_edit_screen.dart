@@ -29,16 +29,15 @@ class AssetEditScreen extends ConsumerStatefulWidget {
 class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
   final _formKey = GlobalKey<FormState>();
   
-  // Asset type icons mapping
-  static const Map<AssetType, IconData> _assetTypeIcons = {
+  final Map<AssetType, IconData> _assetTypeIcons = {
     AssetType.stock: Icons.trending_up,
     AssetType.etf: Icons.pie_chart,
     AssetType.bond: Icons.account_balance,
     AssetType.crypto: Icons.currency_bitcoin,
     AssetType.realEstate: Icons.home,
-    AssetType.gold: Icons.diamond,
     AssetType.cash: Icons.account_balance_wallet,
-    AssetType.other: Icons.category,
+    AssetType.custom: Icons.category,
+    AssetType.liability: Icons.money_off,
   };
   
   late TextEditingController _symbolController;
@@ -52,9 +51,6 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
   late TextEditingController _exchangeController;
   late TextEditingController _sectorController;
   late TextEditingController _industryController;
-  late TextEditingController _metalTypeController;
-  late TextEditingController _purityController;
-  late TextEditingController _weightController;
   late TextEditingController _addressController;
   late TextEditingController _areaController;
   
@@ -82,9 +78,7 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
     _exchangeController = TextEditingController();
     _sectorController = TextEditingController();
     _industryController = TextEditingController();
-    _metalTypeController = TextEditingController();
-    _purityController = TextEditingController();
-    _weightController = TextEditingController();
+
     _addressController = TextEditingController();
     _areaController = TextEditingController();
   }
@@ -121,17 +115,6 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
             _industryController.text = metadata['industry'].toString();
           }
           
-          // Gold/Precious Metals metadata
-          if (metadata['metal_type'] != null) {
-            _metalTypeController.text = metadata['metal_type'].toString();
-          }
-          if (metadata['purity'] != null) {
-            _purityController.text = metadata['purity'].toString();
-          }
-          if (metadata['weight_grams'] != null) {
-            _weightController.text = metadata['weight_grams'].toString();
-          }
-          
           // Real Estate metadata
           if (metadata['address'] != null) {
             _addressController.text = metadata['address'].toString();
@@ -149,14 +132,13 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
     _symbolController.dispose();
     _nameController.dispose();
     _quantityController.dispose();
-    _priceController.dispose();    _currentPriceController.dispose();    _currentPriceController.dispose();
+    _priceController.dispose();
+    _currentPriceController.dispose();
     _notesController.dispose();
     _exchangeController.dispose();
     _sectorController.dispose();
     _industryController.dispose();
-    _metalTypeController.dispose();
-    _purityController.dispose();
-    _weightController.dispose();
+
     _addressController.dispose();
     _areaController.dispose();
     super.dispose();
@@ -188,16 +170,6 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
         }
         if (_industryController.text.isNotEmpty) {
           metadata['industry'] = _industryController.text.trim();
-        }
-      } else if (_originalAsset!.type == AssetType.gold) {
-        if (_metalTypeController.text.isNotEmpty) {
-          metadata['metal_type'] = _metalTypeController.text.trim();
-        }
-        if (_purityController.text.isNotEmpty) {
-          metadata['purity'] = double.tryParse(_purityController.text);
-        }
-        if (_weightController.text.isNotEmpty) {
-          metadata['weight_grams'] = double.tryParse(_weightController.text);
         }
       } else if (_originalAsset!.type == AssetType.realEstate) {
         if (_addressController.text.isNotEmpty) {
@@ -643,60 +615,6 @@ class _AssetEditScreenState extends ConsumerState<AssetEditScreen> {
             border: OutlineInputBorder(),
             prefixIcon: Icon(Icons.business_center),
           ),
-          enabled: !_isLoading,
-        ),
-        const SizedBox(height: 24),
-      ];
-    } else if (type == AssetType.gold) {
-      return [
-        Text(
-          'Precious Metal Details',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-        const SizedBox(height: 16),
-        
-        TextFormField(
-          controller: _metalTypeController,
-          decoration: const InputDecoration(
-            labelText: 'Metal Type (Optional)',
-            hintText: 'e.g., Gold, Silver, Platinum',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.diamond),
-          ),
-          enabled: !_isLoading,
-        ),
-        const SizedBox(height: 16),
-        
-        TextFormField(
-          controller: _purityController,
-          decoration: const InputDecoration(
-            labelText: 'Purity (Optional)',
-            hintText: 'e.g., 99.9',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.percent),
-          ),
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-          ],
-          enabled: !_isLoading,
-        ),
-        const SizedBox(height: 16),
-        
-        TextFormField(
-          controller: _weightController,
-          decoration: const InputDecoration(
-            labelText: 'Weight in Grams (Optional)',
-            hintText: 'Enter weight',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.monitor_weight),
-          ),
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-          ],
           enabled: !_isLoading,
         ),
         const SizedBox(height: 24),

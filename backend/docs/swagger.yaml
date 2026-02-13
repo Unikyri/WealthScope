@@ -20,23 +20,17 @@ definitions:
   dto.ConfirmAsset:
     properties:
       currency:
-        description: Currency is the currency code (required)
         type: string
       name:
-        description: Name is the asset name (required)
         type: string
       purchase_price:
-        description: PurchasePrice is the unit price (required, must be non-negative)
         minimum: 0
         type: number
       quantity:
-        description: Quantity is the number of units (required, must be positive)
         type: number
       symbol:
-        description: Symbol is the ticker symbol (optional)
         type: string
       type:
-        description: Type is the asset type (required)
         type: string
     required:
     - currency
@@ -59,39 +53,29 @@ definitions:
   dto.ConfirmOCRAssetsResponse:
     properties:
       asset_ids:
-        description: AssetIDs contains the IDs of the created assets
         items:
           type: string
         type: array
       created_count:
-        description: CreatedCount is the number of assets successfully created
         type: integer
     type: object
   dto.ExtractedAssetResponse:
     properties:
       confidence:
-        description: Confidence is the OCR confidence score (0.0 to 1.0)
         type: number
       currency:
-        description: Currency is the currency code
         type: string
       name:
-        description: Name is the name of the asset
         type: string
       purchase_price:
-        description: PurchasePrice is the unit price
         type: number
       quantity:
-        description: Quantity is the number of units held
         type: number
       symbol:
-        description: Symbol is the ticker symbol (optional)
         type: string
       total_value:
-        description: TotalValue is the calculated total value (quantity * price)
         type: number
       type:
-        description: Type is the asset category
         type: string
     type: object
   dto.OCRResponse:
@@ -119,6 +103,43 @@ definitions:
       value:
         type: number
     type: object
+  entities.AssetFormSchema:
+    properties:
+      api_sources:
+        items:
+          type: string
+        type: array
+      asset_type:
+        $ref: '#/definitions/entities.AssetType'
+      auto_fill_fields:
+        additionalProperties:
+          type: string
+        type: object
+      manual_fields:
+        additionalProperties:
+          type: string
+        type: object
+    type: object
+  entities.AssetType:
+    enum:
+    - stock
+    - etf
+    - bond
+    - crypto
+    - real_estate
+    - cash
+    - custom
+    - liability
+    type: string
+    x-enum-varnames:
+    - AssetTypeStock
+    - AssetTypeETF
+    - AssetTypeBond
+    - AssetTypeCrypto
+    - AssetTypeRealEstate
+    - AssetTypeCash
+    - AssetTypeCustom
+    - AssetTypeLiability
   entities.ChainResult:
     properties:
       final_state:
@@ -130,7 +151,6 @@ definitions:
           $ref: '#/definitions/entities.StepResult'
         type: array
       total_impact:
-        description: Initial vs Final total value
         type: number
     type: object
   entities.ChangeDetail:
@@ -184,12 +204,10 @@ definitions:
           type: string
         type: array
       level:
-        description: low, medium, high, critical
         type: string
       recommendation:
         type: string
       score:
-        description: 0-100 high is risky
         type: integer
       warnings:
         items:
@@ -208,20 +226,15 @@ definitions:
   entities.ScenarioParams:
     properties:
       asset_id:
-        description: For buy/sell scenarios
         type: string
       asset_types:
-        description: Affected asset types (empty = all)
         items:
           type: string
         type: array
       change_percent:
-        description: For market move scenarios
         type: number
       new_asset:
-        allOf:
-        - $ref: '#/definitions/entities.NewAssetParams'
-        description: For new asset scenarios
+        $ref: '#/definitions/entities.NewAssetParams'
       price:
         type: number
       quantity:
@@ -230,7 +243,6 @@ definitions:
         additionalProperties:
           format: float64
           type: number
-        description: For rebalance scenarios
         type: object
     type: object
   entities.ScenarioResult:
@@ -295,32 +307,21 @@ definitions:
     type: object
   handlers.AssetResponse:
     properties:
+      core_data:
+        additionalProperties: true
+        type: object
       created_at:
         type: string
-      currency:
-        type: string
-      current_price:
-        type: number
+      extended_data:
+        additionalProperties: true
+        type: object
       gain_loss:
         type: number
       gain_loss_percent:
         type: number
       id:
         type: string
-      metadata:
-        additionalProperties: true
-        type: object
       name:
-        type: string
-      notes:
-        type: string
-      purchase_date:
-        type: string
-      purchase_price:
-        type: number
-      quantity:
-        type: number
-      symbol:
         type: string
       total_cost:
         type: number
@@ -342,30 +343,44 @@ definitions:
       value:
         type: number
     type: object
+  handlers.AutofillRequest:
+    properties:
+      core_data:
+        additionalProperties: true
+        type: object
+      type:
+        type: string
+    required:
+    - core_data
+    - type
+    type: object
+  handlers.AutofillResponse:
+    properties:
+      api_sources:
+        items:
+          type: string
+        type: array
+      extended_data:
+        additionalProperties: true
+        type: object
+    type: object
   handlers.BriefingResponse:
     properties:
       alerts:
-        description: Portfolio alerts
         items:
           $ref: '#/definitions/services.PortfolioAlert'
         type: array
       briefing:
-        description: AI-generated narrative
         type: string
       generated_at:
-        description: Timestamp
         type: string
       health_score:
-        allOf:
-        - $ref: '#/definitions/services.HealthScore'
-        description: Portfolio health
+        $ref: '#/definitions/services.HealthScore'
       highlights:
-        description: Key events
         items:
           $ref: '#/definitions/handlers.Highlight'
         type: array
       recommendations:
-        description: Action items
         items:
           type: string
         type: array
@@ -425,46 +440,19 @@ definitions:
     type: object
   handlers.CreateAssetRequest:
     properties:
-      currency:
-        type: string
-      current_price:
-        minimum: 0
-        type: number
-      metadata:
+      core_data:
+        additionalProperties: true
+        type: object
+      extended_data:
         additionalProperties: true
         type: object
       name:
-        maxLength: 255
-        minLength: 1
-        type: string
-      notes:
-        maxLength: 1000
-        type: string
-      purchase_date:
-        type: string
-      purchase_price:
-        minimum: 0
-        type: number
-      quantity:
-        type: number
-      symbol:
-        maxLength: 20
         type: string
       type:
-        enum:
-        - stock
-        - etf
-        - bond
-        - crypto
-        - real_estate
-        - gold
-        - cash
-        - other
         type: string
     required:
+    - core_data
     - name
-    - purchase_price
-    - quantity
     - type
     type: object
   handlers.CreateConversationRequest:
@@ -547,8 +535,14 @@ definitions:
         items:
           $ref: '#/definitions/handlers.AssetResponse'
         type: array
-      pagination:
-        $ref: '#/definitions/handlers.PaginationInfo'
+      page:
+        type: integer
+      per_page:
+        type: integer
+      total_count:
+        type: integer
+      total_pages:
+        type: integer
     type: object
   handlers.MessageResponse:
     properties:
@@ -574,17 +568,6 @@ definitions:
       page:
         type: integer
       total:
-        type: integer
-    type: object
-  handlers.PaginationInfo:
-    properties:
-      page:
-        type: integer
-      per_page:
-        type: integer
-      total_count:
-        type: integer
-      total_pages:
         type: integer
     type: object
   handlers.PingResponse:
@@ -690,41 +673,15 @@ definitions:
     type: object
   handlers.UpdateAssetRequest:
     properties:
-      currency:
-        type: string
-      current_price:
-        minimum: 0
-        type: number
-      metadata:
+      core_data:
+        additionalProperties: true
+        type: object
+      extended_data:
         additionalProperties: true
         type: object
       name:
-        maxLength: 255
-        minLength: 1
-        type: string
-      notes:
-        maxLength: 1000
-        type: string
-      purchase_date:
-        type: string
-      purchase_price:
-        minimum: 0
-        type: number
-      quantity:
-        type: number
-      symbol:
-        maxLength: 20
         type: string
       type:
-        enum:
-        - stock
-        - etf
-        - bond
-        - crypto
-        - real_estate
-        - gold
-        - cash
-        - other
         type: string
     type: object
   handlers.UpdateConversationRequest:
@@ -806,6 +763,19 @@ definitions:
     - AlertTypeCorrelation
     - AlertTypeHealth
     - AlertTypePerformance
+  services.AssetAnalysisResult:
+    properties:
+      key_points:
+        items:
+          type: string
+        type: array
+      sentiment_score:
+        type: number
+      sentiment_trend:
+        type: string
+      summary:
+        type: string
+    type: object
   services.HealthScore:
     properties:
       correlation:
@@ -872,7 +842,6 @@ definitions:
       published_at:
         type: string
       sentiment:
-        description: -1 (negative) to +1 (positive)
         type: number
       source:
         type: string
@@ -1311,6 +1280,38 @@ paths:
       summary: Mark insight as read
       tags:
       - AI Insights
+  /api/v1/ai/insights/asset/{symbol}:
+    get:
+      description: Generates or retrieves AI analysis for a specific asset symbol
+      parameters:
+      - description: Asset Symbol
+        in: path
+        name: symbol
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.AssetAnalysisResult'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get AI analysis for a specific asset
+      tags:
+      - AI Insights
   /api/v1/ai/insights/daily:
     get:
       description: Gets or generates today's daily briefing for the user
@@ -1652,9 +1653,8 @@ paths:
       - AI
   /api/v1/assets:
     get:
-      description: Returns a paginated list of assets for the authenticated user
       parameters:
-      - description: Filter by asset type
+      - description: Filter by type
         in: query
         name: type
         type: string
@@ -1666,11 +1666,13 @@ paths:
         in: query
         name: currency
         type: string
-      - description: 'Page number (default: 1)'
+      - default: 1
+        description: Page number
         in: query
         name: page
         type: integer
-      - description: 'Items per page (default: 20, max: 100)'
+      - default: 20
+        description: Items per page
         in: query
         name: per_page
         type: integer
@@ -1680,33 +1682,17 @@ paths:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/handlers.ListAssetsResponse'
-              type: object
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - BearerAuth: []
-      summary: List user's assets
+            $ref: '#/definitions/handlers.ListAssetsResponse'
+      summary: List assets
       tags:
       - assets
     post:
       consumes:
       - application/json
-      description: Creates a new investment asset for the authenticated user
       parameters:
       - description: Asset data
         in: body
-        name: request
+        name: body
         required: true
         schema:
           $ref: '#/definitions/handlers.CreateAssetRequest'
@@ -1716,64 +1702,25 @@ paths:
         "201":
           description: Created
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/handlers.AssetResponse'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - BearerAuth: []
+            $ref: '#/definitions/handlers.AssetResponse'
       summary: Create a new asset
       tags:
       - assets
   /api/v1/assets/{id}:
     delete:
-      description: Deletes an asset by its ID
       parameters:
       - description: Asset ID
         in: path
         name: id
         required: true
         type: string
-      produces:
-      - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/response.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - BearerAuth: []
+        "204":
+          description: No Content
       summary: Delete an asset
       tags:
       - assets
     get:
-      description: Returns a specific asset by its ID
       parameters:
       - description: Asset ID
         in: path
@@ -1786,42 +1733,22 @@ paths:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/handlers.AssetResponse'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/response.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - BearerAuth: []
+            $ref: '#/definitions/handlers.AssetResponse'
       summary: Get asset by ID
       tags:
       - assets
     put:
       consumes:
       - application/json
-      description: Updates an existing asset
       parameters:
       - description: Asset ID
         in: path
         name: id
         required: true
         type: string
-      - description: Updated asset data
+      - description: Update data
         in: body
-        name: request
+        name: body
         required: true
         schema:
           $ref: '#/definitions/handlers.UpdateAssetRequest'
@@ -1831,27 +1758,43 @@ paths:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/handlers.AssetResponse'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/response.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - BearerAuth: []
+            $ref: '#/definitions/handlers.AssetResponse'
       summary: Update an asset
+      tags:
+      - assets
+  /api/v1/assets/autofill:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Asset type and core data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.AutofillRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.AutofillResponse'
+      summary: Auto-fill asset data
+      tags:
+      - assets
+  /api/v1/assets/schemas:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.AssetFormSchema'
+            type: array
+      summary: Get asset form schemas
       tags:
       - assets
   /api/v1/auth/me:

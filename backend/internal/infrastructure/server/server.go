@@ -56,6 +56,10 @@ func (s *Server) Run() {
 	// Setup scenario services for what-if simulations
 	scenarioEngine, historicalAnalyzer := s.setupScenarioServices(geminiClient)
 
+	// Setup market data registry and new API clients for autofill
+	registry, fredClient, rentcastClient := s.setupMarketDataProvidersV2()
+	autofillSvc := appsvc.NewAutofillService(registry, fredClient, rentcastClient)
+
 	// Create router with dependencies
 	r := router.NewRouter(router.RouterDeps{
 		Config:             s.cfg,
@@ -66,6 +70,7 @@ func (s *Server) Run() {
 		DocumentProcessor:  documentProcessor,
 		ScenarioEngine:     scenarioEngine,
 		HistoricalAnalyzer: historicalAnalyzer,
+		AutofillService:    autofillSvc,
 	})
 
 	// Configure multipart memory limit for file uploads (10MB)
@@ -75,8 +80,8 @@ func (s *Server) Run() {
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%s", s.cfg.Server.Port),
 		Handler:      r,
-		ReadTimeout:  15 * time.Second,
-		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  30 * time.Second,
+		WriteTimeout: 120 * time.Second,
 		IdleTimeout:  60 * time.Second,
 	}
 
@@ -148,15 +153,13 @@ func (s *Server) runPriceUpdateLoop() {
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 
-	// NOTE: We intentionally do not run immediately on startup to avoid
-	// expensive work during deployments; first run happens after interval.
-	for range ticker.C {
+	runPriceUpdate := func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
 		userIDs, err := assetRepo.ListUserIDsWithListedAssets(ctx)
 		if err != nil {
 			s.logger.Error("Failed to list users for price job", zap.Error(err))
-			cancel()
-			continue
+			return
 		}
 
 		for _, userID := range userIDs {
@@ -165,7 +168,14 @@ func (s *Server) runPriceUpdateLoop() {
 				s.logger.Warn("Price job failed for user", zap.String("user_id", userID.String()), zap.Error(err))
 			}
 		}
-		cancel()
+	}
+
+	// Run immediately on startup so market data is available right away
+	s.logger.Info("Running initial price update on startup")
+	runPriceUpdate()
+
+	for range ticker.C {
+		runPriceUpdate()
 	}
 }
 
@@ -304,6 +314,56 @@ func (s *Server) setupMarketDataProviders() domainsvc.MarketDataClient {
 	}
 
 	return registry
+}
+
+// setupMarketDataProvidersV2 extends the base market data providers with FRED and RentCast,
+// returning the raw registry and standalone clients for the AutofillService.
+func (s *Server) setupMarketDataProvidersV2() (*marketdata.ProviderRegistry, *marketdata.FREDClient, *marketdata.RentCastClient) {
+	baseClient := s.setupMarketDataProviders()
+	registry, _ := baseClient.(*marketdata.ProviderRegistry)
+
+	var fredClient *marketdata.FREDClient
+	var rentcastClient *marketdata.RentCastClient
+
+	// Initialize QuotaManager for APIs with strict monthly limits
+	var quotaMgr *marketdata.QuotaManager
+	if s.db != nil {
+		quotaLimits := map[string]int{}
+		if s.cfg.MarketData.RentCastMonthlyQuota > 0 {
+			quotaLimits["rentcast"] = s.cfg.MarketData.RentCastMonthlyQuota
+		} else {
+			quotaLimits["rentcast"] = 45 // default free tier
+		}
+		quotaMgr = marketdata.NewQuotaManager(s.db.DB, quotaLimits)
+		s.logger.Info("Initialized QuotaManager", zap.Any("limits", quotaLimits))
+	}
+
+	// ==================== BOND/RATES PROVIDER (FRED) ====================
+	if s.cfg.MarketData.FREDEnabled && s.cfg.MarketData.FREDAPIKey != "" {
+		fredRateLimit := s.cfg.MarketData.FREDRateLimit
+		if fredRateLimit <= 0 {
+			fredRateLimit = 60
+		}
+		fredLimiter := marketdata.NewRateLimiter(fredRateLimit, time.Minute)
+		fredClient = marketdata.NewFREDClient(s.cfg.MarketData.FREDAPIKey, fredLimiter, quotaMgr)
+		s.logger.Info("Initialized FRED client",
+			zap.Int("rate_limit_per_min", fredRateLimit))
+	}
+
+	// ==================== REAL ESTATE PROVIDER (RentCast) ====================
+	if s.cfg.MarketData.RentCastEnabled && s.cfg.MarketData.RentCastAPIKey != "" {
+		rcRateLimit := s.cfg.MarketData.RentCastRateLimit
+		if rcRateLimit <= 0 {
+			rcRateLimit = 1
+		}
+		rcLimiter := marketdata.NewRateLimiter(rcRateLimit, time.Minute)
+		rentcastClient = marketdata.NewRentCastClient(s.cfg.MarketData.RentCastAPIKey, rcLimiter, quotaMgr)
+		s.logger.Info("Initialized RentCast client",
+			zap.Int("rate_limit_per_min", rcRateLimit),
+			zap.Int("monthly_quota", s.cfg.MarketData.RentCastMonthlyQuota))
+	}
+
+	return registry, fredClient, rentcastClient
 }
 
 // setupNewsProviders configures news providers with rate limiting and fallback.

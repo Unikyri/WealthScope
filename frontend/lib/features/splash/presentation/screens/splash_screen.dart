@@ -47,7 +47,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       if (!onboardingState) {
         // First time user - show onboarding
         if (!mounted) return;
-        context.go('/onboarding-cinematic');
+        context.go('/onboarding');
         return;
       }
 

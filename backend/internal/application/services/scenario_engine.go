@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -79,11 +80,25 @@ func (e *ScenarioEngine) Simulate(ctx context.Context, req entities.ScenarioRequ
 		return nil, err
 	}
 
+	// Generate AI analysis for the simulation result (with timeout to avoid blocking)
+	aiAnalysis := ""
+	if e.aiClient != nil {
+		aiCtx, aiCancel := context.WithTimeout(ctx, 30*time.Second)
+		analysis, aiErr := e.explainSimulation(aiCtx, req, currentState, projectedState, changes, warnings)
+		aiCancel()
+		if aiErr != nil {
+			e.logger.Warn("AI analysis timed out or failed", zap.Error(aiErr))
+		} else {
+			aiAnalysis = analysis
+		}
+	}
+
 	return &entities.ScenarioResult{
 		CurrentState:   currentState,
 		ProjectedState: projectedState,
 		Changes:        changes,
 		Warnings:       warnings,
+		AIAnalysis:     aiAnalysis,
 	}, nil
 }
 
@@ -190,14 +205,21 @@ func (e *ScenarioEngine) simulateSell(
 		return entities.PortfolioState{}, nil, nil, fmt.Errorf("asset not found: %w", findErr)
 	}
 
-	if params.Quantity > asset.Quantity {
-		warnings = append(warnings, fmt.Sprintf("Selling more than owned: %.4f > %.4f", params.Quantity, asset.Quantity))
+	// Extract values from JSONB core_data/extended_data
+	coreMap, _ := asset.GetCoreDataMap()
+	extMap, _ := asset.GetExtendedDataMap()
+
+	assetQty := toFloat64(coreMap["quantity"])
+	assetPurchasePrice := toFloat64(coreMap["purchase_price"])
+
+	if params.Quantity > assetQty {
+		warnings = append(warnings, fmt.Sprintf("Selling more than owned: %.4f > %.4f", params.Quantity, assetQty))
 	}
 
 	// Use current price if available, otherwise purchase price
-	price := asset.PurchasePrice
-	if asset.CurrentPrice != nil {
-		price = *asset.CurrentPrice
+	price := assetPurchasePrice
+	if cp := toFloat64(extMap["current_price"]); cp > 0 {
+		price = cp
 	}
 
 	// Use provided price if specified
@@ -206,7 +228,7 @@ func (e *ScenarioEngine) simulateSell(
 	}
 
 	saleAmount := params.Quantity * price
-	costBasis := params.Quantity * asset.PurchasePrice
+	costBasis := params.Quantity * assetPurchasePrice
 
 	newTotalValue := current.TotalValue - saleAmount
 	newTotalInvested := current.TotalInvested - costBasis
@@ -223,7 +245,7 @@ func (e *ScenarioEngine) simulateSell(
 	}
 
 	// Adjust asset count if selling all
-	if params.Quantity >= asset.Quantity {
+	if params.Quantity >= assetQty {
 		projected.AssetCount--
 	}
 
@@ -479,6 +501,23 @@ func absFloat(x float64) float64 {
 	return x
 }
 
+// toFloat64 safely converts an interface{} (from JSON unmarshal) to float64.
+func toFloat64(v interface{}) float64 {
+	if v == nil {
+		return 0
+	}
+	switch val := v.(type) {
+	case float64:
+		return val
+	case int:
+		return float64(val)
+	case int64:
+		return float64(val)
+	default:
+		return 0
+	}
+}
+
 // GetTemplates returns the list of predefined scenario templates
 
 // SimulateChain runs a multi-step scenario simulation
@@ -686,5 +725,48 @@ Do NOT use markdown headers or bullet points. Just a paragraph.`
 	systemPrompt := "You are WealthScope AI, a financial assistant explaining simulation results."
 
 	// Use ThinkingBalanced (2) for reasonable reasoning depth without excessive latency
+	return e.aiClient.GenerateWithThinking(ctx, prompt, systemPrompt, ai.ThinkingBalanced)
+}
+
+// explainSimulation generates an AI explanation for a single simulation
+func (e *ScenarioEngine) explainSimulation(
+	ctx context.Context,
+	req entities.ScenarioRequest,
+	current, projected entities.PortfolioState,
+	changes []entities.ChangeDetail,
+	warnings []string,
+) (string, error) {
+	prompt := fmt.Sprintf(`Explain this portfolio simulation as if you are a financial advisor.
+
+Scenario Type: %s
+Parameters: %+v
+
+Current State: Value $%.2f, Invested $%.2f
+Projected State: Value $%.2f, Invested $%.2f
+
+Changes:
+`, req.Type, req.Parameters, current.TotalValue, current.TotalInvested, projected.TotalValue, projected.TotalInvested)
+
+	for _, change := range changes {
+		prompt += fmt.Sprintf("- %s (Diff: $%.2f)\n", change.Description, change.Difference)
+	}
+
+	if len(warnings) > 0 {
+		prompt += "\nWarnings:\n"
+		for _, w := range warnings {
+			prompt += fmt.Sprintf("- %s\n", w)
+		}
+	}
+
+	prompt += `
+Provide a concise analysis (2-3 sentences) covering:
+1. What this scenario does to the portfolio.
+2. The impact on total value, allocation, or risk.
+3. A brief recommendation or consideration.
+
+Do NOT use markdown headers or bullet points. Just a paragraph.`
+
+	systemPrompt := "You are WealthScope AI, a financial assistant explaining simulation results."
+
 	return e.aiClient.GenerateWithThinking(ctx, prompt, systemPrompt, ai.ThinkingBalanced)
 }

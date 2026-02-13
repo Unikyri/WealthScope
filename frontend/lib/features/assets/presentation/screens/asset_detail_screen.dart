@@ -6,9 +6,13 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
+import 'package:wealthscope_app/features/subscriptions/data/services/revenuecat_service.dart';
+import 'package:wealthscope_app/shared/widgets/price_freshness_indicator.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/asset_candle_chart.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/gemini_analysis_card.dart';
+import 'package:wealthscope_app/features/assets/presentation/widgets/asset_detail_skeleton.dart';
 import 'package:wealthscope_app/features/assets/presentation/widgets/asset_news_list.dart';
+import 'package:wealthscope_app/shared/widgets/asset_icon_resolver.dart';
 
 class AssetDetailScreen extends ConsumerStatefulWidget {
   final String assetId;
@@ -134,6 +138,20 @@ class _AssetDetailScreenState extends ConsumerState<AssetDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          // Hero icon (smooth transition from AssetCard/TopMover)
+                          HeroMode(
+                            enabled: !MediaQuery.of(context).disableAnimations,
+                            child: Hero(
+                              tag: 'asset-icon-${asset.id ?? widget.assetId}',
+                              child: AssetIconResolver(
+                                symbol: asset.symbol,
+                                assetType: asset.type,
+                                name: asset.name,
+                                size: 48,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
                           // Hero Price
                           Text(
                             '\$${_formatPrice(asset.currentPrice ?? asset.purchasePrice)}', // Fallback
@@ -151,6 +169,15 @@ class _AssetDetailScreenState extends ConsumerState<AssetDetailScreen> {
                               ],
                             ),
                           ).animate().fadeIn().scale(duration: 400.ms),
+                          
+                          if (asset.updatedAt != null || !ref.watch(featureGateProvider).isPremium) ...[
+                            const SizedBox(height: 8),
+                            PriceFreshnessIndicator(
+                              lastUpdated: asset.updatedAt,
+                              isScoutPlan: !ref.watch(featureGateProvider).isPremium,
+                              compact: true,
+                            ),
+                          ],
                           
                           const SizedBox(height: 12),
                           
@@ -312,7 +339,7 @@ class _AssetDetailScreenState extends ConsumerState<AssetDetailScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 16),
-                                AssetNewsList(symbol: asset.symbol),
+                                AssetNewsList(symbol: asset.symbol, assetType: asset.type),
                               ],
                             ),
                           ),
@@ -381,7 +408,10 @@ class _AssetDetailScreenState extends ConsumerState<AssetDetailScreen> {
             ],
           );
         },
-        loading: () => const Scaffold(backgroundColor: AppTheme.backgroundDark, body: Center(child: CircularProgressIndicator())),
+        loading: () => const Scaffold(
+          backgroundColor: AppTheme.backgroundDark,
+          body: AssetDetailSkeleton(),
+        ),
         error: (e, _) => Scaffold(
           backgroundColor: AppTheme.backgroundDark,
           body: Center(child: Text('Error: $e', style: const TextStyle(color: Colors.white))),

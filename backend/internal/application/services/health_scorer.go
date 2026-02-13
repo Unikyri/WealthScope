@@ -193,7 +193,7 @@ func (s *HealthScorer) calculateRiskScore(assets []entities.Asset) int {
 			highRiskValue += value
 		case entities.AssetTypeStock, entities.AssetTypeETF, entities.AssetTypeRealEstate:
 			medRiskValue += value
-		case entities.AssetTypeBond, entities.AssetTypeGold, entities.AssetTypeCash:
+		case entities.AssetTypeBond, entities.AssetTypeCash:
 			lowRiskValue += value
 		default:
 			medRiskValue += value
@@ -292,7 +292,7 @@ func (s *HealthScorer) calculateLiquidityScore(assets []entities.Asset) int {
 		switch asset.Type {
 		case entities.AssetTypeStock, entities.AssetTypeETF, entities.AssetTypeCrypto, entities.AssetTypeCash:
 			liquidValue += value
-		case entities.AssetTypeBond, entities.AssetTypeGold:
+		case entities.AssetTypeBond:
 			liquidValue += value * 0.8 // Somewhat liquid
 			illiquidValue += value * 0.2
 		case entities.AssetTypeRealEstate:

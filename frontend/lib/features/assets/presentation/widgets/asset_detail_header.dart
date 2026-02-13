@@ -124,12 +124,12 @@ class AssetDetailHeader extends StatelessWidget {
         return Icons.currency_bitcoin;
       case AssetType.realEstate:
         return Icons.home;
-      case AssetType.gold:
-        return Icons.diamond;
       case AssetType.cash:
         return Icons.account_balance_wallet;
-      case AssetType.other:
+      case AssetType.custom:
         return Icons.category;
+      case AssetType.liability:
+        return Icons.money_off; 
     }
   }
 

@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/scenarios/presentation/providers/scenarios_providers.dart';
 import 'package:wealthscope_app/features/scenarios/domain/entities/scenario_entity.dart';
+import 'package:wealthscope_app/features/assets/presentation/providers/assets_provider.dart';
+import 'package:wealthscope_app/features/subscriptions/data/services/revenuecat_service.dart';
 
 enum ScenarioType {
   marketMove('Market Movement', Icons.trending_down, 'market_move'),
@@ -43,9 +48,181 @@ class _WhatIfScreenState extends ConsumerState<WhatIfScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final gate = ref.watch(featureGateProvider);
+    final whatIfResult = gate.canUseWhatIf();
+
+    if (!whatIfResult.allowed) return _buildUpgradeScreen(context);
+    return _buildWhatIfContent(context);
+  }
+
+  Widget _buildUpgradeScreen(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppTheme.midnightBlue,
+      appBar: AppBar(
+        backgroundColor: AppTheme.midnightBlue,
+        elevation: 0,
+        title: const Text(
+          'What-If Simulator',
+          style: TextStyle(color: Colors.white),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Icon with gradient glow
+              Container(
+                width: 96,
+                height: 96,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      AppTheme.electricBlue.withValues(alpha: 0.25),
+                      AppTheme.electricBlue.withValues(alpha: 0.0),
+                    ],
+                  ),
+                ),
+                child: const Icon(
+                  Icons.science,
+                  color: AppTheme.electricBlue,
+                  size: 48,
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Title
+              Text(
+                'What-If Simulator',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // Subtitle
+              Text(
+                'Sentinel Exclusive Feature',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.electricBlue,
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Feature list
+              _buildFeatureRow(Icons.trending_down, 'Market crash scenarios'),
+              const SizedBox(height: 12),
+              _buildFeatureRow(
+                  Icons.add_shopping_cart, 'Buy/Sell simulations'),
+              const SizedBox(height: 12),
+              _buildFeatureRow(Icons.balance, 'Portfolio rebalancing'),
+              const SizedBox(height: 12),
+              _buildFeatureRow(
+                  Icons.show_chart, 'Compound interest projections'),
+              const SizedBox(height: 36),
+
+              // CTA
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => context.push('/subscription'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.electricBlue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: Text(
+                    'Upgrade to Sentinel',
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Unlock all premium features',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: AppTheme.textGrey,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeatureRow(IconData icon, String text) {
+    return Row(
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: AppTheme.cardGrey,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: AppTheme.electricBlue, size: 18),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          text,
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            color: Colors.white.withValues(alpha: 0.85),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWhatIfContent(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('What-If Simulator'),
+        actions: [
+          // Sentinel badge
+          Container(
+            margin: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [AppTheme.electricBlue, AppTheme.purpleAccent],
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.workspace_premium,
+                    size: 12, color: Colors.white),
+                const SizedBox(width: 4),
+                Text(
+                  'Sentinel',
+                  style: GoogleFonts.inter(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -310,7 +487,7 @@ class _MarketMoveParams extends StatelessWidget {
   }
 }
 
-class _BuySellParams extends StatelessWidget {
+class _BuySellParams extends ConsumerWidget {
   final bool isBuy;
   final String? selectedAssetId;
   final double quantity;
@@ -330,26 +507,32 @@ class _BuySellParams extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final assetsAsync = ref.watch(allAssetsProvider);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Asset selection
-        DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            labelText: 'Select Asset',
-            border: const OutlineInputBorder(),
-            prefixIcon: const Icon(Icons.search),
+        assetsAsync.when(
+          loading: () => const LinearProgressIndicator(),
+          error: (e, _) => Text('Failed to load assets: $e'),
+          data: (assets) => DropdownButtonFormField<String>(
+            decoration: InputDecoration(
+              labelText: 'Select Asset',
+              border: const OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.search),
+            ),
+            value: selectedAssetId,
+            items: assets.map((asset) {
+              final label = asset.symbol.isNotEmpty
+                  ? '${asset.name} (${asset.symbol})'
+                  : asset.name;
+              return DropdownMenuItem(value: asset.id, child: Text(label));
+            }).toList(),
+            onChanged: onAssetChanged,
+            validator: (value) => value == null ? 'Please select an asset' : null,
           ),
-          value: selectedAssetId,
-          items: const [
-            // TODO: Load from actual portfolio assets
-            DropdownMenuItem(value: '1', child: Text('Apple Inc. (AAPL)')),
-            DropdownMenuItem(value: '2', child: Text('Gold (XAU)')),
-            DropdownMenuItem(value: '3', child: Text('Bitcoin (BTC)')),
-          ],
-          onChanged: onAssetChanged,
-          validator: (value) => value == null ? 'Please select an asset' : null,
         ),
         const SizedBox(height: 16),
 

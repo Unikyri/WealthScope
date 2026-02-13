@@ -4,15 +4,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/core/utils/asset_validators.dart';
 import 'package:wealthscope_app/core/utils/snackbar_utils.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/currency.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
+import 'package:wealthscope_app/features/assets/presentation/providers/asset_form_submission_provider.dart';
 import 'package:wealthscope_app/features/assets/presentation/providers/stock_form_provider.dart';
+import 'package:wealthscope_app/features/assets/presentation/widgets/symbol_search_field.dart';
+import 'package:wealthscope_app/features/assets/presentation/widgets/asset_type_card.dart';
 
 /// Stock/ETF Form Screen
-/// Provides a form for adding stocks and ETFs to the portfolio.
+/// Step 2 of the Add Asset flow for stocks and ETFs.
+/// Uses SymbolSearchField with local catalog for autocomplete.
 class StockFormScreen extends ConsumerStatefulWidget {
   const StockFormScreen({
     required this.type,
@@ -33,10 +38,18 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
   final _priceController = TextEditingController();
   final _exchangeController = TextEditingController();
   final _sectorController = TextEditingController();
-  final _industryController = TextEditingController();
   final _notesController = TextEditingController();
 
   DateTime? _selectedDate;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(stockFormProvider.notifier).reset();
+      ref.read(assetFormSubmissionProvider.notifier).reset();
+    });
+  }
 
   @override
   void dispose() {
@@ -46,7 +59,6 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
     _priceController.dispose();
     _exchangeController.dispose();
     _sectorController.dispose();
-    _industryController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -56,19 +68,20 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
   String get _title => _isStock ? 'New Stock' : 'New ETF';
 
   Future<void> _handleSubmit() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    final formState = ref.read(stockFormProvider);
+    if (formState.isLoading) return;
+    if (!_formKey.currentState!.validate()) return;
 
     final userId = Supabase.instance.client.auth.currentUser?.id;
     if (userId == null) {
       if (!mounted) return;
-      SnackbarUtils.showError(context, 'Authentication error. Please log in again.');
+      SnackbarUtils.showError(
+          context, 'Authentication error. Please log in again.');
       return;
     }
 
     final currency = ref.read(selectedCurrencyProvider);
-    
+
     // Build metadata for stock/ETF
     final metadata = <String, dynamic>{};
     if (_exchangeController.text.isNotEmpty) {
@@ -77,10 +90,7 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
     if (_sectorController.text.isNotEmpty) {
       metadata['sector'] = _sectorController.text.trim();
     }
-    if (_industryController.text.isNotEmpty) {
-      metadata['industry'] = _industryController.text.trim();
-    }
-    
+
     final asset = StockAsset(
       userId: userId,
       symbol: _symbolController.text.trim().toUpperCase(),
@@ -91,7 +101,9 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
       currency: currency,
       type: widget.type,
       metadata: metadata,
-      notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+      notes: _notesController.text.trim().isEmpty
+          ? null
+          : _notesController.text.trim(),
     );
 
     await ref.read(stockFormProvider.notifier).submitForm(asset);
@@ -104,11 +116,25 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
       SnackbarUtils.showError(context, state.error!);
     } else if (state.savedAsset != null) {
       SnackbarUtils.showSuccess(
-        context, 
-        '${_isStock ? 'Stock' : 'ETF'} added successfully',
+        context,
+        'Asset added successfully',
       );
-      context.pop();
+      _clearForm();
+      ref.read(stockFormProvider.notifier).reset();
+      ref.read(assetFormSubmissionProvider.notifier).reset();
+      if (mounted) context.pop();
     }
+  }
+
+  void _clearForm() {
+    _symbolController.clear();
+    _nameController.clear();
+    _quantityController.clear();
+    _priceController.clear();
+    _exchangeController.clear();
+    _sectorController.clear();
+    _notesController.clear();
+    setState(() => _selectedDate = null);
   }
 
   Future<void> _selectDate() async {
@@ -117,67 +143,141 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
       initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.dark().copyWith(
+            colorScheme: const ColorScheme.dark(
+              primary: AppTheme.electricBlue,
+              surface: AppTheme.cardGrey,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (picked != null) {
-      setState(() {
-        _selectedDate = picked;
-      });
+      setState(() => _selectedDate = picked);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final formState = ref.watch(stockFormProvider);
     final selectedCurrency = ref.watch(selectedCurrencyProvider);
+    final typeColor = AssetTypeSelectorCard.getTypeColor(widget.type);
 
     return Scaffold(
+      backgroundColor: AppTheme.midnightBlue,
       appBar: AppBar(
-        title: Text(_title),
+        backgroundColor: AppTheme.midnightBlue,
+        elevation: 0,
+        title: Text(
+          _title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+            fontSize: 20,
+          ),
+        ),
         centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Form(
         key: _formKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           children: [
-            // Symbol Field with Autocomplete
-            _SymbolAutocompleteField(
-              controller: _symbolController,
+            // Step indicator + type badge
+            Row(
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.electricBlue.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'Step 2 of 2',
+                    style: TextStyle(
+                      color: AppTheme.electricBlue,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: typeColor.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        AssetTypeSelectorCard.getTypeIcon(widget.type),
+                        color: typeColor,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        widget.type.label,
+                        style: TextStyle(
+                          color: typeColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            // Company Name field - primary selector, auto-fills symbol, exchange, sector
+            SymbolSearchField(
+              assetType: widget.type,
+              controller: _nameController,
+              label: _isStock ? 'Company Name' : 'Fund Name',
+              searchByCompanyName: true,
+              validator: AssetValidators.validateName,
               onSymbolSelected: (symbol) {
                 setState(() {
-                  _symbolController.text = symbol;
+                  _nameController.text = symbol.name;
+                  _symbolController.text = symbol.symbol;
+                  _exchangeController.text = symbol.exchange ?? '';
+                  _sectorController.text = symbol.sector ?? '';
                 });
               },
             ),
             const SizedBox(height: 16),
 
-            // Name Field
-            TextFormField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: 'Company Name',
-                hintText: 'Enter company name',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.business),
-              ),
-              textCapitalization: TextCapitalization.words,
-              validator: AssetValidators.validateName,
+            // Symbol field - auto-filled when company selected, editable for manual override
+            _buildFormField(
+              controller: _symbolController,
+              label: 'Symbol',
+              hint: 'Auto-filled when selected above',
+              icon: Icons.tag,
+              textCapitalization: TextCapitalization.characters,
+              validator: (value) =>
+                  AssetValidators.validateSymbol(value, required: true),
             ),
             const SizedBox(height: 16),
 
             // Quantity Field
-            TextFormField(
+            _buildFormField(
               controller: _quantityController,
-              decoration: InputDecoration(
-                labelText: 'Quantity',
-                hintText: 'Enter quantity',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.numbers),
-              ),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              label: _isStock ? 'Shares' : 'Units',
+              hint: 'Enter quantity',
+              icon: Icons.numbers,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,4}')),
               ],
@@ -186,30 +286,24 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
             const SizedBox(height: 16),
 
             // Price Field
-            TextFormField(
+            _buildFormField(
               controller: _priceController,
-              decoration: InputDecoration(
-                labelText: 'Purchase Price',
-                hintText: 'Enter purchase price',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.attach_money),
-                suffixText: selectedCurrency.code,
-              ),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              label: 'Purchase Price',
+              hint: 'Enter purchase price',
+              icon: Icons.attach_money,
+              suffixText: selectedCurrency.code,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
               ],
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'El precio de compra es requerido';
+                  return 'Purchase price is required';
                 }
                 final price = double.tryParse(value);
-                if (price == null) {
-                  return 'Ingresa un precio valido';
-                }
-                if (price < 0) {
-                  return 'El precio no puede ser negativo';
-                }
+                if (price == null) return 'Enter a valid price';
+                if (price < 0) return 'Price cannot be negative';
                 return null;
               },
             ),
@@ -217,27 +311,48 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
 
             // Currency Dropdown
             DropdownButtonFormField<Currency>(
-              value: selectedCurrency,
+              initialValue: selectedCurrency,
+              dropdownColor: AppTheme.cardGrey,
+              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: 'Currency',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.monetization_on),
+                labelStyle: TextStyle(color: AppTheme.textGrey),
+                filled: true,
+                fillColor: AppTheme.cardGrey,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide:
+                      BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide:
+                      BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppTheme.electricBlue),
+                ),
+                prefixIcon: Icon(Icons.monetization_on, color: AppTheme.textGrey),
               ),
               items: Currency.values.map((currency) {
                 return DropdownMenuItem(
                   value: currency,
-                  child: Text('${currency.code} - ${currency.name}'),
+                  child: Text(
+                    '${currency.code} - ${currency.name}',
+                    style: const TextStyle(color: Colors.white),
+                  ),
                 );
               }).toList(),
               onChanged: (currency) {
                 if (currency != null) {
-                  ref.read(selectedCurrencyProvider.notifier).setCurrency(currency);
+                  ref
+                      .read(selectedCurrencyProvider.notifier)
+                      .setCurrency(currency);
                 }
               },
               validator: (value) {
-                if (value == null) {
-                  return 'Currency is required';
-                }
+                if (value == null) return 'Currency is required';
                 return null;
               },
             ),
@@ -246,19 +361,30 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
             // Purchase Date Field
             InkWell(
               onTap: _selectDate,
+              borderRadius: BorderRadius.circular(12),
               child: InputDecorator(
                 decoration: InputDecoration(
                   labelText: 'Purchase Date (Optional)',
-                  border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.calendar_today),
+                  labelStyle: TextStyle(color: AppTheme.textGrey),
+                  filled: true,
+                  fillColor: AppTheme.cardGrey,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:
+                        BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:
+                        BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                  ),
+                  prefixIcon:
+                      Icon(Icons.calendar_today, color: AppTheme.textGrey),
                   suffixIcon: _selectedDate != null
                       ? IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            setState(() {
-                              _selectedDate = null;
-                            });
-                          },
+                          icon: Icon(Icons.clear, color: AppTheme.textGrey),
+                          onPressed: () =>
+                              setState(() => _selectedDate = null),
                         )
                       : null,
                 ),
@@ -266,75 +392,54 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
                   _selectedDate != null
                       ? DateFormat.yMMMd().format(_selectedDate!)
                       : 'Select date',
-                  style: _selectedDate != null
-                      ? theme.textTheme.bodyLarge
-                      : theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.hintColor,
-                        ),
+                  style: TextStyle(
+                    color: _selectedDate != null
+                        ? Colors.white
+                        : AppTheme.textGrey,
+                  ),
                 ),
               ),
             ),
             const SizedBox(height: 24),
 
-            // Metadata Section Header
+            // Additional Information Section
             Text(
               'Additional Information (Optional)',
-              style: theme.textTheme.titleMedium?.copyWith(
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.8),
+                fontSize: 15,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
             // Exchange Field
-            TextFormField(
+            _buildFormField(
               controller: _exchangeController,
-              decoration: InputDecoration(
-                labelText: 'Exchange',
-                hintText: 'e.g., NASDAQ, NYSE',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.account_balance_outlined),
-              ),
+              label: 'Exchange',
+              hint: 'e.g., NASDAQ, NYSE',
+              icon: Icons.account_balance_outlined,
               textCapitalization: TextCapitalization.characters,
             ),
             const SizedBox(height: 16),
 
             // Sector Field
-            TextFormField(
+            _buildFormField(
               controller: _sectorController,
-              decoration: InputDecoration(
-                labelText: 'Sector',
-                hintText: 'e.g., Technology, Healthcare',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.category_outlined),
-              ),
-              textCapitalization: TextCapitalization.words,
-            ),
-            const SizedBox(height: 16),
-
-            // Industry Field
-            TextFormField(
-              controller: _industryController,
-              decoration: InputDecoration(
-                labelText: 'Industry',
-                hintText: 'e.g., Consumer Electronics',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.factory_outlined),
-              ),
+              label: 'Sector',
+              hint: 'e.g., Technology, Healthcare',
+              icon: Icons.category_outlined,
               textCapitalization: TextCapitalization.words,
             ),
             const SizedBox(height: 16),
 
             // Notes Field
-            TextFormField(
+            _buildFormField(
               controller: _notesController,
-              decoration: InputDecoration(
-                labelText: 'Notes',
-                hintText: 'Any additional notes about this investment',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.note_outlined),
-              ),
+              label: 'Notes',
+              hint: 'Any additional notes about this investment',
+              icon: Icons.note_outlined,
               maxLines: 3,
-              maxLength: 500,
             ),
             const SizedBox(height: 24),
 
@@ -352,118 +457,91 @@ class _StockFormScreenState extends ConsumerState<StockFormScreen> {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: ElevatedButton(
-            onPressed: formState.isLoading ? null : _handleSubmit,
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+          child: SizedBox(
+            height: 52,
+            child: ElevatedButton(
+              onPressed: formState.isLoading ? null : _handleSubmit,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.electricBlue,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                elevation: 0,
               ),
-            ),
-            child: formState.isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
+              child: formState.isLoading
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text(
+                      'Save Asset',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  )
-                : const Text(
-                    'Save Asset',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
+            ),
           ),
         ),
       ),
     );
   }
-}
 
-/// Symbol Autocomplete Field Widget
-class _SymbolAutocompleteField extends ConsumerStatefulWidget {
-  const _SymbolAutocompleteField({
-    required this.controller,
-    required this.onSymbolSelected,
-  });
-
-  final TextEditingController controller;
-  final ValueChanged<String> onSymbolSelected;
-
-  @override
-  ConsumerState<_SymbolAutocompleteField> createState() =>
-      _SymbolAutocompleteFieldState();
-}
-
-class _SymbolAutocompleteFieldState
-    extends ConsumerState<_SymbolAutocompleteField> {
-  @override
-  Widget build(BuildContext context) {
-    return Autocomplete<String>(
-      optionsBuilder: (textEditingValue) async {
-        if (textEditingValue.text.isEmpty) {
-          return const Iterable<String>.empty();
-        }
-        return await ref
-            .read(stockFormProvider.notifier)
-            .searchSymbols(textEditingValue.text);
-      },
-      onSelected: widget.onSymbolSelected,
-      fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-        // Sync with parent controller
-        controller.text = widget.controller.text;
-        controller.selection = widget.controller.selection;
-
-        return TextFormField(
-          controller: controller,
-          focusNode: focusNode,
-          decoration: InputDecoration(
-            labelText: 'Symbol',
-            hintText: 'Enter symbol (e.g., AAPL)',
-            border: const OutlineInputBorder(),
-            prefixIcon: const Icon(Icons.search),
-          ),
-          textCapitalization: TextCapitalization.characters,
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z]')),
-            LengthLimitingTextInputFormatter(10),
-          ],
-          validator: (value) => AssetValidators.validateSymbol(value, required: true),
-          onChanged: (value) {
-            widget.controller.text = value;
-          },
-        );
-      },
-      optionsViewBuilder: (context, onSelected, options) {
-        return Align(
-          alignment: Alignment.topLeft,
-          child: Material(
-            elevation: 4,
-            borderRadius: BorderRadius.circular(8),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 200, maxWidth: 300),
-              child: ListView.builder(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                itemCount: options.length,
-                itemBuilder: (context, index) {
-                  final option = options.elementAt(index);
-                  return ListTile(
-                    leading: const Icon(Icons.trending_up, size: 20),
-                    title: Text(
-                      option,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    onTap: () {
-                      onSelected(option);
-                    },
-                  );
-                },
-              ),
-            ),
-          ),
-        );
-      },
+  // ---------------------------------------------------------------------------
+  // Reusable dark-themed text form field
+  // ---------------------------------------------------------------------------
+  Widget _buildFormField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    TextCapitalization textCapitalization = TextCapitalization.none,
+    TextInputType? keyboardType,
+    List<TextInputFormatter>? inputFormatters,
+    String? Function(String?)? validator,
+    String? suffixText,
+    int maxLines = 1,
+  }) {
+    return TextFormField(
+      controller: controller,
+      style: const TextStyle(color: Colors.white),
+      textCapitalization: textCapitalization,
+      keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
+      validator: validator,
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        labelStyle: TextStyle(color: AppTheme.textGrey),
+        hintStyle: TextStyle(color: AppTheme.textGrey.withValues(alpha: 0.5)),
+        prefixIcon: Icon(icon, color: AppTheme.textGrey, size: 20),
+        suffixText: suffixText,
+        suffixStyle: TextStyle(color: AppTheme.textGrey),
+        filled: true,
+        fillColor: AppTheme.cardGrey,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppTheme.electricBlue),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppTheme.errorRed),
+        ),
+      ),
     );
   }
 }
@@ -482,11 +560,7 @@ class _SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    if (quantity == null || price == null) {
-      return const SizedBox.shrink();
-    }
+    if (quantity == null || price == null) return const SizedBox.shrink();
 
     final total = quantity! * price!;
     final formatter = NumberFormat.currency(
@@ -494,73 +568,65 @@ class _SummaryCard extends StatelessWidget {
       decimalDigits: 2,
     );
 
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Investment Summary',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Quantity:',
-                  style: theme.textTheme.bodyMedium,
-                ),
-                Text(
-                  quantity!.toStringAsFixed(4),
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Price per unit:',
-                  style: theme.textTheme.bodyMedium,
-                ),
-                Text(
-                  formatter.format(price),
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-            const Divider(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Total Invested:',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Text(
-                  formatter.format(total),
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.cardGrey,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Investment Summary',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+          _summaryRow('Quantity', quantity!.toStringAsFixed(4)),
+          const SizedBox(height: 6),
+          _summaryRow('Price per unit', formatter.format(price)),
+          Divider(
+            height: 20,
+            color: Colors.white.withValues(alpha: 0.08),
+          ),
+          _summaryRow(
+            'Total Invested',
+            formatter.format(total),
+            isBold: true,
+            valueColor: AppTheme.electricBlue,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _summaryRow(String label, String value,
+      {bool isBold = false, Color? valueColor}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: AppTheme.textGrey,
+            fontSize: isBold ? 14 : 13,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            color: valueColor ?? Colors.white,
+            fontSize: isBold ? 16 : 13,
+            fontWeight: isBold ? FontWeight.w700 : FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 }

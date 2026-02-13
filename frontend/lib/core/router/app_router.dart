@@ -19,13 +19,13 @@ import 'package:wealthscope_app/features/dashboard/presentation/screens/dashboar
 import 'package:wealthscope_app/features/news/presentation/screens/article_webview_screen.dart';
 import 'package:wealthscope_app/features/news/presentation/screens/news_screen.dart';
 import 'package:wealthscope_app/features/notifications/presentation/screens/notifications_screen.dart';
-import 'package:wealthscope_app/features/onboarding/presentation/screens/onboarding_cinematic.dart';
 import 'package:wealthscope_app/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:wealthscope_app/features/profile/presentation/screens/profile_screen.dart';
 import 'package:wealthscope_app/features/settings/presentation/screens/settings_screen.dart';
 import 'package:wealthscope_app/features/splash/presentation/screens/splash_screen.dart';
 import 'package:wealthscope_app/shared/widgets/main_shell.dart';
 import 'package:wealthscope_app/features/ai_command/presentation/screens/ai_command_center_screen.dart';
+import 'package:wealthscope_app/features/subscriptions/presentation/screens/subscription_screen.dart';
 
 /// Application Router Configuration
 /// Define all app routes here using GoRouter.
@@ -51,11 +51,6 @@ class AppRouter {
         path: '/onboarding',
         name: 'onboarding',
         builder: (context, state) => const OnboardingScreen(),
-      ),
-      GoRoute(
-        path: '/onboarding-cinematic',
-        name: 'onboarding-cinematic',
-        builder: (context, state) => const OnboardingCinematic(),
       ),
       GoRoute(
         path: '/login',
@@ -146,7 +141,10 @@ class AppRouter {
           GoRoute(
             path: '/ai-chat',
             name: 'ai-chat',
-            builder: (context, state) => const AIChatScreen(),
+            builder: (context, state) {
+              final initialPrompt = state.uri.queryParameters['prompt'];
+              return AIChatScreen(initialPrompt: initialPrompt);
+            },
             routes: [
               GoRoute(
                 path: ':conversationId',
@@ -206,6 +204,11 @@ class AppRouter {
             path: '/ai-command',
             name: 'ai-command',
             builder: (context, state) => const AiCommandCenterScreen(),
+          ),
+          GoRoute(
+            path: '/subscription',
+            name: 'subscription',
+            builder: (context, state) => const SubscriptionScreen(),
           ),
         ],
       ),

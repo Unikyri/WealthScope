@@ -148,10 +148,7 @@ func (a *PortfolioAnalyzer) GetTopMovers(assets []entities.Asset, limit int) (ga
 			continue
 		}
 
-		symbol := ""
-		if asset.Symbol != nil {
-			symbol = *asset.Symbol
-		}
+		symbol := asset.Symbol()
 
 		performances = append(performances, AssetPerformance{
 			Symbol:          symbol,
@@ -194,7 +191,7 @@ func (a *PortfolioAnalyzer) AnalyzeAllocations(breakdown []repositories.AssetTyp
 		entities.AssetTypeBond:       20.0,
 		entities.AssetTypeCrypto:     5.0,
 		entities.AssetTypeRealEstate: 10.0,
-		entities.AssetTypeGold:       5.0,
+		entities.AssetTypeCash:       5.0,
 	}
 
 	var insights []AllocationInsight
@@ -242,9 +239,9 @@ func (a *PortfolioAnalyzer) fetchRelevantNews(ctx context.Context, assets []enti
 
 	var symbolValues []symbolValue
 	for _, asset := range assets {
-		if asset.Symbol != nil && *asset.Symbol != "" {
+		if sym := asset.Symbol(); sym != "" {
 			symbolValues = append(symbolValues, symbolValue{
-				symbol: *asset.Symbol,
+				symbol: sym,
 				value:  asset.TotalValue(),
 			})
 		}

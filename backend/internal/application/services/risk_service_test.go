@@ -112,10 +112,16 @@ func TestRiskService_MultipleAlerts(t *testing.T) {
 	}
 }
 
+// newAssetWithMeta creates a test asset with the given price as both purchase and current price,
+// and metadata stored in ExtendedData (sector, country, exchange).
 func newAssetWithMeta(price float64, meta map[string]interface{}) entities.Asset {
-	raw, _ := json.Marshal(meta)
-	a := entities.NewAsset(uuid.New(), entities.AssetTypeStock, "X", 1, price, "USD")
-	a.CurrentPrice = &price
-	a.Metadata = raw
+	coreData, _ := json.Marshal(map[string]interface{}{
+		"quantity":       1,
+		"purchase_price": price,
+	})
+	// Put current_price in extended_data along with the metadata
+	meta["current_price"] = price
+	extData, _ := json.Marshal(meta)
+	a := entities.NewAsset(uuid.New(), entities.AssetTypeStock, "X", coreData, extData)
 	return *a
 }

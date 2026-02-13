@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wealthscope_app/core/utils/greeting_utils.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../../domain/entities/briefing.dart';
 import '../providers/briefing_provider.dart';
@@ -182,19 +183,17 @@ class _BriefingContent extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    final greeting = getTimeBasedGreeting();
     final hour = DateTime.now().hour;
-    String greeting;
     IconData icon;
-
-    if (hour < 12) {
-      greeting = 'Good Morning';
+    if (hour >= 6 && hour < 12) {
       icon = Icons.wb_sunny_outlined;
-    } else if (hour < 17) {
-      greeting = 'Good Afternoon';
+    } else if (hour >= 12 && hour < 18) {
       icon = Icons.wb_cloudy_outlined;
-    } else {
-      greeting = 'Good Evening';
+    } else if (hour >= 18 && hour < 22) {
       icon = Icons.nights_stay_outlined;
+    } else {
+      icon = Icons.nightlight_round_outlined;
     }
 
     return Column(

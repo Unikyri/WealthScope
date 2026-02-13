@@ -150,3 +150,96 @@ final class DashboardPortfolioSummaryProvider extends $FunctionalProvider<
 
 String _$dashboardPortfolioSummaryHash() =>
     r'828d164509811d45288103d37ac5930e73d86af4';
+
+/// Portfolio Risk Provider
+/// Fetches and caches the portfolio risk analysis data
+
+@ProviderFor(dashboardPortfolioRisk)
+final dashboardPortfolioRiskProvider = DashboardPortfolioRiskProvider._();
+
+/// Portfolio Risk Provider
+/// Fetches and caches the portfolio risk analysis data
+
+final class DashboardPortfolioRiskProvider extends $FunctionalProvider<
+        AsyncValue<PortfolioRisk>, PortfolioRisk, FutureOr<PortfolioRisk>>
+    with $FutureModifier<PortfolioRisk>, $FutureProvider<PortfolioRisk> {
+  /// Portfolio Risk Provider
+  /// Fetches and caches the portfolio risk analysis data
+  DashboardPortfolioRiskProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'dashboardPortfolioRiskProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$dashboardPortfolioRiskHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<PortfolioRisk> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<PortfolioRisk> create(Ref ref) {
+    return dashboardPortfolioRisk(ref);
+  }
+}
+
+String _$dashboardPortfolioRiskHash() =>
+    r'49cfaa9c511f5cb24afc17c856466c633a2648e8';
+
+/// Personalized news for dashboard based on user portfolio.
+/// Fetches news for symbols in user assets, aggregates by portfolio weight,
+/// deduplicates, scores by relevance, and falls back to trending if empty.
+
+@ProviderFor(dashboardPersonalizedNews)
+final dashboardPersonalizedNewsProvider = DashboardPersonalizedNewsProvider._();
+
+/// Personalized news for dashboard based on user portfolio.
+/// Fetches news for symbols in user assets, aggregates by portfolio weight,
+/// deduplicates, scores by relevance, and falls back to trending if empty.
+
+final class DashboardPersonalizedNewsProvider extends $FunctionalProvider<
+        AsyncValue<List<PersonalizedNewsItem>>,
+        List<PersonalizedNewsItem>,
+        FutureOr<List<PersonalizedNewsItem>>>
+    with
+        $FutureModifier<List<PersonalizedNewsItem>>,
+        $FutureProvider<List<PersonalizedNewsItem>> {
+  /// Personalized news for dashboard based on user portfolio.
+  /// Fetches news for symbols in user assets, aggregates by portfolio weight,
+  /// deduplicates, scores by relevance, and falls back to trending if empty.
+  DashboardPersonalizedNewsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'dashboardPersonalizedNewsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$dashboardPersonalizedNewsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<PersonalizedNewsItem>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<PersonalizedNewsItem>> create(Ref ref) {
+    return dashboardPersonalizedNews(ref);
+  }
+}
+
+String _$dashboardPersonalizedNewsHash() =>
+    r'0f4d4971dc2c1d2b3f88263732750bd96e247351';

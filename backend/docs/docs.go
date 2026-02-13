@@ -512,6 +512,59 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/ai/insights/asset/{symbol}": {
+            "get": {
+                "description": "Generates or retrieves AI analysis for a specific asset symbol",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI Insights"
+                ],
+                "summary": "Get AI analysis for a specific asset",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Asset Symbol",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.AssetAnalysisResult"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/ai/insights/daily": {
             "get": {
                 "description": "Gets or generates today's daily briefing for the user",
@@ -1195,23 +1248,17 @@ const docTemplate = `{
         },
         "/api/v1/assets": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Returns a paginated list of assets for the authenticated user",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "assets"
                 ],
-                "summary": "List user's assets",
+                "summary": "List assets",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Filter by asset type",
+                        "description": "Filter by type",
                         "name": "type",
                         "in": "query"
                     },
@@ -1229,13 +1276,15 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page number (default: 1)",
+                        "default": 1,
+                        "description": "Page number",
                         "name": "page",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Items per page (default: 20, max: 100)",
+                        "default": 20,
+                        "description": "Items per page",
                         "name": "per_page",
                         "in": "query"
                     }
@@ -1244,42 +1293,12 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/handlers.ListAssetsResponse"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/handlers.ListAssetsResponse"
                         }
                     }
                 }
             },
             "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Creates a new investment asset for the authenticated user",
                 "consumes": [
                     "application/json"
                 ],
@@ -1293,7 +1312,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "Asset data",
-                        "name": "request",
+                        "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -1305,37 +1324,62 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/handlers.AssetResponse"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/handlers.AssetResponse"
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
+                    }
+                }
+            }
+        },
+        "/api/v1/assets/autofill": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "assets"
+                ],
+                "summary": "Auto-fill asset data",
+                "parameters": [
+                    {
+                        "description": "Asset type and core data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/handlers.AutofillRequest"
                         }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/handlers.AutofillResponse"
                         }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
+                    }
+                }
+            }
+        },
+        "/api/v1/assets/schemas": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "assets"
+                ],
+                "summary": "Get asset form schemas",
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.AssetFormSchema"
+                            }
                         }
                     }
                 }
@@ -1343,12 +1387,6 @@ const docTemplate = `{
         },
         "/api/v1/assets/{id}": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Returns a specific asset by its ID",
                 "produces": [
                     "application/json"
                 ],
@@ -1369,48 +1407,12 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/handlers.AssetResponse"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/handlers.AssetResponse"
                         }
                     }
                 }
             },
             "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Updates an existing asset",
                 "consumes": [
                     "application/json"
                 ],
@@ -1430,8 +1432,8 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Updated asset data",
-                        "name": "request",
+                        "description": "Update data",
+                        "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -1443,51 +1445,12 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/handlers.AssetResponse"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/handlers.AssetResponse"
                         }
                     }
                 }
             },
             "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Deletes an asset by its ID",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "assets"
                 ],
@@ -1502,29 +1465,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
+                    "204": {
+                        "description": "No Content"
                     }
                 }
             }
@@ -2159,28 +2101,22 @@ const docTemplate = `{
             ],
             "properties": {
                 "currency": {
-                    "description": "Currency is the currency code (required)",
                     "type": "string"
                 },
                 "name": {
-                    "description": "Name is the asset name (required)",
                     "type": "string"
                 },
                 "purchase_price": {
-                    "description": "PurchasePrice is the unit price (required, must be non-negative)",
                     "type": "number",
                     "minimum": 0
                 },
                 "quantity": {
-                    "description": "Quantity is the number of units (required, must be positive)",
                     "type": "number"
                 },
                 "symbol": {
-                    "description": "Symbol is the ticker symbol (optional)",
                     "type": "string"
                 },
                 "type": {
-                    "description": "Type is the asset type (required)",
                     "type": "string"
                 }
             }
@@ -2205,14 +2141,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "asset_ids": {
-                    "description": "AssetIDs contains the IDs of the created assets",
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
                 },
                 "created_count": {
-                    "description": "CreatedCount is the number of assets successfully created",
                     "type": "integer"
                 }
             }
@@ -2221,35 +2155,27 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "confidence": {
-                    "description": "Confidence is the OCR confidence score (0.0 to 1.0)",
                     "type": "number"
                 },
                 "currency": {
-                    "description": "Currency is the currency code",
                     "type": "string"
                 },
                 "name": {
-                    "description": "Name is the name of the asset",
                     "type": "string"
                 },
                 "purchase_price": {
-                    "description": "PurchasePrice is the unit price",
                     "type": "number"
                 },
                 "quantity": {
-                    "description": "Quantity is the number of units held",
                     "type": "number"
                 },
                 "symbol": {
-                    "description": "Symbol is the ticker symbol (optional)",
                     "type": "string"
                 },
                 "total_value": {
-                    "description": "TotalValue is the calculated total value (quantity * price)",
                     "type": "number"
                 },
                 "type": {
-                    "description": "Type is the asset category",
                     "type": "string"
                 }
             }
@@ -2291,6 +2217,55 @@ const docTemplate = `{
                 }
             }
         },
+        "entities.AssetFormSchema": {
+            "type": "object",
+            "properties": {
+                "api_sources": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "asset_type": {
+                    "$ref": "#/definitions/entities.AssetType"
+                },
+                "auto_fill_fields": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "manual_fields": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "entities.AssetType": {
+            "type": "string",
+            "enum": [
+                "stock",
+                "etf",
+                "bond",
+                "crypto",
+                "real_estate",
+                "cash",
+                "custom",
+                "liability"
+            ],
+            "x-enum-varnames": [
+                "AssetTypeStock",
+                "AssetTypeETF",
+                "AssetTypeBond",
+                "AssetTypeCrypto",
+                "AssetTypeRealEstate",
+                "AssetTypeCash",
+                "AssetTypeCustom",
+                "AssetTypeLiability"
+            ]
+        },
         "entities.ChainResult": {
             "type": "object",
             "properties": {
@@ -2307,7 +2282,6 @@ const docTemplate = `{
                     }
                 },
                 "total_impact": {
-                    "description": "Initial vs Final total value",
                     "type": "number"
                 }
             }
@@ -2389,14 +2363,12 @@ const docTemplate = `{
                     }
                 },
                 "level": {
-                    "description": "low, medium, high, critical",
                     "type": "string"
                 },
                 "recommendation": {
                     "type": "string"
                 },
                 "score": {
-                    "description": "0-100 high is risky",
                     "type": "integer"
                 },
                 "warnings": {
@@ -2425,27 +2397,19 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "asset_id": {
-                    "description": "For buy/sell scenarios",
                     "type": "string"
                 },
                 "asset_types": {
-                    "description": "Affected asset types (empty = all)",
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
                 },
                 "change_percent": {
-                    "description": "For market move scenarios",
                     "type": "number"
                 },
                 "new_asset": {
-                    "description": "For new asset scenarios",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/entities.NewAssetParams"
-                        }
-                    ]
+                    "$ref": "#/definitions/entities.NewAssetParams"
                 },
                 "price": {
                     "type": "number"
@@ -2454,7 +2418,6 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "target_allocation": {
-                    "description": "For rebalance scenarios",
                     "type": "object",
                     "additionalProperties": {
                         "type": "number",
@@ -2554,14 +2517,16 @@ const docTemplate = `{
         "handlers.AssetResponse": {
             "type": "object",
             "properties": {
+                "core_data": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
                 "created_at": {
                     "type": "string"
                 },
-                "currency": {
-                    "type": "string"
-                },
-                "current_price": {
-                    "type": "number"
+                "extended_data": {
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "gain_loss": {
                     "type": "number"
@@ -2572,26 +2537,7 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "metadata": {
-                    "type": "object",
-                    "additionalProperties": true
-                },
                 "name": {
-                    "type": "string"
-                },
-                "notes": {
-                    "type": "string"
-                },
-                "purchase_date": {
-                    "type": "string"
-                },
-                "purchase_price": {
-                    "type": "number"
-                },
-                "quantity": {
-                    "type": "number"
-                },
-                "symbol": {
                     "type": "string"
                 },
                 "total_cost": {
@@ -2625,41 +2571,62 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.AutofillRequest": {
+            "type": "object",
+            "required": [
+                "core_data",
+                "type"
+            ],
+            "properties": {
+                "core_data": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.AutofillResponse": {
+            "type": "object",
+            "properties": {
+                "api_sources": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "extended_data": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            }
+        },
         "handlers.BriefingResponse": {
             "type": "object",
             "properties": {
                 "alerts": {
-                    "description": "Portfolio alerts",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/services.PortfolioAlert"
                     }
                 },
                 "briefing": {
-                    "description": "AI-generated narrative",
                     "type": "string"
                 },
                 "generated_at": {
-                    "description": "Timestamp",
                     "type": "string"
                 },
                 "health_score": {
-                    "description": "Portfolio health",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/services.HealthScore"
-                        }
-                    ]
+                    "$ref": "#/definitions/services.HealthScore"
                 },
                 "highlights": {
-                    "description": "Key events",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/handlers.Highlight"
                     }
                 },
                 "recommendations": {
-                    "description": "Action items",
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -2751,58 +2718,24 @@ const docTemplate = `{
         "handlers.CreateAssetRequest": {
             "type": "object",
             "required": [
+                "core_data",
                 "name",
-                "purchase_price",
-                "quantity",
                 "type"
             ],
             "properties": {
-                "currency": {
-                    "type": "string"
+                "core_data": {
+                    "type": "object",
+                    "additionalProperties": true
                 },
-                "current_price": {
-                    "type": "number",
-                    "minimum": 0
-                },
-                "metadata": {
+                "extended_data": {
                     "type": "object",
                     "additionalProperties": true
                 },
                 "name": {
-                    "type": "string",
-                    "maxLength": 255,
-                    "minLength": 1
-                },
-                "notes": {
-                    "type": "string",
-                    "maxLength": 1000
-                },
-                "purchase_date": {
                     "type": "string"
                 },
-                "purchase_price": {
-                    "type": "number",
-                    "minimum": 0
-                },
-                "quantity": {
-                    "type": "number"
-                },
-                "symbol": {
-                    "type": "string",
-                    "maxLength": 20
-                },
                 "type": {
-                    "type": "string",
-                    "enum": [
-                        "stock",
-                        "etf",
-                        "bond",
-                        "crypto",
-                        "real_estate",
-                        "gold",
-                        "cash",
-                        "other"
-                    ]
+                    "type": "string"
                 }
             }
         },
@@ -2926,8 +2859,17 @@ const docTemplate = `{
                         "$ref": "#/definitions/handlers.AssetResponse"
                     }
                 },
-                "pagination": {
-                    "$ref": "#/definitions/handlers.PaginationInfo"
+                "page": {
+                    "type": "integer"
+                },
+                "per_page": {
+                    "type": "integer"
+                },
+                "total_count": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
                 }
             }
         },
@@ -2967,23 +2909,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "total": {
-                    "type": "integer"
-                }
-            }
-        },
-        "handlers.PaginationInfo": {
-            "type": "object",
-            "properties": {
-                "page": {
-                    "type": "integer"
-                },
-                "per_page": {
-                    "type": "integer"
-                },
-                "total_count": {
-                    "type": "integer"
-                },
-                "total_pages": {
                     "type": "integer"
                 }
             }
@@ -3143,52 +3068,19 @@ const docTemplate = `{
         "handlers.UpdateAssetRequest": {
             "type": "object",
             "properties": {
-                "currency": {
-                    "type": "string"
+                "core_data": {
+                    "type": "object",
+                    "additionalProperties": true
                 },
-                "current_price": {
-                    "type": "number",
-                    "minimum": 0
-                },
-                "metadata": {
+                "extended_data": {
                     "type": "object",
                     "additionalProperties": true
                 },
                 "name": {
-                    "type": "string",
-                    "maxLength": 255,
-                    "minLength": 1
-                },
-                "notes": {
-                    "type": "string",
-                    "maxLength": 1000
-                },
-                "purchase_date": {
                     "type": "string"
                 },
-                "purchase_price": {
-                    "type": "number",
-                    "minimum": 0
-                },
-                "quantity": {
-                    "type": "number"
-                },
-                "symbol": {
-                    "type": "string",
-                    "maxLength": 20
-                },
                 "type": {
-                    "type": "string",
-                    "enum": [
-                        "stock",
-                        "etf",
-                        "bond",
-                        "crypto",
-                        "real_estate",
-                        "gold",
-                        "cash",
-                        "other"
-                    ]
+                    "type": "string"
                 }
             }
         },
@@ -3306,6 +3198,26 @@ const docTemplate = `{
                 "AlertTypePerformance"
             ]
         },
+        "services.AssetAnalysisResult": {
+            "type": "object",
+            "properties": {
+                "key_points": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "sentiment_score": {
+                    "type": "number"
+                },
+                "sentiment_trend": {
+                    "type": "string"
+                },
+                "summary": {
+                    "type": "string"
+                }
+            }
+        },
         "services.HealthScore": {
             "type": "object",
             "properties": {
@@ -3402,7 +3314,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "sentiment": {
-                    "description": "-1 (negative) to +1 (positive)",
                     "type": "number"
                 },
                 "source": {

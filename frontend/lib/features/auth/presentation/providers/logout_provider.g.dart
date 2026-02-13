@@ -38,7 +38,7 @@ final class LogoutProvider extends $AsyncNotifierProvider<Logout, void> {
   Logout create() => Logout();
 }
 
-String _$logoutHash() => r'82d4d5b31ea5a8b3a7e119b5f29fac2940295031';
+String _$logoutHash() => r'de77658cc1cb91803030c4f858000cf4c02453fa';
 
 /// Provider for handling user logout
 /// Manages the async state of the logout operation

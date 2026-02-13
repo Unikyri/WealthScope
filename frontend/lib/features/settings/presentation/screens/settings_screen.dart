@@ -3,11 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthscope_app/features/auth/presentation/providers/logout_provider.dart';
 import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
-import 'package:wealthscope_app/core/theme/theme_provider.dart';
-import 'package:wealthscope_app/shared/widgets/theme_selection_dialog.dart';
 import 'package:wealthscope_app/core/currency/currency_provider.dart';
 import 'package:wealthscope_app/shared/widgets/currency_selector_dialog.dart';
 import 'package:wealthscope_app/features/notifications/presentation/providers/notification_preferences_provider.dart';
+import 'package:wealthscope_app/features/subscriptions/presentation/widgets/plan_status_card.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -17,7 +16,6 @@ class SettingsScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final authState = ref.watch(authStateProvider);
     final userEmail = authState.userEmail;
-    final currentTheme = ref.watch(themeModeProvider);
     final currentCurrencyAsync = ref.watch(selectedCurrencyProvider);
 
     return Scaffold(
@@ -26,6 +24,12 @@ class SettingsScreen extends ConsumerWidget {
       ),
       body: ListView(
         children: [
+          // Plan Status Card (top of settings)
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: PlanStatusCard(),
+          ),
+
           // Account Section
           _buildSectionHeader(context, 'Account'),
           _buildSettingsTile(
@@ -60,63 +64,8 @@ class SettingsScreen extends ConsumerWidget {
           _buildNotificationToggles(context, ref),
           const Divider(height: 32),
 
-          // Privacy & Security Section
-          _buildSectionHeader(context, 'Privacy & Security'),
-          _buildSettingsTile(
-            context,
-            icon: Icons.fingerprint,
-            title: 'Biometric Login',
-            subtitle: 'Use fingerprint or face ID',
-            trailing: Switch(
-              value: false, // TODO: Connect to actual state
-              onChanged: (value) {
-                // TODO: Handle biometric toggle
-              },
-            ),
-            onTap: null,
-          ),
-          _buildSettingsTile(
-            context,
-            icon: Icons.security,
-            title: 'Two-Factor Authentication',
-            subtitle: 'Add extra security layer',
-            onTap: () {
-              // TODO: Navigate to 2FA setup
-            },
-          ),
-          _buildSettingsTile(
-            context,
-            icon: Icons.privacy_tip_outlined,
-            title: 'Privacy Policy',
-            onTap: () {
-              // TODO: Open privacy policy
-            },
-          ),
-          const Divider(height: 32),
-
-          // App Settings Section
+          // App Settings Section (Theme option removed - dark mode only)
           _buildSectionHeader(context, 'App Settings'),
-          _buildSettingsTile(
-            context,
-            icon: Icons.palette_outlined,
-            title: 'Theme',
-            subtitle: currentTheme.displayName,
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (context) => const ThemeSelectionDialog(),
-              );
-            },
-          ),
-          _buildSettingsTile(
-            context,
-            icon: Icons.language,
-            title: 'Language',
-            subtitle: 'English',
-            onTap: () {
-              // TODO: Navigate to language settings
-            },
-          ),
           _buildSettingsTile(
             context,
             icon: Icons.attach_money,
@@ -157,8 +106,8 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const Divider(height: 32),
 
-          // About Section
-          _buildSectionHeader(context, 'About'),
+          // About & Legal Section (merged Privacy Policy + Terms here)
+          _buildSectionHeader(context, 'About & Legal'),
           _buildSettingsTile(
             context,
             icon: Icons.info_outline,
@@ -166,6 +115,14 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: 'Version 1.0.0',
             onTap: () {
               _showAboutDialog(context);
+            },
+          ),
+          _buildSettingsTile(
+            context,
+            icon: Icons.privacy_tip_outlined,
+            title: 'Privacy Policy',
+            onTap: () {
+              // TODO: Open privacy policy
             },
           ),
           _buildSettingsTile(
@@ -194,7 +151,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const Divider(height: 32),
 
-          // Danger Zone
+          // Account Actions
           _buildSectionHeader(context, 'Account Actions'),
           _buildSettingsTile(
             context,
@@ -261,7 +218,7 @@ class SettingsScreen extends ConsumerWidget {
           ? Text(
               subtitle,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             )
           : null,
@@ -269,7 +226,7 @@ class SettingsScreen extends ConsumerWidget {
           (onTap != null
               ? Icon(
                   Icons.chevron_right,
-                  color: theme.colorScheme.onSurface.withOpacity(0.3),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
                 )
               : null),
       onTap: onTap,
@@ -410,18 +367,18 @@ class SettingsScreen extends ConsumerWidget {
   void _showSignOutDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Sign Out'),
         content: const Text('Are you sure you want to sign out?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context);
-              await ref.read(logoutProvider.future);
+              Navigator.pop(dialogContext);
+              await ref.read(logoutProvider.notifier).signOut();
               if (context.mounted) {
                 context.go('/login');
               }

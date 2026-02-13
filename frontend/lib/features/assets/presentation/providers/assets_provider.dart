@@ -2,8 +2,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wealthscope_app/features/assets/data/providers/asset_repository_provider.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/asset_type.dart';
 import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
-
-import 'package:wealthscope_app/features/assets/domain/entities/stock_asset.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 part 'assets_provider.g.dart';

@@ -54,15 +54,17 @@ func (s *RiskService) AnalyzePortfolio(assets []entities.Asset) PortfolioRisk {
 	alerts = append(alerts, s.checkSectorConcentration(assets, totalValue)...)
 	alerts = append(alerts, s.checkGeographicConcentration(assets, totalValue)...)
 
-	// Simple score: max concentration percentage across dimensions.
+	// Concentration score: max single-entity percentage across dimensions.
 	maxPct := math.Max(s.maxSectorPercent(assets, totalValue), s.maxGeoPercent(assets, totalValue))
-	score := int(math.Round(clamp(maxPct, 0, 100)))
+	concentrationScore := int(math.Round(clamp(maxPct, 0, 100)))
 
-	level := diversificationLevelFromScore(score)
+	// Diversification level considers both concentration AND asset type variety.
+	// A portfolio with many asset types is better diversified even if concentrated in one sector.
+	level := s.diversificationLevel(assets, concentrationScore)
 
 	return PortfolioRisk{
 		Alerts:               alerts,
-		RiskScore:            score,
+		RiskScore:            concentrationScore,
 		DiversificationLevel: level,
 	}
 }
@@ -70,7 +72,7 @@ func (s *RiskService) AnalyzePortfolio(assets []entities.Asset) PortfolioRisk {
 func (s *RiskService) checkSectorConcentration(assets []entities.Asset, totalValue float64) []RiskAlert {
 	sectorValues := make(map[string]float64)
 	for i := range assets {
-		sector := getMetadataString(assets[i].Metadata, "sector")
+		sector := getMetadataString(assets[i].ExtendedData, "sector")
 		if sector == "" {
 			sector = "Other"
 		}
@@ -145,12 +147,12 @@ func (s *RiskService) checkGeographicConcentration(assets []entities.Asset, tota
 
 func (s *RiskService) getAssetRegion(asset entities.Asset) string {
 	// Prefer explicit country
-	country := getMetadataString(asset.Metadata, "country")
+	country := getMetadataString(asset.ExtendedData, "country")
 	if country != "" {
 		return country
 	}
 
-	exchange := strings.ToUpper(getMetadataString(asset.Metadata, "exchange"))
+	exchange := strings.ToUpper(getMetadataString(asset.ExtendedData, "exchange"))
 	switch exchange {
 	case "NASDAQ", "NYSE", "AMEX":
 		return "United States"
@@ -164,7 +166,7 @@ func (s *RiskService) getAssetRegion(asset entities.Asset) string {
 func (s *RiskService) maxSectorPercent(assets []entities.Asset, totalValue float64) float64 {
 	sectorValues := make(map[string]float64)
 	for i := range assets {
-		sector := getMetadataString(assets[i].Metadata, "sector")
+		sector := getMetadataString(assets[i].ExtendedData, "sector")
 		if sector == "" {
 			sector = "Other"
 		}
@@ -214,12 +216,34 @@ func getMetadataString(raw json.RawMessage, key string) string {
 	return strings.TrimSpace(s)
 }
 
-func diversificationLevelFromScore(score int) string {
+// diversificationLevel computes the diversification label by combining
+// concentration risk with asset-type variety. A portfolio spread across
+// many asset types gets a bonus that lowers the effective concentration score.
+func (s *RiskService) diversificationLevel(assets []entities.Asset, concentrationScore int) string {
+	// Count distinct asset types
+	typeSet := make(map[string]bool)
+	for i := range assets {
+		typeSet[string(assets[i].Type)] = true
+	}
+	numTypes := len(typeSet)
+
+	// Apply a diversity bonus: more asset types reduce the effective score.
+	adjustedScore := float64(concentrationScore)
 	switch {
-	case score >= 70:
+	case numTypes >= 4:
+		adjustedScore *= 0.6 // 40% reduction for 4+ types
+	case numTypes >= 3:
+		adjustedScore *= 0.7 // 30% reduction for 3 types
+	case numTypes >= 2:
+		adjustedScore *= 0.85 // 15% reduction for 2 types
+	}
+	// 1 type: no adjustment, concentration alone drives the score
+
+	switch {
+	case adjustedScore >= 70:
 		return "poor"
-	case score >= 40:
-		return "medium"
+	case adjustedScore >= 40:
+		return "moderate"
 	default:
 		return "good"
 	}

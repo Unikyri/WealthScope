@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:wealthscope_app/core/theme/app_theme.dart';
 import 'package:wealthscope_app/features/ai/presentation/providers/ai_chat_provider.dart';
 import 'package:wealthscope_app/features/ai/presentation/widgets/chat_bubble.dart';
 import 'package:wealthscope_app/features/ai/presentation/widgets/typing_indicator.dart';
+import 'package:wealthscope_app/features/subscriptions/data/services/revenuecat_service.dart';
+import 'package:wealthscope_app/features/subscriptions/data/services/usage_tracker.dart';
+import 'package:wealthscope_app/features/subscriptions/presentation/widgets/upgrade_prompt_dialog.dart';
 
 class AIChatScreen extends ConsumerStatefulWidget {
-  const AIChatScreen({super.key});
+  final String? initialPrompt;
+
+  const AIChatScreen({super.key, this.initialPrompt});
 
   @override
   ConsumerState<AIChatScreen> createState() => _AIChatScreenState();
@@ -15,6 +22,16 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-load the prompt into the text field so the user can review/edit
+    // before sending. Does NOT auto-send.
+    if (widget.initialPrompt != null && widget.initialPrompt!.isNotEmpty) {
+      _messageController.text = widget.initialPrompt!;
+    }
+  }
 
   @override
   void dispose() {
@@ -40,12 +57,24 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
     final message = _messageController.text.trim();
     if (message.isEmpty) return;
 
+    // Centralised feature gate check
+    final gate = ref.read(featureGateProvider);
+    final result = gate.canSendAiQuery();
+    if (!result.allowed) {
+      if (!mounted) return;
+      showGatePrompt(context, result);
+      return;
+    }
+
     _messageController.clear();
 
     // Send message via provider
     try {
       await ref.read(aiChatProvider.notifier).sendMessage(message);
       _scrollToBottom();
+
+      // Record AI query usage for ALL plans
+      await ref.read(usageTrackerProvider.notifier).recordAiQuery();
     } catch (e) {
       // Show user-friendly error message
       if (mounted) {
@@ -86,6 +115,9 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
       ),
       body: Column(
         children: [
+          // Scout query limit banner
+          _AiQueryLimitBanner(),
+
           // Messages list
           Expanded(
             child: chatState.when(
@@ -338,6 +370,96 @@ class _MessageInputState extends State<_MessageInput> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Banner shown to ALL users indicating remaining daily AI queries.
+/// Sentinel users see "Pro - Thinking Mode" indicator with their 50/day limit.
+/// Scout users see their 3/day limit with upgrade CTA when at limit.
+class _AiQueryLimitBanner extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final gate = ref.watch(featureGateProvider);
+    final remaining = gate.aiQueriesRemaining;
+    final max = gate.maxAiQueries;
+    final isAtLimit = remaining <= 0;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: isAtLimit
+            ? Colors.amber.withValues(alpha: 0.12)
+            : AppTheme.electricBlue.withValues(alpha: 0.08),
+        border: Border(
+          bottom: BorderSide(
+            color: isAtLimit
+                ? Colors.amber.withValues(alpha: 0.2)
+                : AppTheme.electricBlue.withValues(alpha: 0.1),
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            isAtLimit ? Icons.warning_amber_rounded : Icons.auto_awesome,
+            size: 14,
+            color: isAtLimit ? Colors.amber : AppTheme.electricBlue,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  if (gate.isPremium && !isAtLimit) ...[
+                    TextSpan(
+                      text: gate.aiModelLabel,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.electricBlue,
+                      ),
+                    ),
+                    TextSpan(
+                      text: ' \u2022 ',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: AppTheme.textGrey,
+                      ),
+                    ),
+                  ],
+                  TextSpan(
+                    text: isAtLimit
+                        ? 'Daily limit reached \u2022 Resets at midnight'
+                        : '$remaining/$max queries today',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: isAtLimit ? Colors.amber : AppTheme.textGrey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (isAtLimit && !gate.isPremium)
+            GestureDetector(
+              onTap: () {
+                final result = gate.canSendAiQuery();
+                showGatePrompt(context, result);
+              },
+              child: Text(
+                'Upgrade',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.electricBlue,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

@@ -106,12 +106,12 @@ class AllocationLegend extends StatelessWidget {
         return 'Crypto';
       case AssetType.realEstate:
         return 'Real Estate';
-      case AssetType.gold:
-        return 'Gold';
       case AssetType.cash:
         return 'Cash';
-      case AssetType.other:
-        return 'Other';
+      case AssetType.custom:
+        return 'Custom';
+      case AssetType.liability:
+        return 'Liability';
     }
   }
 
@@ -131,12 +131,12 @@ class AllocationLegend extends StatelessWidget {
         return AppTheme.getChartColor(6);  // Orange
       case AssetType.realEstate:
         return AppTheme.getChartColor(1);  // Emerald
-      case AssetType.gold:
-        return AppTheme.getChartColor(2);  // Amber
       case AssetType.cash:
         return AppTheme.getChartColor(5);  // Cyan
-      case AssetType.other:
+      case AssetType.custom:
         return AppTheme.neutralColor;
+      case AssetType.liability:
+        return AppTheme.alertRed;
     }
   }
 
@@ -145,7 +145,7 @@ class AllocationLegend extends StatelessWidget {
     try {
       return AssetType.fromString(typeString);
     } catch (e) {
-      return AssetType.other;
+      return AssetType.custom;
     }
   }
 

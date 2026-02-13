@@ -10,11 +10,11 @@ class RegisterFormValidators {
   /// Returns null if validation passes
   static String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'El email es requerido';
+      return 'Email is required';
     }
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(value)) {
-      return 'Ingresa un email válido';
+      return 'Enter a valid email';
     }
     return null;
   }
@@ -30,18 +30,18 @@ class RegisterFormValidators {
   /// Returns null if validation passes
   static String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'La contraseña es requerida';
+      return 'Password is required';
     }
     if (value.length < 8) {
-      return 'La contraseña debe tener al menos 8 caracteres';
+      return 'Password must be at least 8 characters';
     }
     // Optional: Check for uppercase letter (recommended)
     if (!RegExp(r'[A-Z]').hasMatch(value)) {
-      return 'La contraseña debe tener al menos una mayúscula';
+      return 'Password must have at least one uppercase letter';
     }
     // Optional: Check for at least one number (recommended)
     if (!RegExp(r'[0-9]').hasMatch(value)) {
-      return 'La contraseña debe tener al menos un número';
+      return 'Password must have at least one number';
     }
     return null;
   }
@@ -55,10 +55,10 @@ class RegisterFormValidators {
   /// Returns null if validation passes
   static String? validateConfirmPassword(String? value, String password) {
     if (value == null || value.isEmpty) {
-      return 'La confirmación de contraseña es requerida';
+      return 'Password confirmation is required';
     }
     if (value != password) {
-      return 'Las contraseñas no coinciden';
+      return 'Passwords do not match';
     }
     return null;
   }

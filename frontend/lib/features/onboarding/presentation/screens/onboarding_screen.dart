@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wealthscope_app/features/onboarding/presentation/providers/onboarding_provider.dart';
+import 'package:wealthscope_app/shared/providers/auth_state_provider.dart';
 
 /// Onboarding screen with 4 slides
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -66,9 +67,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   Future<void> _completeOnboarding() async {
     await ref.read(onboardingProvider.notifier).completeOnboarding();
-    if (mounted) {
-      context.go('/login');
-    }
+    if (!mounted) return;
+    final isAuthenticated = ref.read(authStateProvider).isAuthenticated;
+    context.go(isAuthenticated ? '/dashboard' : '/login');
   }
 
   @override

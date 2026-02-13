@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
 
 	"github.com/google/uuid"
@@ -68,11 +69,20 @@ func (f *fakePagedAssetRepo) ListUserIDsWithListedAssets(ctx context.Context) ([
 	return nil, nil
 }
 
+func newTestAssetForRisk(userID uuid.UUID, assetType entities.AssetType, name string, qty, price float64) entities.Asset {
+	coreData, _ := json.Marshal(map[string]interface{}{
+		"quantity":       qty,
+		"purchase_price": price,
+		"currency":       "USD",
+	})
+	return *entities.NewAsset(userID, assetType, name, coreData, nil)
+}
+
 func TestGetPortfolioRiskUseCase_Execute_AggregatesPages(t *testing.T) {
 	repo := &fakePagedAssetRepo{
 		pages: map[int][]entities.Asset{
-			1: {*entities.NewAsset(uuid.New(), entities.AssetTypeStock, "A", 1, 100, "USD")},
-			2: {*entities.NewAsset(uuid.New(), entities.AssetTypeStock, "B", 1, 100, "USD")},
+			1: {newTestAssetForRisk(uuid.New(), entities.AssetTypeStock, "A", 1, 100)},
+			2: {newTestAssetForRisk(uuid.New(), entities.AssetTypeStock, "B", 1, 100)},
 		},
 	}
 	uc := NewGetPortfolioRiskUseCase(repo, services.NewRiskService())

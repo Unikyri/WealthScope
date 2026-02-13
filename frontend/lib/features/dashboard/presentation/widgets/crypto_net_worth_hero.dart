@@ -1,11 +1,10 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:wealthscope_app/core/theme/app_theme.dart';
+import 'package:wealthscope_app/shared/widgets/price_freshness_indicator.dart';
 import 'package:wealthscope_app/core/theme/custom_icons.dart';
-import 'package:wealthscope_app/core/currency/currency_extensions.dart';
 
 /// Crypto Net Worth Hero Section
 /// Displays Total Net Worth with a Sparkline background
@@ -14,13 +13,17 @@ class CryptoNetWorthHero extends ConsumerWidget {
   final double change;
   final double changePercent;
   final List<double> historyData; // Simple list of values for sparkline
+  final DateTime? lastUpdated;
+  final bool isScoutPlan;
 
   const CryptoNetWorthHero({
     super.key,
     required this.totalValue,
     required this.change,
     required this.changePercent,
-    this.historyData = const [10, 15, 13, 20, 18, 25, 22, 30, 28, 35], // Fake data default
+    this.historyData = const [], // No fake data; use empty until backend provides history
+    this.lastUpdated,
+    this.isScoutPlan = false,
   });
 
   @override
@@ -146,6 +149,14 @@ class CryptoNetWorthHero extends ConsumerWidget {
                     fontFamily: 'Manrope', // Fallback to theme default if not loaded
                   ),
                 ),
+                if (lastUpdated != null || isScoutPlan) ...[
+                  const SizedBox(height: 6),
+                  PriceFreshnessIndicator(
+                    lastUpdated: lastUpdated,
+                    isScoutPlan: isScoutPlan,
+                    compact: true,
+                  ),
+                ],
               ],
             ),
           ),
@@ -191,7 +202,9 @@ class _SimpleSparkline extends StatelessWidget {
   Widget build(BuildContext context) {
     if (data.isEmpty) return const SizedBox.shrink();
 
-    return LineChart(
+    return Semantics(
+      excludeSemantics: true,
+      child: LineChart(
       LineChartData(
         gridData: const FlGridData(show: false),
         titlesData: const FlTitlesData(show: false),
@@ -223,6 +236,6 @@ class _SimpleSparkline extends StatelessWidget {
         ],
         lineTouchData: const LineTouchData(enabled: false), // Static background
       ),
-    );
+    ));
   }
 }

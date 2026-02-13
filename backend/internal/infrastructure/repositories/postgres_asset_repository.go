@@ -71,10 +71,14 @@ func (r *PostgresAssetRepository) FindByUserID(
 			query = query.Where("type = ?", string(*filters.Type))
 		}
 		if filters.Symbol != nil {
-			query = query.Where("symbol = ?", *filters.Symbol)
+			// Search within core_data JSONB for ticker or symbol
+			query = query.Where(
+				"(core_data->>'ticker' = ? OR core_data->>'symbol' = ? OR core_data->>'cusip' = ?)",
+				*filters.Symbol, *filters.Symbol, *filters.Symbol,
+			)
 		}
 		if filters.Currency != nil {
-			query = query.Where("currency = ?", *filters.Currency)
+			query = query.Where("core_data->>'currency' = ?", *filters.Currency)
 		}
 	}
 
@@ -135,17 +139,11 @@ func (r *PostgresAssetRepository) Update(ctx context.Context, asset *entities.As
 		Model(&AssetModel{}).
 		Where("id = ? AND user_id = ?", asset.ID, asset.UserID).
 		Updates(map[string]interface{}{
-			"type":           model.Type,
-			"name":           model.Name,
-			"symbol":         model.Symbol,
-			"quantity":       model.Quantity,
-			"purchase_price": model.PurchasePrice,
-			"current_price":  model.CurrentPrice,
-			"currency":       model.Currency,
-			"purchase_date":  model.PurchaseDate,
-			"metadata":       model.Metadata,
-			"notes":          model.Notes,
-			"updated_at":     model.UpdatedAt,
+			"type":          model.Type,
+			"name":          model.Name,
+			"core_data":     model.CoreData,
+			"extended_data": model.ExtendedData,
+			"updated_at":    model.UpdatedAt,
 		})
 
 	if result.Error != nil {
@@ -186,30 +184,33 @@ func (r *PostgresAssetRepository) CountByUserID(ctx context.Context, userID uuid
 	return count, nil
 }
 
-// GetTotalValueByUserID calculates the total portfolio value for a user
+// GetTotalValueByUserID calculates the total portfolio value for a user.
+// Since values are in JSONB, we fetch all assets and compute in Go.
 func (r *PostgresAssetRepository) GetTotalValueByUserID(ctx context.Context, userID uuid.UUID) (float64, error) {
-	var result struct {
-		TotalValue float64
-	}
-
-	// Use COALESCE to handle NULL current_price by falling back to purchase_price
-	err := r.db.WithContext(ctx).
-		Model(&AssetModel{}).
-		Select("COALESCE(SUM(quantity * COALESCE(current_price, purchase_price)), 0) as total_value").
+	var models []AssetModel
+	result := r.db.WithContext(ctx).
 		Where("user_id = ?", userID).
-		Scan(&result).Error
+		Find(&models)
 
-	if err != nil {
-		return 0, fmt.Errorf("failed to calculate total value: %w", err)
+	if result.Error != nil {
+		return 0, fmt.Errorf("failed to fetch assets for value calculation: %w", result.Error)
 	}
-	return result.TotalValue, nil
+
+	var total float64
+	for _, model := range models {
+		asset := model.ToEntity()
+		total += asset.TotalValue()
+	}
+	return total, nil
 }
 
-// FindBySymbol finds assets by symbol for a specific user
+// FindBySymbol finds assets by symbol for a specific user.
+// Searches across core_data ticker, symbol, and cusip fields.
 func (r *PostgresAssetRepository) FindBySymbol(ctx context.Context, userID uuid.UUID, symbol string) ([]entities.Asset, error) {
 	var models []AssetModel
 	result := r.db.WithContext(ctx).
-		Where("user_id = ? AND symbol = ?", userID, symbol).
+		Where("user_id = ? AND (core_data->>'ticker' = ? OR core_data->>'symbol' = ? OR core_data->>'cusip' = ?)",
+			userID, symbol, symbol, symbol).
 		Find(&models)
 
 	if result.Error != nil {
@@ -227,7 +228,10 @@ func (r *PostgresAssetRepository) FindBySymbol(ctx context.Context, userID uuid.
 func (r *PostgresAssetRepository) FindListedAssets(ctx context.Context, userID uuid.UUID) ([]entities.Asset, error) {
 	var models []AssetModel
 	result := r.db.WithContext(ctx).
-		Where("user_id = ? AND symbol IS NOT NULL AND symbol <> ''", userID).
+		Where(`user_id = ? AND (
+			(core_data->>'ticker' IS NOT NULL AND core_data->>'ticker' <> '') OR
+			(core_data->>'symbol' IS NOT NULL AND core_data->>'symbol' <> '')
+		)`, userID).
 		Find(&models)
 
 	if result.Error != nil {
@@ -241,17 +245,18 @@ func (r *PostgresAssetRepository) FindListedAssets(ctx context.Context, userID u
 	return assets, nil
 }
 
-// UpdateCurrentPriceBySymbol updates current_price for all assets matching a symbol for a user.
+// UpdateCurrentPriceBySymbol updates current_price in extended_data for all assets matching a symbol.
 func (r *PostgresAssetRepository) UpdateCurrentPriceBySymbol(ctx context.Context, userID uuid.UUID, symbol string, price float64) error {
 	now := time.Now().UTC()
-	result := r.db.WithContext(ctx).
-		Model(&AssetModel{}).
-		Where("user_id = ? AND symbol = ?", userID, symbol).
-		Updates(map[string]interface{}{
-			"current_price": price,
-			"updated_at":    now,
-		})
 
+	// Use raw SQL to update JSONB field
+	sql := `UPDATE assets SET
+		extended_data = jsonb_set(COALESCE(extended_data, '{}'), '{current_price}', to_jsonb($1::numeric)),
+		updated_at = $2
+		WHERE user_id = $3 AND (core_data->>'ticker' = $4 OR core_data->>'symbol' = $4)
+		AND deleted_at IS NULL`
+
+	result := r.db.WithContext(ctx).Exec(sql, price, now, userID, symbol)
 	if result.Error != nil {
 		return fmt.Errorf("failed to update current_price: %w", result.Error)
 	}
@@ -264,7 +269,8 @@ func (r *PostgresAssetRepository) ListUserIDsWithListedAssets(ctx context.Contex
 	var userIDs []uuid.UUID
 	result := r.db.WithContext(ctx).
 		Model(&AssetModel{}).
-		Where("symbol IS NOT NULL AND symbol <> ''").
+		Where(`(core_data->>'ticker' IS NOT NULL AND core_data->>'ticker' <> '') OR
+			(core_data->>'symbol' IS NOT NULL AND core_data->>'symbol' <> '')`).
 		Distinct("user_id").
 		Pluck("user_id", &userIDs)
 
@@ -276,7 +282,6 @@ func (r *PostgresAssetRepository) ListUserIDsWithListedAssets(ctx context.Contex
 
 // GetPortfolioSummary returns complete portfolio summary with breakdown by asset type
 func (r *PostgresAssetRepository) GetPortfolioSummary(ctx context.Context, userID uuid.UUID) (*repositories.PortfolioSummary, error) {
-	// Fetch all assets for the user
 	var models []AssetModel
 	result := r.db.WithContext(ctx).
 		Where("user_id = ?", userID).
@@ -286,7 +291,6 @@ func (r *PostgresAssetRepository) GetPortfolioSummary(ctx context.Context, userI
 		return nil, fmt.Errorf("failed to fetch assets for portfolio summary: %w", result.Error)
 	}
 
-	// Calculate totals and build breakdown
 	var totalValue, totalInvested float64
 	typeMap := make(map[entities.AssetType]*repositories.AssetTypeBreakdown)
 	var lastUpdated time.Time
@@ -294,19 +298,16 @@ func (r *PostgresAssetRepository) GetPortfolioSummary(ctx context.Context, userI
 	for _, model := range models {
 		asset := model.ToEntity()
 
-		// Calculate values
 		currentValue := asset.TotalValue()
 		investedValue := asset.TotalCost()
 
 		totalValue += currentValue
 		totalInvested += investedValue
 
-		// Track last updated
 		if asset.UpdatedAt.After(lastUpdated) {
 			lastUpdated = asset.UpdatedAt
 		}
 
-		// Group by type
 		if _, exists := typeMap[asset.Type]; !exists {
 			typeMap[asset.Type] = &repositories.AssetTypeBreakdown{
 				Type: asset.Type,
@@ -316,14 +317,12 @@ func (r *PostgresAssetRepository) GetPortfolioSummary(ctx context.Context, userI
 		typeMap[asset.Type].Count++
 	}
 
-	// Calculate gain/loss
 	gainLoss := totalValue - totalInvested
 	var gainLossPercent float64
 	if totalInvested > 0 {
 		gainLossPercent = (gainLoss / totalInvested) * 100
 	}
 
-	// Build breakdown slice and calculate percentages
 	breakdown := make([]repositories.AssetTypeBreakdown, 0, len(typeMap))
 	for _, tb := range typeMap {
 		if totalValue > 0 {
@@ -332,7 +331,6 @@ func (r *PostgresAssetRepository) GetPortfolioSummary(ctx context.Context, userI
 		breakdown = append(breakdown, *tb)
 	}
 
-	// Set default time if no assets
 	if lastUpdated.IsZero() {
 		lastUpdated = time.Now().UTC()
 	}

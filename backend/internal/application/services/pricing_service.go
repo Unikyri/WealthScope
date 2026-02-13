@@ -141,10 +141,9 @@ func (s *PricingService) UpdateAssetPrices(
 
 	symbols := make([]string, 0, len(listed))
 	for _, a := range listed {
-		if a.Symbol == nil || *a.Symbol == "" {
-			continue
+		if sym := a.Symbol(); sym != "" {
+			symbols = append(symbols, sym)
 		}
-		symbols = append(symbols, *a.Symbol)
 	}
 
 	quotes, err := s.GetQuotes(ctx, symbols)
@@ -153,17 +152,18 @@ func (s *PricingService) UpdateAssetPrices(
 	}
 
 	for _, a := range listed {
-		if a.Symbol == nil || *a.Symbol == "" {
+		sym := a.Symbol()
+		if sym == "" {
 			continue
 		}
-		q := quotes[*a.Symbol]
+		q := quotes[sym]
 		if q == nil {
 			continue
 		}
 
 		// Update asset current_price
-		if err := assetRepo.UpdateCurrentPriceBySymbol(ctx, userID, *a.Symbol, q.Price); err != nil {
-			return fmt.Errorf("failed to update current_price for %s: %w", *a.Symbol, err)
+		if err := assetRepo.UpdateCurrentPriceBySymbol(ctx, userID, sym, q.Price); err != nil {
+			return fmt.Errorf("failed to update current_price for %s: %w", sym, err)
 		}
 
 		// Persist history record
