@@ -11,6 +11,7 @@ import (
 	"github.com/Unikyri/WealthScope/backend/internal/application/services"
 	"github.com/Unikyri/WealthScope/backend/internal/application/usecases"
 	"github.com/Unikyri/WealthScope/backend/internal/domain/entities"
+	"github.com/Unikyri/WealthScope/backend/pkg/response"
 )
 
 // AssetHandler handles HTTP requests for asset operations
@@ -136,13 +137,13 @@ func getUserIDFromContext(c *gin.Context) (uuid.UUID, error) {
 func (h *AssetHandler) Create(c *gin.Context) {
 	userID, err := getUserIDFromContext(c)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		response.Unauthorized(c, "unauthorized")
 		return
 	}
 
 	var req CreateAssetRequest
 	if bindErr := c.ShouldBindJSON(&req); bindErr != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body: " + bindErr.Error()})
+		response.BadRequest(c, "invalid request body: "+bindErr.Error())
 		return
 	}
 
@@ -158,7 +159,7 @@ func (h *AssetHandler) Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, toAssetResponse(output.Asset))
+	response.Created(c, toAssetResponse(output.Asset))
 }
 
 // List handles listing all assets for the authenticated user
@@ -175,7 +176,7 @@ func (h *AssetHandler) Create(c *gin.Context) {
 func (h *AssetHandler) List(c *gin.Context) {
 	userID, err := getUserIDFromContext(c)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		response.Unauthorized(c, "unauthorized")
 		return
 	}
 
@@ -220,7 +221,7 @@ func (h *AssetHandler) List(c *gin.Context) {
 		assetResponses[i] = toAssetResponse(&output.Assets[i])
 	}
 
-	c.JSON(http.StatusOK, ListAssetsResponse{
+	response.Success(c, ListAssetsResponse{
 		Assets:     assetResponses,
 		TotalCount: output.TotalCount,
 		Page:       output.Page,
@@ -239,13 +240,13 @@ func (h *AssetHandler) List(c *gin.Context) {
 func (h *AssetHandler) GetByID(c *gin.Context) {
 	userID, err := getUserIDFromContext(c)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		response.Unauthorized(c, "unauthorized")
 		return
 	}
 
 	assetID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid asset ID"})
+		response.BadRequest(c, "invalid asset ID")
 		return
 	}
 
@@ -258,7 +259,7 @@ func (h *AssetHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, toAssetResponse(output.Asset))
+	response.Success(c, toAssetResponse(output.Asset))
 }
 
 // Update handles updating an existing asset
@@ -273,19 +274,19 @@ func (h *AssetHandler) GetByID(c *gin.Context) {
 func (h *AssetHandler) Update(c *gin.Context) {
 	userID, err := getUserIDFromContext(c)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		response.Unauthorized(c, "unauthorized")
 		return
 	}
 
 	assetID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid asset ID"})
+		response.BadRequest(c, "invalid asset ID")
 		return
 	}
 
 	var req UpdateAssetRequest
 	if bindErr := c.ShouldBindJSON(&req); bindErr != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body: " + bindErr.Error()})
+		response.BadRequest(c, "invalid request body: "+bindErr.Error())
 		return
 	}
 
@@ -302,7 +303,7 @@ func (h *AssetHandler) Update(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, toAssetResponse(output.Asset))
+	response.Success(c, toAssetResponse(output.Asset))
 }
 
 // Delete handles deleting an asset
@@ -314,13 +315,13 @@ func (h *AssetHandler) Update(c *gin.Context) {
 func (h *AssetHandler) Delete(c *gin.Context) {
 	userID, err := getUserIDFromContext(c)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		response.Unauthorized(c, "unauthorized")
 		return
 	}
 
 	assetID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid asset ID"})
+		response.BadRequest(c, "invalid asset ID")
 		return
 	}
 
@@ -347,38 +348,34 @@ func (h *AssetHandler) Delete(c *gin.Context) {
 func (h *AssetHandler) Autofill(c *gin.Context) {
 	_, err := getUserIDFromContext(c)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		response.Unauthorized(c, "unauthorized")
 		return
 	}
 
 	var req AutofillRequest
 	if bindErr := c.ShouldBindJSON(&req); bindErr != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body: " + bindErr.Error()})
+		response.BadRequest(c, "invalid request body: "+bindErr.Error())
 		return
 	}
 
 	assetType := entities.AssetType(req.Type)
 	if !assetType.IsValid() {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid asset type: " + req.Type})
+		response.BadRequest(c, "invalid asset type: "+req.Type)
 		return
 	}
 
 	if h.autofillSvc == nil {
-		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "autofill service not available"})
+		response.Error(c, http.StatusServiceUnavailable, "SERVICE_UNAVAILABLE", "autofill service not available")
 		return
 	}
 
 	extendedData, apiSources, err := h.autofillSvc.Fill(c.Request.Context(), assetType, req.CoreData)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":         "autofill partially failed",
-			"extended_data": extendedData,
-			"api_sources":   apiSources,
-		})
+		response.InternalError(c, "autofill partially failed")
 		return
 	}
 
-	c.JSON(http.StatusOK, AutofillResponse{
+	response.Success(c, AutofillResponse{
 		ExtendedData: extendedData,
 		APISources:   apiSources,
 	})
@@ -392,7 +389,7 @@ func (h *AssetHandler) Autofill(c *gin.Context) {
 // @Router /api/v1/assets/schemas [get]
 func (h *AssetHandler) GetSchemas(c *gin.Context) {
 	schemas := entities.AllFormSchemas()
-	c.JSON(http.StatusOK, gin.H{"schemas": schemas})
+	response.Success(c, gin.H{"schemas": schemas})
 }
 
 // --- Error handling ---
@@ -400,15 +397,15 @@ func (h *AssetHandler) GetSchemas(c *gin.Context) {
 func handleAssetError(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, usecases.ErrInvalidAssetType):
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.BadRequest(c, err.Error())
 	case errors.Is(err, usecases.ErrAssetNotFound):
-		c.JSON(http.StatusNotFound, gin.H{"error": "asset not found"})
+		response.NotFound(c, "asset not found")
 	case errors.Is(err, usecases.ErrUnauthorized):
-		c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
+		response.Forbidden(c, "access denied")
 	case errors.Is(err, usecases.ErrMissingRequiredData):
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.BadRequest(c, err.Error())
 	default:
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		response.InternalError(c, "internal server error")
 	}
 }
 
